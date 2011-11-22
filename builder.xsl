@@ -21,7 +21,7 @@
         <checker>
             <step id="{$START}" type="START">
                 <xsl:attribute name="next">
-                    <xsl:value-of select="check:getNextURLLinks(wadl:resources)" separator=" "/>
+                    <xsl:value-of select="(check:getNextURLLinks(wadl:resources), check:getNextMethodLinks(wadl:resources))" separator=" "/>
                 </xsl:attribute>
             </step>
             <xsl:apply-templates/>
@@ -117,7 +117,7 @@
             else generate-id($r)"/>
     </xsl:function>
     
-    <xsl:function name="check:getNextMethodLinks" as="xsd:string*">
+    <xsl:function name="check:nextMethodLinks" as="xsd:string*">
         <xsl:param name="from" as="node()"/>
         <xsl:for-each-group select="$from/wadl:method" group-by="@name">
             <xsl:choose>
@@ -132,6 +132,16 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:for-each-group>
+        <xsl:if test="$from/wadl:resource[@rax:invisible]">
+            <xsl:for-each select="$from/wadl:resource[@rax:invisible]">
+                <xsl:sequence select="check:nextMethodLinks(.)"/>
+            </xsl:for-each>
+        </xsl:if>
+    </xsl:function>
+    
+    <xsl:function name="check:getNextMethodLinks">
+        <xsl:param name="from" as="node()"/>
+        <xsl:sequence select="check:nextMethodLinks($from)"/>
         <xsl:sequence select="$METHOD_FAIL"/>
     </xsl:function>
 </xsl:stylesheet>

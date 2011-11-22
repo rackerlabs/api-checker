@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checker xmlns:check="http://www.rackspace.com/repose/wadl/checker"
          xmlns="http://www.rackspace.com/repose/wadl/checker">
-   <step id="S0" type="START" next="d1e16 d1e91 d1e257 SE0"/>
+   <step id="S0" type="START" next="d1e16 d1e91 d1e257 SE0 d1e5977 SE1"/>
    <step type="URL" id="d1e16" match="v1\.1" next="d1e91 d1e257 SE0 d1e5977 SE1"/>
    <step type="URL" id="d1e91" match="extensions" next="d1e177 SE0 d1e6119 SE1"/>
    <step type="URL" id="d1e177" match="" next="SE0 d1e6197 SE1"/>
