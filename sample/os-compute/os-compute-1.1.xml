@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checker xmlns:check="http://www.rackspace.com/repose/wadl/checker"
+         xmlns="http://www.rackspace.com/repose/wadl/checker">
+   <step id="S0" type="START" next="d1e16 d1e91 d1e257 SE0"/>
+   <step type="URL" id="d1e16" match="v1\.1" next="d1e91 d1e257 SE0 d1e5977 SE1"/>
+   <step type="URL" id="d1e91" match="extensions" next="d1e177 SE0 d1e6119 SE1"/>
+   <step type="URL" id="d1e177" match="" next="SE0 d1e6197 SE1"/>
+   <step type="URL" id="d1e257" match="" next="d1e261 d1e331 d1e2654 d1e3846 SE0 SE1"/>
+   <step type="URL" id="d1e261" match="limits" next="SE0 d1e6051 SE1"/>
+   <step type="URL" id="d1e331" match="servers"
+         next="d1e538 d1e643 SE0 d1e6727 d1e6625 SE1"/>
+   <step type="URL" id="d1e538" match="detail" next="SE0 d1e6825 SE1"/>
+   <step type="URL" id="d1e643" match=""
+         next="d1e896 d1e1618 d1e1834 SE0 d1e6921 d1e6995 d1e7094 SE1"/>
+   <step type="URL" id="d1e896" match="action" next="SE0 POST_d1e896 SE1"/>
+   <step type="METHOD" id="POST_d1e896" match="POST"
+         next="d1e7172 d1e7263 d1e7354 d1e7459 d1e7564 d1e7669 d1e7775"/>
+   <step type="URL" id="d1e1618" match="ips" next="d1e1724 SE0 d1e7891 SE1"/>
+   <step type="URL" id="d1e1724" match="" next="SE0 d1e7989 SE1"/>
+   <step type="URL" id="d1e1834" match="metadata"
+         next="d1e2300 SE0 d1e8628 d1e8460 d1e8348 SE1"/>
+   <step type="URL" id="d1e2300" match="" next="SE0 d1e8799 d1e8905 d1e9063 SE1"/>
+   <step type="URL" id="d1e2654" match="images" next="d1e2767 d1e2879 SE0 d1e6376 SE1"/>
+   <step type="URL" id="d1e2767" match="detail" next="SE0 d1e6273 SE1"/>
+   <step type="URL" id="d1e2879" match="" next="d1e3026 SE0 d1e6481 d1e6555 SE1"/>
+   <step type="URL" id="d1e3026" match="metadata"
+         next="d1e3492 SE0 d1e8628 d1e8460 d1e8348 SE1"/>
+   <step type="URL" id="d1e3492" match="" next="SE0 d1e8799 d1e8905 d1e9063 SE1"/>
+   <step type="URL" id="d1e3846" match="flavors" next="d1e3947 d1e4047 SE0 d1e8088 SE1"/>
+   <step type="URL" id="d1e3947" match="detail" next="SE0 d1e8181 SE1"/>
+   <step type="URL" id="d1e4047" match="" next="SE0 d1e8273 SE1"/>
+   <step type="URL" id="d1e5499" match="" next="SE0 d1e8799 d1e8905 d1e9063 SE1"/>
+   <step type="METHOD" id="d1e5977" match="GET" label="Version Details"/>
+   <step type="METHOD" id="d1e6051" match="GET" label="List Limits"/>
+   <step type="METHOD" id="d1e6119" match="GET" label="List Extensions"/>
+   <step type="METHOD" id="d1e6197" match="GET" label="Get Extension"/>
+   <step type="METHOD" id="d1e6273" match="GET" label="List Detail Images"/>
+   <step type="METHOD" id="d1e6376" match="GET" label="List Images"/>
+   <step type="METHOD" id="d1e6481" match="GET" label="Get Image Details"/>
+   <step type="METHOD" id="d1e6555" match="DELETE" label="Delete Image"/>
+   <step type="METHOD" id="d1e6625" match="POST" label="Create Server"/>
+   <step type="METHOD" id="d1e6727" match="GET" label="List Servers"/>
+   <step type="METHOD" id="d1e6825" match="GET" label="List Detail Servers"/>
+   <step type="METHOD" id="d1e6921" match="GET" label="Get Server Details"/>
+   <step type="METHOD" id="d1e6995" match="PUT"
+         label="Update Server Name / Administrative Password"/>
+   <step type="METHOD" id="d1e7094" match="DELETE" label="Delete Server"/>
+   <step type="METHOD" id="d1e7172" match="POST" label="Change Password"/>
+   <step type="METHOD" id="d1e7263" match="POST" label="Reboot Server"/>
+   <step type="METHOD" id="d1e7354" match="POST" label="Rebuild Server"/>
+   <step type="METHOD" id="d1e7459" match="POST" label="Resize Server"/>
+   <step type="METHOD" id="d1e7564" match="POST" label="Confirm Resized Server"/>
+   <step type="METHOD" id="d1e7669" match="POST" label="Revert Resized Server"/>
+   <step type="METHOD" id="d1e7775" match="POST" label="Create Image"/>
+   <step type="METHOD" id="d1e7891" match="GET" label="List Addresses"/>
+   <step type="METHOD" id="d1e7989" match="GET" label="List Addresses by Network"/>
+   <step type="METHOD" id="d1e8088" match="GET" label="List Flavors"/>
+   <step type="METHOD" id="d1e8181" match="GET" label="List Detail Flavors"/>
+   <step type="METHOD" id="d1e8273" match="GET" label="Get Flavor Details"/>
+   <step type="METHOD" id="d1e8348" match="GET" label="List Metadata"/>
+   <step type="METHOD" id="d1e8460" match="POST" label="Update Metadata"/>
+   <step type="METHOD" id="d1e8628" match="PUT" label="Create or Replace Metadata"/>
+   <step type="METHOD" id="d1e8799" match="GET" label="Get Metadata Item"/>
+   <step type="METHOD" id="d1e8905" match="PUT" label="Create or Update Metadata Item"/>
+   <step type="METHOD" id="d1e9063" match="DELETE" label="Delete Metadata Item"/>
+   <step id="SE0" type="URL_FAIL"/>
+   <step id="SE1" type="METHOD_FAIL"/>
+   <step id="SA" type="ACCEPT"/>
+</checker>
