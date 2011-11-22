@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<checker xmlns="http://www.rackspace.com/repose/wadl/checker">
+    <step id="3"
+          type="URL"
+          match="v1\.1">
+        <next>
+            <step ref="4"/>
+            <step ref="5"/>
+            <step ref="6"/>
+            <step ref="0"/>
+            <step ref="1"/>
+        </next>
+    </step>
+    <step id="4"
+          type="URL"
+          match="extensions">
+    </step>
+    <step id="5"
+          type="URL"
+          match=".*">
+    </step>
+    <step id="6"
+          type="METHOD"
+          match="GET"/>
+    <step id="0"
+          type="URL_FAIL"/>
+    <step id="1"
+          type="METHOD_FAIL"/>
+    <step id="2"
+          type="ACCEPT"/>
+</checker>
