@@ -6,7 +6,7 @@
     xmlns:check="http://www.rackspace.com/repose/wadl/checker"
     xmlns:rax="http://docs.rackspace.com/api"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
-    exclude-result-prefixes="xsd wadl"
+    exclude-result-prefixes="xsd wadl rax"
     version="2.0">
     
     <xsl:output indent="yes" method="xml"/>
@@ -34,6 +34,7 @@
     <xsl:template match="wadl:resource">
         <xsl:variable name="links" as="xsd:string*">
             <xsl:sequence select="check:getNextURLLinks(.)"/>
+            <xsl:sequence select="check:getNextMethodLinks(.)"/>
         </xsl:variable>
         <step type="URL">
             <xsl:attribute name="id" select="generate-id()"/>
@@ -50,6 +51,28 @@
             <xsl:attribute name="next" select="$links" separator=" "/>
         </step>
         <xsl:apply-templates/>
+    </xsl:template>
+    
+    <xsl:template match="wadl:method">
+        <!-- Only work with source methods, not copies -->
+        <xsl:if test="(not(@rax:id))">
+            <step type="method">
+                <xsl:attribute name="id" select="generate-id()"/>
+                <xsl:attribute name="match" select="check:toRegExEscaped(@name)"/>
+                <xsl:if test="@id or wadl:doc/@title">
+                    <xsl:attribute name="label">
+                        <xsl:choose>
+                            <xsl:when test="wadl:doc/@title">
+                                <xsl:value-of select="normalize-space(wadl:doc/@title)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="normalize-space(@id)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                </xsl:if>
+            </step>
+        </xsl:if>
     </xsl:template>
     
     <xsl:template match="text()"/>
@@ -70,5 +93,14 @@
             if (xsd:boolean($r/@rax:invisible)) then
             (generate-id($r), check:nextURLLinks($r))
             else generate-id($r)"/>
+    </xsl:function>
+    
+    <xsl:function name="check:getNextMethodLinks" as="xsd:string*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:sequence select="for $m in $from/wadl:method return
+                              if ($m/@rax:id) then
+                                generate-id($from/ancestor::*/wadl:method[@id=$m/@rax:id])
+                                else generate-id($m)"/>
+        <xsl:sequence select="$METHOD_FAIL"/>
     </xsl:function>
 </xsl:stylesheet>
