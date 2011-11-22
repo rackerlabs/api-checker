@@ -4,13 +4,7 @@
     <step id="3"
           type="URL"
           match="v1\.1">
-        <next>
-            <step ref="4"/>
-            <step ref="5"/>
-            <step ref="6"/>
-            <step ref="0"/>
-            <step ref="1"/>
-        </next>
+        <next ref="4 5 6 0 1"/>
     </step>
     <step id="4"
           type="URL"
