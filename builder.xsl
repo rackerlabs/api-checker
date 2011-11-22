@@ -51,12 +51,34 @@
             <xsl:attribute name="next" select="$links" separator=" "/>
         </step>
         <xsl:apply-templates/>
+        <xsl:call-template name="check:addMethodSets"/>
     </xsl:template>
+    
+    <xsl:template name="check:addMethodSets">
+        <xsl:variable name="from" select="." as="node()"/>
+        <xsl:variable name="baseId" select="generate-id()"/>
+        <xsl:for-each-group select="wadl:method" group-by="@name">
+            <xsl:if test="count(current-group()) &gt; 1">
+                <step type="METHOD" id="{current-grouping-key()}_{$baseId}"
+                     match="{current-grouping-key()}">
+                    <xsl:attribute name="next">
+                        <xsl:value-of separator=" ">
+                            <xsl:sequence select="for $m in current-group() return
+                                                   if ($m/@rax:id) then
+                                                     generate-id($from/ancestor::*/wadl:method[@id=$m/@rax:id])
+                                                     else generate-id($m)"></xsl:sequence>
+                        </xsl:value-of>
+                    </xsl:attribute>
+                </step>
+            </xsl:if>
+        </xsl:for-each-group>
+    </xsl:template>
+    
     
     <xsl:template match="wadl:method">
         <!-- Only work with source methods, not copies -->
         <xsl:if test="(not(@rax:id))">
-            <step type="method">
+            <step type="METHOD">
                 <xsl:attribute name="id" select="generate-id()"/>
                 <xsl:attribute name="match" select="check:toRegExEscaped(@name)"/>
                 <xsl:if test="@id or wadl:doc/@title">
@@ -75,7 +97,7 @@
         </xsl:if>
     </xsl:template>
     
-    <xsl:template match="text()"/>
+    <xsl:template match="text()" mode="#all"/>
     
     <xsl:function name="check:toRegExEscaped" as="xsd:string">
         <xsl:param name="in" as="xsd:string"/>
@@ -97,10 +119,19 @@
     
     <xsl:function name="check:getNextMethodLinks" as="xsd:string*">
         <xsl:param name="from" as="node()"/>
-        <xsl:sequence select="for $m in $from/wadl:method return
-                              if ($m/@rax:id) then
-                                generate-id($from/ancestor::*/wadl:method[@id=$m/@rax:id])
-                                else generate-id($m)"/>
+        <xsl:for-each-group select="$from/wadl:method" group-by="@name">
+            <xsl:choose>
+                <xsl:when test="count(current-group()) &gt; 1">
+                    <xsl:sequence select="concat(current-grouping-key(),'_',generate-id($from))"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:sequence select="for $m in current-group() return
+                                          if ($m/@rax:id) then
+                                           generate-id($from/ancestor::*/wadl:method[@id=$m/@rax:id])
+                                          else generate-id($m)"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:for-each-group>
         <xsl:sequence select="$METHOD_FAIL"/>
     </xsl:function>
 </xsl:stylesheet>
