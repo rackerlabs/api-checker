@@ -60,7 +60,7 @@
         <xsl:for-each-group select="wadl:method" group-by="@name">
             <xsl:if test="count(current-group()) &gt; 1">
                 <step type="METHOD" id="{current-grouping-key()}_{$baseId}"
-                     match="{current-grouping-key()}">
+                     match="{current-grouping-key()}" label="ε">
                     <xsl:attribute name="next">
                         <xsl:value-of separator=" ">
                             <xsl:sequence select="for $m in current-group() return
