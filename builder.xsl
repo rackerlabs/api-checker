@@ -76,7 +76,6 @@
               Template parameter <xsl:value-of select="@path"/> missing wadl:param element!
           </xsl:message>
         </xsl:if>
-        <xsl:message select="concat(@path,'&#x0a;')"/>
         <xsl:value-of select="check:getMatch(resolve-QName($param/@type,$param))"/>
     </xsl:template>
     <xsl:template name="check:addMethodSets">
