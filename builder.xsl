@@ -99,10 +99,15 @@
         </xsl:for-each-group>
     </xsl:template>
     
-    
     <xsl:template match="wadl:method">
-        <!-- Only work with source methods, not copies -->
-        <xsl:if test="(not(@rax:id))">
+        <!--
+            Only work with source methods, not copies if possible.  
+            If the source isn't available then use the first copy
+            as the source.
+        -->
+        <xsl:variable name="raxid" select="@rax:id"/>
+        <xsl:if test="(not($raxid) or 
+                      (not(//wadl:method[@id=$raxid]) and (generate-id((//wadl:method[@rax:id = $raxid])[1]) = generate-id())))">
             <step type="METHOD">
                 <xsl:attribute name="id" select="generate-id()"/>
                 <xsl:attribute name="match" select="check:toRegExEscaped(@name)"/>
@@ -152,7 +157,9 @@
                 <xsl:otherwise>
                     <xsl:sequence select="for $m in current-group() return
                                           if ($m/@rax:id) then
-                                           generate-id($from/ancestor::*/wadl:method[@id=$m/@rax:id])
+                                            if ($from/ancestor::*/wadl:method[@id=$m/@rax:id]) then
+                                                generate-id($from/ancestor::*/wadl:method[@id=$m/@rax:id])
+                                            else generate-id(($from/ancestor::*//wadl:method[@rax:id = $m/@rax:id])[1])
                                           else generate-id($m)"/>
                 </xsl:otherwise>
             </xsl:choose>
