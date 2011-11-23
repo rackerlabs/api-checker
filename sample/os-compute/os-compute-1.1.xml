@@ -13,7 +13,7 @@
    <step type="URL" id="d1e643" match=""
          next="d1e896 d1e1618 d1e1834 SE0 d1e6921 d1e6995 d1e7094 SE1"/>
    <step type="URL" id="d1e896" match="action" next="SE0 POST_d1e896 SE1"/>
-   <step type="METHOD" id="POST_d1e896" match="POST"
+   <step type="METHOD" id="POST_d1e896" match="POST" label="ε"
          next="d1e7172 d1e7263 d1e7354 d1e7459 d1e7564 d1e7669 d1e7775"/>
    <step type="URL" id="d1e1618" match="ips" next="d1e1724 SE0 d1e7891 SE1"/>
    <step type="URL" id="d1e1724" match="" next="SE0 d1e7989 SE1"/>
