@@ -10,6 +10,7 @@
    <xsl:param name="nfaMode" select="true()" as="xsd:boolean"/>
    <xsl:variable name="source_types" select="('START')" as="xsd:string*"/>
    <xsl:variable name="sink_types" select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')" as="xsd:string*"/>
+   <xsl:variable name="real_start" select="'REAL_START'" as="xsd:string"/>
    <xsl:variable name="indent" select='"           "'/>
    <xsl:template match="check:checker">
        <xsl:text>digraph Checker { rankdir=LR; fontname="Helvetica"; labelloc=b;
@@ -26,13 +27,31 @@
                </xsl:text>
            </xsl:otherwise>
        </xsl:choose>
-       <xsl:text>
+       <xsl:choose>
+           <xsl:when test="$nfaMode">
+               <xsl:text>
+           {
+           rank=source&#x0a;</xsl:text>
+           <xsl:value-of select="concat($indent,$real_start,'&#x0a;')"/>
+           <xsl:text>}
+               {
+               rank=same&#x0a;</xsl:text><xsl:apply-templates mode="source"/>
+               <xsl:value-of select="$indent"/>
+               <xsl:text>}&#x0a;</xsl:text>
+           </xsl:when>
+           <xsl:otherwise>
+               <xsl:text>
            {
            rank=source&#x0a;</xsl:text><xsl:apply-templates mode="source"/>
-       <xsl:value-of select="$indent"/>
-       <xsl:text>}&#x0a;</xsl:text>
+               <xsl:value-of select="$indent"/>
+               <xsl:text>}&#x0a;</xsl:text>
+           </xsl:otherwise>
+       </xsl:choose>
        <xsl:value-of select="$indent"/>
        <xsl:text>{&#x0a;</xsl:text>
+       <xsl:if test="$nfaMode">
+           <xsl:apply-templates mode="nfa_connections"/>
+       </xsl:if>
        <xsl:apply-templates mode="connections"/>
        <xsl:value-of select="$indent"/>
        <xsl:text>}&#x0a;</xsl:text>
@@ -42,7 +61,9 @@
            rank=sink&#x0a;</xsl:text><xsl:apply-templates mode="sink"/>
           <xsl:value-of select="concat($indent,'}')"/>
        </xsl:if>
-       <xsl:text>&#x0a;//Nodes&#x0a;</xsl:text>
+       <xsl:text>&#x0a;//Nodes&#x0a;
+       </xsl:text>
+       <xsl:value-of select="concat($real_start,'[style=invis]&#x0a;')"/>
        <xsl:apply-templates/>
        <xsl:text>}</xsl:text>
    </xsl:template>
@@ -52,6 +73,9 @@
    </xsl:template>
    <xsl:template match="check:step[count(index-of($sink_types,@type)) != 0]" mode="sink">
        <xsl:value-of select="concat($indent,@id,'&#x0a;')"/>
+   </xsl:template>
+   <xsl:template match="check:step[$source_types = @type]" mode="nfa_connections">
+       <xsl:value-of select="concat($indent,$real_start,'-&gt;',@id,'&#x0a;')"/>
    </xsl:template>
    <xsl:template match="check:step" mode="connections">
        <xsl:variable name="step" select="."/>
@@ -120,7 +144,14 @@
         <xsl:value-of select="'&quot;'"/>
         <xsl:choose>
             <xsl:when test="(count(index-of($source_types,@type)) != 0)">
-                <xsl:text>, shape=none, fillcolor="white"</xsl:text>
+                <xsl:choose>
+                    <xsl:when test="$nfaMode">
+                        <xsl:text>, fillcolor="white"</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>, shape=none, fillcolor="white"</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
             <xsl:when test="@type = 'ACCEPT'">
                 <xsl:text>, shape=doublecircle, fillcolor="white"</xsl:text>
