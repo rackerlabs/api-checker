@@ -38,7 +38,7 @@
         <xsl:param name="checker" as="node()"/>
         <xsl:param name="dups" as="node()"/>
         <xsl:variable name="excludes" as="xsd:string*">
-            <xsl:sequence select="tokenize($dups/check:group/@exclude,' ')"/>
+            <xsl:sequence select="tokenize(string-join($dups/check:group/@exclude,' '),' ')"/>
         </xsl:variable>
         <checker>
             <xsl:apply-templates select="$checker" mode="unDup">
