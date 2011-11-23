@@ -7,6 +7,7 @@
      
    <xsl:output method="text"/>
    <xsl:param name="ignoreSinks" select="false()" as="xsd:boolean"/>
+   <xsl:param name="nfaMode" select="false()" as="xsd:boolean"/>
    <xsl:variable name="source_types" select="('START')" as="xsd:string*"/>
    <xsl:variable name="sink_types" select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')" as="xsd:string*"/>
    <xsl:variable name="indent" select='"           "'/>
@@ -77,7 +78,10 @@
         </xsl:choose>
         <xsl:value-of select="'&quot;'"/>
         <xsl:choose>
-            <xsl:when test="(count(index-of($source_types,@type)) != 0) or @type = 'ACCEPT'">
+            <xsl:when test="(count(index-of($source_types,@type)) != 0)">
+                <xsl:text>, shape=none, fillcolor="white"</xsl:text>
+            </xsl:when>
+            <xsl:when test="@type = 'ACCEPT'">
                 <xsl:text>, shape=doublecircle, fillcolor="white"</xsl:text>
             </xsl:when>
             <xsl:when test="count(index-of($sink_types,@type)) != 0">
