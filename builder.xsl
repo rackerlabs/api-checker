@@ -17,6 +17,9 @@
     <xsl:variable name="METHOD_FAIL" select="'SE1'"/>
     <xsl:variable name="ACCEPT"      select="'SA'"/>
     
+    <!-- Useful namespaces -->
+    <xsl:variable name="schemaNS" select="'http://www.w3.org/2001/XMLSchema'"/>
+    
     <xsl:template match="wadl:application">
         <checker>
             <step id="{$START}" type="START">
@@ -36,12 +39,13 @@
             <xsl:sequence select="check:getNextURLLinks(.)"/>
             <xsl:sequence select="check:getNextMethodLinks(.)"/>
         </xsl:variable>
+        <xsl:variable name="templatePath" select="starts-with(@path,'{')" as="xsd:boolean"/>
         <step type="URL">
             <xsl:attribute name="id" select="generate-id()"/>
             <xsl:attribute name="match">
                 <xsl:choose>
-                    <xsl:when test="starts-with(@path,'{')">
-                        <!-- Handle Templates -->
+                    <xsl:when test="$templatePath">
+                        <xsl:call-template name="check:getTemplateMatch"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="check:toRegExEscaped(@path)"/>
@@ -49,11 +53,32 @@
                 </xsl:choose>
             </xsl:attribute>
             <xsl:attribute name="next" select="$links" separator=" "/>
+            <xsl:if test="$templatePath">
+                <xsl:attribute name="label">
+                    <xsl:value-of select="check:paramForTemplatePath(.)/@name"/>
+                </xsl:attribute>
+            </xsl:if>
         </step>
         <xsl:apply-templates/>
         <xsl:call-template name="check:addMethodSets"/>
     </xsl:template>
-    
+    <xsl:function name="check:paramForTemplatePath" as="node()">
+        <xsl:param name="path" as="node()"/>
+        <xsl:variable name="paramName" select="replace($path/@path,'(\{|\})','')"
+            as="xsd:string"/>
+        <xsl:copy-of select="$path/wadl:param[@style='template' and @name=$paramName]"></xsl:copy-of>
+    </xsl:function>
+    <xsl:template name="check:getTemplateMatch">
+        <xsl:variable name="param" select="check:paramForTemplatePath(.)"/>
+        <xsl:variable name="paramName" select="$param/@name" as="xsd:string"/>
+        <xsl:if test="not($param)">
+          <xsl:message terminate="yes">
+              Template parameter <xsl:value-of select="@path"/> missing wadl:param element!
+          </xsl:message>
+        </xsl:if>
+        <xsl:message select="concat(@path,'&#x0a;')"/>
+        <xsl:value-of select="check:getMatch(resolve-QName($param/@type,$param))"/>
+    </xsl:template>
     <xsl:template name="check:addMethodSets">
         <xsl:variable name="from" select="." as="node()"/>
         <xsl:variable name="baseId" select="generate-id()"/>
@@ -143,5 +168,31 @@
         <xsl:param name="from" as="node()"/>
         <xsl:sequence select="check:nextMethodLinks($from)"/>
         <xsl:sequence select="$METHOD_FAIL"/>
+    </xsl:function>
+    
+    <xsl:function name="check:getMatch" as="xsd:string">
+        <xsl:param name="type" as="xsd:QName"/>
+        <xsl:choose>
+            <xsl:when test="namespace-uri-from-QName($type) = $schemaNS">
+                <xsl:value-of select="check:getMatchForPlainXSDType($type)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$type"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+    
+    <xsl:function name="check:getMatchForPlainXSDType" as="xsd:string">
+        <xsl:param name="type" as="xsd:QName"/>
+        <xsl:variable name="name" as="xsd:string"
+            select="local-name-from-QName($type)"/>
+        <xsl:choose>
+            <xsl:when test="$name = 'string'">
+                <xsl:value-of select="'.*'"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$type"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 </xsl:stylesheet>
