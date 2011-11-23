@@ -7,13 +7,26 @@
      
    <xsl:output method="text"/>
    <xsl:param name="ignoreSinks" select="false()" as="xsd:boolean"/>
-   <xsl:param name="nfaMode" select="false()" as="xsd:boolean"/>
+   <xsl:param name="nfaMode" select="true()" as="xsd:boolean"/>
    <xsl:variable name="source_types" select="('START')" as="xsd:string*"/>
    <xsl:variable name="sink_types" select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')" as="xsd:string*"/>
    <xsl:variable name="indent" select='"           "'/>
    <xsl:template match="check:checker">
        <xsl:text>digraph Checker { rankdir=LR; fontname="Helvetica"; labelloc=b;
-           node [fontname="Helvetica", shape=rect, style=filled,fillcolor="#EEEEEE"]
+       </xsl:text>
+       <xsl:choose>
+           <xsl:when test="$nfaMode">
+               <xsl:text>
+                    node [fontname="Helvetica", shape=ellipse, style=filled,fillcolor="#EEEEEE"]
+               </xsl:text>
+           </xsl:when>
+           <xsl:otherwise>
+               <xsl:text>
+                    node [fontname="Helvetica", shape=rect, style=filled,fillcolor="#EEEEEE"]
+               </xsl:text>
+           </xsl:otherwise>
+       </xsl:choose>
+       <xsl:text>
            {
            rank=source&#x0a;</xsl:text><xsl:apply-templates mode="source"/>
        <xsl:value-of select="$indent"/>
@@ -45,14 +58,39 @@
        <xsl:choose>
            <xsl:when test="$ignoreSinks and count(index-of($sink_types,@type)) != 0"/>
            <xsl:otherwise>
+               <xsl:variable name="label" select="@label"/>
                <xsl:variable name="id" select="@id"/>
                <xsl:variable name="nexts" select="tokenize(normalize-space(@next),' ')" as="xsd:string*"/>
                <xsl:for-each select="$nexts">
                    <xsl:variable name="next" select="." as="xsd:string"/>
+                   <xsl:variable name="nextStep" select="$step/../check:step[@id = $next]" as="node()"/>
                    <xsl:choose>
-                       <xsl:when test="$ignoreSinks and count(index-of($sink_types,$step/../check:step[@id=$next]/@type)) != 0"/>
+                       <xsl:when test="$ignoreSinks and count(index-of($sink_types,$nextStep/@type)) != 0"/>
                        <xsl:otherwise>
-                           <xsl:value-of select="concat($indent,$id,'-&gt;',.,'&#x0a;')"></xsl:value-of>
+                           <xsl:value-of select="concat($indent,$id,'-&gt;',.)"/>
+                           <xsl:choose>
+                               <xsl:when test="$nfaMode">
+                                   <xsl:text> [label=&quot;</xsl:text>
+                                   <xsl:choose>
+                                       <xsl:when test="$label = 'ε'">
+                                           <xsl:value-of select="$label"/>
+                                       </xsl:when>
+                                       <xsl:otherwise>
+                                           <xsl:value-of select="if (contains($nextStep/@type,'FAIL')) then $nextStep/@type 
+                                                                 else substring($nextStep/@type,1,1)"/>
+                                           <xsl:if test="$nextStep/@match">
+                                             <xsl:text> (</xsl:text>
+                                             <xsl:value-of select="check:escapeRegex($nextStep/@match)"/>
+                                             <xsl:text>)</xsl:text>
+                                           </xsl:if>
+                                       </xsl:otherwise>
+                                   </xsl:choose>
+                                   <xsl:text>&quot;];&#x0a;</xsl:text>
+                               </xsl:when>
+                               <xsl:otherwise>
+                                   <xsl:text>&#x0a;</xsl:text>
+                               </xsl:otherwise>
+                           </xsl:choose>
                        </xsl:otherwise>
                    </xsl:choose>
                </xsl:for-each>
@@ -66,15 +104,18 @@
               <xsl:value-of select="concat(@id,'[')"/>
               <xsl:value-of select="'label=&quot;'"/>
               <xsl:choose>
+                  <xsl:when test="$nfaMode">
+                      <xsl:value-of select="@id"/>
+                  </xsl:when>
                   <xsl:when test="@label">
-                <xsl:value-of select="concat(check:escapeRegex(@match),' \n(',@label,')')"/>
-            </xsl:when>
-            <xsl:when test="@match">
-                <xsl:value-of select="check:escapeRegex(@match)"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="@type"/>
-            </xsl:otherwise>
+                     <xsl:value-of select="concat(check:escapeRegex(@match),' \n(',@label,')')"/>
+                  </xsl:when>
+                  <xsl:when test="@match">
+                     <xsl:value-of select="check:escapeRegex(@match)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                     <xsl:value-of select="@type"/>
+                  </xsl:otherwise>
         </xsl:choose>
         <xsl:value-of select="'&quot;'"/>
         <xsl:choose>
