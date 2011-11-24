@@ -6,10 +6,10 @@
     version="2.0">
      
    <xsl:output method="text"/>
-   <xsl:param name="ignoreSinks" select="false()" as="xsd:boolean"/>
+   <xsl:param name="ignoreSinks" select="true()" as="xsd:boolean"/>
    <xsl:param name="nfaMode" select="true()" as="xsd:boolean"/>
    <xsl:variable name="source_types" select="('START')" as="xsd:string*"/>
-   <xsl:variable name="sink_types" select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')" as="xsd:string*"/>
+   <xsl:variable name="sink_types" select="('URL_FAIL', 'METHOD_FAIL')" as="xsd:string*"/>
    <xsl:variable name="real_start" select="'REAL_START'" as="xsd:string"/>
    <xsl:variable name="indent" select='"           "'/>
    <xsl:template match="check:checker">
@@ -53,12 +53,13 @@
            <xsl:apply-templates mode="nfa_connections"/>
        </xsl:if>
        <xsl:apply-templates mode="connections"/>
+       <xsl:apply-templates mode="connect_accept"/>
        <xsl:value-of select="$indent"/>
        <xsl:text>}&#x0a;</xsl:text>
        <xsl:if test="not($ignoreSinks)">
           <xsl:text>
            {
-           rank=sink&#x0a;</xsl:text><xsl:apply-templates mode="sink"/>
+            &#x0a;</xsl:text><xsl:apply-templates mode="sink"/>
           <xsl:value-of select="concat($indent,'}')"/>
        </xsl:if>
        <xsl:text>&#x0a;//Nodes&#x0a;
@@ -76,6 +77,15 @@
    </xsl:template>
    <xsl:template match="check:step[$source_types = @type]" mode="nfa_connections">
        <xsl:value-of select="concat($indent,$real_start,'-&gt;',@id,'&#x0a;')"/>
+   </xsl:template>
+   <xsl:template match="check:step[@type = 'METHOD']" mode="connect_accept">
+       <xsl:if test="@label != 'ε'">
+           <xsl:value-of select="concat($indent,@id,'-&gt;SA ')"/>
+           <xsl:if test="$nfaMode">
+               <xsl:text>[label=&quot;ε&quot;]</xsl:text>
+           </xsl:if>
+           <xsl:text>&#x0a;</xsl:text>
+       </xsl:if>
    </xsl:template>
    <xsl:template match="check:step" mode="connections">
        <xsl:variable name="step" select="."/>
@@ -100,13 +110,17 @@
                                            <xsl:value-of select="$label"/>
                                        </xsl:when>
                                        <xsl:otherwise>
-                                           <xsl:value-of select="if (contains($nextStep/@type,'FAIL')) then $nextStep/@type 
-                                                                 else substring($nextStep/@type,1,1)"/>
-                                           <xsl:if test="$nextStep/@match">
-                                             <xsl:text> (</xsl:text>
-                                             <xsl:value-of select="check:escapeRegex($nextStep/@match)"/>
-                                             <xsl:text>)</xsl:text>
-                                           </xsl:if>
+                                           <xsl:value-of select="substring($nextStep/@type,1,1)"/>
+                                           <xsl:choose>
+                                               <xsl:when test="$nextStep/@match">
+                                                 <xsl:text> (</xsl:text>
+                                                 <xsl:value-of select="check:escapeRegex($nextStep/@match)"/>
+                                                 <xsl:text>)</xsl:text>
+                                               </xsl:when>
+                                               <xsl:otherwise>
+                                                   <xsl:text> (.*)</xsl:text>
+                                               </xsl:otherwise>
+                                           </xsl:choose>
                                        </xsl:otherwise>
                                    </xsl:choose>
                                    <xsl:text>&quot;];&#x0a;</xsl:text>
