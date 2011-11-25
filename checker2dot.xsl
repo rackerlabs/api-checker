@@ -191,28 +191,21 @@
        <xsl:param name="step" as="node()"/>
        <xsl:param name="nextStep" as="node()"/>
        <xsl:param name="nexts" as="xsd:string*"/>
-       <xsl:choose>
-           <xsl:when test="$nextStep/@type != 'METHOD_FAIL'">
-               <xsl:text>(.*)</xsl:text>
-           </xsl:when>
-           <xsl:otherwise>
-               <xsl:variable name="matches" as="xsd:string*" 
-                             select="distinct-values(for $n in $nexts 
-                                                     return $step/../check:step[@id=$n and @type='METHOD']/@match)"/>
-               <xsl:choose>
-                   <xsl:when test="count($matches) != 0">
-                       <xsl:value-of>
-                        <xsl:text>(!~(</xsl:text>
-                        <xsl:value-of select="$matches" separator=" | "/>
-                        <xsl:text>))</xsl:text>
-                       </xsl:value-of>
-                   </xsl:when>
-                   <xsl:otherwise>
-                       <xsl:text>(.*)</xsl:text>
-                   </xsl:otherwise>
-               </xsl:choose>
-           </xsl:otherwise>
-       </xsl:choose>
+          <xsl:variable name="matches" as="xsd:string*" 
+                        select="distinct-values(for $n in $nexts 
+                                                return $step/../check:step[@id=$n and @type=substring-before($nextStep/@type,'_')]/@match)"/>
+          <xsl:choose>
+              <xsl:when test="count($matches) != 0">
+                  <xsl:value-of>
+                   <xsl:text>(!~(</xsl:text>
+                   <xsl:value-of select="$matches" separator=" | "/>
+                   <xsl:text>))</xsl:text>
+                  </xsl:value-of>
+              </xsl:when>
+              <xsl:otherwise>
+                  <xsl:text>(.*)</xsl:text>
+              </xsl:otherwise>
+          </xsl:choose>
    </xsl:function>
    <xsl:function name="check:escapeRegex" as="xsd:string">
       <xsl:param name="in" as="xsd:string"/>
