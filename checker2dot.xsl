@@ -134,8 +134,8 @@
                </xsl:for-each>
                <!-- Add Bad URL connections --> 
                <xsl:if test="$nfaMode and $step/@type = 'URL_FAIL'">
-                   <xsl:value-of select="concat($indent,$id,'-&gt;',$id,' [label=&quot;U(.*)&quot;]&#x0a;')"/>
-                   <xsl:value-of select="concat($indent,$id,'-&gt;',$id,' [label=&quot;M(.*)&quot;]&#x0a;')"/>
+                   <xsl:value-of select="concat($indent,$id,'-&gt;',$id,' [label=&quot;U(.*)&quot;, tailport=n, headport=ne]&#x0a;')"/>
+                   <xsl:value-of select="concat($indent,$id,'-&gt;',$id,' [label=&quot;M(.*)&quot;, tailport=s, headport=sw]&#x0a;')"/>
                </xsl:if>
            </xsl:otherwise>
        </xsl:choose>
