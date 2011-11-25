@@ -1,46 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checker xmlns:check="http://www.rackspace.com/repose/wadl/checker"
          xmlns="http://www.rackspace.com/repose/wadl/checker">
-   <step id="S0" type="START" next="d1e16 d1e91 d1e257 SE0 d1e5977 SE1"/>
-   <step type="URL" id="d1e16" match="v1\.1" next="d1e91 d1e257 SE0 d1e5977 SE1"/>
-   <step type="URL" id="d1e91" match="extensions" next="d1e177 SE0 d1e6119 SE1"/>
-   <step type="URL" id="d1e177" match=".*" next="SE0 d1e6197 SE1" label="alias"/>
-   <step type="URL" id="d1e257" match=".*" next="d1e261 d1e331 d1e2654 d1e3846 SE0 SE1"
-         label="tenantId"/>
-   <step type="URL" id="d1e261" match="limits" next="SE0 d1e6051 SE1"/>
+   <step id="S0" type="START" next="d1e16 d1e91 d1e257 d1e5977 SE1"/>
+   <step type="URL" id="d1e16" match="v1\.1" next="d1e91 d1e257 d1e5977 SE1"/>
+   <step type="URL" id="d1e91" match="extensions" next="d1e177 d1e6119 SE1"/>
+   <step type="URL" id="d1e177" match=".*" label="alias" next="d1e6197 SE1 SE0"/>
+   <step type="URL" id="d1e257" match=".*" label="tenantId"
+         next="d1e261 d1e331 d1e2654 d1e3846 SE1 SE0"/>
+   <step type="URL" id="d1e261" match="limits" next="d1e6051 SE1 SE0"/>
    <step type="URL" id="d1e331" match="servers"
-         next="d1e538 d1e643 SE0 d1e6727 d1e6625 SE1"/>
-   <step type="URL" id="d1e538" match="detail" next="SE0 d1e6825 SE1"/>
-   <step type="URL" id="d1e643" match="osapi:UUID"
-         next="d1e896 d1e1618 d1e1834 SE0 d1e6921 d1e6995 d1e7094 SE1"
-         label="serverId"/>
-   <step type="URL" id="d1e896" match="action" next="SE0 POST_d1e896 SE1"/>
+         next="d1e538 d1e643 d1e6727 d1e6625 SE1 SE0"/>
+   <step type="URL" id="d1e538" match="detail" next="d1e6825 SE1 SE0"/>
+   <step type="URL" id="d1e643" match="osapi:UUID" label="serverId"
+         next="d1e896 d1e1618 d1e1834 d1e6921 d1e6995 d1e7094 SE1 SE0"/>
+   <step type="URL" id="d1e896" match="action" next="POST_d1e896 SE1 SE0"/>
    <step type="METHOD" id="POST_d1e896" match="POST" label="ε"
          next="d1e7172 d1e7263 d1e7354 d1e7459 d1e7564 d1e7669 d1e7775"/>
-   <step type="URL" id="d1e1618" match="ips" next="d1e1724 SE0 d1e7891 SE1"/>
-   <step type="URL" id="d1e1724" match=".*" next="SE0 d1e7989 SE1" label="networkId"/>
+   <step type="URL" id="d1e1618" match="ips" next="d1e1724 d1e7891 SE1"/>
+   <step type="URL" id="d1e1724" match=".*" label="networkId" next="d1e7989 SE1 SE0"/>
    <step type="URL" id="d1e1834" match="metadata"
-         next="d1e2300 SE0 d1e8628 d1e8460 d1e8348 SE1"/>
-   <step type="URL" id="d1e2300" match="osapi:MetadataKey"
-         next="SE0 d1e8799 d1e8905 d1e9063 SE1"
-         label="key"/>
-   <step type="URL" id="d1e2654" match="images" next="d1e2767 d1e2879 SE0 d1e6376 SE1"/>
-   <step type="URL" id="d1e2767" match="detail" next="SE0 d1e6273 SE1"/>
-   <step type="URL" id="d1e2879" match="osapi:UUID"
-         next="d1e3026 SE0 d1e6481 d1e6555 SE1"
-         label="imageId"/>
+         next="d1e2300 d1e8628 d1e8460 d1e8348 SE1 SE0"/>
+   <step type="URL" id="d1e2300" match="osapi:MetadataKey" label="key"
+         next="d1e8799 d1e8905 d1e9063 SE1 SE0"/>
+   <step type="URL" id="d1e2654" match="images" next="d1e2767 d1e2879 d1e6376 SE1 SE0"/>
+   <step type="URL" id="d1e2767" match="detail" next="d1e6273 SE1 SE0"/>
+   <step type="URL" id="d1e2879" match="osapi:UUID" label="imageId"
+         next="d1e3026 d1e6481 d1e6555 SE1 SE0"/>
    <step type="URL" id="d1e3026" match="metadata"
-         next="d1e3492 SE0 d1e8628 d1e8460 d1e8348 SE1"/>
-   <step type="URL" id="d1e3492" match="osapi:MetadataKey"
-         next="SE0 d1e8799 d1e8905 d1e9063 SE1"
-         label="key"/>
-   <step type="URL" id="d1e3846" match="flavors" next="d1e3947 d1e4047 SE0 d1e8088 SE1"/>
-   <step type="URL" id="d1e3947" match="detail" next="SE0 d1e8181 SE1"/>
-   <step type="URL" id="d1e4047" match="osapi:UUID" next="SE0 d1e8273 SE1"
-         label="flavorId"/>
-   <step type="URL" id="d1e5499" match="osapi:MetadataKey"
-         next="SE0 d1e8799 d1e8905 d1e9063 SE1"
-         label="key"/>
+         next="d1e3492 d1e8628 d1e8460 d1e8348 SE1 SE0"/>
+   <step type="URL" id="d1e3492" match="osapi:MetadataKey" label="key"
+         next="d1e8799 d1e8905 d1e9063 SE1 SE0"/>
+   <step type="URL" id="d1e3846" match="flavors" next="d1e3947 d1e4047 d1e8088 SE1 SE0"/>
+   <step type="URL" id="d1e3947" match="detail" next="d1e8181 SE1 SE0"/>
+   <step type="URL" id="d1e4047" match="osapi:UUID" label="flavorId"
+         next="d1e8273 SE1 SE0"/>
+   <step type="URL" id="d1e5499" match="osapi:MetadataKey" label="key"
+         next="d1e8799 d1e8905 d1e9063 SE1 SE0"/>
    <step type="METHOD" id="d1e5977" match="GET" label="Version Details"/>
    <step type="METHOD" id="d1e6051" match="GET" label="List Limits"/>
    <step type="METHOD" id="d1e6119" match="GET" label="List Extensions"/>
