@@ -20,20 +20,64 @@
     <!-- Useful namespaces -->
     <xsl:variable name="schemaNS" select="'http://www.w3.org/2001/XMLSchema'"/>
     
+    <!-- Useful matches -->
+    <xsl:variable name="matchAll" select="'.*'"/>
+    
     <xsl:template match="wadl:application">
+        <!--
+            The first pass processes the WADL
+            and connects all of the states.
+         -->
+        <xsl:variable name="pass1">
+            <checker>
+                <step id="{$START}" type="START">
+                    <xsl:attribute name="next">
+                        <xsl:value-of select="(check:getNextURLLinks(wadl:resources), check:getNextMethodLinks(wadl:resources))" separator=" "/>
+                    </xsl:attribute>
+                </step>
+                <xsl:apply-templates/>
+                <step id="{$URL_FAIL}"    type="URL_FAIL"/>
+                <step id="{$METHOD_FAIL}" type="METHOD_FAIL"/>
+                <step id="{$ACCEPT}" type="ACCEPT"/>
+            </checker>
+        </xsl:variable>
+        <!--
+            In the second pass, we connect the error
+            states in the machine.
+        -->
         <checker>
-            <step id="{$START}" type="START">
-                <xsl:attribute name="next">
-                    <xsl:value-of select="(check:getNextURLLinks(wadl:resources), check:getNextMethodLinks(wadl:resources))" separator=" "/>
-                </xsl:attribute>
-            </step>
-            <xsl:apply-templates/>
-            <step id="{$URL_FAIL}"    type="URL_FAIL"/>
-            <step id="{$METHOD_FAIL}" type="METHOD_FAIL"/>
-            <step id="{$ACCEPT}" type="ACCEPT"/>
+            <xsl:apply-templates select="$pass1" mode="addErrorStates"/>
         </checker>
     </xsl:template>
-        
+    
+    <xsl:template match="check:step" mode="addErrorStates">
+        <xsl:choose>
+            <xsl:when test="@type=('URL','START')">
+                <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
+                <xsl:variable name="doConnect" as="xsd:boolean" 
+                    select="not((for $n in $nexts return 
+                              if (..//check:step[@id = $n and @match=$matchAll])
+                              then false() else true()) = false())"/>
+                <xsl:variable name="newNexts" as="xsd:string*">
+                    <xsl:sequence select="$nexts"/>
+                    <xsl:sequence select="$METHOD_FAIL"/>
+                    <xsl:if test="$doConnect">
+                        <xsl:sequence select="($URL_FAIL)"/>
+                    </xsl:if>
+                </xsl:variable>
+                <step>
+                    <xsl:copy-of select="@*[name() != 'next']"/>
+                    <xsl:attribute name="next">
+                        <xsl:value-of select="$newNexts" separator=" "/>
+                    </xsl:attribute>
+                </step>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
     <xsl:template match="wadl:resource">
         <xsl:variable name="links" as="xsd:string*">
             <xsl:sequence select="check:getNextURLLinks(.)"/>
@@ -135,18 +179,13 @@
         
     <xsl:function name="check:getNextURLLinks" as="xsd:string*">
         <xsl:param name="from" as="node()"/>
-        <xsl:sequence select="(check:nextURLLinks($from), $URL_FAIL)"/>
-    </xsl:function>
-    
-    <xsl:function name="check:nextURLLinks" as="xsd:string*">
-        <xsl:param name="from" as="node()"/>
         <xsl:sequence select="for $r in $from/wadl:resource return 
             if (xsd:boolean($r/@rax:invisible)) then
-            (generate-id($r), check:nextURLLinks($r))
+            (generate-id($r), check:getNextURLLinks($r))
             else generate-id($r)"/>
     </xsl:function>
     
-    <xsl:function name="check:nextMethodLinks" as="xsd:string*">
+    <xsl:function name="check:getNextMethodLinks" as="xsd:string*">
         <xsl:param name="from" as="node()"/>
         <xsl:for-each-group select="$from/wadl:method" group-by="@name">
             <xsl:choose>
@@ -165,15 +204,9 @@
         </xsl:for-each-group>
         <xsl:if test="$from/wadl:resource[@rax:invisible]">
             <xsl:for-each select="$from/wadl:resource[@rax:invisible]">
-                <xsl:sequence select="check:nextMethodLinks(.)"/>
+                <xsl:sequence select="check:getNextMethodLinks(.)"/>
             </xsl:for-each>
         </xsl:if>
-    </xsl:function>
-    
-    <xsl:function name="check:getNextMethodLinks">
-        <xsl:param name="from" as="node()"/>
-        <xsl:sequence select="check:nextMethodLinks($from)"/>
-        <xsl:sequence select="$METHOD_FAIL"/>
     </xsl:function>
     
     <xsl:function name="check:getMatch" as="xsd:string">
