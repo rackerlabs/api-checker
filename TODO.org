@@ -1,10 +1,10 @@
 * api-checker TODOs
+** TODO Mavenize
 ** TODO WADL Normalize, Builder, opt1 in a single path.
 *** Need to determine how this gets put together.
     Current Thoughts:
     1. XProc 
     2. XSLTs only
-
     Regardless of approach lanch is through scala.
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
