@@ -1,7 +1,15 @@
 * api-checker TODOs
 ** TODO WADL Normalize, Builder, opt1 in a single path.
+*** Need to determine how this gets put together.
+    Current Thoughts:
+    1. XProc 
+    2. XSLTs only
+
+    Regardless of approach lanch is through scala.
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
+   Maybe an optional output?
 ** TODO Review builder output -- still make sense? Update if needed.
+** TODO Schema for checker XML (XSD 1.1 and 1.0)
 ** TODO Add Translation Tests.
 ** TODO Checker to scala.
 ** TODO WADL Change Detector...
