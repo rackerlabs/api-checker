@@ -1,5 +1,5 @@
 * api-checker TODOs
-** TODO Mavenize
+** DONE Mavenize
 ** TODO WADL Normalize, Builder, opt1 in a single path.
 *** Need to determine how this gets put together.
     Current Thoughts:

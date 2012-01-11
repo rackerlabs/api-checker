@@ -1,0 +1,114 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.rackspace.papi.components</groupId>
+    <artifactId>api-checker</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>API Checker</name>
+
+    <description>
+        A repose component that ensures that HTTP requests are valid
+        according to a WADL.
+    </description>
+
+    <properties>
+        <scala.version>2.9.0</scala.version>
+        <saxon.version>9.3</saxon.version>
+        <scala.test.version>1.6.1</scala.test.version>
+        <junit.version>4.10</junit.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon</artifactId>
+            <version>${saxon.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.9.0</artifactId>
+            <version>${scala.test.version}</version>
+        </dependency>
+    </dependencies>
+    <profiles>
+        <profile>
+            <id>Rackspace Research Repositories</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>rackspace-research</id>
+                    <name>Rackspace Research Repository</name>
+                    <url>http://maven.research.rackspacecloud.com/content/groups/public/</url>
+                </repository>
+                <repository>
+                    <id>scala-tools.org</id>
+                    <name>Scala-tools Maven2 Repository</name>
+                    <url>http://scala-tools.org/repo-releases</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>rackspace-research</id>
+                    <name>Rackspace Research Repository</name>
+                    <url>http://maven.research.rackspacecloud.com/content/groups/public/</url>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>scala-tools.org</id>
+                    <name>Scala-tools Maven2 Repository</name>
+                    <url>http://scala-tools.org/repo-releases</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.10</version>
+                <configuration>
+                    <includes>
+                        <include>**/*.class</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.jteigen</groupId>
+                <artifactId>maven-scalatest-plugin</artifactId>
+                <version>1.1-SNAPSHOT</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
