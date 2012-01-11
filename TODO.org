@@ -1,0 +1,6 @@
+* api-checker TODOs
+** TODO WADL Normalize, Builder, opt1 in a single path.
+** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
+** TODO Review builder output -- still make sense? Update if needed.
+** TODO Add Translation Tests.
+** TODO Checker to scala.
