@@ -1,5 +1,6 @@
 * api-checker TODOs
 ** DONE Mavenize
+** TODO Move Normalizer code to a lib in WADL tools.
 ** TODO WADL Normalize, Builder, opt1 in a single path.
 *** Need to determine how this gets put together.
     Current Thoughts:
