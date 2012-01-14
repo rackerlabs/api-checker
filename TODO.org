@@ -1,12 +1,9 @@
 * api-checker TODOs
 ** DONE Mavenize
 ** DONE Move Normalizer code to a lib in WADL tools.
-** TODO WADL Normalize, Builder, opt1 in a single path.
-*** Need to determine how this gets put together.
-    Current Thoughts:
-    1. XProc 
-    2. XSLTs only
-    Regardless of approach lanch is through scala.
+** TODO WADL Normalize, Builder, opt1 in a single path [0/2]
+   1. [ ] Add Builder Library
+   2. [ ] Add Opt as an option, by pipding through opt1
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** TODO Review builder output -- still make sense? Update if needed.
