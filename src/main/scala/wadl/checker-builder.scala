@@ -14,8 +14,13 @@ import com.rackspace.cloud.api.wadl.RType._
 import com.rackspace.cloud.api.wadl.XSDVersion._
 import com.rackspace.cloud.api.wadl.Converters._
 
-class WADLCheckerBuilder{
-  private val wadl = new WADLNormalizer
+class WADLCheckerBuilder(private var wadl : WADLNormalizer) {
+
+  if (wadl == null) {
+    wadl = new WADLNormalizer
+  }
+
+  def this() = this(null)
 
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
 
