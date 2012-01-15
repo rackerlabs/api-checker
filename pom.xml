@@ -19,6 +19,7 @@
         <saxon.version>9.3</saxon.version>
         <scala.test.version>1.6.1</scala.test.version>
         <junit.version>4.10</junit.version>
+        <wadl-tools.version>1.0.0-SNAPSHOT</wadl-tools.version>
     </properties>
 
     <dependencies>
@@ -43,6 +44,11 @@
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_2.9.0</artifactId>
             <version>${scala.test.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rackspace.cloud.api</groupId>
+            <artifactId>wadl-tools</artifactId>
+            <version>${wadl-tools.version}</version>
         </dependency>
     </dependencies>
     <profiles>
