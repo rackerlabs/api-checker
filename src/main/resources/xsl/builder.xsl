@@ -6,7 +6,7 @@
     xmlns:check="http://www.rackspace.com/repose/wadl/checker"
     xmlns:rax="http://docs.rackspace.com/api"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
-    exclude-result-prefixes="xsd wadl rax"
+    exclude-result-prefixes="xsd wadl rax check"
     version="2.0">
     
     <xsl:output indent="yes" method="xml"/>
