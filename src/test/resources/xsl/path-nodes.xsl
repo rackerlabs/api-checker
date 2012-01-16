@@ -11,8 +11,8 @@
     extension-element-prefixes="saxon"
     version="2.0">
 
-    <xsl:param name="position" as="xsd:integer" select="1"/>
-    <xsl:variable name="step" as="node()" select="/chk:checker/chk:step[$position]"/>
+    <xsl:param name="sid" as="xsd:string" select="'S0'"/>
+    <xsl:variable name="step" as="node()" select="/chk:checker/chk:step[@id=$sid]"/>
     <xsl:variable name="d" as="node()" select="/chk:checker"/>
 
     <xsl:output indent="yes" method="xml"/>
