@@ -41,7 +41,7 @@
         <xsl:for-each select="$nexts">
             <xsl:variable name="next" select="."/>
             <xsl:call-template name="chk:followPaths">
-                <xsl:with-param name="step" select="$d/chk:step[@id=$next]"/> <!-- fix me-->
+                <xsl:with-param name="step" select="$d/chk:step[@id=$next]"/>
             </xsl:call-template>
         </xsl:for-each>
     </xsl:template>
