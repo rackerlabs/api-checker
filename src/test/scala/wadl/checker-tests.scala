@@ -33,13 +33,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
-      printf ("%s\n",checker)
       then("The checker should contain a single start node")
       assert (checker, "count(//chk:step[@type='START']) = 1")
-      and("The checker should contain METHOD_FAIL and URL_FAIL nodes")
-      assert (checker, "/chk:checker/chk:step[@type='METHOD_FAIL']")
-      assert (checker, "/chk:checker/chk:step[@type='URL_FAIL']")
-      and("The path from start should only contain METHOD_FAIL and URL_FAIL nodes")
+      and("The path from start should only contain METHOD_FAIL and URL_FAIL and the start node itself")
+      val path = allStepsFromStep(checker, (stepsWithType(checker,"START")(0) \ "@id").text)
+      assert (path, "count(//chk:step) = 3")
+      assert (path, "/chk:checker/chk:step[@type='START']")
+      assert (path, "/chk:checker/chk:step[@type='METHOD_FAIL']")
+      assert (path, "/chk:checker/chk:step[@type='URL_FAIL']")
     }
   }
 }
