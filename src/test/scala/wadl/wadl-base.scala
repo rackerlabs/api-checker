@@ -23,4 +23,8 @@ class BaseCheckerSpec extends BaseWADLSpec {
     transformer.transform (checker, new StreamResult(bytesOut))
     XML.loadString(bytesOut.toString())
   }
+
+  def stepsWithType (checker : NodeSeq, nodeType : String) : NodeSeq = {
+    (checker \\ "step").filter(n => (n \ "@type").text == nodeType)
+  }
 }
