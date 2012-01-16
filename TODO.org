@@ -1,9 +1,11 @@
 * api-checker TODOs
 ** DONE Mavenize
 ** DONE Move Normalizer code to a lib in WADL tools.
-** TODO WADL Normalize, Builder, opt1 in a single path [0/2]
-   1. [ ] Add Builder Library
-   2. [ ] Add Opt as an option, by pipding through opt1
+** TODO WADL Normalize, Builder, opt1 in a single path [1/4]
+   1. [X] Add Builder Library
+   2. [ ] Simple transation tests to confirm the lib is working
+   3. [ ] Add Opt as an option, by pipding through opt1
+   4. [ ] Simple optimization test to confirm functionality
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** TODO Review builder output -- still make sense? Update if needed.
