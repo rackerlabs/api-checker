@@ -36,11 +36,38 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       then("The checker should contain a single start node")
       assert (checker, "count(//chk:step[@type='START']) = 1")
       and("The path from start should only contain METHOD_FAIL and URL_FAIL and the start node itself")
-      val path = allStepsFromStep(checker, (stepsWithType(checker,"START")(0) \ "@id").text)
+      val path = allStepsFromStart(checker)
       assert (path, "count(//chk:step) = 3")
       assert (path, "/chk:checker/chk:step[@type='START']")
       assert (path, "/chk:checker/chk:step[@type='METHOD_FAIL']")
       assert (path, "/chk:checker/chk:step[@type='URL_FAIL']")
+    }
+
+    scenario("The WADL contains a single multi-path resource with a GET method") {
+      given("a WADL that contains a single multi-path resource with a GET method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      printf ("%s\n",checker)
+      then("The checker should contain an URL node for each path step")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
+      and ("The checker should contain a single GET method")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD']) = 1")
+      assert (checker, "xsd:string(/chk:checker/chk:step[@type='METHOD'][1]/@match) = 'GET'")
+      and ("The path from the start should contain all URL nodes in order")
+      and ("it should end in the GET method node")
+      val path = allStepsFromStart(checker)
+      printf ("%s\n",path)
     }
   }
 }
