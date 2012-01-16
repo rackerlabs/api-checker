@@ -24,6 +24,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
     XML.loadString(bytesOut.toString())
   }
 
+  def allStepsFromStart (checker : NodeSeq) : NodeSeq = {
+    allStepsFromStep (checker, (stepsWithType(checker,"START")(0) \ "@id").text)
+  }
+
   def stepsWithType (checker : NodeSeq, nodeType : String) : NodeSeq = {
     (checker \\ "step").filter(n => (n \ "@type").text == nodeType)
   }
