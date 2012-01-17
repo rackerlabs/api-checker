@@ -13,9 +13,10 @@
          6. [X] Resource Type
          7. [X] Resource Type with Method Reference
          8. [ ] Multiple Resource PATH
-      2. [ ] Other misc Translation tests [0/2]
+      2. [ ] Other misc Translation tests [0/3]
          1. [ ] State Labels
          2. [ ] RegEx Encoding
+         3. [ ] rax:invisible extension
    3. [ ] Add Opt as an option, by pipding through opt1
    4. [ ] Simple optimization test to confirm functionality
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
