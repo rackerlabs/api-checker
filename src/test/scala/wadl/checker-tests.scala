@@ -54,7 +54,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //  form the assertions below must apply to all of them.
     //
 
-    def multiPathAssertions (checker : NodeSeq) : Unit = {
+    def singlePathAssertions (checker : NodeSeq) : Unit = {
       printf ("%s\n",checker)
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
@@ -96,7 +96,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
-      multiPathAssertions(checker)
+      singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource in tree form") {
@@ -123,7 +123,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
-      multiPathAssertions(checker)
+      singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource in mixed form") {
@@ -146,7 +146,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
-      multiPathAssertions(checker)
+      singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource with a method referece") {
@@ -168,7 +168,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
-      multiPathAssertions(checker)
+      singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource with a resource type") {
@@ -190,7 +190,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
-      multiPathAssertions(checker)
+      singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource with a resource type with method references") {
@@ -213,8 +213,283 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
-      multiPathAssertions(checker)
+      singlePathAssertions(checker)
     }
 
+    //
+    //  The following scenarios test two resources located at
+    //  /path/to/my/resource with a GET and a DELETE method and
+    //  /path/to/my/other_resource with a GET and POST method. They
+    //  are equivalent but they are written in slightly different WADL
+    //  form. The assertions below must apply to all of them.
+    //
+
+    def multiplePathAssertions (checker : NodeSeq) : Unit = {
+      printf ("%s\n",checker)
+      then("The checker should contain an URL node for each path step")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
+      and ("The checker should contain a GET, POST, and DELETE method")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE']")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='POST']")
+      and ("The path from the start should contain all URL nodes in order")
+      and ("it should end in the right method")
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("other_resource"), Method("GET"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("other_resource"), Method("POST"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("path"), URLFail)
+      assert (checker, URL("path"), MethodFail)
+      assert (checker, URL("to"), URLFail)
+      assert (checker, URL("to"), MethodFail)
+      assert (checker, URL("my"), URLFail)
+      assert (checker, URL("my"), MethodFail)
+      assert (checker, URL("resource"), URLFail)
+      assert (checker, URL("resource"), MethodFail)
+      assert (checker, URL("other_resource"), URLFail)
+      assert (checker, URL("other_resource"), MethodFail)
+    }
+
+    scenario("The WADL contains multiple, related paths") {
+      given ("a WADL with multiple related paths")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+              </resource>
+              <resource path="path/to/my/other_resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="POST">
+                      <response status="200"/>
+                   </method>
+              </resource>
+          </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiplePathAssertions(checker)
+    }
+
+    scenario("The WADL in tree format contains multiple, related paths") {
+      given ("a WADL in tree format with multiple related paths")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path">
+                <resource path="to">
+                  <resource path="my">
+                   <resource path="resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="DELETE">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+                   <resource path="other_resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="POST">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+                 </resource>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiplePathAssertions(checker)
+    }
+
+    scenario("The WADL in mix format contains multiple, related paths") {
+      given ("a WADL in mix format with multiple related paths")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my">
+                   <resource path="resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="DELETE">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+                   <resource path="other_resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="POST">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiplePathAssertions(checker)
+    }
+
+    //
+    //  The following scenarios test two resources located at
+    //  /path/to/my/resource with a GET and a DELETE method and
+    //  /path/to/my/other_resource with a GET and POST method. They
+    //  are equivalent but they are written in slightly different WADL
+    //  form. The assertions below must apply to all of them.
+    //
+
+    def multipleUnrelatedPathAssertions (checker : NodeSeq) : Unit = {
+      printf ("%s\n",checker)
+      then("The checker should contain an URL node for each path step")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 8")
+      and ("The checker should contain a GET, POST, and DELETE method")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE']")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='POST']")
+      and ("The path from the start should contain all URL nodes in order")
+      and ("it should end in the right method")
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
+      assert (checker, Start, URL("this"), URL("is"), URL("my"), URL("other_resource"), Method("GET"))
+      assert (checker, Start, URL("this"), URL("is"), URL("my"), URL("other_resource"), Method("POST"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("this"), URLFail)
+      assert (checker, URL("this"), MethodFail)
+      assert (checker, URL("is"), URLFail)
+      assert (checker, URL("is"), MethodFail)
+      assert (checker, URL("path"), URLFail)
+      assert (checker, URL("path"), MethodFail)
+      assert (checker, URL("to"), URLFail)
+      assert (checker, URL("to"), MethodFail)
+      assert (checker, URL("my"), URLFail)
+      assert (checker, URL("my"), MethodFail)
+      assert (checker, URL("resource"), URLFail)
+      assert (checker, URL("resource"), MethodFail)
+      assert (checker, URL("other_resource"), URLFail)
+      assert (checker, URL("other_resource"), MethodFail)
+    }
+
+    scenario("The WADL contains multiple, unrelated paths") {
+      given ("a WADL with multiple unrelated paths")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+              </resource>
+              <resource path="this/is/my/other_resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="POST">
+                      <response status="200"/>
+                   </method>
+              </resource>
+          </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multipleUnrelatedPathAssertions(checker)
+    }
+
+    scenario("The WADL in tree format contains multiple, unrelated paths") {
+      given ("a WADL in tree format with multiple unrelated paths")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path">
+                <resource path="to">
+                  <resource path="my">
+                   <resource path="resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="DELETE">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+                 </resource>
+                </resource>
+              </resource>
+              <resource path="this">
+                <resource path="is">
+                   <resource path="my">
+                     <resource path="other_resource">
+                       <method name="GET">
+                          <response status="200 203"/>
+                       </method>
+                       <method name="POST">
+                          <response status="200"/>
+                       </method>
+                     </resource>
+                   </resource>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multipleUnrelatedPathAssertions(checker)
+    }
+
+    scenario("The WADL in mix format contains multiple, unrelated paths") {
+      given ("a WADL in mix format with multiple unrelated paths")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my">
+                   <resource path="resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="DELETE">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+              </resource>
+              <resource path="this/is/my">
+                   <resource path="other_resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="POST">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multipleUnrelatedPathAssertions(checker)
+    }
   }
 }
