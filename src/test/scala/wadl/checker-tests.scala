@@ -46,30 +46,25 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, Start, MethodFail)
     }
 
-    scenario("The WADL contains a single multi-path resource with a GET method") {
-      given("a WADL that contains a single multi-path resource with a GET method")
-      val inWADL =
-        <application xmlns="http://wadl.dev.java.net/2009/02">
-           <grammars/>
-           <resources base="https://test.api.openstack.com">
-              <resource path="path/to/my/resource">
-                   <method name="GET">
-                      <response status="200 203"/>
-                   </method>
-              </resource>
-           </resources>
-        </application>
-      when("the wadl is translated")
-      val checker = builder.build (inWADL)
+
+    //
+    //  The following scenarios test a single resource located at
+    //  /path/to/my/resource with a GET and a DELETE method. They are
+    //  equivalent but they are written in slightly different WADL
+    //  form the assertions below must apply to all of them.
+    //
+
+    def multiPathAssertions (checker : NodeSeq) : Unit = {
       printf ("%s\n",checker)
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
-      and ("The checker should contain a single GET method")
-      assert (checker, "count(/chk:checker/chk:step[@type='METHOD']) = 1")
-      assert (checker, "xsd:string(/chk:checker/chk:step[@type='METHOD'][1]/@match) = 'GET'")
+      and ("The checker should contain a GET and a DELETE method")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE']")
       and ("The path from the start should contain all URL nodes in order")
-      and ("it should end in the GET method node")
+      and ("it should end in the GET and a DELETE method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
       and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
@@ -82,5 +77,144 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), URLFail)
       assert (checker, URL("resource"), MethodFail)
     }
+
+    scenario("The WADL contains a single multi-path resource") {
+      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiPathAssertions(checker)
+    }
+
+    scenario("The WADL contains a single multi-path resource in tree form") {
+      given("a WADL that contains a single multi-path resource in tree form with a GET and DELETE method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path">
+                <resource path="to">
+                  <resource path="my">
+                   <resource path="resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="DELETE">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+                 </resource>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiPathAssertions(checker)
+    }
+
+    scenario("The WADL contains a single multi-path resource in mixed form") {
+      given("a WADL that contains a single multi-path resource in mixed form with a GET and DELETE method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my">
+                   <resource path="resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="DELETE">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiPathAssertions(checker)
+    }
+
+    scenario("The WADL contains a single multi-path resource with a method referece") {
+      given("a WADL that contains a single multi-path resource with a method reference")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method href="#getMethod" />
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiPathAssertions(checker)
+    }
+
+    scenario("The WADL contains a single multi-path resource with a resource type") {
+      given("a WADL that contains a single multi-path resource with a resource type")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource" type="#test"/>
+           </resources>
+           <resource_type id="test">
+              <method id="getMethod" name="GET">
+                  <response status="200 203"/>
+              </method>
+              <method name="DELETE">
+                  <response status="200"/>
+              </method>
+           </resource_type>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiPathAssertions(checker)
+    }
+
+    scenario("The WADL contains a single multi-path resource with a resource type with method references") {
+      given("a WADL that contains a single multi-path resource with a resource type with method references")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource" type="#test"/>
+           </resources>
+           <resource_type id="test">
+              <method href="#getMethod" />
+              <method name="DELETE">
+                  <response status="200"/>
+              </method>
+           </resource_type>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      multiPathAssertions(checker)
+    }
+
   }
 }
