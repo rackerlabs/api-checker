@@ -517,5 +517,44 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE' and @label='deleteResource']")
     }
 
+    scenario("The WADL contains an initial invisible node") {
+      given ("a WADL with an initial invisble node")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource rax:invisible="true" path="path">
+               <method name="GET">
+                    <response status="200 203"/>
+                </method>
+                <resource path="to">
+                  <resource path="my">
+                   <resource path="resource">
+                     <method name="GET">
+                        <response status="200 203"/>
+                     </method>
+                     <method name="DELETE">
+                        <response status="200"/>
+                     </method>
+                   </resource>
+                 </resource>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      when ("the wadl is translated")
+      val checker = builder.build (inWADL)
+      printf ("%s\n", checker)
+      then("All paths should be available as defined in the WADL...")
+      assert (checker, Start, URL("path"), Method("GET"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
+      and("Paths should also be accessible directly from start")
+      assert (checker, Start, Method("GET"))
+      assert (checker, Start, URL("to"), URL("my"), URL("resource"), Method("GET"))
+      assert (checker, Start, URL("to"), URL("my"), URL("resource"), Method("DELETE"))
+    }
+
   }
 }
