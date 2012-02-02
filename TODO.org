@@ -29,6 +29,7 @@
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** TODO Review builder output -- still make sense? Update if needed.
+** TODO CLI for translation?
 ** TODO Schema for checker XML (XSD 1.1 and 1.0)
 ** TODO Checker to scala.
 ** TODO WADL Change Detector...
