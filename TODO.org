@@ -21,9 +21,28 @@
       2. [X] Other misc Translation tests [2/2]
          1. [X] State Labels
          2. [X] rax:invisible extension
-      3. [ ] Test Path Templates[0/2]
-         1. [ ] String templates
-         2. [ ] RegEx Encoding
+      3. [ ] Test Path Templates[0/3]
+         1. [ ] String templates[0/8]
+            1. [ ] At the end of the path
+            2. [ ] At the end of the path (tree)
+            3. [ ] At the end of the path (mixed)
+            4. [ ] In between path
+            5. [ ] In between path (tree)
+            6. [ ] In between path (mixed)
+            7. [ ] Different prefix
+            8. [ ] Bad QName
+         2. [ ] Test Path Templates of other types[0/8]
+            1. [ ] At the end of the path
+            2. [ ] At the end of the path (tree)
+            3. [ ] At the end of the path (mixed)
+            4. [ ] In between path
+            5. [ ] In between path (tree)
+            6. [ ] In between path (mixed)
+            7. [ ] Bad QName
+            8. [ ] Missing Grammar File? (Simple test)
+         3. [ ] RegEx Encoding[0/2]
+            1. [ ] In URL
+            2. [ ] In Method
    3. [ ] Add Opt as an option, by pipding through opt1
    4. [ ] Simple optimization test to confirm functionality
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
