@@ -3,7 +3,7 @@
 ** DONE Move Normalizer code to a lib in WADL tools.
 ** TODO WADL Normalize, Builder, opt1 in a single path [1/4]
    1. [X] Add Builder Library
-   2. [-] Simple transation tests to confirm the lib is working [2/4]
+   2. [-] Simple transation tests to confirm the lib is working [2/5]
       1. [X] Test URI and Method from various WADL configurations[13/13]
          1. [X] Emtpty WADL
          2. [X] URL/Method single resource
@@ -21,7 +21,13 @@
       2. [X] Other misc Translation tests [2/2]
          1. [X] State Labels
          2. [X] rax:invisible extension
-      3. [-] Test Path Templates[2/4]
+      3. [ ] Ensure that input WADLs are correct before tests are run.
+      4. [ ] WADL Grammar[0/2]
+         1. [ ] External Grammar[0/2]
+            1. [ ] File Available
+            2. [ ] Missing File
+         2. [ ] Inline Grammar
+      5. [-] Test Path Templates[2/4]
          1. [X] String templates[7/7]
             1. [X] At the end of the path
             2. [X] At the end of the path (tree)
@@ -46,7 +52,6 @@
          4. [ ] RegEx Encoding[0/2]
             1. [ ] In URL
             2. [ ] In Method
-      4. [ ] Ensure that input WADLs are connect before tests are run.
    3. [ ] Add Opt as an option, by pipding through opt1
    4. [ ] Simple optimization test to confirm functionality
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
