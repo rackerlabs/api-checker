@@ -665,5 +665,114 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       stringTemplateAtEndAssertions(checker)
     }
 
+
+    //
+    //  The following scenarios test a string template parameter in the
+    //  middle of the resource path (/path/to/my/{id}/resource. They are
+    //  equivalent but they are written in slightly different WADL
+    //  form the assertions below must apply to all of them.
+    //
+
+    def stringTemplateInMiddleAssertions (checker : NodeSeq) : Unit = {
+      printf ("%s\n",checker)
+      then("The checker should contain an URL node for each path step")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
+      and ("The checker should contain a GET method")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
+      and ("The path from the start should contain all URL nodes including a .*")
+      and ("it should end in the GET method node")
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL(".*"), URL("resource"), Method("GET"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("path"), URLFail)
+      assert (checker, URL("path"), MethodFail)
+      assert (checker, URL("to"), URLFail)
+      assert (checker, URL("to"), MethodFail)
+      assert (checker, URL("my"), MethodFail)
+      assert (checker, URL("resource"), MethodFail)
+      assert (checker, URL("resource"), URLFail)
+      assert (checker, URL(".*"), URLFail)
+      assert (checker, URL(".*"), MethodFail)
+      and ("the URL('my') will not have an URL fail because all URLs are accepted")
+      val stepsFromResource = allStepsFromStep (checker, URL("my"), 2)
+      assert (stepsFromResource, "not(//chk:step[@type='URL_FAIL'])")
+    }
+
+    scenario("The WADL contains a template parameter of type string in the middle of the path") {
+      given("a WADL with a single template string in the middle of the path")
+      val inWADL=
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/{id}/resource">
+                   <param name="id" style="template" type="xsd:string"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when ("the wadl is translated")
+      val checker = builder.build (inWADL)
+      stringTemplateInMiddleAssertions(checker)
+    }
+
+    scenario("The WADL in tree format contains a template parameter of type string in the middle of the path") {
+      given("a WADL in tree format with a single template string in the middle of the path")
+      val inWADL=
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path">
+                <resource path="to">
+                  <resource path="my">
+                    <resource path="{id}">
+                       <param name="id" style="template" type="xsd:string"/>
+                      <resource path="resource">
+                       <method href="#getMethod" />
+                     </resource>
+                  </resource>
+                </resource>
+               </resource>
+             </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when ("the wadl is translated")
+      val checker = builder.build (inWADL)
+      stringTemplateInMiddleAssertions(checker)
+    }
+
+    scenario("The WADL in mix format contains a template parameter of type string in the middle of the path") {
+      given("a WADL in mix format with a single template string in the middle of the path")
+      val inWADL=
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my">
+                   <resource path="{id}">
+                      <param name="id" style="template" type="xsd:string"/>
+                    <resource path="resource">
+                       <method href="#getMethod" />
+                    </resource>
+               </resource>
+             </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when ("the wadl is translated")
+      val checker = builder.build (inWADL)
+      stringTemplateInMiddleAssertions(checker)
+    }
+
   }
 }
