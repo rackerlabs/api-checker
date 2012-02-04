@@ -690,11 +690,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       given("a WADL with a template parameter, with a mismatch in the param name")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
-                     xmlns:x="http://www.w3.org/2001/XMLSchema">
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
            <grammars/>
            <resources base="https://test.api.openstack.com">
               <resource path="path/to/my/resource/{id}">
-                   <param name="other" style="template" type="x:string"/>
+                   <param name="other" style="template" type="xsd:string"/>
                    <method href="#getMethod" />
               </resource>
            </resources>
@@ -713,7 +713,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       given("a WADL with a template parameter but no param element")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
-                     xmlns:x="http://www.w3.org/2001/XMLSchema">
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
            <grammars/>
            <resources base="https://test.api.openstack.com">
               <resource path="path/to/my/resource/{id}">
@@ -735,11 +735,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       given("a WADL with a template parameter, with a mismatch in the param type")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
-                     xmlns:x="http://www.w3.org/2001/XMLSchema">
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
            <grammars/>
            <resources base="https://test.api.openstack.com">
               <resource path="path/to/my/resource/{id}">
-                   <param name="id" style="header" type="x:string"/>
+                   <param name="id" style="header" type="xsd:string"/>
                    <method href="#getMethod" />
               </resource>
            </resources>
