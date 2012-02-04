@@ -110,6 +110,15 @@
         <xsl:param name="path" as="node()"/>
         <xsl:variable name="paramName" select="replace($path/@path,'(\{|\})','')"
             as="xsd:string"/>
+        <xsl:if test="not($path/wadl:param[@style='template' and @name=$paramName])">
+            <xsl:message terminate="yes">
+                <xsl:text>[ERROR] The WADL contains a resource with {</xsl:text>
+                <xsl:value-of select="$paramName"/>
+                <xsl:text>} but a template param of name '</xsl:text>
+                <xsl:value-of select="$paramName"/>
+                <xsl:text>' is not found.</xsl:text>
+            </xsl:message>
+        </xsl:if>
         <xsl:copy-of select="$path/wadl:param[@style='template' and @name=$paramName]"></xsl:copy-of>
     </xsl:function>
     <xsl:template name="check:getTemplateMatch">

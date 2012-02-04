@@ -14,6 +14,12 @@ import com.rackspace.cloud.api.wadl.RType._
 import com.rackspace.cloud.api.wadl.XSDVersion._
 import com.rackspace.cloud.api.wadl.Converters._
 
+
+/**
+ * An exception when transating the WADL into a checker.
+ */
+class WADLException(private val msg : String, private val cause : Throwable) extends Throwable(msg, cause) {}
+
 class WADLCheckerBuilder(private var wadl : WADLNormalizer) {
 
   if (wadl == null) {
@@ -25,11 +31,15 @@ class WADLCheckerBuilder(private var wadl : WADLNormalizer) {
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
 
   def build (in : Source, out: Result) : Unit = {
-    val transformer = wadl.newTransformer(TREE, XSD11, false, KEEP)
-    val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
+    try {
+      val transformer = wadl.newTransformer(TREE, XSD11, false, KEEP)
+      val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
 
-    buildHandler.setResult (out)
-    transformer.transform (in, new SAXResult(buildHandler))
+      buildHandler.setResult (out)
+      transformer.transform (in, new SAXResult(buildHandler))
+    } catch {
+      case e => throw new WADLException ("WADL Processing Error", e)
+    }
   }
 
   def build (in : (String, NodeSeq)) : NodeSeq = {
@@ -42,3 +52,4 @@ class WADLCheckerBuilder(private var wadl : WADLNormalizer) {
     build (("",in))
   }
 }
+

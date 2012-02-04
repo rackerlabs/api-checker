@@ -686,6 +686,29 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       stringTemplateAtEndAssertions(checker)
     }
 
+    scenario("Error Condition: The WADL contains a template parameter of type string, but the param element has a name mismatch") {
+      given("a WADL with a template parameter, with a mismatch in the pram name")
+      val inWADL=
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:x="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{id}">
+                   <param name="other" style="template" type="x:string"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when ("the wadl is translated")
+      then ("A WADLException should be thrown")
+      intercept[WADLException] {
+        val checker = builder.build (inWADL)
+      }
+    }
+
     //
     //  The following scenarios test a string template parameter in the
     //  middle of the resource path (/path/to/my/{id}/resource. They are
