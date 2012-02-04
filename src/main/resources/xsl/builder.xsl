@@ -124,11 +124,6 @@
     <xsl:template name="check:getTemplateMatch">
         <xsl:variable name="param" select="check:paramForTemplatePath(.)"/>
         <xsl:variable name="paramName" select="$param/@name" as="xsd:string"/>
-        <xsl:if test="not($param)">
-          <xsl:message terminate="yes">
-              Template parameter <xsl:value-of select="@path"/> missing wadl:param element!
-          </xsl:message>
-        </xsl:if>
         <xsl:value-of select="check:getMatch(resolve-QName($param/@type,$param))"/>
     </xsl:template>
     <xsl:template name="check:addMethodSets">
