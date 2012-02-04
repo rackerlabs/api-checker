@@ -665,6 +665,26 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       stringTemplateAtEndAssertions(checker)
     }
 
+    scenario("The WADL contains a template parameter of type string at the end of a path, the prefix used is not xsd, but the qname is valid") {
+      given("a WADL with a single template string at the end of the path, the prefix used is not xsd, but the qname is valid")
+      val inWADL=
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:x="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{id}">
+                   <param name="id" style="template" type="x:string"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when ("the wadl is translated")
+      val checker = builder.build (inWADL)
+      stringTemplateAtEndAssertions(checker)
+    }
 
     //
     //  The following scenarios test a string template parameter in the
@@ -773,6 +793,5 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       val checker = builder.build (inWADL)
       stringTemplateInMiddleAssertions(checker)
     }
-
   }
 }
