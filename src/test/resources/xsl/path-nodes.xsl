@@ -12,6 +12,7 @@
     version="2.0">
 
     <xsl:param name="sid" as="xsd:string" select="'S0'"/>
+    <xsl:param name="max" as="xsd:integer" select="2147483647"/>
     <xsl:variable name="step" as="node()" select="/chk:checker/chk:step[@id=$sid]"/>
     <xsl:variable name="d" as="node()" select="/chk:checker"/>
 
@@ -22,6 +23,7 @@
             <checker>
                 <xsl:call-template name="chk:followPaths">
                     <xsl:with-param name="step" select="$step"/>
+                    <xsl:with-param name="max" select="$max"/>
                 </xsl:call-template>
             </checker>
         </xsl:variable>
@@ -34,16 +36,20 @@
 
     <xsl:template name="chk:followPaths">
         <xsl:param name="step" as="node()"/>
+        <xsl:param name="max" as="xsd:integer"/>
 
-        <xsl:copy-of select="$step"/>
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize($step/@next,' ')"/>
-        <xsl:variable name="id" as="xsd:string" select="$step/@id"/>
-        <xsl:for-each select="$nexts">
-            <xsl:variable name="next" select="."/>
-            <xsl:call-template name="chk:followPaths">
-                <xsl:with-param name="step" select="$d/chk:step[@id=$next]"/>
-            </xsl:call-template>
-        </xsl:for-each>
+        <xsl:if test="$max &gt; 0">
+            <xsl:copy-of select="$step"/>
+            <xsl:variable name="nexts" as="xsd:string*" select="tokenize($step/@next,' ')"/>
+            <xsl:variable name="id" as="xsd:string" select="$step/@id"/>
+            <xsl:for-each select="$nexts">
+                <xsl:variable name="next" select="."/>
+                <xsl:call-template name="chk:followPaths">
+                    <xsl:with-param name="step" select="$d/chk:step[@id=$next]"/>
+                    <xsl:with-param name="max" select="$max - 1"/>
+                </xsl:call-template>
+            </xsl:for-each>
+        </xsl:if>
     </xsl:template>
 
 </xsl:stylesheet>
