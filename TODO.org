@@ -22,7 +22,7 @@
          1. [X] State Labels
          2. [X] rax:invisible extension
       3. [ ] Test Path Templates[0/3]
-         1. [-] String templates[7/9]
+         1. [-] String templates[8/9]
             1. [X] At the end of the path
             2. [X] At the end of the path (tree)
             3. [X] At the end of the path (mixed)
@@ -30,10 +30,10 @@
             5. [X] In between path (tree)
             6. [X] In between path (mixed)
             7. [X] Different prefix
-            8. [-] Resource/Parameter mismatch[2/3]
+            8. [X] Resource/Parameter mismatch[3/3]
                1. [X] Name MisMatch
                2. [X] Missing parameter
-               3. [ ] Bad Parameter type
+               3. [X] Bad Parameter type
             9. [ ] Bad QName
          2. [ ] Test Path Templates of other types[0/9]
             1. [ ] At the end of the path
