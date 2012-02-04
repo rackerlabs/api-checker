@@ -754,6 +754,28 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       }
     }
 
+    scenario("Error Condition: The WADL contains a template parameter of a type with a bad qname") {
+      given("a WADL with a template parameter of a type with a bad qname")
+      val inWADL=
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{id}">
+                   <param name="id" style="template" type="xsd:string"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when ("the wadl is translated")
+      then ("A WADLException should be thrown")
+      intercept[WADLException] {
+        val checker = builder.build (inWADL)
+      }
+    }
+
     //
     //  The following scenarios test a string template parameter in the
     //  middle of the resource path (/path/to/my/{id}/resource. They are

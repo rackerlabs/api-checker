@@ -21,8 +21,8 @@
       2. [X] Other misc Translation tests [2/2]
          1. [X] State Labels
          2. [X] rax:invisible extension
-      3. [ ] Test Path Templates[0/3]
-         1. [-] String templates[8/9]
+      3. [-] Test Path Templates[1/3]
+         1. [X] String templates[9/9]
             1. [X] At the end of the path
             2. [X] At the end of the path (tree)
             3. [X] At the end of the path (mixed)
@@ -34,7 +34,7 @@
                1. [X] Name MisMatch
                2. [X] Missing parameter
                3. [X] Bad Parameter type
-            9. [ ] Bad QName
+            9. [X] Bad QName
          2. [ ] Test Path Templates of other types[0/9]
             1. [ ] At the end of the path
             2. [ ] At the end of the path (tree)
