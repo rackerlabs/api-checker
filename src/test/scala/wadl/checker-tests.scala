@@ -55,7 +55,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def singlePathAssertions (checker : NodeSeq) : Unit = {
-      printf ("%s\n",checker)
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
       and ("The checker should contain a GET and a DELETE method")
@@ -225,7 +224,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def multiplePathAssertions (checker : NodeSeq) : Unit = {
-      printf ("%s\n",checker)
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
       and ("The checker should contain a GET, POST, and DELETE method")
@@ -357,7 +355,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def multipleUnrelatedPathAssertions (checker : NodeSeq) : Unit = {
-      printf ("%s\n",checker)
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 8")
       and ("The checker should contain a GET, POST, and DELETE method")
@@ -510,7 +507,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
-      printf ("%s\n", checker)
       then("The method nodes should contain a resource label with the id")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD']) = 2")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET' and @label='getResource']")
@@ -545,7 +541,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </application>
       when ("the wadl is translated")
       val checker = builder.build (inWADL)
-      printf ("%s\n", checker)
       then("All paths should be available as defined in the WADL...")
       assert (checker, Start, URL("path"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
@@ -564,7 +559,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def stringTemplateAtEndAssertions (checker : NodeSeq) : Unit = {
-      printf ("%s\n",checker)
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
       and ("The checker should contain a GET method")
@@ -784,7 +778,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def stringTemplateInMiddleAssertions (checker : NodeSeq) : Unit = {
-      printf ("%s\n",checker)
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
       and ("The checker should contain a GET method")
