@@ -996,5 +996,45 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       val checker = builder.build (inWADL)
       customTemplateAtEndAssertions(checker)
     }
+
+    scenario("The WADL in mix format contains a template parameter of a custom type at the end of the path") {
+      given("A WADL in mix format with a template parameter of a custom type at the end of the path")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://simple.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my">
+                   <resource path="resource">
+                    <resource id="yn" path="{yn}">
+                       <param name="yn" style="template" type="tst:yesno"/>
+                       <method href="#getMethod" />
+                    </resource>
+                    </resource>
+               </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      register("test://simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateAtEndAssertions(checker)
+    }
   }
 }

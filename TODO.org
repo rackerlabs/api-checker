@@ -31,10 +31,10 @@
             5. [X] In between path (tree)
             6. [X] In between path (mixed)
             7. [X] Different prefix
-         2. [-] Test Path Templates of other types[2/7]
+         2. [-] Test Path Templates of other types[3/7]
             1. [X] At the end of the path
             2. [X] At the end of the path (tree)
-            3. [ ] At the end of the path (mixed)
+            3. [X] At the end of the path (mixed)
             4. [ ] In between path
             5. [ ] In between path (tree)
             6. [ ] In between path (mixed)
