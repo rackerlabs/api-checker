@@ -2,18 +2,22 @@ package com.rackspace.com.papi.components.checker.wadl
 
 import scala.xml._
 
+import java.io.InputStream
 import java.io.ByteArrayOutputStream
+import java.io.Reader
 
 import javax.xml.transform._
 import javax.xml.transform.sax._
 import javax.xml.transform.stream._
+
+import org.xml.sax.XMLReader
+import org.xml.sax.InputSource
 
 import com.rackspace.cloud.api.wadl.WADLNormalizer
 import com.rackspace.cloud.api.wadl.WADLFormat._
 import com.rackspace.cloud.api.wadl.RType._
 import com.rackspace.cloud.api.wadl.XSDVersion._
 import com.rackspace.cloud.api.wadl.Converters._
-
 
 /**
  * An exception when transating the WADL into a checker.
@@ -40,6 +44,27 @@ class WADLCheckerBuilder(private var wadl : WADLNormalizer) {
     } catch {
       case e => throw new WADLException ("WADL Processing Error", e)
     }
+  }
+
+  def build(in : (String, InputStream), out: Result) : Unit = {
+    val xmlReader = wadl.newSAXParser.getXMLReader()
+    val inputSource = new InputSource(in._2)
+    inputSource.setSystemId(in._1)
+    build(new SAXSource(xmlReader, inputSource), out)
+  }
+
+  def build(in : InputStream, out: Result) : Unit = {
+    build (("",in), out)
+  }
+
+  def build(in : Reader, out: Result) : Unit = {
+    val xmlReader = wadl.newSAXParser.getXMLReader()
+    build(new SAXSource(xmlReader, new InputSource(in)), out)
+  }
+
+  def build(in : String, out: Result) : Unit = {
+    val xmlReader = wadl.newSAXParser.getXMLReader()
+    build(new SAXSource(xmlReader, new InputSource(in)), out)
   }
 
   def build (in : (String, NodeSeq)) : NodeSeq = {

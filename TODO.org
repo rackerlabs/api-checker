@@ -3,7 +3,7 @@
 ** DONE Move Normalizer code to a lib in WADL tools.
 ** TODO WADL Normalize, Builder, opt1 in a single path [1/4]
    1. [X] Add Builder Library
-   2. [-] Simple transation tests to confirm the lib is working [2/5]
+   2. [-] Simple transation tests to confirm the lib is working [3/5]
       1. [X] Test URI and Method from various WADL configurations[13/13]
          1. [X] Emtpty WADL
          2. [X] URL/Method single resource
@@ -21,7 +21,7 @@
       2. [X] Other misc Translation tests [2/2]
          1. [X] State Labels
          2. [X] rax:invisible extension
-      3. [ ] Ensure that input WADLs are correct before tests are run.
+      3. [X] Ensure that input WADLs are correct before tests are run.
       4. [ ] WADL Grammar[0/2]
          1. [ ] External Grammar[0/2]
             1. [ ] File Available

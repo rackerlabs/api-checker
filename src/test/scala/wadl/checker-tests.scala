@@ -29,7 +29,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
-           <resources base="https://test.api.openstack.com"/>
+           <resources base="https://test.api.openstack.com">
+              <resource/>
+           </resources>
         </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)

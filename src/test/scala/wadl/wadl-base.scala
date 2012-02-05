@@ -25,7 +25,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
     if (max > 0) {
       transformer.setParameter("max",max)
     }
-    transformer.transform (checker, new StreamResult(bytesOut))
+    transformer.transform (new StreamSource(checker), new StreamResult(bytesOut))
     XML.loadString(bytesOut.toString())
   }
 
