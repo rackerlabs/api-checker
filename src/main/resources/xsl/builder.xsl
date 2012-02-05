@@ -100,7 +100,15 @@
         <xsl:param name="qname" as="xsd:QName"/>
         <ns>
             <xsl:attribute name="prefix">
-                <xsl:value-of select="prefix-from-QName($qname)"/>
+                <xsl:variable name="prefix" select="prefix-from-QName($qname)"/>
+                <xsl:choose>
+                    <xsl:when test="not($prefix)">
+                        <xsl:value-of select="generate-id()"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$prefix"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:attribute>
             <xsl:attribute name="uri">
                 <xsl:value-of select="namespace-uri-from-QName($qname)"/>
