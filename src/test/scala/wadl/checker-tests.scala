@@ -1036,5 +1036,164 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       val checker = builder.build (inWADL)
       customTemplateAtEndAssertions(checker)
     }
+
+    //
+    //  The following scenarios test a custom template parameter in the
+    //  middle of the resource path (/path/to/my/{yn}/resource. They are
+    //  equivalent but they are written in slightly different WADL
+    //  form the assertions below must apply to all of them.
+    //
+
+    def customTemplateInMiddleAssertions (checker : NodeSeq) : Unit = {
+      then("The checker should contain an URL node for each path step")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
+      and("A single URLXSD node")
+      assert (checker, "count(/chk:checker/chk:step[@type='URLXSD']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='URLXSD' and @label='yn']) = 1")
+      and ("The checker should contain a GET method")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
+      and ("The path from the start should contain all URL and URLXSD nodes")
+      and ("it should end in the GET method node")
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), Label("yn"), URL("resource"), Method("GET"))
+      and ("The URLXSD should match a valid QName")
+      assert (checker, "namespace-uri-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
+                                           "= 'test://schema/a'")
+      assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
+                                           "= 'yesno'")
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("path"), URLFail)
+      assert (checker, URL("path"), MethodFail)
+      assert (checker, URL("to"), URLFail)
+      assert (checker, URL("to"), MethodFail)
+      assert (checker, URL("my"), MethodFail)
+      assert (checker, URL("my"), URLFail)
+      assert (checker, URL("resource"), MethodFail)
+      assert (checker, URL("resource"), URLFail)
+      assert (checker, Label("yn"), URLFail)
+      assert (checker, Label("yn"), MethodFail)
+    }
+
+    scenario("The WADL contains a template parameter of a custom type in the middle of the path") {
+      given("A WADL with a template parameter of a custom type in the middle of  the path")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://simple.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="yn" path="path/to/my/{yn}/resource">
+                   <param name="yn" style="template" type="tst:yesno"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      register("test://simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateInMiddleAssertions(checker)
+    }
+
+    scenario("The WADL in tree format contains a template parameter of a custom type in the middle of the path") {
+      given("A WADL in tree format with a template parameter of a custom type in the middle of  the path")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://simple.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path">
+                <resource path="to">
+                  <resource path="my">
+                    <resource id="yn" path="{yn}">
+                       <param name="yn" style="template" type="tst:yesno"/>
+                      <resource path="resource">
+                       <method href="#getMethod" />
+                     </resource>
+                  </resource>
+                </resource>
+               </resource>
+             </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      register("test://simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateInMiddleAssertions(checker)
+    }
+
+    scenario("The WADL in mix format contains a template parameter of a custom type in the middle of the path") {
+      given("A WADL in mix format with a template parameter of a custom type in the middle of  the path")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://simple.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my">
+                 <resource id="yn" path="{yn}">
+                   <param name="yn" style="template" type="tst:yesno"/>
+                   <resource path="resource">
+                     <method href="#getMethod" />
+                   </resource>
+                 </resource>
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      register("test://simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateInMiddleAssertions(checker)
+    }
+
   }
 }
