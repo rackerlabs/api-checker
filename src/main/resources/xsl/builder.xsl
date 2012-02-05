@@ -22,6 +22,11 @@
     
     <!-- Useful matches -->
     <xsl:variable name="matchAll" select="'.*'"/>
+
+    <!-- A list of namespaces -->
+    <xsl:variable name="namespaces">
+        <xsl:call-template name="check:getNamespaces"/>
+    </xsl:variable>
     
     <xsl:template match="wadl:application">
         <!--
@@ -46,13 +51,66 @@
             states in the machine.
         -->
         <checker>
+            <xsl:call-template name="check:addNamespaceNodes"/>
             <xsl:apply-templates select="$pass1" mode="addErrorStates"/>
         </checker>
     </xsl:template>
     
+    <xsl:template name="check:getNamespaces">
+        <!--
+            Retrieve all required namespaces
+        -->
+        <xsl:variable name="ns">
+            <namespaces>
+                <xsl:apply-templates mode="ns"/>
+            </namespaces>
+        </xsl:variable>
+
+        <!--
+            Return only unique ones.
+        -->
+        <namespaces>
+            <xsl:for-each-group select="$ns//check:ns" group-by="@uri">
+                <xsl:copy-of select="current-group()[1]"/>
+            </xsl:for-each-group>
+        </namespaces>
+    </xsl:template>
+
+    <xsl:template name="check:addNamespaceNodes">
+        <xsl:for-each select="$namespaces//check:ns">
+            <xsl:namespace name="{@prefix}" select="@uri"/>
+        </xsl:for-each>
+    </xsl:template>
+
+    <xsl:template match="wadl:param[@type]" mode="ns">
+        <xsl:variable name="qname" select="resolve-QName(@type,.)" as="xsd:QName"/>
+        <xsl:call-template name="check:printns">
+            <xsl:with-param name="qname" select="$qname"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="wadl:representation[@element]" mode="ns">
+        <xsl:variable name="qname" select="resolve-QName(@element,.)" as="xsd:QName"/>
+        <xsl:call-template name="check:printns">
+            <xsl:with-param name="qname" select="$qname"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="check:printns">
+        <xsl:param name="qname" as="xsd:QName"/>
+        <ns>
+            <xsl:attribute name="prefix">
+                <xsl:value-of select="prefix-from-QName($qname)"/>
+            </xsl:attribute>
+            <xsl:attribute name="uri">
+                <xsl:value-of select="namespace-uri-from-QName($qname)"/>
+            </xsl:attribute>
+        </ns>
+    </xsl:template>
+
     <xsl:template match="check:step" mode="addErrorStates">
         <xsl:choose>
-            <xsl:when test="@type=('URL','START')">
+            <xsl:when test="@type=('URL','URLXSD','START')">
                 <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
                 <xsl:variable name="doConnect" as="xsd:boolean" 
                     select="not((for $n in $nexts return 
@@ -84,7 +142,17 @@
             <xsl:sequence select="check:getNextMethodLinks(.)"/>
         </xsl:variable>
         <xsl:variable name="templatePath" select="starts-with(@path,'{')" as="xsd:boolean"/>
-        <step type="URL">
+        <step>
+            <xsl:attribute name="type">
+                <xsl:choose>
+                    <xsl:when test="$templatePath and check:isXSDURL(.)">
+                        <xsl:text>URLXSD</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>URL</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
             <xsl:attribute name="id" select="generate-id()"/>
             <xsl:attribute name="match">
                 <xsl:choose>
@@ -106,6 +174,19 @@
         <xsl:apply-templates/>
         <xsl:call-template name="check:addMethodSets"/>
     </xsl:template>
+    <xsl:function name="check:isXSDURL" as="xsd:boolean">
+        <xsl:param name="path" as="node()"/>
+        <xsl:variable name="param" select="check:paramForTemplatePath($path)"/>
+        <xsl:variable name="type" select="resolve-QName($param/@type,$param)" as="xsd:QName"/>
+        <xsl:choose>
+            <xsl:when test="(namespace-uri-from-QName($type) = $schemaNS) and (local-name-from-QName($type) = 'string')">
+                <xsl:value-of select="false()"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="true()"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
     <xsl:function name="check:paramForTemplatePath" as="node()">
         <xsl:param name="path" as="node()"/>
         <xsl:variable name="paramName" select="replace($path/@path,'(\{|\})','')"
@@ -123,7 +204,6 @@
     </xsl:function>
     <xsl:template name="check:getTemplateMatch">
         <xsl:variable name="param" select="check:paramForTemplatePath(.)"/>
-        <xsl:variable name="paramName" select="$param/@name" as="xsd:string"/>
         <xsl:value-of select="check:getMatch(resolve-QName($param/@type,$param))"/>
     </xsl:template>
     <xsl:template name="check:addMethodSets">
@@ -220,11 +300,11 @@
                 <xsl:value-of select="check:getMatchForPlainXSDType($type)"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="$type"/>
+                <xsl:value-of select="check:normType($type)"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
-    
+
     <xsl:function name="check:getMatchForPlainXSDType" as="xsd:string">
         <xsl:param name="type" as="xsd:QName"/>
         <xsl:variable name="name" as="xsd:string"
@@ -234,8 +314,13 @@
                 <xsl:value-of select="'.*'"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="$type"/>
+                <xsl:value-of select="check:normType($type)"/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="check:normType" as="xsd:string">
+        <xsl:param name="type" as="xsd:QName"/>
+        <xsl:value-of select="concat($namespaces//check:ns[@uri = namespace-uri-from-QName($type)]/@prefix,':',local-name-from-QName($type))"/>
     </xsl:function>
 </xsl:stylesheet>

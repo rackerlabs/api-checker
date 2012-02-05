@@ -45,8 +45,16 @@ class BaseCheckerSpec extends BaseWADLSpec {
     (checker \\ "step").filter(n => (n \ "@match").text == nodeMatch)
   }
 
+  def stepsWithLabel (checker : NodeSeq, labelMatch  : String) : NodeSeq = {
+    (checker \\ "step").filter(n => (n \ "@label").text == labelMatch)
+  }
+
   def stepsWithURLMatch (checker : NodeSeq, urlMatch  : String) : NodeSeq = {
     stepsWithMatch (checker, urlMatch).filter(n => (n \ "@type").text == "URL")
+  }
+
+  def stepsWithURLXSDMatch (checker : NodeSeq, urlMatch  : String) : NodeSeq = {
+    stepsWithMatch (checker, urlMatch).filter(n => (n \ "@type").text == "URLXSD")
   }
 
   def stepsWithMethodMatch (checker : NodeSeq, methodMatch  : String) : NodeSeq = {
@@ -58,6 +66,8 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def URLFail : (NodeSeq) => NodeSeq = stepsWithType(_, "URL_FAIL")
   def MethodFail : (NodeSeq) => NodeSeq = stepsWithType(_, "METHOD_FAIL")
   def URL(url : String) : (NodeSeq) => NodeSeq = stepsWithURLMatch(_, url)
+  def URLXSD(url : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatch(_, url)
+  def Label(label : String) : (NodeSeq) => NodeSeq = stepsWithLabel(_, label)
   def Method(method : String) : (NodeSeq) => NodeSeq = stepsWithMethodMatch(_, method)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {

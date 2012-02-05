@@ -181,6 +181,9 @@
             <xsl:when test="@type = 'URL'">
                 <xsl:text>, fillcolor="yellowgreen"</xsl:text>
             </xsl:when>
+            <xsl:when test="@type = 'URLXSD'">
+                <xsl:text>, fillcolor="yellowgreen"</xsl:text>
+            </xsl:when>
         </xsl:choose>
          <xsl:value-of select="']&#x0a;'"/>
              </xsl:otherwise>

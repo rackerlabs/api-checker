@@ -22,12 +22,7 @@
          1. [X] State Labels
          2. [X] rax:invisible extension
       3. [X] Ensure that input WADLs are correct before tests are run.
-      4. [ ] WADL Grammar[0/2]
-         1. [ ] External Grammar[0/2]
-            1. [ ] File Available
-            2. [ ] Missing File
-         2. [ ] Inline Grammar
-      5. [-] Test Path Templates[2/4]
+      4. [-] Test Path Templates[2/4]
          1. [X] String templates[7/7]
             1. [X] At the end of the path
             2. [X] At the end of the path (tree)
@@ -36,14 +31,14 @@
             5. [X] In between path (tree)
             6. [X] In between path (mixed)
             7. [X] Different prefix
-         2. [ ] Test Path Templates of other types[0/7]
-            1. [ ] At the end of the path
+         2. [-] Test Path Templates of other types[1/7]
+            1. [X] At the end of the path
             2. [ ] At the end of the path (tree)
             3. [ ] At the end of the path (mixed)
             4. [ ] In between path
             5. [ ] In between path (tree)
             6. [ ] In between path (mixed)
-            7. [ ] Missing Grammar File? (Simple test)
+            7. [ ] Test default QName type.
          3. [X] Resource/Parameter mismatch[4/4]
             1. [X] Name MisMatch
             2. [X] Missing parameter
@@ -52,6 +47,11 @@
          4. [ ] RegEx Encoding[0/2]
             1. [ ] In URL
             2. [ ] In Method
+      5. [ ] WADL Grammar[0/2]
+         1. [ ] External Grammar[0/2]
+            1. [ ] File Available
+            2. [ ] Missing File
+         2. [ ] Inline Grammar(?)
    3. [ ] Add Opt as an option, by pipding through opt1
    4. [ ] Simple optimization test to confirm functionality
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
