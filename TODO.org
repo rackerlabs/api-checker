@@ -56,10 +56,9 @@
          2. [ ] Inline Grammar(?)
    3. [ ] Add Opt as an option, by pipding through opt1
    4. [ ] Simple optimization test to confirm functionality
-** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
-** TODO Review builder output -- still make sense? Update if needed.
+** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO CLI for translation?
 ** TODO Schema for checker XML (XSD 1.1 and 1.0)
 ** TODO Checker to scala.
