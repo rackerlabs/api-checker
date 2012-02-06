@@ -1037,6 +1037,126 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateAtEndAssertions(checker)
     }
 
+    scenario("The WADL contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+      given("A WADL with a template parameter of a custom type at the end of the path, with the type in a default namespace")
+      val inWADL =
+        <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
+                          xmlns="test://schema/a">
+           <wadl:grammars>
+              <wadl:include href="test://simple.xsd"/>
+           </wadl:grammars>
+           <wadl:resources base="https://test.api.openstack.com">
+              <wadl:resource id="yn" path="path/to/my/resource/{yn}">
+                   <wadl:param name="yn" style="template" type="yesno"/>
+                   <wadl:method href="#getMethod" />
+              </wadl:resource>
+           </wadl:resources>
+           <wadl:method id="getMethod" name="GET">
+               <wadl:response status="200 203"/>
+           </wadl:method>
+        </wadl:application>
+      register("test://simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateAtEndAssertions(checker)
+    }
+
+    scenario("The WADL in tree format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+      given("A WADL in tree format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
+      val inWADL =
+        <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
+                          xmlns="test://schema/a">
+           <wadl:grammars>
+              <wadl:include href="test://simple.xsd"/>
+           </wadl:grammars>
+           <wadl:resources base="https://test.api.openstack.com">
+              <wadl:resource path="path">
+                <wadl:resource path="to">
+                  <wadl:resource path="my">
+                   <wadl:resource path="resource">
+                    <wadl:resource path="{yn}">
+                       <wadl:param name="yn" style="template" type="yesno"/>
+                       <wadl:method href="#getMethod" />
+                    </wadl:resource>
+                  </wadl:resource>
+                </wadl:resource>
+               </wadl:resource>
+             </wadl:resource>
+           </wadl:resources>
+           <wadl:method id="getMethod" name="GET">
+               <wadl:response status="200 203"/>
+           </wadl:method>
+        </wadl:application>
+      register("test://simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateAtEndAssertions(checker)
+    }
+
+    scenario("The WADL in mix format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+      given("A WADL in mix format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
+      val inWADL =
+        <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
+                         xmlns="test://schema/a">
+           <wadl:grammars>
+              <wadl:include href="test://simple.xsd"/>
+           </wadl:grammars>
+           <wadl:resources base="https://test.api.openstack.com">
+              <wadl:resource path="path/to/my">
+                   <wadl:resource path="resource">
+                    <wadl:resource id="yn" path="{yn}">
+                       <wadl:param name="yn" style="template" type="yesno"/>
+                       <wadl:method href="#getMethod" />
+                    </wadl:resource>
+                    </wadl:resource>
+               </wadl:resource>
+           </wadl:resources>
+           <wadl:method id="getMethod" name="GET">
+               <wadl:response status="200 203"/>
+           </wadl:method>
+        </wadl:application>
+      register("test://simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateAtEndAssertions(checker)
+    }
+
     //
     //  The following scenarios test a custom template parameter in the
     //  middle of the resource path (/path/to/my/{yn}/resource. They are
