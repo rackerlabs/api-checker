@@ -33,48 +33,55 @@ class WADLCheckerBuilder(private var wadl : WADLNormalizer) {
   def this() = this(null)
 
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
+  val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/removeDups.xsl")))
 
-  def build (in : Source, out: Result) : Unit = {
+  def build (in : Source, out: Result, removeDups : Boolean) : Unit = {
     try {
       val transformer = wadl.newTransformer(TREE, XSD11, false, KEEP)
       val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
 
-      buildHandler.setResult (out)
+      if (removeDups) {
+        val dupsHandler = wadl.saxTransformerFactory.newTransformerHandler(dupsTemplates)
+        buildHandler.setResult (new SAXResult (dupsHandler))
+        dupsHandler.setResult(out)
+      } else {
+        buildHandler.setResult (out)
+      }
       transformer.transform (in, new SAXResult(buildHandler))
     } catch {
       case e => throw new WADLException ("WADL Processing Error", e)
     }
   }
 
-  def build(in : (String, InputStream), out: Result) : Unit = {
+  def build(in : (String, InputStream), out: Result, removeDups : Boolean) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
     val inputSource = new InputSource(in._2)
     inputSource.setSystemId(in._1)
-    build(new SAXSource(xmlReader, inputSource), out)
+    build(new SAXSource(xmlReader, inputSource), out, removeDups)
   }
 
-  def build(in : InputStream, out: Result) : Unit = {
-    build (("",in), out)
+  def build(in : InputStream, out: Result, removeDups : Boolean) : Unit = {
+    build (("",in), out, removeDups)
   }
 
-  def build(in : Reader, out: Result) : Unit = {
+  def build(in : Reader, out: Result, removeDups : Boolean) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out)
+    build(new SAXSource(xmlReader, new InputSource(in)), out, removeDups)
   }
 
-  def build(in : String, out: Result) : Unit = {
+  def build(in : String, out: Result, removeDups : Boolean) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out)
+    build(new SAXSource(xmlReader, new InputSource(in)), out, removeDups)
   }
 
-  def build (in : (String, NodeSeq)) : NodeSeq = {
+  def build (in : (String, NodeSeq), removeDups : Boolean) : NodeSeq = {
     val bytesOut = new ByteArrayOutputStream()
-    build (in, new StreamResult(bytesOut))
+    build (in, new StreamResult(bytesOut), removeDups)
     XML.loadString (bytesOut.toString())
   }
 
-  def build (in: NodeSeq) : NodeSeq = {
-    build (("",in))
+  def build (in: NodeSeq, removeDups : Boolean = false) : NodeSeq = {
+    build (("",in), removeDups)
   }
 }
 
