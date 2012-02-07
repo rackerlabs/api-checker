@@ -266,7 +266,7 @@
     
     <xsl:function name="check:toRegExEscaped" as="xsd:string">
         <xsl:param name="in" as="xsd:string"/>
-        <xsl:value-of select="replace($in,'\.|\\|\(|\)|\{|\}|\[|\]|\?|\+|\^|\$|#','\\$0')"/>
+        <xsl:value-of select="replace($in,'\.|\\|\(|\)|\{|\}|\[|\]|\?|\+|\-|\^|\$|#|\*|\|','\\$0')"/>
     </xsl:function>
         
     <xsl:function name="check:getNextURLLinks" as="xsd:string*">

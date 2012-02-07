@@ -1315,5 +1315,24 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateInMiddleAssertions(checker)
     }
 
+    scenario("The WADL contains a URL with special regex symbols") {
+      given("a WADL that contains an URL winh special regex symbols")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="\^-.${}*+|#()[]">
+                  <method name=".-"/>
+              </resource>
+              <resource path="^ABC[D]EFG#">
+                  <method name="-GET..IT-"/>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      assert (checker, Start, URL("\\\\\\^\\-\\.\\$\\{\\}\\*\\+\\|\\#\\(\\)\\[\\]"), Method("\\.\\-"))
+      assert (checker, Start, URL("\\^ABC\\[D\\]EFG\\#"), Method("\\-GET\\.\\.IT\\-"))
+    }
   }
 }
