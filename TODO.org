@@ -56,6 +56,9 @@
          2. [ ] Inline Grammar(?)
    3. [ ] Add Opt as an option, by pipding through opt1
    4. [ ] Simple optimization test to confirm functionality
+        1. [ ] OPT on but no duplicates
+        2. [ ] A single duplicate
+        3. [ ] Multiple duplicates
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
