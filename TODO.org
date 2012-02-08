@@ -54,11 +54,17 @@
             1. [ ] File Available
             2. [ ] Missing File
          2. [ ] Inline Grammar(?)
-   3. [ ] Add Opt as an option, by pipding through opt1
-   4. [ ] Simple optimization test to confirm functionality
-        1. [ ] OPT on but no duplicates
-        2. [ ] A single duplicate
-        3. [ ] Multiple duplicates
+   3. [ ] Add Opt as an option, by pipeing through removeDups
+   4. [-] Simple optimization test to confirm functionality[3/9]
+        1. [X] OPT on but no duplicates
+        2. [X] OPT on but no duplicates (tree)
+        3. [X] OPT on but no duplicates (mixed)
+        4. [ ] A single duplicate
+        5. [ ] A single duplicate (tree)
+        6. [ ] A single duplicate (mixed)
+        7. [ ] Multiple duplicates
+        8. [ ] Multiple duplicates (tree)
+        9. [ ] Multiple duplicates (mixed)
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
