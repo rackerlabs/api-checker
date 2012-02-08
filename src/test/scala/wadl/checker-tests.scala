@@ -1449,4 +1449,122 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     noDupAsserts(checker_dupoff)
   }
 
+  //
+  //  The following scenarios test the remove duplicate optimization
+  //  when there is a single duplicate. They are equivalent but they are
+  //  written in slightly different WADL form the assertions below
+  //  must apply to all of them.
+  //
+
+  def singleDupAsserts(checker_dupon : NodeSeq, checker_dupoff : NodeSeq) : Unit = {
+    then("Paths should exist in both checkers")
+    assert (checker_dupon, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
+    assert (checker_dupon, Start, URL("path"), URL("to"), URL("another"), URL("resource"), Method("GET"))
+    assert (checker_dupoff, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
+    assert (checker_dupoff, Start, URL("path"), URL("to"), URL("another"), URL("resource"), Method("GET"))
+
+    and("there should be a duplicate resource node when dup is off")
+    assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='path']) = 1")
+    assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='to']) = 1")
+    assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='my']) = 1")
+    assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='resource']) = 2")
+    assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='another']) = 1")
+    assert (checker_dupoff, "count(//chk:step[@type='METHOD' and @match='GET']) = 1")
+
+    and("there should *not* be a duplicate resource node when dup is on")
+    assert (checker_dupon, "count(//chk:step[@type='URL' and @match='path']) = 1")
+    assert (checker_dupon, "count(//chk:step[@type='URL' and @match='to']) = 1")
+    assert (checker_dupon, "count(//chk:step[@type='URL' and @match='my']) = 1")
+    assert (checker_dupon, "count(//chk:step[@type='URL' and @match='resource']) = 1")
+    assert (checker_dupon, "count(//chk:step[@type='URL' and @match='another']) = 1")
+    assert (checker_dupon, "count(//chk:step[@type='METHOD' and @match='GET']) = 1")
+  }
+
+  scenario("The WADL contain a single duplicate and remove dup optimization is on") {
+    given("a WADL that contains a single duplicate")
+    val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                     <method href="#res"/>
+              </resource>
+              <resource path="path/to/another/resource">
+                     <method href="#res"/>
+              </resource>
+           </resources>
+           <method id="res" name="GET">
+                 <response status="200 203"/>
+           </method>
+        </application>
+    when("the WADL is translated, with dup remove on")
+    val checker_dupon = builder.build(inWADL, true)
+    and ("the WADL is translated, with dup remove off")
+    val checker_dupoff = builder.build(inWADL)
+
+    singleDupAsserts(checker_dupon, checker_dupoff)
+  }
+
+  scenario("The WADL, in tree format, contains a single duplicate node and remove dup optimization is on") {
+    given("a WADL in tree format contains a single duplicate")
+    val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path">
+                <resource path="to">
+                  <resource path="my">
+                   <resource path="resource">
+                     <method href="#res"/>
+                   </resource>
+                 </resource>
+                 <resource path="another">
+                   <resource path="resource">
+                     <method href="#res"/>
+                   </resource>
+                 </resource>
+                </resource>
+              </resource>
+           </resources>
+           <method id="res" name="GET">
+                 <response status="200 203"/>
+           </method>
+        </application>
+    when("the WADL is translated, with dup remove on")
+    val checker_dupon = builder.build(inWADL, true)
+    and ("the WADL is translated, with dup remove off")
+    val checker_dupoff = builder.build(inWADL)
+
+    singleDupAsserts(checker_dupon, checker_dupoff)
+  }
+
+  scenario("The WADL, in mix format,  contain a single duplicate and remove dup optimization is on") {
+    given("a WADL, in mix format,  that contains a single duplicate")
+    val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my">
+                 <resource path="resource">
+                     <method href="#res"/>
+                 </resource>
+              </resource>
+              <resource path="path/to/another">
+                 <resource path="resource">
+                     <method href="#res"/>
+                 </resource>
+              </resource>
+           </resources>
+           <method id="res" name="GET">
+                 <response status="200 203"/>
+           </method>
+        </application>
+    when("the WADL is translated, with dup remove on")
+    val checker_dupon = builder.build(inWADL, true)
+    and ("the WADL is translated, with dup remove off")
+    val checker_dupoff = builder.build(inWADL)
+
+    singleDupAsserts(checker_dupon, checker_dupoff)
+  }
+
 }
