@@ -1,0 +1,184 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
+    targetNamespace="http://www.rackspace.com/repose/wadl/checker">
+
+    <!-- The Checker Element -->
+    <element name="checker" type="chk:Checker"/>
+
+    <!-- Complex Types -->
+    <complexType name="Step">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                   Base type for all other steps.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="id" type="xsd:ID" use="required"/>
+        <attribute name="type" type="chk:StepType" use="required"/>
+        <attribute name="label" type="xsd:string" use="optional"/>
+    </complexType>
+
+    <complexType name="Checker">
+        <sequence>
+            <element name="step" type="chk:Step" minOccurs="0" maxOccurs="unbounded">
+                <alternative test="@type eq 'START'" type="chk:StartStep"/>
+                <alternative test="@type eq 'URL_FAIL'" type="chk:URLFailStep"/>
+                <alternative test="@type eq 'METHOD_FAIL'" type="chk:MethodFailStep"/>
+                <alternative test="@type eq 'ACCEPT'" type="chk:AcceptStep"/>
+                <alternative test="@type eq 'URL'" type="chk:URLStep"/>
+                <alternative test="@type eq 'METHOD'" type="chk:MethodStep"/>
+                <alternative test="@type eq 'URLXSD'" type="chk:URLXSDStep"/>
+            </element>
+        </sequence>
+    </complexType>
+
+    <!-- Connected Steps -->
+    <complexType name="ConnectedStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A base step type for all steps that connect to other steps.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:Step">
+                <attribute name="next" type="xsd:IDREFS" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="StartStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A start step, denotes the start of the machine.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="URLStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A step in the URL path. The match attribute
+                    contains a regex that matches the steps section of
+                    the path.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep">
+                <attribute name="match" type="xsd:string" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="URLXSDStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A step in the URL path. The match attribute
+                    contains a QName that is used to represent an XSD
+                    simple type that validates against the section of
+                    the path.
+                </html:p>
+                <html:p>
+                    Note: If possible, should extend to make sure tha
+                    the simple type is defined by a referenced schema.
+                    We're not there yet.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep">
+                <attribute name="match" type="xsd:QName" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="MethodStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A step checking the current method.  The match
+                    attribute contains a regex that matches against
+                    the method name.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:Step">
+                <attribute name="match" type="xsd:string" use="required"/>
+                <!-- Step is only connected in one very particular
+                     case, os unlike a regular connected step, there
+                     are cases where MethodStep is terminal. Long
+                     term, MethodStep should be a regular method step,
+                     but we're not there yet.-->
+                <attribute name="next" type="xsd:IDREFS" use="optional"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <!-- End Steps -->
+    <complexType name="AcceptStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    An accept step, we accept the input.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:Step"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="URLFailStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A URLFail step, this should generate a 404 (Not Found).
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:Step"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="MethodFailStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A MethodFail step, this should generate a 405 (Method Not Allowed).
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:Step"/>
+        </complexContent>
+    </complexType>
+
+    <!-- Simple Types -->
+    <simpleType name="StepType">
+        <restriction base="xsd:string">
+            <enumeration value="START"/>
+            <enumeration value="URL_FAIL"/>
+            <enumeration value="METHOD_FAIL"/>
+            <enumeration value="ACCEPT"/>
+            <enumeration value="URL"/>
+            <enumeration value="METHOD"/>
+            <enumeration value="URLXSD"/>
+        </restriction>
+    </simpleType>
+</schema>
