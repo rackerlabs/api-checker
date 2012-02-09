@@ -1,7 +1,7 @@
 * api-checker TODOs
 ** DONE Mavenize
 ** DONE Move Normalizer code to a lib in WADL tools.
-** TODO WADL Normalize, Builder, opt1 in a single path [2/4]
+** TODO WADL Normalize, Builder, opt1 in a single path [3/4]
    1. [X] Add Builder Library
    2. [-] Simple transation tests to confirm the lib is working [4/5]
       1. [X] Test URI and Method from various WADL configurations[13/13]
@@ -55,16 +55,16 @@
             2. [ ] Missing File
          2. [ ] Inline Grammar(?)
    3. [X] Add Opt as an option, by pipeing through removeDups
-   4. [-] Simple optimization test to confirm functionality[6/9]
+   4. [X] Simple optimization test to confirm functionality[9/9]
         1. [X] OPT on but no duplicates
         2. [X] OPT on but no duplicates (tree)
         3. [X] OPT on but no duplicates (mixed)
         4. [X] A single duplicate
         5. [X] A single duplicate (tree)
         6. [X] A single duplicate (mixed)
-        7. [ ] Multiple duplicates
-        8. [ ] Multiple duplicates (tree)
-        9. [ ] Multiple duplicates (mixed)
+        7. [X] Multiple duplicates
+        8. [X] Multiple duplicates (tree)
+        9. [X] Multiple duplicates (mixed)
 ** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
