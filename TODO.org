@@ -1,6 +1,7 @@
 * api-checker TODOs
 ** DONE Mavenize
 ** DONE Move Normalizer code to a lib in WADL tools.
+** DONE Schema for checker XML (XSD 1.1)
 ** TODO WADL Normalize, Builder, opt1 in a single path [3/4]
    1. [X] Add Builder Library
    2. [-] Simple transation tests to confirm the lib is working [4/5]
@@ -69,6 +70,5 @@
    Maybe an optional output?
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO CLI for translation?
-** TODO Schema for checker XML (XSD 1.1 and 1.0)
 ** TODO Checker to scala.
 ** TODO WADL Change Detector...
