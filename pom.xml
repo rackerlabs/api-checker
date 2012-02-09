@@ -19,7 +19,7 @@
         <saxon.version>9.3</saxon.version>
         <scala.test.version>1.6.1</scala.test.version>
         <junit.version>4.10</junit.version>
-        <wadl-tools.version>1.0.0-SNAPSHOT</wadl-tools.version>
+        <wadl-tools.version>1.0.1-SNAPSHOT</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
     </properties>
 
