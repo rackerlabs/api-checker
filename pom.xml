@@ -21,6 +21,7 @@
         <junit.version>4.10</junit.version>
         <wadl-tools.version>1.0.1-SNAPSHOT</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
+        <xerces.version>2.12.0-SNAPSHOT</xerces.version>
     </properties>
 
     <dependencies>
@@ -34,6 +35,11 @@
             <artifactId>saxon</artifactId>
             <version>${saxon.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xerces-xsd11</artifactId>
+            <version>${xerces.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -122,6 +128,7 @@
                     <includes>
                         <include>**/*.class</include>
                     </includes>
+                    <enableAssertions>false</enableAssertions>
                 </configuration>
             </plugin>
             <plugin>
