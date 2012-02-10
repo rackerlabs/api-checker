@@ -73,3 +73,7 @@
 ** TODO CLI for translation?
 ** TODO Checker to scala.
 ** TODO WADL Change Detector...
+** TODO File Xerces Bugs[0/2]
+   1. [ ] assert error
+   2. [ ] multiple ID error in cli validator
+
