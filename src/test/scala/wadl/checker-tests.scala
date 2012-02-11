@@ -1760,4 +1760,44 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     multipleDupAsserts(checker_dupon, checker_dupoff)
   }
 
+  scenario("The WADL contains a single resource with multiple methods of the same type") {
+      given("a WADL that contains a single resource with multiple methods of the same type")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method id="action1" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method id="action2" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method id="action3" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method id="action4" name="POST">
+                      <response status="201"/>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      then("There should be a total of 5 POST method steps...4 specified plus 1 collecting them")
+      assert(checker, "count(//chk:step[@type='METHOD']) = 5")
+      and ("All paths should go through POST step.")
+      println(checker)
+      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Method("POST"))
+      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action1"))
+      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action2"))
+      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action3"))
+      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action4"))
+      and ("One of the post steps is labeled ε, the rest are labeled according to thier ID")
+      assert(checker, "//chk:step[@type='METHOD' and @label='action1']")
+      assert(checker, "//chk:step[@type='METHOD' and @label='action2']")
+      assert(checker, "//chk:step[@type='METHOD' and @label='action3']")
+      assert(checker, "//chk:step[@type='METHOD' and @label='action4']")
+      assert(checker, "//chk:step[@type='METHOD' and @label='ε']")
+    }
 }
