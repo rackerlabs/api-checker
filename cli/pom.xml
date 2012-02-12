@@ -18,6 +18,7 @@
     <description>API Checker Command Line Tools</description>
 
     <modules>
+        <module>wadl2checker</module>
         <module>wadl2dot</module>
     </modules>
 
