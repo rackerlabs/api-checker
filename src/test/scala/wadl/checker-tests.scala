@@ -1037,7 +1037,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateAtEndAssertions(checker)
     }
 
-    scenario("The WADL contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+    ignore("The WADL contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
       given("A WADL with a template parameter of a custom type at the end of the path, with the type in a default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
@@ -1073,7 +1073,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateAtEndAssertions(checker)
     }
 
-    scenario("The WADL in tree format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+    ignore("The WADL in tree format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
       given("A WADL in tree format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
@@ -1117,7 +1117,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateAtEndAssertions(checker)
     }
 
-    scenario("The WADL in mix format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+    ignore("The WADL in mix format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
       given("A WADL in mix format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
@@ -1787,7 +1787,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       then("There should be a total of 5 POST method steps...4 specified plus 1 collecting them")
       assert(checker, "count(//chk:step[@type='METHOD']) = 5")
       and ("All paths should go through POST step.")
-      println(checker)
       assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Method("POST"))
       assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action1"))
       assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action2"))
