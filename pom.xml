@@ -5,14 +5,17 @@
     <groupId>com.rackspace.papi.components</groupId>
     <artifactId>api-checker</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>API Checker</name>
-
     <description>
         A repose component that ensures that HTTP requests are valid
         according to a WADL.
     </description>
+
+    <modules>
+        <module>core</module>
+    </modules>
 
     <properties>
         <scala.version>2.9.0</scala.version>
@@ -103,39 +106,4 @@
             </pluginRepositories>
         </profile>
     </profiles>
-    <build>
-        <sourceDirectory>src/main/scala</sourceDirectory>
-        <testSourceDirectory>src/test/scala</testSourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.10</version>
-                <configuration>
-                    <includes>
-                        <include>**/*.class</include>
-                    </includes>
-                    <enableAssertions>false</enableAssertions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.jteigen</groupId>
-                <artifactId>maven-scalatest-plugin</artifactId>
-                <version>1.1-SNAPSHOT</version>
-            </plugin>
-        </plugins>
-    </build>
 </project>
