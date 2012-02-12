@@ -19,7 +19,12 @@
         <xsl:choose>
             <xsl:when test="not($dups/check:group)">
                 <!-- No duplicats found, output checker -->
-                <xsl:copy-of select="$checker"/>
+                <checker>
+                  <xsl:copy-of select="/check:checker/namespace::*"/>
+                  <xsl:for-each select="$checker//check:step">
+                      <xsl:copy-of select="."/>
+                  </xsl:for-each>
+                </checker>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="replaceAllDups">

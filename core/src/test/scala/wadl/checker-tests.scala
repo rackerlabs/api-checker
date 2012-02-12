@@ -1157,6 +1157,86 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateAtEndAssertions(checker)
     }
 
+    scenario("The WADL contains a template parameter of a custom type at the end of the path, with remove dup on") {
+      given("A WADL with a template parameter of a custom type at the end of the path")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://simple.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="yn" path="path/to/my/resource/{yn}">
+                   <param name="yn" style="template" type="tst:yesno"/>
+                   <method href="#getMethod" />
+              </resource>
+              <resource path="1/dup">
+                   <method href="#getMethod" />
+              </resource>
+              <resource path="2/dup">
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      register("test://simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL, true)
+      then("The checker should contain an URL node for each path step")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 7")
+      and("A single URLXSD node")
+      assert (checker, "count(/chk:checker/chk:step[@type='URLXSD']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='URLXSD' and @label='yn']) = 1")
+      and ("The checker should contain a GET method")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
+      and ("The path from the start should contain all URL and URLXSD nodes")
+      and ("it should end in the GET method node")
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Label("yn"), Method("GET"))
+      and ("The URLXSD should match a valid QName")
+      assert (checker, "namespace-uri-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
+                                           "= 'test://schema/a'")
+      assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
+                                           "= 'yesno'")
+      and ("There should not be a duplicate dup node")
+      assert (checker, "count(//chk:step[@type='URL' and @match='dup']) = 1")
+      and ("The dup paths should be valid")
+      assert (checker, Start, URL("1"), URL("dup"), Method("GET"))
+      assert (checker, Start, URL("2"), URL("dup"), Method("GET"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("1"), URLFail)
+      assert (checker, URL("1"), MethodFail)
+      assert (checker, URL("2"), URLFail)
+      assert (checker, URL("2"), MethodFail)
+      assert (checker, URL("dup"), URLFail)
+      assert (checker, URL("dup"), MethodFail)
+      assert (checker, URL("path"), URLFail)
+      assert (checker, URL("path"), MethodFail)
+      assert (checker, URL("to"), URLFail)
+      assert (checker, URL("to"), MethodFail)
+      assert (checker, URL("my"), URLFail)
+      assert (checker, URL("my"), MethodFail)
+      assert (checker, URL("resource"), URLFail)
+      assert (checker, URL("resource"), MethodFail)
+      assert (checker, Label("yn"), URLFail)
+      assert (checker, Label("yn"), MethodFail)
+    }
+
     //
     //  The following scenarios test a custom template parameter in the
     //  middle of the resource path (/path/to/my/{yn}/resource. They are
