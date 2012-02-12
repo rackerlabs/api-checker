@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checker xmlns="http://www.rackspace.com/repose/wadl/checker">
+   <step id="S0" type="START" next="d1e10 d1e12 SE1"/>
+   <step type="URL" id="d1e10" match="v1\.1" next="d1e12 SE1"/>
+   <step type="URL" id="d1e12" match=".*" label="tenantId" next="d1e23 SE1 SE0"/>
+   <step type="URL" id="d1e23" match="OS-BS" next="d1e25 d1e1888 d1e3744 SE1 SE0"/>
+   <step type="URL" id="d1e25" match="volumes"
+         next="d1e428 d1e565 d1e4452 d1e4770 SE1 SE0"/>
+   <step type="URL" id="d1e428" match="detail" next="d1e4614 SE1 SE0"/>
+   <step type="URL" id="d1e565" match="osapi:uuid" label="id"
+         next="d1e1068 d1e4857 d1e4546 d1e4707 SE1 SE0"/>
+   <step type="URL" id="d1e1068" match="metadata"
+         next="d1e1534 d1e1082 d1e1253 d1e1421 SE1 SE0"/>
+   <step type="METHOD" id="d1e1082" match="PUT" label="Create or Replace Metadata"/>
+   <step type="METHOD" id="d1e1253" match="POST" label="Update Metadata"/>
+   <step type="METHOD" id="d1e1421" match="GET" label="List Metadata"/>
+   <step type="URL" id="d1e1534" match="osapi:MetadataKey" label="key"
+         next="d1e1545 d1e1650 d1e1808 SE1 SE0"/>
+   <step type="METHOD" id="d1e1545" match="GET" label="Get Metadata Item"/>
+   <step type="METHOD" id="d1e1650" match="PUT" label="Create or Update Metadata Item"/>
+   <step type="METHOD" id="d1e1808" match="DELETE" label="Delete Metadata Item"/>
+   <step type="URL" id="d1e1888" match="backups"
+         next="d1e2286 d1e2421 d1e4943 d1e5342 SE1 SE0"/>
+   <step type="URL" id="d1e2286" match="detail" next="d1e5035 SE1 SE0"/>
+   <step type="URL" id="d1e2421" match="osapi:uuid" label="id"
+         next="d1e1068 d1e5126 d1e5211 d1e5279 SE1 SE0"/>
+   <step type="URL" id="d1e3744" match="types" next="d1e3866 d1e5430 SE1 SE0"/>
+   <step type="URL" id="d1e3866" match="osapi:uuid" label="id" next="d1e5512 SE1 SE0"/>
+   <step type="METHOD" id="d1e4452" match="GET" label="listVolumes"/>
+   <step type="METHOD" id="d1e4546" match="GET" label="getVolume"/>
+   <step type="METHOD" id="d1e4614" match="GET" label="listDetailVolumes"/>
+   <step type="METHOD" id="d1e4707" match="DELETE" label="deleteVolume"/>
+   <step type="METHOD" id="d1e4770" match="POST" label="createVolume"/>
+   <step type="METHOD" id="d1e4857" match="PUT" label="updateVolume"/>
+   <step type="METHOD" id="d1e4943" match="GET" label="listBackups"/>
+   <step type="METHOD" id="d1e5035" match="GET" label="listDetailBackups"/>
+   <step type="METHOD" id="d1e5126" match="PUT" label="updateBackup"/>
+   <step type="METHOD" id="d1e5211" match="GET" label="getBackup"/>
+   <step type="METHOD" id="d1e5279" match="DELETE" label="deleteBackup"/>
+   <step type="METHOD" id="d1e5342" match="POST" label="createBackup"/>
+   <step type="METHOD" id="d1e5430" match="GET" label="listTypes"/>
+   <step type="METHOD" id="d1e5512" match="GET" label="getType"/>
+   <step id="SE0" type="URL_FAIL"/>
+   <step id="SE1" type="METHOD_FAIL"/>
+   <step id="SA" type="ACCEPT"/>
+</checker>
