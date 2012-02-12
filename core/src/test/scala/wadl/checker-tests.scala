@@ -100,6 +100,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       singlePathAssertions(checker)
     }
 
+    ignore("The WADL contains a single multi-path resource ending in /") {
+      given("a WADL that contains a single multi-path resource with a GET and DELETE method and ending in /")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      singlePathAssertions(checker)
+    }
+
     scenario("The WADL contains a single multi-path resource in tree form") {
       given("a WADL that contains a single multi-path resource in tree form with a GET and DELETE method")
       val inWADL =
