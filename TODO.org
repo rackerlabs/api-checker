@@ -5,6 +5,8 @@
 ** DONE File Xerces Bugs[2/2]
    1. [X] assert error
    2. [X] multiple ID error in cli validator
+** DONE WADL Normalize, Builder, opt1, checker2dot in a single PATH.
+   Maybe an optional output?
 ** TODO WADL Normalize, Builder, opt1 in a single path [3/4]
    1. [X] Add Builder Library
    2. [-] Simple transation tests to confirm the lib is working [5/6]
@@ -70,10 +72,8 @@
         7. [X] Multiple duplicates
         8. [X] Multiple duplicates (tree)
         9. [X] Multiple duplicates (mixed)
-** TODO WADL Normalize, Builder, opt1, checker2dot in a single PATH.
-   Maybe an optional output?
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO CLI for translation?
 ** TODO Checker to scala.
 ** TODO WADL Change Detector...
-
+** TODO Real tests on DOT output

@@ -25,7 +25,7 @@ import com.rackspace.cloud.api.wadl.Converters._
  */
 class WADLException(private val msg : String, private val cause : Throwable) extends Throwable(msg, cause) {}
 
-class WADLCheckerBuilder(private var wadl : WADLNormalizer) {
+class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   if (wadl == null) {
     wadl = new WADLNormalizer
