@@ -15,6 +15,7 @@
 
     <modules>
         <module>core</module>
+        <module>cli</module>
     </modules>
 
     <properties>
@@ -102,6 +103,10 @@
                     <id>scala-tools.org</id>
                     <name>Scala-tools Maven2 Repository</name>
                     <url>http://scala-tools.org/repo-releases</url>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>onejar-maven-plugin.googlecode.com</id>
+                    <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
                 </pluginRepository>
             </pluginRepositories>
         </profile>
