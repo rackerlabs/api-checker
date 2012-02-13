@@ -1058,7 +1058,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateAtEndAssertions(checker)
     }
 
-    ignore("The WADL contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+    scenario("The WADL contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
       given("A WADL with a template parameter of a custom type at the end of the path, with the type in a default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
@@ -1094,7 +1094,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateAtEndAssertions(checker)
     }
 
-    ignore("The WADL in tree format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+    scenario("The WADL in tree format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
       given("A WADL in tree format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
@@ -1138,7 +1138,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       customTemplateAtEndAssertions(checker)
     }
 
-    ignore("The WADL in mix format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
+    scenario("The WADL in mix format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
       given("A WADL in mix format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
