@@ -18,7 +18,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
 
   private val pathNodesTemplates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/path-nodes.xsl")))
 
-  def allStepsFromStep (checker : NodeSeq, id : String, max : Integer = 0) : NodeSeq = {
+  def allStepsFromStep (checker : NodeSeq, id : String, max : Int = 0) : NodeSeq = {
     val bytesOut = new ByteArrayOutputStream()
     val transformer = pathNodesTemplates.newTransformer
     transformer.setParameter("sid",id)
@@ -29,7 +29,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
     XML.loadString(bytesOut.toString())
   }
 
-  def allStepsFromStep (checker : NodeSeq, step_fun : (NodeSeq) => NodeSeq, max : Integer) : NodeSeq = {
+  def allStepsFromStep (checker : NodeSeq, step_fun : (NodeSeq) => NodeSeq, max : Int) : NodeSeq = {
     allStepsFromStep (checker, (step_fun(checker)(0) \ "@id").text, max)
   }
 
