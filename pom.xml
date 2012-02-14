@@ -26,6 +26,7 @@
         <wadl-tools.version>1.0.1-SNAPSHOT</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.0-SNAPSHOT</xerces.version>
+        <servlet.version>3.1</servlet.version>
     </properties>
 
     <dependencies>
@@ -61,6 +62,11 @@
             <artifactId>wadl-tools</artifactId>
             <version>${wadl-tools.version}</version>
         </dependency>
+         <dependency>
+             <groupId>org.glassfish</groupId>
+             <artifactId>javax.servlet</artifactId>
+             <version>${servlet.version}</version>
+         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
             <artifactId>wadl-tools</artifactId>
