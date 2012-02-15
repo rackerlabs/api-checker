@@ -16,14 +16,15 @@ abstract class Step(val id : String, val label : String) {
 abstract class ConnectedStep(id : String, label : String, val next : Array[Step]) extends Step (id, label) {
 
   def checkStep(req : HttpServletRequest, resp : HttpServletResponse) : Boolean
+  val mismatchMessage : String = "Step Mismatch"
 
   override def check(req : HttpServletRequest, resp : HttpServletResponse) : Option[CheckerResult] = {
     if (checkStep (req, resp)) {
       val results : Array[Option[CheckerResult]] = next.map (n =>n.check(req, resp)).filter(s => s.isDefined)
       results.foreach(n => if (n.get.valid) return n)
-      new MultiFailResult (results.map(n=>n.get))
+      return Some (new MultiFailResult (results.map(n=>n.get)))
     }
-    None
+    Some(new MismatchResult(mismatchMessage))
   }
 }
 
@@ -32,6 +33,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
 //
 class Start(id : String, label : String, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override def checkStep(req : HttpServletRequest, resp : HttpServletResponse) : Boolean = true
+  override val mismatchMessage : String = "Bad Start Node?"
 }
 
 //
@@ -52,7 +54,9 @@ class Accept(id : String, label : String) extends Step(id, label) {
 class URLFail(id : String, label : String) extends Step(id, label) {
   override def check(req : HttpServletRequest, resp : HttpServletResponse) : Option[CheckerResult] = {
     //
-    //  Generate a good error message with context
+    //  If there is stuff in the path, then this error is
+    //  applicable. Generate the error, commit the message. No URI
+    //  stuff, then return None.
     //
     return Some(new URLFailResult("Could not find the given resource"))
   }
@@ -65,7 +69,8 @@ class URLFail(id : String, label : String) extends Step(id, label) {
 class MethodFail(id : String, label : String) extends Step(id, label) {
   override def check(req : HttpServletRequest, resp : HttpServletResponse) : Option[CheckerResult] = {
     //
-    //  Generate a good error message with context
+    //  If there is URL stuff return NONE.  Otherwise generate an
+    //  error, commit the message.
     //
     return Some(new MethodFailResult("Expecting method "))
   }
