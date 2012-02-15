@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse
 //  The start step
 //
 class Start(id : String, label : String, next : Array[Step]) extends ConnectedStep(id, label, next) {
-  override def checkStep(req : HttpServletRequest, resp : HttpServletResponse) : Boolean = true
+  override def checkStep(req : HttpServletRequest, resp : HttpServletResponse, uriLevel : Int) : Int = uriLevel
   override val mismatchMessage : String = "Bad Start Node?"
 }
 
@@ -15,7 +15,7 @@ class Start(id : String, label : String, next : Array[Step]) extends ConnectedSt
 //  The accept state, send the request over
 //
 class Accept(id : String, label : String) extends Step(id, label) {
-  override def check(req : HttpServletRequest, resp : HttpServletResponse) : Option[CheckerResult] = {
+  override def check(req : HttpServletRequest, resp : HttpServletResponse, uriLevel : Int) : Option[CheckerResult] = {
     //
     //  Send request...
     //
@@ -27,7 +27,7 @@ class Accept(id : String, label : String) extends Step(id, label) {
 //  The URLFail state, return a 404
 //
 class URLFail(id : String, label : String) extends Step(id, label) {
-  override def check(req : HttpServletRequest, resp : HttpServletResponse) : Option[CheckerResult] = {
+  override def check(req : HttpServletRequest, resp : HttpServletResponse, uriLevel : Int) : Option[CheckerResult] = {
     //
     //  If there is stuff in the path, then this error is
     //  applicable. Generate the error, commit the message. No URI
@@ -42,7 +42,7 @@ class URLFail(id : String, label : String) extends Step(id, label) {
 //
 
 class MethodFail(id : String, label : String) extends Step(id, label) {
-  override def check(req : HttpServletRequest, resp : HttpServletResponse) : Option[CheckerResult] = {
+  override def check(req : HttpServletRequest, resp : HttpServletResponse, uriLevel : Int) : Option[CheckerResult] = {
     //
     //  If there is URL stuff return NONE.  Otherwise generate an
     //  error, commit the message.
