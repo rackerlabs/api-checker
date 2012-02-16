@@ -46,6 +46,14 @@ class MethodFail(id : String, label : String) extends Step(id, label) {
     //  If there is URL stuff return NONE.  Otherwise generate an
     //  error, commit the message.
     //
-    return Some(new MethodFailResult("Expecting method", uriLevel))
+    var result : Option[MethodFailResult] = None
+
+    if (uriLevel >= req.URISegment.size) {
+      val mfr = new MethodFailResult("Bad method", uriLevel)
+      result = Some(mfr)
+      resp.setStatus(mfr.code)
+    }
+
+    return result
   }
 }
