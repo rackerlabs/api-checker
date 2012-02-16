@@ -1,10 +1,6 @@
 package com.rackspace.com.papi.components.checker.step
 
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-
 import com.rackspace.com.papi.components.checker.servlet._
-
 
 //
 //  The start step
