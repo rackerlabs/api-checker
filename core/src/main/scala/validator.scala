@@ -10,11 +10,7 @@ import com.rackspace.com.papi.components.checker.servlet._
 
 class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg, cause) {}
 
-abstract class Validator {
-
-  val startStep : Step
-  val resultHandler : ResultHandler
-
+class Validator(val startStep : Step, val resultHandler : ResultHandler) {
   def validate (req : HttpServletRequest, res : HttpServletResponse) : Unit = {
     try {
       val creq = new CheckerServletRequest (req)
