@@ -40,12 +40,24 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //  Check this step, if successful, check next relevant steps.
   //
   override def check(req : CheckerServletRequest, resp : CheckerServletResponse, uriLevel : Int) : Option[Result] = {
+    var result : Option[Result] = None
     val nextURILevel = checkStep(req, resp, uriLevel)
+
     if (nextURILevel != -1) {
-      val results : Array[Option[Result]] = next.map (n =>n.check(req, resp, nextURILevel)).filter(s => s.isDefined)
-      results.foreach(n => if (n.get.valid) return n)
-      return Some (new MultiFailResult (results.map(n=>n.get), uriLevel))
+      val results : Array[Result] = next.map (n =>n.check(req, resp, nextURILevel)).filter(s => s.isDefined).map(r => r.get)
+      results.foreach(n => if (n.valid) { n.addStepId(id); return Some(n) })
+
+      if (results.size == 1) {
+        results(0).addStepId(id)
+        result = Some(results(0))
+      } else {
+        result = Some(new MultiFailResult (results, uriLevel, id))
+      }
+
+    } else {
+      result = Some(new MismatchResult(mismatchMessage, uriLevel, id))
     }
-    Some(new MismatchResult(mismatchMessage, uriLevel))
+
+    return result
   }
 }

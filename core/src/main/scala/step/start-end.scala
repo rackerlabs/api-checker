@@ -18,7 +18,7 @@ class Accept(id : String, label : String) extends Step(id, label) {
     //
     //  Send request...
     //
-    return Some(AcceptResult)
+    return Some(new AcceptResult("ACCEPTED", uriLevel, id))
   }
 }
 
@@ -35,9 +35,8 @@ class URLFail(id : String, label : String) extends Step(id, label) {
     var result : Option[URLFailResult] = None
 
     if (uriLevel < req.URISegment.size) {
-      var ufr = new URLFailResult("Could not find the given resource", uriLevel)
+      var ufr = new URLFailResult("Could not find the given resource", uriLevel, id)
       result = Some(ufr)
-      resp.setStatus(ufr.code)
     }
 
     return result
@@ -56,9 +55,8 @@ class MethodFail(id : String, label : String) extends Step(id, label) {
     var result : Option[MethodFailResult] = None
 
     if (uriLevel >= req.URISegment.size) {
-      val mfr = new MethodFailResult("Bad method", uriLevel)
+      val mfr = new MethodFailResult("Bad method", uriLevel, id)
       result = Some(mfr)
-      resp.setStatus(mfr.code)
     }
 
     return result
