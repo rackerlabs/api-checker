@@ -32,14 +32,21 @@ class URLFail(id : String, label : String) extends Step(id, label) {
     //  applicable. Generate the error, commit the message. No URI
     //  stuff, then return None.
     //
-    return Some(new URLFailResult("Could not find the given resource", uriLevel))
+    var result : Option[URLFailResult] = None
+
+    if (uriLevel < req.URISegment.size) {
+      var ufr = new URLFailResult("Could not find the given resource", uriLevel)
+      result = Some(ufr)
+      resp.setStatus(ufr.code)
+    }
+
+    return result
   }
 }
 
 //
 // Method fail state
 //
-
 class MethodFail(id : String, label : String) extends Step(id, label) {
   override def check(req : CheckerServletRequest, resp : CheckerServletResponse, uriLevel : Int) : Option[Result] = {
     //
