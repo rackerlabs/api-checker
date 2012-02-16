@@ -17,7 +17,9 @@ abstract class Validator {
 
   def validate (req : HttpServletRequest, res : HttpServletResponse) : Unit = {
     try {
-      resultHandler.handle(startStep.check (new CheckerServletRequest (req), new CheckerServletResponse(res), 0).get)
+      val creq = new CheckerServletRequest (req)
+      val cres = new CheckerServletResponse(res)
+      resultHandler.handle(creq, cres, startStep.check (creq, cres, 0).get)
     } catch {
       case v : ValidatorException => throw v
       case e => throw new ValidatorException("Error while validating request", e)

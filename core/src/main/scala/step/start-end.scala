@@ -32,7 +32,7 @@ class URLFail(id : String, label : String) extends Step(id, label) {
     //  applicable. Generate the error, commit the message. No URI
     //  stuff, then return None.
     //
-    return Some(new URLFailResult("Could not find the given resource"))
+    return Some(new URLFailResult("Could not find the given resource", uriLevel))
   }
 }
 
@@ -46,6 +46,6 @@ class MethodFail(id : String, label : String) extends Step(id, label) {
     //  If there is URL stuff return NONE.  Otherwise generate an
     //  error, commit the message.
     //
-    return Some(new MethodFailResult("Expecting method "))
+    return Some(new MethodFailResult("Expecting method", uriLevel))
   }
 }

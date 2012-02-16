@@ -44,8 +44,8 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
     if (nextURILevel != -1) {
       val results : Array[Option[Result]] = next.map (n =>n.check(req, resp, nextURILevel)).filter(s => s.isDefined)
       results.foreach(n => if (n.get.valid) return n)
-      return Some (new MultiFailResult (results.map(n=>n.get)))
+      return Some (new MultiFailResult (results.map(n=>n.get), uriLevel))
     }
-    Some(new MismatchResult(mismatchMessage))
+    Some(new MismatchResult(mismatchMessage, uriLevel))
   }
 }
