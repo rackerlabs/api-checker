@@ -239,4 +239,46 @@ class ValidatorSuite extends BaseValidatorSuite {
     assertResultFailed(validator_REG2.validate(request("GET","/a/b/d"),response))
   }
 
+  //
+  // validator_REG3 tests that GET and X-GET are both supported on
+  // /a. The validator is used in the following tests.
+  //
+  //
+  // validator_AB allows a GET on /a/b. The validator is used in the
+  // following tests.
+  //
+  val validator_REG3 = new Validator({
+    val accept = new Accept("A0", "Accept")
+    val urlFail = new URLFail("UF", "URLFail")
+    val methodFail = new MethodFail ("MF", "MethodFail")
+    val get = new Method("GET/XGET", "GET/XGET", """X?GET""".r, Array (accept))
+    val b = new URI("b","b", "b".r, Array(get, urlFail, methodFail))
+    val a = new URI("a","a", "a".r, Array(b, urlFail, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    start
+  }, assertHandler)
+
+  test ("GET on /a/b should succeed on validator_REG3") {
+    validator_REG3.validate(request("GET","/a/b"),response)
+  }
+
+  test ("XGET on /a/b should succeed on validator_REG3") {
+    validator_REG3.validate(request("XGET","/a/b"),response)
+  }
+
+  test ("PUT on /a/b should fail validator_REG3") {
+    assertResultFailed(validator_REG3.validate(request("PUT","/a/b"),response))
+  }
+
+  test ("POST on /a/b should fail validator_REG3") {
+    assertResultFailed(validator_REG3.validate(request("POST","/a/b"),response))
+  }
+
+  test ("X on /a/b should fail validator_REG3") {
+    assertResultFailed(validator_REG3.validate(request("X-","/a/b"),response))
+  }
+
+  test ("XPUT on /a/b should fail validator_REG3") {
+    assertResultFailed(validator_REG3.validate(request("XPUT","/a/b"),response))
+  }
 }
