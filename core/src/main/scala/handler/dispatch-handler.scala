@@ -4,7 +4,6 @@ import scala.collection.immutable.List
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.Result
-import com.rackspace.com.papi.components.checker.ResultHandler
 
 class DispatchResultHandler(private[this] var handlers : List[ResultHandler] = List[ResultHandler]())
       extends ResultHandler {

@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletResponse
 import com.rackspace.com.papi.components.checker.step.Step
 import com.rackspace.com.papi.components.checker.step.Result
 
+import com.rackspace.com.papi.components.checker.handler.ResultHandler
+
 import com.rackspace.com.papi.components.checker.servlet._
 
 class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg, cause) {}

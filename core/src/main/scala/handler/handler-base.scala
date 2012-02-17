@@ -1,4 +1,4 @@
-package com.rackspace.com.papi.components.checker
+package com.rackspace.com.papi.components.checker.handler
 
 import com.rackspace.com.papi.components.checker.step.Result
 import com.rackspace.com.papi.components.checker.servlet._
