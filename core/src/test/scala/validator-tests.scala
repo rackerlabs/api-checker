@@ -1,5 +1,9 @@
 package com.rackspace.com.papi.components.checker
 
+import java.util.Date
+import java.math.BigInteger
+import scala.util.Random
+
 import com.rackspace.com.papi.components.checker.step._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -89,4 +93,59 @@ class ValidatorSuite extends BaseValidatorSuite {
     assertResultFailed(validator_AB.validate(request("GET","/index.html"),response))
   }
 
+  //
+  // validator_REG1 allows a GET on /a/\-*?[0-9]+/c. That is, the 2nd
+  // URI component MUST be a (possibly negative) integer of
+  // unspecified size. The validator is used in the following tests.
+  //
+  val validator_REG1 = new Validator({
+    val accept = new Accept("A0", "Accept")
+    val urlFail = new URLFail("UF", "URLFail")
+    val methodFail = new MethodFail ("MF", "MethodFail")
+    val get = new Method("GET", "GET", "GET".r, Array (accept))
+    val c = new URI("c","c", "c".r, Array(get, urlFail, methodFail))
+    val digit = new URI("digit","digit", """\-*[0-9]+""".r, Array(c, urlFail, methodFail))
+    val a = new URI("a","a", "a".r, Array(digit, urlFail, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    start
+  }, assertHandler)
+
+  test ("GET on /a/7/c should succeed on validator_REG1") {
+    validator_REG1.validate(request("GET","/a/7/c"),response)
+  }
+
+  test ("GET on /a/-7/c should succeed on validator_REG1") {
+    validator_REG1.validate(request("GET","/a/-7/c"),response)
+  }
+
+  test ("GET on /a/<randomLong>/c should succeed on validator_REG1") {
+    val rl = new Random(new Date().getTime()).nextLong()
+    validator_REG1.validate(request("GET","/a/"+rl+"/c"),response)
+  }
+
+  test ("GET on /a/<bigInt>/c should succeed on validator_REG1") {
+    val bi = new BigInteger(1024, new Random(new Date().getTime()).self)
+    validator_REG1.validate(request("GET","/a/"+bi+"/c"),response)
+  }
+
+  test ("GET on /a/<randomDouble>/c should fail validator_REG1") {
+    val rf = new Random(new Date().getTime()).nextDouble()
+    assertResultFailed(validator_REG1.validate(request("GET","/a/"+rf+"/c"),response))
+  }
+
+  test ("GET on /a//c should fail validator_REG1") {
+    assertResultFailed(validator_REG1.validate(request("GET","/a//c"),response))
+  }
+
+  test ("GET on /a/b/c should fail validator_REG1") {
+    assertResultFailed(validator_REG1.validate(request("GET","/a/b/c"),response))
+  }
+
+  test ("GET on /a should fail validator_REG1") {
+    assertResultFailed(validator_REG1.validate(request("GET","/a"),response))
+  }
+
+  test ("GET on /a/+7/c should fail validator_REG1") {
+    assertResultFailed(validator_REG1.validate(request("GET","/a/+7/c"),response))
+  }
 }
