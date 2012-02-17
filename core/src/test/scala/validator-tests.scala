@@ -1,6 +1,7 @@
 package com.rackspace.com.papi.components.checker
 
 import java.util.Date
+import java.util.UUID
 import java.math.BigInteger
 import scala.util.Random
 
@@ -148,4 +149,94 @@ class ValidatorSuite extends BaseValidatorSuite {
   test ("GET on /a/+7/c should fail validator_REG1") {
     assertResultFailed(validator_REG1.validate(request("GET","/a/+7/c"),response))
   }
+
+  //
+  // validator_REG2 allows a GET on /a/.*/c. That is, the 2nd URI
+  // component can be anything. The validator is used in the
+  // following tests.
+  //
+  val validator_REG2 = new Validator({
+    val accept = new Accept("A0", "Accept")
+    val urlFail = new URLFail("UF", "URLFail")
+    val methodFail = new MethodFail ("MF", "MethodFail")
+    val get = new Method("GET", "GET", "GET".r, Array (accept))
+    val c = new URI("c","c", "c".r, Array(get, urlFail, methodFail))
+    val digit = new URI("any","any", """.*""".r, Array(c, urlFail, methodFail))
+    val a = new URI("a","a", "a".r, Array(digit, urlFail, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    start
+  }, assertHandler)
+
+  test ("GET on /a/7/c should succeed on validator_REG2") {
+    validator_REG2.validate(request("GET","/a/7/c"),response)
+  }
+
+  test ("GET on /a/-7/c should succeed on validator_REG2") {
+    validator_REG2.validate(request("GET","/a/-7/c"),response)
+  }
+
+  test ("GET on /a/<randomLong>/c should succeed on validator_REG2") {
+    val rl = new Random(new Date().getTime()).nextLong()
+    validator_REG2.validate(request("GET","/a/"+rl+"/c"),response)
+  }
+
+  test ("GET on /a/<bigInt>/c should succeed on validator_REG2") {
+    val bi = new BigInteger(1024, new Random(new Date().getTime()).self)
+    validator_REG2.validate(request("GET","/a/"+bi+"/c"),response)
+  }
+
+  test ("GET on /a/<randomDouble>/c should succeed validator_REG2") {
+    val rf = new Random(new Date().getTime()).nextDouble()
+    validator_REG2.validate(request("GET","/a/"+rf+"/c"),response)
+  }
+
+  test ("GET on /a/<uuid>/c should succeed validator_REG2") {
+    val uuid = UUID.randomUUID().toString()
+    validator_REG2.validate(request("GET","/a/"+uuid+"/c"),response)
+  }
+
+  test ("GET on /a/<katakana>/c should succeed validator_REG2") {
+    validator_REG2.validate(request("GET","/a/%E3%83%84%E3%83%85%E3%83%8C%E3%82%A4/c"),response)
+  }
+
+  test ("GET on /a/<arrows>/c should succeed validator_REG2") {
+    validator_REG2.validate(request("GET","/a/%E2%86%90%E2%86%91%E2%86%92%E2%86%93/c"),response)
+  }
+
+  test ("GET on /a/<snowman>/c should succeed validator_REG2") {
+    validator_REG2.validate(request("GET","/a/%E2%98%83/c"),response)
+  }
+
+  test ("GET on /a/b/c should succeed validator_REG2") {
+    validator_REG2.validate(request("GET","/a/b/c"),response)
+  }
+
+  test ("GET on /a/ 7/c should succeed validator_REG2") {
+    validator_REG2.validate(request("GET","/a/+7/c"),response)
+  }
+
+  test ("GET on /a/+7/c should succeed validator_REG2") {
+    validator_REG2.validate(request("GET","/a/%2B7/c"),response)
+  }
+
+  test ("GET on /a/    /c should succeed validator_REG2") {
+    validator_REG2.validate(request("GET","/a/++++/c"),response)
+  }
+
+  test ("GET on /a/  hi  /c should succeed validator_REG2") {
+    validator_REG2.validate(request("GET","/a/++hi++/c"),response)
+  }
+
+  test ("GET on /a//c should fail validator_REG2") {
+    assertResultFailed(validator_REG2.validate(request("GET","/a//c"),response))
+  }
+
+  test ("GET on /a should fail validator_REG2") {
+    assertResultFailed(validator_REG2.validate(request("GET","/a"),response))
+  }
+
+  test ("GET on /a/b/d should fail validator_REG2") {
+    assertResultFailed(validator_REG2.validate(request("GET","/a/b/d"),response))
+  }
+
 }

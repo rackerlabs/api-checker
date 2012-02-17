@@ -1,6 +1,7 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import java.io.PrintStream
+import java.net.URLDecoder
 
 import com.rackspace.com.papi.components.checker._
 import com.rackspace.com.papi.components.checker.servlet._
@@ -16,7 +17,7 @@ class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandl
         vout+Console.RESET+"]"
       }
 
-      printf ("%s %s %s ", valid(result.valid), req.getMethod() , req.getRequestURI())
+      printf ("%s %s %s ", valid(result.valid), req.getMethod() , URLDecoder.decode(req.getRequestURI(), "UTF-8"))
       printPath (req, result)
       println
     }

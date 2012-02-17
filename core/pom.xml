@@ -50,6 +50,7 @@
                         <include>**/*.class</include>
                     </includes>
                     <enableAssertions>false</enableAssertions>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
             <plugin>
