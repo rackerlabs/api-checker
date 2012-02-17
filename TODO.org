@@ -11,14 +11,15 @@
 ** TODO Implement validator [2/7]
    1. [X] Implement dispatch handler
    2. [X] Create assert handler
-   3. [-] Simple tests on validator [2/7]
+   3. [-] Simple tests on validator [2/8]
       1. [X] GET a/b
       2. [X] Empty machine
       3. [ ] GET on regex
-      4. [ ] Method regex
-      5. [ ] GET with valid complex a/b a/b/c a/d a/d/c
-      6. [ ] GET / POST with valid complex a/b a/b/c a/d a/d/c
-      7. [ ] Ambiguous URI test
+      4. [ ] GET on an allow all regex
+      5. [ ] Method regex
+      6. [ ] GET with valid complex a/b a/b/c a/d a/d/c
+      7. [ ] GET / POST with valid complex a/b a/b/c a/d a/d/c
+      8. [ ] Ambiguous URI test
    4. [ ] Unit test steps [0/6] 
       1. [ ] Start
       2. [ ] Accept
