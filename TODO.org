@@ -8,8 +8,8 @@
 ** DONE WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** DONE CLI for translation?
-** TODO Implement validator [0/5]
-   1. [ ] Implement dispatch handler
+** TODO Implement validator [1/5]
+   1. [X] Implement dispatch handler
    2. [ ] Create assert handler
    3. [ ] Simple tests on validator [0/7]
       1. [ ] Empty machine
