@@ -8,11 +8,13 @@ class URI(id : String, label : String, val uri : Regex, next : Array[Step]) exte
   override val mismatchMessage : String = next.toString;
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, uriLevel : Int) : Int = {
+    var ret = uriLevel
     if (uriLevel < req.URISegment.size) {
       req.URISegment(uriLevel) match {
-        case uri() => return uriLevel+1
+        case uri() => ret=ret+1
+        case _ => ret= -1
       }
     }
-    return -1
+    ret
   }
 }
