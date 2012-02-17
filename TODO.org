@@ -8,6 +8,26 @@
 ** DONE WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** DONE CLI for translation?
+** TODO Implement validator [0/5]
+   1. [ ] Implement dispatch handler
+   2. [ ] Create assert handler
+   3. [ ] Simple tests on validator [0/7]
+      1. [ ] Empty machine
+      2. [ ] GET a/b
+      3. [ ] GET on regex
+      4. [ ] Method regex
+      5. [ ] GET with valid complex a/b a/b/c a/d a/d/c
+      6. [ ] GET / POST with valid complex a/b a/b/c a/d a/d/c
+      7. [ ] Ambiguous URI test
+   4. [ ] Unit test steps [0/6] 
+      1. [ ] Start
+      2. [ ] Accept
+      3. [ ] MethodFail
+      4. [ ] URLFail
+      5. [ ] URI
+      6. [ ] Method
+   5. [ ] Clean up console handler
+** TODO Checker to scala.
 ** TODO WADL Normalize, Builder, opt1 in a single path [3/4]
    1. [X] Add Builder Library
    2. [-] Simple transation tests to confirm the lib is working [5/6]
@@ -74,6 +94,5 @@
         8. [X] Multiple duplicates (tree)
         9. [X] Multiple duplicates (mixed)
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
-** TODO Checker to scala.
 ** TODO WADL Change Detector...
 ** TODO Real tests on DOT output
