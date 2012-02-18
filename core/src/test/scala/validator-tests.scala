@@ -244,9 +244,6 @@ class ValidatorSuite extends BaseValidatorSuite {
   // /a. The validator is used in the following tests.
   //
   //
-  // validator_AB allows a GET on /a/b. The validator is used in the
-  // following tests.
-  //
   val validator_REG3 = new Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
@@ -280,5 +277,107 @@ class ValidatorSuite extends BaseValidatorSuite {
 
   test ("XPUT on /a/b should fail validator_REG3") {
     assertResultFailed(validator_REG3.validate(request("XPUT","/a/b"),response))
+  }
+
+  //
+  // validator_CPLX1 tests the following:
+  //
+  // GET   /a/b
+  // GET   /a/b/c
+  // POST  /a/b/c
+  // PUT   /a/<any not b or d>/c
+  // GET   /a/d/c
+  // POST  /a/d/c
+  //
+  // c in /a/b/c and a/d/c is the same node.
+  // c in /a/<any not b or d >/c is different
+  //
+  // That is a PUT on /a/b/c or /a/d/c should fail.
+  //
+  // The validator is used in the following tests.
+  //
+  val validator_CPLX1 = new Validator({
+    val accept = new Accept("A0", "Accept")
+    val urlFail = new URLFail("UF", "URLFail")
+    val methodFail = new MethodFail ("MF", "MethodFail")
+    val get = new Method("GET", "GET", "GET".r, Array (accept))
+    val put = new Method("PUT", "PUT", "PUT".r, Array (accept))
+    val post = new Method("POST", "POST", "POST".r, Array (accept))
+    val c1 = new URI("c1","c1", "c".r, Array(get, post, urlFail, methodFail))
+    val b = new URI("b","b", "b".r, Array(get, c1, urlFail, methodFail))
+    val d = new URI("d","d", "d".r, Array(c1, urlFail, methodFail))
+    val c2 = new URI("c2","c2", "c".r, Array(put, urlFail, methodFail))
+    val anynotbd = new URI("any","any", """[^bd]""".r, Array(c2, urlFail, methodFail))
+    val a = new URI("a","a", "a".r, Array(b, d, anynotbd, urlFail, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    start
+  }, assertHandler)
+
+  test ("GET on /a/b should succeed on validator_CPLX1") {
+    validator_CPLX1.validate(request("GET","/a/b"),response)
+  }
+
+  test ("GET on /a/b/c should succeed on validator_CPLX1") {
+    validator_CPLX1.validate(request("GET","/a/b/c"),response)
+  }
+
+  test ("POST on /a/b/c should succeed on validator_CPLX1") {
+    validator_CPLX1.validate(request("POST","/a/b/c"),response)
+  }
+
+  test ("GET on /a/d/c should succeed on validator_CPLX1") {
+    validator_CPLX1.validate(request("GET","/a/d/c"),response)
+  }
+
+  test ("POST on /a/d/c should succeed on validator_CPLX1") {
+    validator_CPLX1.validate(request("POST","/a/d/c"),response)
+  }
+
+  test ("PUT on /a/!/c should succeed validator_CPLX1") {
+    validator_CPLX1.validate(request("PUT","/a/!/c"),response)
+  }
+
+  test ("PUT on /a/z/c should succeed validator_CPLX1") {
+    validator_CPLX1.validate(request("PUT","/a/z/c"),response)
+  }
+
+  test ("PUT on /a/<katakana>/c should succeed validator_CPLX1") {
+    validator_CPLX1.validate(request("PUT","/a/%E3%83%84/c"),response)
+  }
+
+  test ("PUT on /a/<arrow>/c should succeed validator_CPLX1") {
+    validator_CPLX1.validate(request("PUT","/a/%E2%86%90/c"),response)
+  }
+
+  test ("PUT on /a/<snowman>/c should succeed validator_CPLX1") {
+    validator_CPLX1.validate(request("PUT","/a/%E2%98%83/c"),response)
+  }
+
+  test ("PUT on /a/b/c should fail validator_CPLX1") {
+    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/b/c"),response))
+  }
+
+  test ("PUT on /a/d/c should fail validator_CPLX1") {
+    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/d/c"),response))
+  }
+
+  test ("GET on /a/d should fail on validator_CPLX1") {
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/d"),response))
+  }
+
+  test ("GET on /a/z should fail on validator_CPLX1") {
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z"),response))
+  }
+
+  test ("GET on /a/<katakana> should fail validator_CPLX1") {
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84"),response))
+  }
+
+  test ("GET on /a/z/c should fail validator_CPLX1") {
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z/c"),response))
+  }
+
+  test ("GET on /a/<katakana>/c should fail validator_CPLX1") {
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84/c"),response))
   }
 }

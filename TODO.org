@@ -8,17 +8,16 @@
 ** DONE WADL Normalize, Builder, opt1, checker2dot in a single PATH.
    Maybe an optional output?
 ** DONE CLI for translation?
-** TODO Implement validator [2/7]
+** TODO Implement validator [3/7]
    1. [X] Implement dispatch handler
    2. [X] Create assert handler
-   3. [-] Simple tests on validator [5/8]
+   3. [X] Simple tests on validator [6/6]
       1. [X] GET a/b
       2. [X] Empty machine
       3. [X] GET on regex
       4. [X] GET on an allow all regex
       5. [X] Method regex
-      6. [ ] GET with valid complex a/b a/b/c a/d a/d/c
-      7. [ ] Ambiguous URI test
+      6. [X] Complex URI tests
    4. [ ] Unit test steps [0/6] 
       1. [ ] Start
       2. [ ] Accept
