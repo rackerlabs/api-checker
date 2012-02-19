@@ -19,6 +19,13 @@ class StepSuite extends BaseStepSuite {
     assert(res.get.isInstanceOf[AcceptResult])
   }
 
+  test("Start should not change URI level") {
+    val start = new Start("s", "s", Array[Step]())
+    assert(start.checkStep(null, null, -1) == -1)
+    assert(start.checkStep(request("GET", "/a/b"), response, 2) == 2)
+    assert(start.checkStep(request("",""), response, 1000) == 1000)
+  }
+
   test("Method should return method fail result if the URI level has been exceeded") {
     val mf  = new MethodFail("mf", "mf")
     val res = mf.check (request("GET", "/a/b"), response, 2)
