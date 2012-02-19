@@ -94,4 +94,33 @@ class StepSuite extends BaseStepSuite {
     assert (uri2.checkStep (request("GET", "/a/b"), response, 4) == -1)
   }
 
+  test("Method mismatch message should be the same of the uri regex") {
+    val method = new Method("GET", "GET", "GET".r, Array[Step]())
+    assert (method.mismatchMessage == "GET".r.toString)
+  }
+
+  test("In a Method step, if the uriLevel has not been exceeded, the returned URI level should be -1") {
+    val method = new Method("GET", "GET", "GET".r, Array[Step]())
+    assert (method.checkStep (request("GET", "/a/b"), response, 0) == -1)
+    assert (method.checkStep (request("GET", "/a/b"), response, 1) == -1)
+  }
+
+  test("In a Method step, if the uriLevel has been exceeded, and the method matches, the URI level should stay the same") {
+    val method = new Method("GET", "GET", "GET".r, Array[Step]())
+    assert (method.checkStep (request("GET", "/a/b"), response, 2) == 2)
+    assert (method.checkStep (request("GET", "/a/b"), response, 3) == 3)
+    val method2 = new Method("GETPOST", "GET or POST", "GET|POST".r, Array[Step]())
+    assert (method2.checkStep (request("GET", "/a/b"), response, 2) == 2)
+    assert (method2.checkStep (request("POST", "/a/b"), response, 3) == 3)
+  }
+
+  test("In a Method step, if the uriLevel has been exceeded, and the method does not match, the URI level should be set to -1") {
+    val method = new Method("GET", "GET", "GET".r, Array[Step]())
+    assert (method.checkStep (request("POST", "/a/b"), response, 2) == -1)
+    assert (method.checkStep (request("GTB", "/a/b"), response, 3) == -1)
+    val method2 = new Method("GETPOST", "GET or POST", "GET|POST".r, Array[Step]())
+    assert (method2.checkStep (request("PUT", "/a/b"), response, 2) == -1)
+    assert (method2.checkStep (request("DELETE", "/a/b"), response, 3) == -1)
+  }
+
 }
