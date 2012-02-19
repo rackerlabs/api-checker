@@ -62,4 +62,36 @@ class StepSuite extends BaseStepSuite {
     assert (res2 == None)
   }
 
+  test("URI mismatch message should be the same of the uri regex") {
+    val uri = new URI("u", "u", "u".r, Array[Step]())
+    assert (uri.mismatchMessage == "u".r.toString)
+  }
+
+  test("In a URI step, if there is a URI match, the uriLevel should increase by 1") {
+    val uri = new URI("a", "a", "a".r, Array[Step]())
+    assert (uri.checkStep (request("GET", "/a/b"), response, 0) == 1)
+
+    val uri2 = new URI("ab", "a or b", "[a-b]".r, Array[Step]())
+    assert (uri2.checkStep (request("GET", "/a/b"), response, 0) == 1)
+    assert (uri2.checkStep (request("GET", "/a/b"), response, 1) == 2)
+  }
+
+  test("In a URI step, if there is a URI mismatch, the uriLevel should be -1") {
+    val uri = new URI("a", "a", "a".r, Array[Step]())
+    assert (uri.checkStep (request("GET", "/c/b"), response, 0) == -1)
+
+    val uri2 = new URI("ab", "a or b", "[a-b]".r, Array[Step]())
+    assert (uri2.checkStep (request("GET", "/c/d"), response, 0) == -1)
+    assert (uri2.checkStep (request("GET", "/c/d"), response, 1) == -1)
+  }
+
+  test("In a URI step, if there is a URI match, but the URI level has been exceeded the new URI level should be -1") {
+    val uri = new URI("a", "a", "a".r, Array[Step]())
+    assert (uri.checkStep (request("GET", "/a/b"), response, 2) == -1)
+
+    val uri2 = new URI("ab", "a or b", "[a-b]".r, Array[Step]())
+    assert (uri2.checkStep (request("GET", "/a/b"), response, 3) == -1)
+    assert (uri2.checkStep (request("GET", "/a/b"), response, 4) == -1)
+  }
+
 }

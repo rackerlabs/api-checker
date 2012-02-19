@@ -18,12 +18,12 @@
       4. [X] GET on an allow all regex
       5. [X] Method regex
       6. [X] Complex URI tests
-   4. [-] Unit test steps [4/6]
+   4. [-] Unit test steps [5/6]
       1. [X] Start
       2. [X] Accept
       3. [X] MethodFail
       4. [X] URLFail
-      5. [ ] URI
+      5. [X] URI
       6. [ ] Method
    5. [ ] Clean up console handler...should be more readable
    6. [ ] Quickly extract correct error
