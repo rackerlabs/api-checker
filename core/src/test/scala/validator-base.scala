@@ -47,9 +47,9 @@ class BaseValidatorSuite extends FunSuite {
 
   def response : HttpServletResponse = mock(classOf[HttpServletResponse]);
 
-  def assertResultFailed(f : => Any) : Unit = {
+  def assertResultFailed(f : => Any) : Option[ResultFailedException] = {
     val expectMsg = "Expected validation exception caused by ResultFailed"
-    val result = try {
+    val result : Option[ResultFailedException] = try {
       f
       None
     } catch {
@@ -60,13 +60,27 @@ class BaseValidatorSuite extends FunSuite {
         } else if (!cause.isInstanceOf[ResultFailedException]) {
           throw new TestFailedException(Some(expectMsg+" but got "+cause), Some(cause), 4)
         } else {
-          Some(v)
+          Some(cause.asInstanceOf[ResultFailedException])
         }
       case t : Throwable =>
         throw new TestFailedException(Some(expectMsg+" but got "+t), Some(t), 4)
     }
     if (result == None) {
       throw new TestFailedException(Some(expectMsg+" but got no exception."), None, 4)
+    }
+    result
+  }
+
+  def assertResultFailed(f : => Any, code : Int) : Unit = {
+    var result : ErrorResult = null
+    assertResultFailed(f).get.result match {
+      case mfr : MultiFailResult =>
+        result = mfr.reduce.get.asInstanceOf[ErrorResult]
+      case other : ErrorResult =>
+        result = other
+    }
+    if (result.code != code) {
+      throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
   }
 }
