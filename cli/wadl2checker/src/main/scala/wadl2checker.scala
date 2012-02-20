@@ -9,7 +9,7 @@ import javax.xml.transform._
 import javax.xml.transform.stream._
 
 object Wadl2Checker {
-  val parser = new ArgotParser("wadl2checker", preUsage=Some("wadl2checker: Vesion 1.0.0-SNAPSHOT"))
+  val parser = new ArgotParser("wadl2checker", preUsage=Some("wadl2checker: Version 1.0.0-SNAPSHOT"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")

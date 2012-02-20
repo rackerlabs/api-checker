@@ -9,7 +9,7 @@ import javax.xml.transform._
 import javax.xml.transform.stream._
 
 object Wadl2Dot {
-  val parser = new ArgotParser("wadl2dot", preUsage=Some("wadl2dot: Vesion 1.0.0-SNAPSHOT"))
+  val parser = new ArgotParser("wadl2dot", preUsage=Some("wadl2dot: Version 1.0.0-SNAPSHOT"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
