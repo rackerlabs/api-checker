@@ -50,11 +50,14 @@ class ValidatorSuite extends BaseValidatorSuite {
   val validator_AB = new Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
+    val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
+    val urlFailB = new URLFailMatch("UFB", "URLFail","b".r)
     val methodFail = new MethodFail ("MF", "MethodFail")
+    val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", "GET".r)
     val get = new Method("GET", "GET", "GET".r, Array (accept))
-    val b = new URI("b","b", "b".r, Array(get, urlFail, methodFail))
-    val a = new URI("a","a", "a".r, Array(b, urlFail, methodFail))
-    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    val b = new URI("b","b", "b".r, Array(get, urlFail, methodFailGet))
+    val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
   }, assertHandler)
 
@@ -102,12 +105,16 @@ class ValidatorSuite extends BaseValidatorSuite {
   val validator_REG1 = new Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
+    val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
+    val urlFailC = new URLFailMatch("UFA", "URLFail","c".r)
+    val urlFailDigit = new URLFailMatch("UFA", "URLFailDigit","""\-*[0-9]+""".r)
     val methodFail = new MethodFail ("MF", "MethodFail")
+    val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", "GET".r)
     val get = new Method("GET", "GET", "GET".r, Array (accept))
-    val c = new URI("c","c", "c".r, Array(get, urlFail, methodFail))
-    val digit = new URI("digit","digit", """\-*[0-9]+""".r, Array(c, urlFail, methodFail))
-    val a = new URI("a","a", "a".r, Array(digit, urlFail, methodFail))
-    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    val c = new URI("c","c", "c".r, Array(get, urlFail, methodFailGet))
+    val digit = new URI("digit","digit", """\-*[0-9]+""".r, Array(c, urlFailC, methodFail))
+    val a = new URI("a","a", "a".r, Array(digit, urlFailDigit, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
   }, assertHandler)
 
@@ -158,12 +165,16 @@ class ValidatorSuite extends BaseValidatorSuite {
   val validator_REG2 = new Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
+    val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
+    val urlFailC = new URLFailMatch("UFA", "URLFail","c".r)
+    val urlFailDigit = new URLFailMatch("UFA", "URLFailDigit",""".*""".r)
     val methodFail = new MethodFail ("MF", "MethodFail")
+    val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", "GET".r)
     val get = new Method("GET", "GET", "GET".r, Array (accept))
-    val c = new URI("c","c", "c".r, Array(get, urlFail, methodFail))
-    val digit = new URI("any","any", """.*""".r, Array(c, urlFail, methodFail))
-    val a = new URI("a","a", "a".r, Array(digit, urlFail, methodFail))
-    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    val c = new URI("c","c", "c".r, Array(get, urlFail, methodFailGet))
+    val digit = new URI("any","any", """.*""".r, Array(c, urlFailC, methodFail))
+    val a = new URI("a","a", "a".r, Array(digit, urlFailDigit, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
   }, assertHandler)
 
@@ -241,17 +252,20 @@ class ValidatorSuite extends BaseValidatorSuite {
 
   //
   // validator_REG3 tests that GET and X-GET are both supported on
-  // /a. The validator is used in the following tests.
+  // /a/b. The validator is used in the following tests.
   //
   //
   val validator_REG3 = new Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
+    val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
+    val urlFailB = new URLFailMatch("UFB", "URLFail","b".r)
     val methodFail = new MethodFail ("MF", "MethodFail")
+    val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", """X?GET""".r)
     val get = new Method("GET/XGET", "GET/XGET", """X?GET""".r, Array (accept))
-    val b = new URI("b","b", "b".r, Array(get, urlFail, methodFail))
-    val a = new URI("a","a", "a".r, Array(b, urlFail, methodFail))
-    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    val b = new URI("b","b", "b".r, Array(get, urlFail, methodFailGet))
+    val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
   }, assertHandler)
 
@@ -299,17 +313,23 @@ class ValidatorSuite extends BaseValidatorSuite {
   val validator_CPLX1 = new Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
+    val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
+    val urlFailC = new URLFailMatch("UFA", "URLFail","c".r)
+    val urlFailABNotAB = new URLFailMatch("UFABNAB", "URLFail","""b|d|[^bd]""".r)
     val methodFail = new MethodFail ("MF", "MethodFail")
+    val methodFailPut = new MethodFailMatch ("MFG", "MethodFail", "PUT".r)
+    val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", "GET".r)
+    val methodFailGetPost = new MethodFailMatch ("MFG", "MethodFail", "GET|POST".r)
     val get = new Method("GET", "GET", "GET".r, Array (accept))
     val put = new Method("PUT", "PUT", "PUT".r, Array (accept))
     val post = new Method("POST", "POST", "POST".r, Array (accept))
-    val c1 = new URI("c1","c1", "c".r, Array(get, post, urlFail, methodFail))
-    val b = new URI("b","b", "b".r, Array(get, c1, urlFail, methodFail))
-    val d = new URI("d","d", "d".r, Array(c1, urlFail, methodFail))
-    val c2 = new URI("c2","c2", "c".r, Array(put, urlFail, methodFail))
-    val anynotbd = new URI("any","any", """[^bd]""".r, Array(c2, urlFail, methodFail))
-    val a = new URI("a","a", "a".r, Array(b, d, anynotbd, urlFail, methodFail))
-    val start = new Start("START", "Start", Array(a, urlFail, methodFail))
+    val c1 = new URI("c1","c1", "c".r, Array(get, post, urlFail, methodFailGetPost))
+    val b = new URI("b","b", "b".r, Array(get, c1, urlFailC, methodFailGet))
+    val d = new URI("d","d", "d".r, Array(c1, urlFailC, methodFail))
+    val c2 = new URI("c2","c2", "c".r, Array(put, urlFail, methodFailPut))
+    val anynotbd = new URI("any","any", """[^bd]""".r, Array(c2, urlFailC, methodFail))
+    val a = new URI("a","a", "a".r, Array(b, d, anynotbd, urlFailABNotAB, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
   }, assertHandler)
 
