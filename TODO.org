@@ -26,9 +26,9 @@
       5. [X] URI
       6. [X] Method
    5. [X] Clean up console handler...should be more readable
-   6. [ ] Add Fail Matchers[0/5]
-      1. [ ] Add URL Fail Matcher
-      2. [ ] Add Method Fail Matchers
+   6. [-] Add Fail Matchers[2/5]
+      1. [X] Add URL Fail Matcher
+      2. [X] Add Method Fail Matchers
       3. [ ] Test URL Fail Matcher
       4. [ ] Test Method Fail Matcher
       5. [ ] Update validation tests to use both matchers

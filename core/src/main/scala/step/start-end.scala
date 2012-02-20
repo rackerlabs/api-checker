@@ -1,5 +1,7 @@
 package com.rackspace.com.papi.components.checker.step
 
+import scala.util.matching.Regex
+
 import com.rackspace.com.papi.components.checker.servlet._
 
 //
@@ -44,6 +46,23 @@ class URLFail(id : String, label : String) extends Step(id, label) {
 }
 
 //
+//  Like URLFail, but fails only if the current uri path is not matched
+//  against the uri regex
+//
+class URLFailMatch(id : String, label : String, val uri : Regex) extends URLFail(id, label) {
+  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, uriLevel : Int) : Option[Result] = {
+    var result : Option[Result] = super.check (req, resp, uriLevel)
+    if (result != None) {
+      req.URISegment(uriLevel) match {
+        case uri() => result = None
+        case _ => ; // Pass our parent's result on the match.
+      }
+    }
+    result
+  }
+}
+
+//
 // Method fail state
 //
 class MethodFail(id : String, label : String) extends Step(id, label) {
@@ -60,5 +79,22 @@ class MethodFail(id : String, label : String) extends Step(id, label) {
     }
 
     return result
+  }
+}
+
+//
+//  Like MethodFail, but fails only if the current method is not
+//  matched against the uri regex
+//
+class MethodFailMatch(id : String, label : String, val method : Regex) extends MethodFail(id, label) {
+  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, uriLevel : Int) : Option[Result] = {
+    var result : Option[Result] = super.check(req, resp, uriLevel)
+    if (result != None) {
+      req.getMethod() match {
+        case method() => result = None
+        case _ => ; // Pass our parent's result on the match.
+      }
+    }
+    result
   }
 }
