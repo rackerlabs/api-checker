@@ -26,6 +26,8 @@
         <wadl-tools.version>1.0.1-SNAPSHOT</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.0-SNAPSHOT</xerces.version>
+        <servlet.version>3.1</servlet.version>
+        <mockito.version>1.9.0</mockito.version>
     </properties>
 
     <dependencies>
@@ -61,6 +63,11 @@
             <artifactId>wadl-tools</artifactId>
             <version>${wadl-tools.version}</version>
         </dependency>
+         <dependency>
+             <groupId>org.glassfish</groupId>
+             <artifactId>javax.servlet</artifactId>
+             <version>${servlet.version}</version>
+         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
             <artifactId>wadl-tools</artifactId>
@@ -72,6 +79,12 @@
             <groupId>org.apache.santuario</groupId>
             <artifactId>xmlsec</artifactId>
             <version>${xmlsec.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
