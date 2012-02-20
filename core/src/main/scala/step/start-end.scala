@@ -37,7 +37,8 @@ class URLFail(id : String, label : String) extends Step(id, label) {
     var result : Option[URLFailResult] = None
 
     if (uriLevel < req.URISegment.size) {
-      val ufr = new URLFailResult("Could not find the given resource", uriLevel, id)
+      val path = (for (i <- 0 until (uriLevel-1)) yield req.URISegment(i)).foldLeft("")(_ + "/" + _)+"/<<"+req.URISegment(uriLevel)+">>"
+      val ufr = new URLFailResult("Resource not found: "+path, uriLevel, id)
       result = Some(ufr)
     }
 
@@ -74,7 +75,7 @@ class MethodFail(id : String, label : String) extends Step(id, label) {
     var result : Option[MethodFailResult] = None
 
     if (uriLevel >= req.URISegment.size) {
-      val mfr = new MethodFailResult("Bad method", uriLevel, id)
+      val mfr = new MethodFailResult("Bad method: "+req.getMethod(), uriLevel, id)
       result = Some(mfr)
     }
 
