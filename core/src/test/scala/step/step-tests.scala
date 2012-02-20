@@ -26,7 +26,7 @@ class StepSuite extends BaseStepSuite {
     assert(start.checkStep(request("",""), response, 1000) == 1000)
   }
 
-  test("Method should return method fail result if the URI level has been exceeded") {
+  test("MethodFail should return method fail result if the URI level has been exceeded") {
     val mf  = new MethodFail("mf", "mf")
     val res = mf.check (request("GET", "/a/b"), response, 2)
     assert (res.isDefined)
@@ -36,8 +36,34 @@ class StepSuite extends BaseStepSuite {
     assert (res2.get.isInstanceOf[MethodFailResult])
   }
 
-  test("Method should return None when URI level is not exceeded") {
+  test("MethodFail should return None when URI level is not exceeded") {
     val mf  = new MethodFail("mf", "mf")
+    val res = mf.check (request("GET", "/a/b"), response, 0)
+    assert (res == None)
+    val res2 = mf.check (request("GET", "/a/b"), response, 1)
+    assert (res2 == None)
+  }
+
+  test("MethodFailMatch should return method fail result if the URI level has been exceeded and the method regex does not match") {
+    val mf  = new MethodFailMatch("mf", "mf", "POST".r)
+    val res = mf.check (request("GET", "/a/b"), response, 2)
+    assert (res.isDefined)
+    assert (res.get.isInstanceOf[MethodFailResult])
+    val res2 = mf.check (request("GET", "/a/b"), response, 3)
+    assert (res2.isDefined)
+    assert (res2.get.isInstanceOf[MethodFailResult])
+  }
+
+  test("MethodFailMatch should return None if the URI level has been exceeded and the method regex matches") {
+    val mf  = new MethodFailMatch("mf", "mf", "GET".r)
+    val res = mf.check (request("GET", "/a/b"), response, 2)
+    assert (res == None)
+    val res2 = mf.check (request("GET", "/a/b"), response, 3)
+    assert (res2 == None)
+  }
+
+  test("MethodFailMatch should return None when URI level is not exceeded") {
+    val mf  = new MethodFailMatch("mf", "mf", "GET".r)
     val res = mf.check (request("GET", "/a/b"), response, 0)
     assert (res == None)
     val res2 = mf.check (request("GET", "/a/b"), response, 1)
@@ -56,6 +82,30 @@ class StepSuite extends BaseStepSuite {
 
   test("URLFail should return None if URI level has been exceeded") {
     val uf = new URLFail("uf", "uf")
+    val res = uf.check (request("GET", "/a/b"), response, 2)
+    assert (res == None)
+    val res2 = uf.check (request("GET", "/a/b"), response, 3)
+    assert (res2 == None)
+  }
+
+  test("URLFailMatch should return URL fail result if URI level has not been exceeded and the uri regex does not match") {
+    val uf = new URLFailMatch ("ufm", "ufm", "c".r)
+    val res = uf.check (request("GET", "/a/b"), response, 0)
+    assert (res.isDefined)
+    assert (res.get.isInstanceOf[URLFailResult])
+    val res2 = uf.check (request("GET", "/a/b"), response, 1)
+    assert (res2.isDefined)
+    assert (res2.get.isInstanceOf[URLFailResult])
+  }
+
+  test("URLFailMatch should return None if URI level has not been exceeded and the uri regex matches") {
+    val uf = new URLFailMatch ("ufm", "ufm", "a".r)
+    val res = uf.check (request("GET", "/a/b"), response, 0)
+    assert (res == None)
+  }
+
+  test("URLFailMatch should return None if URI level has been exceeded") {
+    val uf = new URLFailMatch("uf", "uf", "a".r)
     val res = uf.check (request("GET", "/a/b"), response, 2)
     assert (res == None)
     val res2 = uf.check (request("GET", "/a/b"), response, 3)
