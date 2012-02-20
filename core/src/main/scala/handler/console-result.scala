@@ -7,6 +7,7 @@ import com.rackspace.com.papi.components.checker._
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.Result
 import com.rackspace.com.papi.components.checker.step.MultiFailResult
+import com.rackspace.com.papi.components.checker.step.MismatchResult
 
 class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandler {
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, result : Result)  : Unit = {
@@ -25,13 +26,17 @@ class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandl
 
   private def printPath (req : CheckerServletRequest, result : Result) : Unit = {
     Console.withOut(out) {
-      print ("[")
-      result.stepIDs.foreach (s => out.print(" "+s))
-      if (result.isInstanceOf[MultiFailResult]) {
-        val mfr = result.asInstanceOf[MultiFailResult]
-        mfr.fails.foreach ( f => printPath(req, f))
+      result match {
+        case mfr : MultiFailResult => print ("{")
+        case mr  : MismatchResult => print ("(")
+        case other => print ("[")
       }
-      print ("]")
+      result.stepIDs.foreach (s => out.print(" "+s+" "))
+      result match {
+        case mfr : MultiFailResult => mfr.fails.foreach ( f => printPath(req, f)) ; print ("}")
+        case mr  : MismatchResult => print (")")
+        case other => print ("]")
+      }
     }
   }
 }
