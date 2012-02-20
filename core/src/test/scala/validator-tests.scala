@@ -381,6 +381,10 @@ class ValidatorSuite extends BaseValidatorSuite {
     assertResultFailed(validator_CPLX1.validate(request("PUT","/a/d/c"),response))
   }
 
+  test ("PUT on /a/atest/c should fail validator_CPLX1") {
+    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/atest/c"),response))
+  }
+
   test ("GET on /a/d should fail on validator_CPLX1") {
     assertResultFailed(validator_CPLX1.validate(request("GET","/a/d"),response))
   }
@@ -400,4 +404,68 @@ class ValidatorSuite extends BaseValidatorSuite {
   test ("GET on /a/<katakana>/c should fail validator_CPLX1") {
     assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84/c"),response))
   }
+
+  //
+  // validator_AM allows:
+  //
+  // GET /.*/b
+  // PUT /a/b
+  //
+  // The of course means that a GET on /a/b is allowed.
+  //
+  // The validator is used in the following tests.
+  //
+  val validator_AM = new Validator({
+    val accept = new Accept("A0", "Accept")
+    val urlFail = new URLFail("UF", "URLFail")
+    val urlFailB = new URLFailMatch("UFB", "URLFail","b".r)
+    val methodFail = new MethodFail ("MF", "MethodFail")
+    val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", "GET".r)
+    val methodFailPut = new MethodFailMatch ("MFP", "MethodFail", "PUT".r)
+    val get = new Method("GET", "GET", "GET".r, Array (accept))
+    val put = new Method("PUT", "PUT", "PUT".r, Array (accept))
+    val b = new URI("b","b", "b".r, Array(put, urlFail, methodFailPut))
+    val b2 = new URI("b2","b2", "b".r, Array(get, urlFail, methodFailGet))
+    val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
+    val any = new URI("any","any", ".*".r, Array(b2, urlFailB, methodFail))
+    val start = new Start("START", "Start", Array(a, any,  methodFail))
+    start
+  }, assertHandler)
+
+  test ("GET on /a/b should succeed on validator_AM") {
+    validator_AM.validate(request("GET","/a/b"),response)
+  }
+
+  test ("PUT on /a/b should succeed on validator_AM") {
+    validator_AM.validate(request("PUT","/a/b"),response)
+  }
+
+  test ("GET on /b/b should succeed on validator_AM") {
+    validator_AM.validate(request("GET","/b/b"),response)
+  }
+
+  test ("GET on /<katakana>/b should succeed validator_AM") {
+    validator_AM.validate(request("GET","/%E3%83%84%E3%83%85%E3%83%8C%E3%82%A4/b"),response)
+  }
+
+  test ("GET on /<arrows>/b should succeed validator_AM") {
+    validator_AM.validate(request("GET","/%E2%86%90%E2%86%91%E2%86%92%E2%86%93/b"),response)
+  }
+
+  test ("POST on /a/b should fail on validator_AM") {
+    assertResultFailed(validator_AM.validate(request("POST","/a/b"),response))
+  }
+
+  test ("DELETE on /z/b should fail on validator_AM") {
+    assertResultFailed(validator_AM.validate(request("DELETE","/a/b"),response))
+  }
+
+  test ("GET on /a/c should fail on validator_AM") {
+    assertResultFailed(validator_AM.validate(request("GET","/a/c"),response))
+  }
+
+  test ("GET on /z/c should fail on validator_AM") {
+    assertResultFailed(validator_AM.validate(request("GET","/z/c"),response))
+  }
+
 }
