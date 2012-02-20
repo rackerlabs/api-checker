@@ -20,6 +20,8 @@ class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandl
 
       printf ("%s %s %s ", valid(result.valid), req.getMethod() , URLDecoder.decode(req.getRequestURI(), "UTF-8"))
       printPath (req, result)
+      print (" ")
+      printResult(result)
       println
     }
   }
@@ -36,6 +38,15 @@ class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandl
         case mfr : MultiFailResult => mfr.fails.foreach ( f => printPath(req, f)) ; print ("}")
         case mr  : MismatchResult => print (")")
         case other => print ("]")
+      }
+    }
+  }
+
+  private def printResult (result : Result) : Unit = {
+    Console.withOut(out) {
+      result match {
+        case mrf : MultiFailResult => print (mrf.reduce.get)
+        case other => print (other)
       }
     }
   }

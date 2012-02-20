@@ -19,8 +19,12 @@ abstract class Result(val message : String,   // A message describing the result
   def addStepId(stepId : String) : Unit = {
     stepIDs = stepId +: stepIDs
   }
+
+  override def toString : String = message
 }
-abstract class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String) extends Result(message, false, true, uriLevel, stepId)
+abstract class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String) extends Result(message, false, true, uriLevel, stepId) {
+  override def toString : String = code+" : "+message
+}
 
 class AcceptResult(message: String, uriLevel : Int, stepId : String)  extends Result(message, true, true, uriLevel, stepId)
 class URLFailResult(message : String, uriLevel : Int, stepId : String) extends ErrorResult(message, 404, uriLevel, stepId)
@@ -28,4 +32,23 @@ class MethodFailResult(message: String, uriLevel : Int, stepId : String) extends
 class MismatchResult(message: String, uriLevel : Int, stepId : String) extends Result(message, false, false, uriLevel, stepId)
 
 class MultiFailResult(val fails : Array[Result], uriLevel : Int, stepId : String)
-      extends Result ("Multiple possible errors", false, false, uriLevel, stepId);
+      extends Result ("Multiple possible errors", false, false, uriLevel, stepId)
+{
+  //
+  //  Pick a single fail result out of the possible set of failers.
+  //
+  def reduce : Option[Result] = {
+    fails.foreach (res =>
+      {
+        res match {
+          case f : MultiFailResult =>
+            val red = f.reduce
+            if (red != None) { return red }
+          case other : Result =>
+            if (other.terminal) { return Some(other) }
+        }
+      })
+    None
+  }
+
+}

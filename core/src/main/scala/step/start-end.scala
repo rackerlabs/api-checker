@@ -20,7 +20,7 @@ class Accept(id : String, label : String) extends Step(id, label) {
     //
     //  Send request...
     //
-    return Some(new AcceptResult("ACCEPTED", uriLevel, id))
+    return Some(new AcceptResult("", uriLevel, id))
   }
 }
 
@@ -37,7 +37,7 @@ class URLFail(id : String, label : String) extends Step(id, label) {
     var result : Option[URLFailResult] = None
 
     if (uriLevel < req.URISegment.size) {
-      val path = (for (i <- 0 until (uriLevel-1)) yield req.URISegment(i)).foldLeft("")(_ + "/" + _)+"/<<"+req.URISegment(uriLevel)+">>"
+      val path = (for (i <- 0 until (uriLevel)) yield req.URISegment(i)).foldLeft("")(_ + "/" + _)+"/{"+req.URISegment(uriLevel)+"}"
       val ufr = new URLFailResult("Resource not found: "+path, uriLevel, id)
       result = Some(ufr)
     }
