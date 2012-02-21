@@ -147,12 +147,43 @@
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
-                    A URLFail step, this should generate a 404 (Not Found).
+                    A URLFail step, this should generate a 404 (Not
+                    Found). If the notMatch and notTypes attributes
+                    are missing the step always applies.  If the
+                    attributes are present, the present attributes
+                    must be satisfied in order of the step to apply.
                 </html:p>
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step"/>
+            <extension base="chk:Step">
+                <attribute name="notMatch" type="xsd:string" use="optional">
+                    <annotation>
+                        <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                            <html:p>
+                                A URLFail step applies only if the
+                                current URL segment does
+                                <html:strong>not</html:strong>
+                                validate against the regex listed in
+                                this attribute.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="notTypes" type="chk:QNameList" use="optional">
+                    <annotation>
+                        <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                            <html:p>
+                                A URLFail step applies if the
+                                current URL segment does
+                                <html:strong>not</html:strong>
+                                validate against any in the list of
+                                simple types listed in this attribute.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
         </complexContent>
     </complexType>
 
@@ -160,12 +191,30 @@
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
-                    A MethodFail step, this should generate a 405 (Method Not Allowed).
+                    A MethodFail step, this should generate a 405
+                    (Method Not Allowed). If the notMatch attribute is
+                    missing the step always applies.  If the attribute
+                    is present, it must be satisfied in order of the
+                    step to apply.
                 </html:p>
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step"/>
+            <extension base="chk:Step">
+                <attribute name="notMatch" type="xsd:string" use="optional">
+                    <annotation>
+                        <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                            <html:p>
+                                A MethodFail step applies if the
+                                current method does
+                                <html:strong>not</html:strong>
+                                validate against the regex listed in
+                                this attribute.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
         </complexContent>
     </complexType>
 
@@ -180,5 +229,9 @@
             <enumeration value="METHOD"/>
             <enumeration value="URLXSD"/>
         </restriction>
+    </simpleType>
+
+    <simpleType name="QNameList">
+        <list itemType="xsd:QName"/>
     </simpleType>
 </schema>
