@@ -97,6 +97,7 @@
     <xsl:template name="getDups" as="node()">
         <xsl:param name="checker" as="node()"/>
         <checker>
+            <!-- Groups by type, next, match -->
             <xsl:for-each-group select="$checker//check:step" group-by="@type">
                 <xsl:for-each-group select="current-group()" group-by="@next">
                     <xsl:for-each-group select="current-group()" group-by="@match">
@@ -113,6 +114,53 @@
                             </group>
                         </xsl:if>
                     </xsl:for-each-group>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
+            <!-- For each method fail, url fail, groups by not Match -->
+            <xsl:for-each-group select="$checker//check:step[(@type='METHOD_FAIL' or @type='URL_FAIL') and not(@notTypes)]" group-by="@notMatch">
+                <xsl:if test="count(current-group()) > 1">
+                    <group>
+                        <xsl:attribute name="include">
+                            <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                        </xsl:attribute>
+                        <xsl:attribute name="exclude">
+                            <xsl:value-of separator=" ">
+                                <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                            </xsl:value-of>
+                        </xsl:attribute>
+                    </group>
+                </xsl:if>
+            </xsl:for-each-group>
+            <!-- URL fail with @notTypes only -->
+            <xsl:for-each-group select="$checker//check:step[@type='URL_FAIL' and not(@notMatch)]" group-by="@notTypes">
+                <xsl:if test="count(current-group()) > 1">
+                    <group>
+                        <xsl:attribute name="include">
+                            <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                        </xsl:attribute>
+                        <xsl:attribute name="exclude">
+                            <xsl:value-of separator=" ">
+                                <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                            </xsl:value-of>
+                        </xsl:attribute>
+                    </group>
+                </xsl:if>
+            </xsl:for-each-group>
+            <!-- URL fail with @notTypes and @notMatch -->
+            <xsl:for-each-group select="$checker//check:step[@type='URL_FAIL' and @notMatch]" group-by="@notTypes">
+                <xsl:for-each-group select="current-group()" group-by="@notMatch">
+                    <xsl:if test="count(current-group()) > 1">
+                        <group>
+                            <xsl:attribute name="include">
+                                <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                            </xsl:attribute>
+                            <xsl:attribute name="exclude">
+                                <xsl:value-of separator=" ">
+                                    <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                                </xsl:value-of>
+                            </xsl:attribute>
+                        </group>
+                    </xsl:if>
                 </xsl:for-each-group>
             </xsl:for-each-group>
         </checker>
