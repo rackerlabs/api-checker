@@ -79,7 +79,7 @@
             <xsl:when test="name() = 'next'">
                 <xsl:variable name="nexts" as="xsd:string*" select="tokenize(.,' ')"/>
                 <xsl:attribute name="next">
-                  <xsl:value-of select="check:swapExclude($nexts,$excludes,$dups)" separator=" "/>
+                  <xsl:value-of select="check:removeDupNext(check:swapExclude($nexts,$excludes,$dups))" separator=" "/>
                 </xsl:attribute>
             </xsl:when>
             <!-- Copy labels only if all excluded labels match -->
@@ -96,6 +96,13 @@
         </xsl:choose>
     </xsl:template>
     
+    <xsl:function name="check:removeDupNext" as="xsd:string*">
+        <xsl:param name="nexts" as="xsd:string*"/>
+        <xsl:for-each-group select="$nexts" group-by=".">
+            <xsl:value-of select="current-group()[1]"/>
+        </xsl:for-each-group>
+    </xsl:function>
+
     <xsl:function name="check:swapExclude" as="xsd:string*">
         <xsl:param name="nexts" as="xsd:string*"/>
         <xsl:param name="excludes" as="xsd:string*"/>
