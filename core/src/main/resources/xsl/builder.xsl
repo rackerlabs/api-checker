@@ -50,9 +50,19 @@
             In the second pass, we connect the error
             states in the machine.
         -->
+        <xsl:variable name="pass2">
+            <checker>
+                <xsl:apply-templates select="$pass1" mode="addErrorStates"/>
+            </checker>
+        </xsl:variable>
+        <!--
+            Finally add namespaces and remove unconnected nodes.
+        -->
         <checker>
             <xsl:call-template name="check:addNamespaceNodes"/>
-            <xsl:apply-templates select="$pass1" mode="addErrorStates"/>
+            <xsl:apply-templates select="$pass2" mode="pruneStates">
+                <xsl:with-param name="nexts" select="tokenize(string-join($pass2//check:step/@next,' '),' ')"/>
+            </xsl:apply-templates>
         </checker>
     </xsl:template>
     
@@ -114,6 +124,21 @@
                 <xsl:value-of select="namespace-uri-from-QName($qname)"/>
             </xsl:attribute>
         </ns>
+    </xsl:template>
+
+    <xsl:template match="check:step" mode="pruneStates">
+        <xsl:param name="nexts" as="xsd:string*"/>
+        <xsl:choose>
+            <xsl:when test="@type='START'">
+                <xsl:copy-of select="."/>
+            </xsl:when>
+            <xsl:when test="@id = $nexts">
+                <xsl:copy-of select="."/>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- pruned -->
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="check:step" mode="addErrorStates">
