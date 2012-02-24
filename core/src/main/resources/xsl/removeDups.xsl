@@ -18,16 +18,40 @@
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="not($dups/check:group)">
-                <!-- No duplicats found, output checker -->
+                <!-- No duplicats found, tidy up empty epsillon cases -->
                 <checker>
                   <xsl:copy-of select="/check:checker/namespace::*"/>
-                  <xsl:for-each select="$checker//check:step">
-                      <xsl:copy-of select="."/>
-                  </xsl:for-each>
+                  <xsl:apply-templates select="$checker" mode="epsilonRemove"/>
                 </checker>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="replaceAllDups">
+                    <xsl:with-param name="checker">
+                        <xsl:call-template name="replaceDups">
+                            <xsl:with-param name="checker" select="$checker"/>
+                            <xsl:with-param name="dups" select="$dups"/>
+                        </xsl:call-template>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="check:checker" name="replaceEpsilons" mode="epsilonRemove">
+        <xsl:param name="checker" select="." as="node()"/>
+        <xsl:variable name="dups" as="node()">
+            <xsl:call-template name="getEpsilonDups">
+                <xsl:with-param name="checker" select="$checker"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="not($dups/check:group)">
+                <xsl:for-each select="$checker//check:step">
+                    <xsl:copy-of select="."/>
+                </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="replaceEpsilons">
                     <xsl:with-param name="checker">
                         <xsl:call-template name="replaceDups">
                             <xsl:with-param name="checker" select="$checker"/>
@@ -57,7 +81,7 @@
         <xsl:param name="dups" as="node()"/>
         <xsl:param name="excludes" as="xsd:string*"/>
         <xsl:choose>
-            <xsl:when test="count(index-of($excludes,@id)) != 0"/>
+            <xsl:when test="$excludes = @id"/>
             <xsl:otherwise>
                 <step>
                     <xsl:apply-templates select="@*" mode="unDup">
@@ -112,6 +136,23 @@
                               else $n"/>
     </xsl:function>
     
+    <xsl:template name="getEpsilonDups" as="node()">
+        <xsl:param name="checker" as="node()"/>
+        <checker>
+            <!-- Treat epsilon methods as dups -->
+            <xsl:for-each select="$checker//check:step[@type='METHOD']">
+                <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
+                <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts]"/>
+                <xsl:if test="every $s in $nextStep satisfies $s/@type='METHOD'">
+                    <group>
+                        <xsl:attribute name="include" select="$nexts[1]"/>
+                        <xsl:attribute name="exclude" select="@id"/>
+                    </group>
+                </xsl:if>
+            </xsl:for-each>
+        </checker>
+    </xsl:template>
+
     <xsl:template name="getDups" as="node()">
         <xsl:param name="checker" as="node()"/>
         <checker>
