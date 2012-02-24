@@ -9,7 +9,7 @@
    <xsl:param name="ignoreSinks" select="true()" as="xsd:boolean"/>
    <xsl:param name="nfaMode" select="true()" as="xsd:boolean"/>
    <xsl:variable name="source_types" select="('START')" as="xsd:string*"/>
-   <xsl:variable name="sink_types" select="('URL_FAIL', 'METHOD_FAIL')" as="xsd:string*"/>
+   <xsl:variable name="sink_types" select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')" as="xsd:string*"/>
    <xsl:variable name="real_start" select="'REAL_START'" as="xsd:string"/>
    <xsl:variable name="indent" select='"           "'/>
    <xsl:template match="check:checker">
