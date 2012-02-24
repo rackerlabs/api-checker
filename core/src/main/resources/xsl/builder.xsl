@@ -296,6 +296,8 @@
             <step type="METHOD">
                 <xsl:attribute name="id" select="generate-id()"/>
                 <xsl:attribute name="match" select="check:toRegExEscaped(@name)"/>
+                <!-- for now, once we get to the method we accept -->
+                <xsl:attribute name="next" select="$ACCEPT"/>
                 <xsl:if test="@id or wadl:doc/@title">
                     <xsl:attribute name="label">
                         <xsl:choose>
