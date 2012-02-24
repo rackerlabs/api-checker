@@ -63,6 +63,7 @@
                     <xsl:apply-templates select="@*" mode="unDup">
                         <xsl:with-param name="dups" select="$dups"/>
                         <xsl:with-param name="excludes" select="$excludes"/>
+                        <xsl:with-param name="id" select="@id"/>
                     </xsl:apply-templates>
                 </step>
             </xsl:otherwise>
@@ -72,12 +73,22 @@
     <xsl:template match="@*" mode="unDup">
         <xsl:param name="dups" as="node()"/>
         <xsl:param name="excludes" as="xsd:string*"/>
+        <xsl:param name="id" as="xsd:string"/>
         <xsl:choose>
+            <!-- Substitude excludes from nexts -->
             <xsl:when test="name() = 'next'">
                 <xsl:variable name="nexts" as="xsd:string*" select="tokenize(.,' ')"/>
                 <xsl:attribute name="next">
                   <xsl:value-of select="check:swapExclude($nexts,$excludes,$dups)" separator=" "/>
                 </xsl:attribute>
+            </xsl:when>
+            <!-- Copy labels only if all excluded labels match -->
+            <xsl:when test="name() = 'label'">
+                <xsl:variable name="excludedIDs" as="xsd:string*" select="tokenize($dups/check:group[@include=$id]/@exclude, ' ')"/>
+                <xsl:variable name="excludedLabels" select="//check:step[@id=$excludedIDs]/@label" as="xsd:string*"/>
+                <xsl:if test="every $l in $excludedLabels satisfies $l=.">
+                    <xsl:copy/>
+                </xsl:if>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:copy/>
