@@ -276,7 +276,7 @@
        <xsl:param name="id" as="xsd:string"/>
        <xsl:param name="color" as="xsd:string"/>
        <xsl:param name="shape" as="xsd:string"/>
-       <xsl:variable name="out" as="xsd:string*">
+       <xsl:value-of>
            <xsl:value-of select="$id"/>
            <xsl:text>[label="</xsl:text>
            <xsl:value-of select="$id"/>
@@ -285,7 +285,6 @@
            <xsl:text>", shape="</xsl:text>
            <xsl:value-of select="$shape"/>
            <xsl:text>"]&#x0a;</xsl:text>
-       </xsl:variable>
-       <xsl:value-of select="string-join($out,'')"/>
+       </xsl:value-of>
    </xsl:function>
 </xsl:stylesheet>
