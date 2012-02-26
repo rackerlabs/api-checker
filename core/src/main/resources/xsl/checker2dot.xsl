@@ -9,7 +9,16 @@
    <xsl:param name="ignoreSinks" select="true()" as="xsd:boolean"/>
    <xsl:param name="nfaMode" select="true()" as="xsd:boolean"/>
    <xsl:variable name="source_types" select="('START')" as="xsd:string*"/>
-   <xsl:variable name="sink_types" select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')" as="xsd:string*"/>
+   <xsl:variable name="sink_types" as="xsd:string*">
+       <xsl:choose>
+           <xsl:when test="$nfaMode">
+               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL')"/>
+           </xsl:when>
+           <xsl:otherwise>
+               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')"/>
+           </xsl:otherwise>
+       </xsl:choose>
+   </xsl:variable>
    <xsl:variable name="real_start" select="'REAL_START'" as="xsd:string"/>
    <xsl:variable name="indent" select='"           "'/>
    <xsl:template match="check:checker">
@@ -98,6 +107,9 @@
                                    <xsl:choose>
                                        <xsl:when test="$label = 'ε'">
                                            <xsl:value-of select="$label"/>
+                                       </xsl:when>
+                                       <xsl:when test="$nextStep/@type = 'ACCEPT'">
+                                           <xsl:value-of select="'ε'"/>
                                        </xsl:when>
                                        <xsl:otherwise>
                                            <xsl:value-of select="substring($nextStep/@type,1,1)"/>
