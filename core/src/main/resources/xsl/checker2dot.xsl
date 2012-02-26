@@ -146,6 +146,15 @@
                   <xsl:when test="@match">
                      <xsl:value-of select="check:escapeRegex(@match)"/>
                   </xsl:when>
+                  <xsl:when test="@notMatch and @notTypes">
+                      <xsl:value-of select="check:notMatchRegex((tokenize(@notMatch,' '), tokenize(@notTypes,' ')))"/>
+                  </xsl:when>
+                  <xsl:when test="@notMatch">
+                      <xsl:value-of select="check:notMatchRegex(tokenize(@notMatch,' '))"/>
+                  </xsl:when>
+                  <xsl:when test="@notTypes">
+                      <xsl:value-of select="check:notMatchRegex(tokenize(@notTypes,' '))"/>
+                  </xsl:when>
                   <xsl:otherwise>
                      <xsl:value-of select="@type"/>
                   </xsl:otherwise>
@@ -165,8 +174,11 @@
             <xsl:when test="@type = 'ACCEPT'">
                 <xsl:text>, shape=doublecircle, fillcolor="white"</xsl:text>
             </xsl:when>
-            <xsl:when test="count(index-of($sink_types,@type)) != 0">
-                <xsl:text>, shape=doublecircle, fillcolor="crimson"</xsl:text>
+            <xsl:when test="@type = 'METHOD_FAIL'">
+                <xsl:text>, shape=ellipse, fillcolor="salmon"</xsl:text>
+            </xsl:when>
+            <xsl:when test="@type= 'URL_FAIL'">
+                <xsl:text>, shape=ellipse, fillcolor="salmon3"</xsl:text>
             </xsl:when>
             <xsl:when test="@type = 'URL'">
                 <xsl:text>, fillcolor="yellowgreen"</xsl:text>
@@ -203,5 +215,12 @@
    <xsl:function name="check:escapeRegex" as="xsd:string">
       <xsl:param name="in" as="xsd:string"/>
       <xsl:value-of select="replace($in,'\\','\\\\')"/> 
+   </xsl:function>
+   <xsl:function name="check:notMatchRegex" as="xsd:string">
+       <xsl:param name="in" as="xsd:string*"/>
+       <xsl:variable name="inEsc"
+                     select="for $i in $in return check:escapeRegex($i)"
+                     as="xsd:string*"/>
+       <xsl:value-of select="concat('!(',string-join($in,' | '),')')"/>
    </xsl:function>
 </xsl:stylesheet>
