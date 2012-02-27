@@ -12,7 +12,7 @@ import scala.collection.mutable.Map
 //  according to the checker schema.  Please ensure that a validation
 //  stage occurs before the handler is called.
 //
-class StepHandler() extends ContentHandler {
+class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   //
   // ID -> Step
   //
@@ -26,6 +26,8 @@ class StepHandler() extends ContentHandler {
   //
   private[this] var start : Step = null
 
+  def this() = this(null)
+
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
     if (localName == "step") {
       atts.getValue("type") match {
@@ -38,6 +40,9 @@ class StepHandler() extends ContentHandler {
         case "URLXSD"      => addURLXSD(atts)
       }
     }
+    if (contentHandler != null) {
+      contentHandler.startElement(uri, localName, qname, atts)
+    }
   }
 
   override def endDocument = {
@@ -48,6 +53,9 @@ class StepHandler() extends ContentHandler {
       }
     }}
     next.clear
+    if (contentHandler != null) {
+      contentHandler.endDocument()
+    }
   }
 
   //
@@ -126,13 +134,49 @@ class StepHandler() extends ContentHandler {
   //
   //  Other content handler methods
   //
-  override def characters(ch : Array[Char], start : Int, length : Int) = {}
-  override def endElement(uri : String, localName : String, qname : String) = {}
-  override def endPrefixMapping (prefix : String) = {}
-  override def ignorableWhitespace(ch : Array[Char], start : Int, length : Int) = {}
-  override def processingInstruction(target : String, data : String) = {}
-  override def setDocumentLocator(locator : Locator) = {}
-  override def skippedEntity (name : String) = {}
-  override def startDocument = {}
-  override def startPrefixMapping (prefix : String, uri : String) = {}
+  override def characters(ch : Array[Char], start : Int, length : Int) = {
+    if (contentHandler != null) {
+      contentHandler.characters(ch, start, length)
+    }
+  }
+  override def endElement(uri : String, localName : String, qname : String) = {
+    if (contentHandler != null) {
+      contentHandler.endElement(uri, localName, qname)
+    }
+  }
+  override def endPrefixMapping (prefix : String) = {
+    if (contentHandler != null) {
+      contentHandler.endPrefixMapping(prefix)
+    }
+  }
+  override def ignorableWhitespace(ch : Array[Char], start : Int, length : Int) = {
+    if (contentHandler != null) {
+      contentHandler.ignorableWhitespace(ch, start, length)
+    }
+  }
+  override def processingInstruction(target : String, data : String) = {
+    if (contentHandler != null) {
+      contentHandler.processingInstruction(target, data)
+    }
+  }
+  override def setDocumentLocator(locator : Locator) = {
+    if (contentHandler != null) {
+      contentHandler.setDocumentLocator(locator)
+    }
+  }
+  override def skippedEntity (name : String) = {
+    if (contentHandler != null) {
+      contentHandler.skippedEntity(name)
+    }
+  }
+  override def startDocument = {
+    if (contentHandler != null) {
+      contentHandler.startDocument()
+    }
+  }
+  override def startPrefixMapping (prefix : String, uri : String) = {
+    if (contentHandler != null) {
+      contentHandler.startPrefixMapping(prefix, uri)
+    }
+  }
 }
