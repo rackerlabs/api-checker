@@ -69,7 +69,7 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
     build (in, null, removeDups)
   }
 
-  def build (in : NodeSeq, removeDups : Boolean) : Step = {
+  def build (in : NodeSeq, removeDups : Boolean = false) : Step = {
     build (("",in), removeDups)
   }
 }
