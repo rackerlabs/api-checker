@@ -48,7 +48,7 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   override def endDocument = {
     next.foreach { case (id, nexts) => {
       val step = steps(id).asInstanceOf[ConnectedStep]
-      for ( i <- 0 to nexts.length) {
+      for ( i <- 0 to (nexts.length - 1)) {
         step.next(i) = steps(nexts(i))
       }
     }}
@@ -67,7 +67,7 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   //  The following add steps...
   //
   private[this] def addStart(atts : Attributes) : Unit = {
-    val nexts : Array[String] = atts.getValue("nexts").split(" ")
+    val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
 
@@ -108,7 +108,7 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {
-    val nexts : Array[String] = atts.getValue("nexts").split(" ")
+    val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
@@ -118,7 +118,7 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   }
 
   private[this] def addMethod(atts : Attributes) : Unit = {
-    val nexts : Array[String] = atts.getValue("nexts").split(" ")
+    val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
