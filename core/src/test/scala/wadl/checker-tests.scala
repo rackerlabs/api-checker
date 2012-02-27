@@ -1447,28 +1447,20 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   def noDupAsserts(checker : NodeSeq) : Unit = {
     then("The paths in both resources should match")
     assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
-    assert (checker, Start, URL("path"), URL("to"), URL("another"), URL("res"), Method("GET"))
     assert (checker, "count(//chk:step[@type='URL' and @match='path']) = 1")
     assert (checker, "count(//chk:step[@type='URL' and @match='to']) = 1")
     assert (checker, "count(//chk:step[@type='URL' and @match='my']) = 1")
     assert (checker, "count(//chk:step[@type='URL' and @match='resource']) = 1")
-    assert (checker, "count(//chk:step[@type='URL' and @match='another']) = 1")
-    assert (checker, "count(//chk:step[@type='URL' and @match='res']) = 1")
-    assert (checker, "count(//chk:step[@type='METHOD' and @match='GET']) = 2")
+    assert (checker, "count(//chk:step[@type='METHOD' and @match='GET']) = 1")
   }
 
-  scenario("The WADL does not contain any duplicate nodes, but remove dup optimization is on") {
+  scenario("The WADL does not contain any duplicate resources, but remove dup optimization is on") {
     given("a WADL that contains no duplicate nodes")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
            <resources base="https://test.api.openstack.com">
               <resource path="path/to/my/resource">
-                     <method name="GET">
-                        <response status="200 203"/>
-                     </method>
-              </resource>
-              <resource path="path/to/another/res">
                      <method name="GET">
                         <response status="200 203"/>
                      </method>
@@ -1499,13 +1491,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                      </method>
                    </resource>
                  </resource>
-                 <resource path="another">
-                   <resource path="res">
-                     <method name="GET">
-                        <response status="200 203"/>
-                     </method>
-                   </resource>
-                 </resource>
                 </resource>
               </resource>
            </resources>
@@ -1527,13 +1512,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            <resources base="https://test.api.openstack.com">
               <resource path="path/to/my">
                   <resource path="resource">
-                     <method name="GET">
-                        <response status="200 203"/>
-                     </method>
-                  </resource>
-              </resource>
-              <resource path="path/to/another">
-                  <resource path="res">
                      <method name="GET">
                         <response status="200 203"/>
                      </method>
@@ -1703,7 +1681,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker_dupon, "count(//chk:step[@type='URL' and @match='resource2']) = 1")
 
     and("there should be the same number of methods in each")
-    assert (checker_dupon, "count(//chk:step[@type='METHOD' and @match='GET']) = 2")
+    assert (checker_dupon, "count(//chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker_dupoff, "count(//chk:step[@type='METHOD' and @match='GET']) = 2")
   }
 
