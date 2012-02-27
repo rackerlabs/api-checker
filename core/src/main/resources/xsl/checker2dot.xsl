@@ -64,6 +64,11 @@
            <xsl:apply-templates mode="nfa_connections"/>
        </xsl:if>
        <xsl:apply-templates mode="connections"/>
+       <!-- Add Bad URL connections -->
+       <xsl:if test="$nfaMode and not($ignoreSinks)">
+           <xsl:value-of select="concat($indent,$urlFail,'-&gt;',$urlFail,' [label=&quot;U(.*)&quot;, tailport=n, headport=ne]&#x0a;')"/>
+           <xsl:value-of select="concat($indent,$urlFail,'-&gt;',$urlFail,' [label=&quot;M(.*)&quot;, tailport=s, headport=sw]&#x0a;')"/>
+       </xsl:if>
        <xsl:value-of select="$indent"/>
        <xsl:text>}&#x0a;</xsl:text>
        <xsl:if test="not($ignoreSinks) and not($nfaMode)">
@@ -143,11 +148,6 @@
                        </xsl:otherwise>
                    </xsl:choose>
                </xsl:for-each>
-               <!-- Add Bad URL connections --> 
-               <xsl:if test="$nfaMode and $step/@type = 'URL_FAIL'">
-                   <xsl:value-of select="concat($indent,$id,'-&gt;',$id,' [label=&quot;U(.*)&quot;, tailport=n, headport=ne]&#x0a;')"/>
-                   <xsl:value-of select="concat($indent,$id,'-&gt;',$id,' [label=&quot;M(.*)&quot;, tailport=s, headport=sw]&#x0a;')"/>
-               </xsl:if>
            </xsl:otherwise>
        </xsl:choose>
    </xsl:template>
