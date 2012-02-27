@@ -60,12 +60,37 @@
         -->
         <checker>
             <xsl:call-template name="check:addNamespaceNodes"/>
-            <xsl:apply-templates select="$pass2" mode="pruneStates">
-                <xsl:with-param name="nexts" select="tokenize(string-join($pass2//check:step/@next,' '),' ')"/>
-            </xsl:apply-templates>
+            <xsl:call-template name="check:pruneStates">
+                <xsl:with-param name="checker" select="$pass2"/>
+            </xsl:call-template>
         </checker>
     </xsl:template>
-    
+
+    <xsl:template name="check:pruneStates">
+        <xsl:param name="checker" as="node()"/>
+        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(string-join($checker//check:step/@next,' '),' ')"/>
+        <xsl:variable name="connected" as="xsd:integer" select="count($checker//check:step[$nexts = @id])"/>
+        <xsl:variable name="all" as="xsd:integer" select="count($checker//check:step[@type != 'START'])"/>
+        <xsl:choose>
+            <xsl:when test="$connected = $all">
+                <xsl:for-each select="$checker//check:step">
+                    <xsl:copy-of select="."/>
+                </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="check:pruneStates">
+                    <xsl:with-param name="checker">
+                        <checker>
+                            <xsl:apply-templates select="$checker" mode="pruneStates">
+                                <xsl:with-param name="nexts" select="$nexts"/>
+                            </xsl:apply-templates>
+                        </checker>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template name="check:getNamespaces">
         <!--
             Retrieve all required namespaces
