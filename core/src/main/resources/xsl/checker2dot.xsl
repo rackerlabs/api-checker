@@ -127,7 +127,9 @@
                                                  <xsl:text>)</xsl:text>
                                                </xsl:when>
                                                <xsl:otherwise>
-                                                   <xsl:value-of select="check:getErrorRegex($step, $nextStep,$nexts)"/>
+                                                   <xsl:call-template name="check:getErrorRegex">
+                                                       <xsl:with-param name="nextStep" select="$nextStep"/>
+                                                   </xsl:call-template>
                                                </xsl:otherwise>
                                            </xsl:choose>
                                        </xsl:otherwise>
@@ -211,26 +213,23 @@
          </xsl:choose>
      </xsl:template>
    <xsl:template match="text()" mode="#all"/>
-   <xsl:function name="check:getErrorRegex" as="xsd:string">
-       <xsl:param name="step" as="node()"/>
+   <xsl:template name="check:getErrorRegex" as="xsd:string">
        <xsl:param name="nextStep" as="node()"/>
-       <xsl:param name="nexts" as="xsd:string*"/>
-          <xsl:variable name="matches" as="xsd:string*" 
-                        select="distinct-values(for $n in $nexts 
-                                                return $step/../check:step[@id=$n and @type=substring-before($nextStep/@type,'_')]/@match)"/>
-          <xsl:choose>
-              <xsl:when test="count($matches) != 0">
-                  <xsl:value-of>
-                   <xsl:text>(!~(</xsl:text>
-                   <xsl:value-of select="$matches" separator=" | "/>
-                   <xsl:text>))</xsl:text>
-                  </xsl:value-of>
-              </xsl:when>
-              <xsl:otherwise>
-                  <xsl:text>(.*)</xsl:text>
-              </xsl:otherwise>
-          </xsl:choose>
-   </xsl:function>
+       <xsl:choose>
+           <xsl:when test="$nextStep/@notMatch and $nextStep/@notTypes">
+               <xsl:value-of select="check:notMatchRegex((tokenize($nextStep/@notMatch,' '), tokenize($nextStep/@notTypes,' ')))"/>
+           </xsl:when>
+           <xsl:when test="$nextStep/@notMatch">
+               <xsl:value-of select="check:notMatchRegex(tokenize($nextStep/@notMatch,' '))"/>
+           </xsl:when>
+           <xsl:when test="$nextStep/@notTypes">
+               <xsl:value-of select="check:notMatchRegex(tokenize($nextStep/@notTypes,' '))"/>
+           </xsl:when>
+           <xsl:otherwise>
+               <xsl:text>(.*)</xsl:text>
+           </xsl:otherwise>
+       </xsl:choose>
+   </xsl:template>
    <xsl:function name="check:escapeRegex" as="xsd:string">
       <xsl:param name="in" as="xsd:string"/>
       <xsl:value-of select="replace($in,'\\','\\\\')"/> 
