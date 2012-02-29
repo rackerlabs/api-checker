@@ -50,9 +50,6 @@ class WADLStepSpec extends BaseStepSpec {
         </application>
       when("the wadl is translated")
       val step = builder.build (inWADL).asInstanceOf[Start]
-      //
-      // add assertions
-      //
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
       assert(step, Start, URI("path"), URLFailMatch("to"))
@@ -86,9 +83,15 @@ class WADLStepSpec extends BaseStepSpec {
         </application>
       when("the wadl is translated")
       val step = builder.build (inWADL)
-      //
-      // add assertions
-      //
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET"))
+      assert(step, Start, URI("path"), MethodFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("other_resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("other_resource"), Method("POST"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("other_resource"), MethodFailMatch("GET|POST"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URLFailMatch("other_resource|resource"))
     }
 
     scenario("The WADL contains multiple, unrelated paths") {
@@ -117,9 +120,16 @@ class WADLStepSpec extends BaseStepSpec {
         </application>
       when("the wadl is translated")
       val step = builder.build (inWADL)
-      //
-      //  Add assertions
-      //
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET"))
+      assert(step, Start, URI("path"), MethodFail)
+      assert(step, Start, URI("this"), URI("is"), URI("my"), URI("other_resource"), Method("GET"), Accept)
+      assert(step, Start, URI("this"), URI("is"), URI("my"), URI("other_resource"), Method("POST"), Accept)
+      assert(step, Start, URI("this"), URLFailMatch("is"))
+      assert(step, Start, URI("this"), URI("is"), URI("my"), URI("other_resource"), MethodFailMatch("GET|POST"))
+      assert(step, Start, URI("this"), URI("is"), MethodFail)
     }
 
     scenario("The WADL contains method ids") {
