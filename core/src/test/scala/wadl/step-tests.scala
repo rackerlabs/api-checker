@@ -150,9 +150,13 @@ class WADLStepSpec extends BaseStepSpec {
         </application>
       when("the wadl is translated")
       val step = builder.build (inWADL)
-      //
-      //  Add assertions
-      //
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET"))
+      assert(step, Start, URI("path"), MethodFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Label("getResource"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Label("deleteResource"), Accept)
     }
 
     scenario("The WADL contains an initial invisible node") {

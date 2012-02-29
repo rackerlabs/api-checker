@@ -24,6 +24,7 @@ class BaseStepSpec extends BaseWADLSpec {
     a.filter (f => f.isInstanceOf[URI]).filter(f => f.asInstanceOf[URI].uri.toString == uri)
   def withMethod(a : Array[Step], method : String) : Array[Step] =
     a.filter (f => f.isInstanceOf[Method]).filter(f => f.asInstanceOf[Method]. method.toString == method)
+  def withLabel(a : Array[Step], label : String) : Array[Step] = a.filter (f => f.label == label)
 
   def Start   : (Array[Step]) => Array[Step] = withStart
   def Accept  : (Array[Step]) => Array[Step] = withAccept
@@ -33,6 +34,7 @@ class BaseStepSpec extends BaseWADLSpec {
   def MethodFailMatch(m : String) : (Array[Step]) => Array[Step] = withMethodFailMatch(_, m)
   def URI(m : String) : (Array[Step]) => Array[Step] = withURI(_, m)
   def Method(m : String) : (Array[Step]) => Array[Step] = withMethod(_, m)
+  def Label(m : String) : (Array[Step]) => Array[Step] = withLabel(_, m)
 
   def assert(s : Step, step_funs : ((Array[Step]) => Array[Step])*) : Unit = {
     if (step_funs.length == 0) throw new TestFailedException("Path assertion should contain at least one step!",4)
