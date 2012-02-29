@@ -56,7 +56,7 @@ class WADLStepSpec extends BaseStepSpec {
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
       assert(step, Start, URI("path"), URLFailMatch("to"))
-      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE GET"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET"))
       assert(step, Start, URI("path"), MethodFail)
     }
 

@@ -218,7 +218,7 @@
                     <step type="METHOD_FAIL">
                         <xsl:attribute name="id" select="$MethodMatchID"/>
                         <xsl:attribute name="notMatch">
-                            <xsl:value-of select="$nextMethodMatch" separator=" "/>
+                            <xsl:value-of select="$nextMethodMatch" separator="|"/>
                         </xsl:attribute>
                     </step>
                 </xsl:if>
@@ -227,7 +227,7 @@
                         <xsl:attribute name="id" select="$URLMatchID"/>
                         <xsl:if test="count($nextURLMatch) &gt; 0">
                             <xsl:attribute name="notMatch">
-                                <xsl:value-of select="$nextURLMatch" separator=" "/>
+                                <xsl:value-of select="$nextURLMatch" separator="|"/>
                             </xsl:attribute>
                         </xsl:if>
                         <xsl:if test="count($nextURLXSDMatch) &gt; 0">
