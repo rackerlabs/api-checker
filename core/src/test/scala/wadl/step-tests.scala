@@ -49,10 +49,15 @@ class WADLStepSpec extends BaseStepSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val step = builder.build (inWADL)
+      val step = builder.build (inWADL).asInstanceOf[Start]
       //
       // add assertions
       //
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE GET"))
+      assert(step, Start, URI("path"), MethodFail)
     }
 
     scenario("The WADL contains multiple, related paths") {
