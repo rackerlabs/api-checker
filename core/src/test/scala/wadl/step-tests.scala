@@ -2,6 +2,7 @@ package com.rackspace.com.papi.components.checker.wadl
 
 import scala.xml._
 import org.junit.runner.RunWith
+import org.scalatest.TestFailedException
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers._
 
@@ -187,9 +188,16 @@ class WADLStepSpec extends BaseStepSpec {
         </application>
       when ("the wadl is translated")
       val step = builder.build (inWADL)
-      //
-      // Add assertions
-      //
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET"))
+      assert(step, Start, URI("path"), MethodFail)
+      assert(step, Start, URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("to"), URLFailMatch("my"))
+      assert(step, Start, URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET"))
+      assert(step, Start, URLFailMatch("path|to"))
     }
 
     scenario("The WADL contains a template parameter of type string at the end of a path") {
@@ -209,10 +217,14 @@ class WADLStepSpec extends BaseStepSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
-      //
-      //  Add assertions
-      //
+      val step = builder.build (inWADL)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI(".*"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI(".*"), MethodFailMatch("GET"))
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      and("There should not be an URLFail node right before a catch any URI...")
+      intercept[TestFailedException] {
+        assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
+      }
     }
 
     scenario("The WADL contains a template parameter of type string in the middle of the path") {
@@ -232,10 +244,13 @@ class WADLStepSpec extends BaseStepSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
-      //
-      //  Add assertions
-      //
+      val step = builder.build (inWADL)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI(".*"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI(".*"), URI("resource"), MethodFailMatch("GET"))
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      intercept[TestFailedException] {
+        assert(step, Start, URI("path"), URI("to"), URI("my"), URLFail)
+      }
     }
 
   }
