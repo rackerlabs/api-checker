@@ -21,6 +21,7 @@
                 <!-- No duplicats found, tidy up empty epsillon cases -->
                 <checker>
                   <xsl:copy-of select="/check:checker/namespace::*"/>
+                  <xsl:copy-of select="/check:checker/check:grammar"/>
                   <xsl:apply-templates select="$checker" mode="epsilonRemove"/>
                 </checker>
             </xsl:when>

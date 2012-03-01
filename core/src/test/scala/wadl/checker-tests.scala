@@ -936,6 +936,8 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), MethodFail)
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
+      and("The grammar nodes are added to the checker")
+      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://simple.xsd' and @type='W3C_XML']")
     }
 
     scenario("The WADL contains a template parameter of a custom type at the end of the path") {
@@ -1256,6 +1258,8 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), MethodFail)
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
+      and("The grammar nodes are added to the checker")
+      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://simple.xsd' and @type='W3C_XML']")
     }
 
     //
@@ -1294,6 +1298,8 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), URLFail)
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
+      and("The grammar nodes are added to the checker")
+      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://simple.xsd' and @type='W3C_XML']")
     }
 
     scenario("The WADL contains a template parameter of a custom type in the middle of the path") {

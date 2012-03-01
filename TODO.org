@@ -100,10 +100,12 @@
             2. [X] In Method
       5. [X] Write tests for multi-method target
       6. [ ] WADL Grammar[0/2]
-         3. [ ] External Grammar[0/2]
-            1. [ ] File Available, add to checker
-            2. [ ] Missing File
-         4. [ ] Inline Grammar(?)
+         1. [-] External Grammar[1/4]
+            1. [X] File Available, add to checker
+            2. [ ] Multiple available files
+            3. [ ] Missing File
+            4. [ ] Relative paths
+         2. [ ] Inline Grammar(?)
    4. [X] Add Opt as an option, by pipeing through removeDups
    5. [X] Simple optimization test to confirm functionality[9/9]
         1. [X] OPT on but no duplicates
