@@ -52,7 +52,7 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build(in : InputStream, removeDups : Boolean) : Step = {
-    build(("", in), null, removeDups)
+    build(("test://mywadl.wadl", in), null, removeDups)
   }
 
   def build (in : Reader, removeDups : Boolean) : Step = {
@@ -70,6 +70,6 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build (in : NodeSeq, removeDups : Boolean = false) : Step = {
-    build (("",in), removeDups)
+    build (("test://mywadl.wadl",in), removeDups)
   }
 }

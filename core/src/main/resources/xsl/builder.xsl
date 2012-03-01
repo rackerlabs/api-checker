@@ -60,10 +60,30 @@
         -->
         <checker>
             <xsl:call-template name="check:addNamespaceNodes"/>
+            <xsl:apply-templates mode="grammar"/>
             <xsl:call-template name="check:pruneStates">
                 <xsl:with-param name="checker" select="$pass2"/>
             </xsl:call-template>
         </checker>
+    </xsl:template>
+
+    <xsl:template match="wadl:include" mode="grammar">
+        <xsl:choose>
+            <xsl:when test="doc-available(@href)">
+                <xsl:variable name="ns" select="doc(@href)/xsd:schema/@targetNamespace"/>
+                <xsl:choose>
+                    <xsl:when test="$ns">
+                        <grammar ns="{$ns}" href="{@href}"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:message>[WARNING] Could not retrieve target namespace from <xsl:value-of select="@href"/> ignoring...</xsl:message>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:message>[WARNING] Couldn't process grammar <xsl:value-of select="@href"/> ignoring...</xsl:message>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="check:pruneStates">
