@@ -128,14 +128,8 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step">
+            <extension base="chk:ConnectedStep">
                 <attribute name="match" type="xsd:string" use="required"/>
-                <!-- Step is only connected in one very particular
-                     case, os unlike a regular connected step, there
-                     are cases where MethodStep is terminal. Long
-                     term, MethodStep should be a regular method step,
-                     but we're not there yet.-->
-                <attribute name="next" type="xsd:IDREFS" use="optional"/>
             </extension>
         </complexContent>
     </complexType>
