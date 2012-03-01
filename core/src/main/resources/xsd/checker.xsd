@@ -4,6 +4,7 @@
     xmlns="http://www.w3.org/2001/XMLSchema"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
+    xmlns:saxon="http://saxon.sf.net/"
     targetNamespace="http://www.rackspace.com/repose/wadl/checker">
 
     <!-- The Checker Element -->
@@ -35,6 +36,16 @@
                 <alternative test="@type eq 'URLXSD'" type="chk:URLXSDStep"/>
             </element>
         </sequence>
+        <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
+                saxon:message="There should be 1 and only 1 step of type START.">
+            <annotation>
+                <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                    <html:p>
+                        There should be a single START node.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </assert>
     </complexType>
 
     <!-- Connected Steps -->
