@@ -99,7 +99,7 @@
       6. [ ] WADL Grammar[0/2]
          1. [ ] External Grammar[0/2]
             1. [ ] File Available, add to checker
-            3. [ ] Missing File
+            2. [ ] Missing File
          2. [ ] Inline Grammar(?)
    3. [X] Add Opt as an option, by pipeing through removeDups
    4. [X] Simple optimization test to confirm functionality[9/9]
