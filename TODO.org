@@ -43,10 +43,10 @@
       other handler
    5. [X] Add support in validator
    6. [X] Test conversion..including new error states.
-** TODO Updates to XSD Schema[2/3]
+** DONE Updates to XSD Schema[3/3]
    1. [X] Checker should allow only one start node.
    2. [X] Method must always have next nodes.
-   3. [ ] Add grammar section (type, namespace, href)
+   3. [X] Add grammar section (type, namespace, href)
 ** TODO WADL Normalize, Builder, opt1 in a single path [3/4]
    1. [X] Add Builder Library
    2. [-] Simple transation tests to confirm the lib is working [5/6]

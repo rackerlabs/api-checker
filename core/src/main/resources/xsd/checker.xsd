@@ -26,6 +26,7 @@
 
     <complexType name="Checker">
         <sequence>
+            <element name="grammar" type="chk:Grammar" minOccurs="0" maxOccurs="unbounded"/>
             <element name="step" type="chk:Step" minOccurs="0" maxOccurs="unbounded">
                 <alternative test="@type eq 'START'" type="chk:StartStep"/>
                 <alternative test="@type eq 'URL_FAIL'" type="chk:URLFailStep"/>
@@ -223,6 +224,21 @@
         </complexContent>
     </complexType>
 
+    <!-- Grammar Def -->
+    <complexType name="Grammar">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Describes a grammar needed for validation by the
+                    checker.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="type" type="chk:GrammarType" use="optional" default="W3C_XML"/>
+        <attribute name="ns" type="xsd:string" use="optional"/>
+        <attribute name="href" type="xsd:anyURI" use="required"/>
+    </complexType>
+
     <!-- Simple Types -->
     <simpleType name="StepType">
         <restriction base="xsd:string">
@@ -233,6 +249,13 @@
             <enumeration value="URL"/>
             <enumeration value="METHOD"/>
             <enumeration value="URLXSD"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="GrammarType">
+        <restriction base="xsd:string">
+            <enumeration value="W3C_XML"/>
+            <!-- Others to follow? -->
         </restriction>
     </simpleType>
 
