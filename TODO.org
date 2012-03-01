@@ -35,11 +35,11 @@
    7. [X] Capture attempt in error steps
    8. [X] Quickly extract correct error in multi-result case
    9. [X] Assert that validator tests above return the correct error
-** TODO Checker to scala.[2/6]
+** TODO Checker to scala.[4/6]
    1. [X] Build support for method/uri fail match in schema
    2. [X] Populate method/uri fail match in checker conversion
-   3. [ ] Update dot conversion to accunt for method/uri fail match
-   4. [ ] Checker to scala as a handler -- possibly passing to an
+   3. [X] Update dot conversion to accunt for method/uri fail match
+   4. [X] Checker to scala as a handler -- possibly passing to an
       other handler
    5. [ ] Add support in validator
    6. [ ] Test conversion..including new error states.
