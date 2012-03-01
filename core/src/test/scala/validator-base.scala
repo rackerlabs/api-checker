@@ -12,11 +12,14 @@ import org.scalatest.TestFailedException
 
 import org.mockito.Mockito._
 
+import org.w3c.dom.Document
+
 /**
  * The assert handler throws an ValidationFailedExecption whenever
  * the request in invalid.
  */
 class AssertResultHandler extends ResultHandler {
+  def init(checker : Option[Document]) : Unit = {}
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, result : Result)  : Unit = {
     if (!result.valid) {
       throw new ResultFailedException("Validation failed",req,resp,result)

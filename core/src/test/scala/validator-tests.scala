@@ -15,7 +15,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   // validator_EMPTY does not allow ANY HTTP requests. The validator
   // is used in the following tests.
   //
-  val validator_EMPTY = new Validator({
+  val validator_EMPTY = Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
     val methodFail = new MethodFail ("MF", "MethodFail")
@@ -47,7 +47,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   // validator_AB allows a GET on /a/b. The validator is used in the
   // following tests.
   //
-  val validator_AB = new Validator({
+  val validator_AB = Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
     val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
@@ -102,7 +102,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   // URI component MUST be a (possibly negative) integer of
   // unspecified size. The validator is used in the following tests.
   //
-  val validator_REG1 = new Validator({
+  val validator_REG1 = Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
     val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
@@ -162,7 +162,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   // component can be anything. The validator is used in the
   // following tests.
   //
-  val validator_REG2 = new Validator({
+  val validator_REG2 = Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
     val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
@@ -255,7 +255,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   // /a/b. The validator is used in the following tests.
   //
   //
-  val validator_REG3 = new Validator({
+  val validator_REG3 = Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
     val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
@@ -310,7 +310,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_CPLX1 = new Validator({
+  val validator_CPLX1 = Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
     val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
@@ -415,7 +415,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_AM = new Validator({
+  val validator_AM = Validator({
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
     val urlFailB = new URLFailMatch("UFB", "URLFail","b".r)
