@@ -60,10 +60,42 @@
         -->
         <checker>
             <xsl:call-template name="check:addNamespaceNodes"/>
+            <xsl:apply-templates mode="grammar"/>
             <xsl:call-template name="check:pruneStates">
                 <xsl:with-param name="checker" select="$pass2"/>
             </xsl:call-template>
         </checker>
+    </xsl:template>
+
+    <xsl:template match="wadl:grammars/wadl:include" mode="grammar">
+        <xsl:choose>
+            <xsl:when test="doc-available(@href)">
+                <xsl:variable name="ns" select="doc(@href)/xsd:schema/@targetNamespace"/>
+                <xsl:choose>
+                    <xsl:when test="$ns">
+                        <grammar ns="{$ns}" href="{@href}"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:message>[WARNING] Don't understand XML grammar of <xsl:value-of select="@href"/> ignoring...</xsl:message>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="unparsed-text-available(@href)">
+                <xsl:message>[WARNING] Don't understand unparsed grammar of <xsl:value-of select="@href"/> ignoring...</xsl:message>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:message terminate="yes">[ERROR] Couldn't access grammar <xsl:value-of select="@href"/></xsl:message>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="wadl:grammars/xsd:schema" mode="grammar">
+        <grammar>
+            <xsl:if test="@targetNamespace">
+                <xsl:attribute name="ns" select="@targetNamespace"/>
+            </xsl:if>
+            <xsl:copy-of select="."/>
+        </grammar>
     </xsl:template>
 
     <xsl:template name="check:pruneStates">
