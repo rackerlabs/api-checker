@@ -25,6 +25,10 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   // The start step
   //
   private[this] var start : Step = null
+  //
+  // The prefix mappings
+  //
+  private[this] val prefixes : Map[String, String] = new HashMap[String, String]
 
   def this() = this(null)
 
@@ -144,7 +148,16 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
       contentHandler.endElement(uri, localName, qname)
     }
   }
+  override def startPrefixMapping (prefix : String, uri : String) = {
+    prefixes += (prefix -> uri)
+
+    if (contentHandler != null) {
+      contentHandler.startPrefixMapping(prefix, uri)
+    }
+  }
   override def endPrefixMapping (prefix : String) = {
+    prefixes -= prefix
+
     if (contentHandler != null) {
       contentHandler.endPrefixMapping(prefix)
     }
@@ -172,11 +185,6 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   override def startDocument = {
     if (contentHandler != null) {
       contentHandler.startDocument()
-    }
-  }
-  override def startPrefixMapping (prefix : String, uri : String) = {
-    if (contentHandler != null) {
-      contentHandler.startPrefixMapping(prefix, uri)
     }
   }
 }
