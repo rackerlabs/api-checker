@@ -76,12 +76,15 @@
                         <grammar ns="{$ns}" href="{@href}"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:message>[WARNING] Could not retrieve target namespace from <xsl:value-of select="@href"/> ignoring...</xsl:message>
+                        <xsl:message>[WARNING] Don't understand XML grammar of <xsl:value-of select="@href"/> ignoring...</xsl:message>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
+            <xsl:when test="unparsed-text-available(@href)">
+                <xsl:message>[WARNING] Don't understand unparsed grammar of <xsl:value-of select="@href"/> ignoring...</xsl:message>
+            </xsl:when>
             <xsl:otherwise>
-                <xsl:message>[WARNING] Couldn't process grammar <xsl:value-of select="@href"/> ignoring...</xsl:message>
+                <xsl:message terminate="yes">[ERROR] Couldn't access grammar <xsl:value-of select="@href"/></xsl:message>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

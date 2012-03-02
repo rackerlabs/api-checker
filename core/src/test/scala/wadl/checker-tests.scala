@@ -1298,6 +1298,99 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://app/xsd/simple.xsd' and @type='W3C_XML']")
     }
 
+    scenario("The WADL contains a template parameter of a custom type, but the grammar is missing") {
+      given("A WADL with a template parameter of a custom type, but the grammar is missing")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://app/xsd/simple.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="yn" path="path/to/my/resource/{yn}">
+                   <param name="yn" style="template" type="tst:yesno"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when("the wadl is translated")
+      then ("A WADLException should be thrown")
+      intercept[WADLException] {
+        val checker = builder.build (inWADL)
+      }
+    }
+
+    scenario("The WADL contains a template parameter of a custom type, but the grammar is not XSD") {
+      given("A WADL with a template parameter of a custom type, but the grammar is not XSD")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://app/xsd/simple.rng"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="int" path="path/to/my/resource/{int}">
+                   <param name="int" style="template" type="tst:int"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when("the wadl is translated")
+      register("test://app/xsd/simple.rng",
+               <grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+               xmlns="http://relaxng.org/ns/structure/1.0" >
+                 <define name="int">
+                   <data type="integer"/>
+                 </define>
+               </grammar>
+             )
+      then ("The grammar should be ignored")
+      val checker = builder.build (inWADL)
+      assert (checker, "not(/chk:checker/chk:grammar)")
+    }
+
+    //
+    //  We ignore until we handle adding an unparsed text reslover for
+    //  testing.
+    //
+    ignore("The WADL contains a template parameter of a custom type, but the grammar is not XML") {
+      given("A WADL with a template parameter of a custom type, but the grammar is not XML")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://app/xsd/simple.json"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="int" path="path/to/my/resource/{int}">
+                   <param name="int" style="template" type="tst:int"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      when("the wadl is translated")
+      // register_unparsed("test://app/xsd/simple.json",
+      //          """
+      //            {
+      //              "type" : "int"
+      //            }
+      //          """
+      //        )
+      then ("The grammar should be ignored")
+      val checker = builder.build (inWADL)
+      assert (checker, "not(/chk:checker/chk:grammar)")
+    }
+
+
     //
     //  The following scenarios test a custom template parameter in the
     //  middle of the resource path (/path/to/my/{yn}/resource. They are

@@ -99,12 +99,14 @@
             1. [X] In URL
             2. [X] In Method
       5. [X] Write tests for multi-method target
-      6. [ ] WADL Grammar[0/2]
-         1. [-] External Grammar[3/4]
+      6. [-] WADL Grammar[1/2]
+         1. [X] External Grammar[6/6]
             1. [X] File Available, add to checker
             2. [X] Multiple available files
             3. [X] Relative paths
-            4. [ ] Missing File
+            4. [X] Missing File should fail
+            5. [X] Should not fail with unknown XML
+            6. [X] Should not fail with unknown unparsed-text
          2. [ ] Inline Grammar(?)
    4. [X] Add Opt as an option, by pipeing through removeDups
    5. [X] Simple optimization test to confirm functionality[9/9]
