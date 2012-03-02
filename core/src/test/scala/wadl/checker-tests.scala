@@ -937,7 +937,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
       and("The grammar nodes are added to the checker")
-      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://simple.xsd' and @type='W3C_XML']")
+      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://app/xsd/simple.xsd' and @type='W3C_XML']")
     }
 
     scenario("The WADL contains a template parameter of a custom type at the end of the path") {
@@ -946,7 +946,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
            <grammars>
-              <include href="test://simple.xsd"/>
+              <include href="test://app/xsd/simple.xsd"/>
            </grammars>
            <resources base="https://test.api.openstack.com">
               <resource id="yn" path="path/to/my/resource/{yn}">
@@ -958,7 +958,43 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      register("test://simple.xsd",
+      register("test://app/xsd/simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateAtEndAssertions(checker)
+    }
+
+    scenario("The WADL contains a template parameter of a custom type at the end of the path, the schema is in a relative path") {
+      given("A WADL with a template parameter of a custom type at the end of the path, the schema is in a relative path")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="xsd/simple.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="yn" path="path/to/my/resource/{yn}">
+                   <param name="yn" style="template" type="tst:yesno"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      register("test://app/xsd/simple.xsd",
                <schema elementFormDefault="qualified"
                         attributeFormDefault="unqualified"
                         xmlns="http://www.w3.org/2001/XMLSchema"
@@ -982,7 +1018,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
            <grammars>
-              <include href="test://simple.xsd"/>
+              <include href="test://app/xsd/simple.xsd"/>
            </grammars>
            <resources base="https://test.api.openstack.com">
               <resource path="path">
@@ -1002,7 +1038,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      register("test://simple.xsd",
+      register("test://app/xsd/simple.xsd",
                <schema elementFormDefault="qualified"
                         attributeFormDefault="unqualified"
                         xmlns="http://www.w3.org/2001/XMLSchema"
@@ -1026,7 +1062,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
            <grammars>
-              <include href="test://simple.xsd"/>
+              <include href="test://app/xsd/simple.xsd"/>
            </grammars>
            <resources base="https://test.api.openstack.com">
               <resource path="path/to/my">
@@ -1042,7 +1078,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      register("test://simple.xsd",
+      register("test://app/xsd/simple.xsd",
                <schema elementFormDefault="qualified"
                         attributeFormDefault="unqualified"
                         xmlns="http://www.w3.org/2001/XMLSchema"
@@ -1066,7 +1102,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
                           xmlns="test://schema/a">
            <wadl:grammars>
-              <wadl:include href="test://simple.xsd"/>
+              <wadl:include href="test://app/xsd/simple.xsd"/>
            </wadl:grammars>
            <wadl:resources base="https://test.api.openstack.com">
               <wadl:resource id="yn" path="path/to/my/resource/{yn}">
@@ -1078,7 +1114,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <wadl:response status="200 203"/>
            </wadl:method>
         </wadl:application>
-      register("test://simple.xsd",
+      register("test://app/xsd/simple.xsd",
                <schema elementFormDefault="qualified"
                         attributeFormDefault="unqualified"
                         xmlns="http://www.w3.org/2001/XMLSchema"
@@ -1102,7 +1138,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
                           xmlns="test://schema/a">
            <wadl:grammars>
-              <wadl:include href="test://simple.xsd"/>
+              <wadl:include href="test://app/xsd/simple.xsd"/>
            </wadl:grammars>
            <wadl:resources base="https://test.api.openstack.com">
               <wadl:resource path="path">
@@ -1122,7 +1158,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <wadl:response status="200 203"/>
            </wadl:method>
         </wadl:application>
-      register("test://simple.xsd",
+      register("test://app/xsd/simple.xsd",
                <schema elementFormDefault="qualified"
                         attributeFormDefault="unqualified"
                         xmlns="http://www.w3.org/2001/XMLSchema"
@@ -1146,7 +1182,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
                          xmlns="test://schema/a">
            <wadl:grammars>
-              <wadl:include href="test://simple.xsd"/>
+              <wadl:include href="test://app/xsd/simple.xsd"/>
            </wadl:grammars>
            <wadl:resources base="https://test.api.openstack.com">
               <wadl:resource path="path/to/my">
@@ -1162,7 +1198,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <wadl:response status="200 203"/>
            </wadl:method>
         </wadl:application>
-      register("test://simple.xsd",
+      register("test://app/xsd/simple.xsd",
                <schema elementFormDefault="qualified"
                         attributeFormDefault="unqualified"
                         xmlns="http://www.w3.org/2001/XMLSchema"
@@ -1186,7 +1222,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
            <grammars>
-              <include href="test://simple.xsd"/>
+              <include href="test://app/xsd/simple.xsd"/>
            </grammars>
            <resources base="https://test.api.openstack.com">
               <resource id="yn" path="path/to/my/resource/{yn}">
@@ -1204,7 +1240,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      register("test://simple.xsd",
+      register("test://app/xsd/simple.xsd",
                <schema elementFormDefault="qualified"
                         attributeFormDefault="unqualified"
                         xmlns="http://www.w3.org/2001/XMLSchema"
@@ -1259,7 +1295,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
       and("The grammar nodes are added to the checker")
-      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://simple.xsd' and @type='W3C_XML']")
+      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://app/xsd/simple.xsd' and @type='W3C_XML']")
     }
 
     //

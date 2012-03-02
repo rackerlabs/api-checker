@@ -83,7 +83,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build(in : InputStream, out: Result, removeDups : Boolean, validateChecker : Boolean) : Unit = {
-    build (("test://mywadl.wadl",in), out, removeDups, validateChecker)
+    build (("test://app/mywadl.wadl",in), out, removeDups, validateChecker)
   }
 
   def build(in : Reader, out: Result, removeDups : Boolean, validateChecker : Boolean) : Unit = {
@@ -103,7 +103,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build (in: NodeSeq, removeDups : Boolean = false, validateChecker : Boolean = true) : NodeSeq = {
-    build (("test://mywadl.wadl",in), removeDups, validateChecker)
+    build (("test://app/mywadl.wadl",in), removeDups, validateChecker)
   }
 }
 
