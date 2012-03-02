@@ -15,7 +15,7 @@ import org.xml.sax.InputSource
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
-import scala.collection.mutable.LinkedList
+import scala.collection.mutable.ArrayBuffer
 
 //
 //  The StepHandler assumes it is receiving content that is valid
@@ -47,7 +47,7 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   //
   // A list of source
   //
-  private[this] val grammarSources : LinkedList[Source] = new LinkedList[Source]
+  private[this] val grammarSources : ArrayBuffer[Source] = new ArrayBuffer[Source]
   //
   // Our schema factory...
   //
@@ -113,7 +113,7 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   private[this] def addGrammar(atts : Attributes) : Unit = {
     val href = atts.getValue("href")
     if (href != null) {
-      grammarSources :+ new SAXSource(new InputSource(href))
+      grammarSources += new SAXSource(new InputSource(href))
     }
   }
 

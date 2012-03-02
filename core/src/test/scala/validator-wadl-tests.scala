@@ -257,4 +257,68 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   test ("GET on /z/c should fail on validator_AM") {
     assertResultFailed(validator_AM.validate(request("GET","/z/c"),response), 404)
   }
+
+  //
+  // validator_UUID allows:
+  //
+  // The validator is used in the following tests.
+  //
+  val validator_UUID = Validator(
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+                 xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
+           <grammars>
+              <include href="https://raw.github.com/openstack/compute-api/master/openstack-compute-api-2/src/xsd/common.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="uuid" path="path/to/my/resource/{uuid}">
+                   <param name="uuid" style="template" type="csapi:UUID"/>
+                   <method href="#getMethod" />
+              </resource>
+              <resource id="progress" path="path/to/{progress}">
+                   <param name="progress" style="template" type="csapi:Progress"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+    ,false, assertHandler)
+
+  test ("GET on /path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498f should succeed on validator_UUID") {
+    validator_UUID.validate(request("GET","/path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498f"),response)
+  }
+
+  test ("GET on /path/to/my/resource/e5b13268-6477-11e1-8e8a-ff0ea421704f should succeed on validator_UUID") {
+    validator_UUID.validate(request("GET","/path/to/my/resource/e5b13268-6477-11e1-8e8a-ff0ea421704f"),response)
+  }
+
+  test ("GET on /path/to/my/resource/16dfce76-6478-11e1-9e38-97e6e1882c28 should succeed on validator_UUID") {
+    validator_UUID.validate(request("GET","/path/to/my/resource/16dfce76-6478-11e1-9e38-97e6e1882c28"),response)
+  }
+
+  test ("DELETE on /path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498f should fail on validator_UUID") {
+    assertResultFailed(validator_UUID.validate(request("DELETE","/path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498f"),response), 405)
+  }
+
+  test ("GET on /path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498z should fail on validator_UUID") {
+    assertResultFailed(validator_UUID.validate(request("GET","/path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498z"),response), 404)
+  }
+
+  test ("GET on /path/to/100 should succeed on validator_UUID") {
+    validator_UUID.validate(request("GET","/path/to/100"),response)
+  }
+
+  test ("GET on /path/to/20 should succeed on validator_UUID") {
+    validator_UUID.validate(request("GET","/path/to/20"),response)
+  }
+
+  test ("GET on /path/to/hello should fail on validator_UUID") {
+    assertResultFailed(validator_UUID.validate(request("GET","/path/to/hello"),response), 404)
+  }
+
+  test ("GET on /path/to/101 should fail on validator_UUID") {
+    assertResultFailed(validator_UUID.validate(request("GET","/path/to/101"),response), 404)
+  }
+
 }
