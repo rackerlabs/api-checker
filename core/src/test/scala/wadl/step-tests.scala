@@ -6,6 +6,8 @@ import org.scalatest.TestFailedException
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers._
 
+import javax.xml.namespace.QName
+
 import com.rackspace.com.papi.components.checker.step._
 
 @RunWith(classOf[JUnitRunner])
@@ -263,5 +265,43 @@ class WADLStepSpec extends BaseStepSpec {
       }
     }
 
+    scenario("The WADL contains a template parameter of a custom type at the end of the path") {
+      given("A WADL with a template parameter of a custom type at the end of the path")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+              <include href="test://app/xsd/simple.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="yn" path="path/to/my/resource/{yn}">
+                   <param name="yn" style="template" type="tst:yesno"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
+      register("test://app/xsd/simple.xsd",
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>)
+      when("the wadl is translated")
+      val step = builder.build (inWADL)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URIXSD(new QName("test://schema/a","yesno","tst")),Method("GET"), Accept)
+      //
+      //  TODO: Fill other assertions...
+      //
+    }
   }
 }

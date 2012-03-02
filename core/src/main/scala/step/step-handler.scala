@@ -1,11 +1,21 @@
 package com.rackspace.com.papi.components.checker.step
 
+import javax.xml.transform.Source
+import javax.xml.transform.sax.SAXSource
+
+import javax.xml.validation.Schema
+import javax.xml.validation.SchemaFactory
+
+import javax.xml.namespace.QName
+
 import org.xml.sax.ContentHandler
 import org.xml.sax.Locator
 import org.xml.sax.Attributes
+import org.xml.sax.InputSource
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
+import scala.collection.mutable.LinkedList
 
 //
 //  The StepHandler assumes it is receiving content that is valid
@@ -29,20 +39,50 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   // The prefix mappings
   //
   private[this] val prefixes : Map[String, String] = new HashMap[String, String]
+  //
+  // In the first phase we process grammars, when this is false we're
+  // processing steps.
+  //
+  private[this] var processGrammar : Boolean = true
+  //
+  // A list of source
+  //
+  private[this] val grammarSources : LinkedList[Source] = new LinkedList[Source]
+  //
+  // Our schema factory...
+  //
+  private[this] val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+
+  //
+  //  Enable CTA full XPath2.0 checking in XSD 1.1
+  //
+  schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
+
+  //
+  // Our schema...
+  //
+  private[this] var schema : Schema = null
 
   def this() = this(null)
 
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
-    if (localName == "step") {
-      atts.getValue("type") match {
-        case "START"       => addStart(atts)
-        case "ACCEPT"      => addAccept(atts)
-        case "URL_FAIL"    => addURLFail(atts)
-        case "METHOD_FAIL" => addMethodFail(atts)
-        case "URL"         => addURL(atts)
-        case "METHOD"      => addMethod(atts)
-        case "URLXSD"      => addURLXSD(atts)
-      }
+    localName match {
+      case "checker" => // ignore
+      case "step" =>
+        if (processGrammar) {
+          setupGrammar
+        }
+        atts.getValue("type") match {
+          case "START"       => addStart(atts)
+          case "ACCEPT"      => addAccept(atts)
+          case "URL_FAIL"    => addURLFail(atts)
+          case "METHOD_FAIL" => addMethodFail(atts)
+          case "URL"         => addURL(atts)
+          case "METHOD"      => addMethod(atts)
+          case "URLXSD"      => addURLXSD(atts)
+        }
+      case "grammar" =>
+        addGrammar(atts)
     }
     if (contentHandler != null) {
       contentHandler.startElement(uri, localName, qname, atts)
@@ -68,6 +108,24 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   def step : Step = start
 
   //
+  //  We add new grammar source, we use it for processing later.
+  //
+  private[this] def addGrammar(atts : Attributes) : Unit = {
+    val href = atts.getValue("href")
+    if (href != null) {
+      grammarSources :+ new SAXSource(new InputSource(href))
+    }
+  }
+
+  //
+  //  Process the grammar to generate a schema.
+  //
+  private[this] def setupGrammar : Unit = {
+    schema = schemaFactory.newSchema(grammarSources.toArray)
+    processGrammar = false
+  }
+
+  //
   //  The following add steps...
   //
   private[this] def addStart(atts : Attributes) : Unit = {
@@ -91,11 +149,23 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val notMatch : String = atts.getValue("notMatch")
+    val notTypes : Array[String] = {
+      val nt = atts.getValue("notTypes")
+      if (nt != null) {
+        nt.split(" ")
+      } else {
+        null
+      }
+    }
 
-    if (notMatch == null) {
+    if (notMatch == null && notTypes == null) {
       steps += (id -> new URLFail(id, label))
-    } else {
+    } else if (notMatch != null && notTypes == null) {
       steps += (id -> new URLFailMatch(id, label, notMatch.r))
+    } else if (notMatch == null && notTypes != null) {
+      steps += (id -> new URLFailXSD(id, label, notTypes.map (nt => qname(nt)), schema))
+    } else {
+      steps += (id -> new URLFailXSDMatch(id, label, notMatch.r, notTypes.map(nt => qname(nt)), schema))
     }
   }
 
@@ -132,7 +202,22 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   }
 
   private[this] def addURLXSD(atts : Attributes) : Unit = {
-    System.err.println("StepHandler WARNING: URLXSD currently not supported")
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+
+    next  += (id -> nexts)
+    steps += (id -> new URIXSD(id, label, qname(_match), schema, new Array[Step](nexts.length)))
+  }
+
+  private[this] def qname(_match : String)  : QName = {
+    if (_match.contains(":")) {
+      val qname = _match.split(":")
+      new QName(prefixes(qname(0)), qname(1), qname(0))
+    } else {
+      new QName(prefixes(""), _match)
+    }
   }
 
   //

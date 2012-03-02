@@ -7,6 +7,8 @@ import org.scalatest.TestFailedException
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
 
+import javax.xml.namespace.QName
+
 import com.rackspace.com.papi.components.checker.step._
 
 class BaseStepSpec extends BaseWADLSpec {
@@ -22,6 +24,8 @@ class BaseStepSpec extends BaseWADLSpec {
     a.filter (f => f.isInstanceOf[MethodFailMatch]).filter(f => f.asInstanceOf[MethodFailMatch].method.toString == mat)
   def withURI(a : Array[Step], uri : String) : Array[Step] =
     a.filter (f => f.isInstanceOf[URI]).filter(f => f.asInstanceOf[URI].uri.toString == uri)
+  def withURIXSD(a : Array[Step], qname : QName) : Array[Step] =
+    a.filter (f => f.isInstanceOf[URIXSD]).filter(f => f.asInstanceOf[URIXSD].xsd.simpleType == qname)
   def withMethod(a : Array[Step], method : String) : Array[Step] =
     a.filter (f => f.isInstanceOf[Method]).filter(f => f.asInstanceOf[Method]. method.toString == method)
   def withLabel(a : Array[Step], label : String) : Array[Step] = a.filter (f => f.label == label)
@@ -33,6 +37,7 @@ class BaseStepSpec extends BaseWADLSpec {
   def URLFailMatch(m : String) : (Array[Step]) => Array[Step] = withURLFailMatch(_, m)
   def MethodFailMatch(m : String) : (Array[Step]) => Array[Step] = withMethodFailMatch(_, m)
   def URI(m : String) : (Array[Step]) => Array[Step] = withURI(_, m)
+  def URIXSD(m : QName) : (Array[Step]) => Array[Step] = withURIXSD(_, m)
   def Method(m : String) : (Array[Step]) => Array[Step] = withMethod(_, m)
   def Label(m : String) : (Array[Step]) => Array[Step] = withLabel(_, m)
 
