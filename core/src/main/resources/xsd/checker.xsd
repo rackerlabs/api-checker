@@ -234,9 +234,23 @@
                 </html:p>
             </documentation>
         </annotation>
+        <sequence>
+            <!--
+                 Pretty lax check for now, not really any schema type
+                 we use the assertion to restrict this to
+                 xsd:schema only.
+
+                 TODO, bring in XSD 1.1 schema and actually validate.
+            -->
+            <any minOccurs="0" maxOccurs="1" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax"/>
+        </sequence>
         <attribute name="type" type="chk:GrammarType" use="optional" default="W3C_XML"/>
         <attribute name="ns" type="xsd:string" use="optional"/>
-        <attribute name="href" type="xsd:anyURI" use="required"/>
+        <attribute name="href" type="xsd:anyURI" use="optional"/>
+        <assert test="if (xsd:*) then xsd:schema else true()"
+                saxon:message="Only xsd:schema element is allowed!"/>
+        <assert test="if (xsd:schema and @href) then false() else true()"
+                saxon:message="Grammar can't have both an href and a schema"/>
     </complexType>
 
     <!-- Simple Types -->

@@ -67,7 +67,7 @@
         </checker>
     </xsl:template>
 
-    <xsl:template match="wadl:include" mode="grammar">
+    <xsl:template match="wadl:grammars/wadl:include" mode="grammar">
         <xsl:choose>
             <xsl:when test="doc-available(@href)">
                 <xsl:variable name="ns" select="doc(@href)/xsd:schema/@targetNamespace"/>
@@ -87,6 +87,15 @@
                 <xsl:message terminate="yes">[ERROR] Couldn't access grammar <xsl:value-of select="@href"/></xsl:message>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="wadl:grammars/xsd:schema" mode="grammar">
+        <grammar>
+            <xsl:if test="@targetNamespace">
+                <xsl:attribute name="ns" select="@targetNamespace"/>
+            </xsl:if>
+            <xsl:copy-of select="."/>
+        </grammar>
     </xsl:template>
 
     <xsl:template name="check:pruneStates">

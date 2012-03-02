@@ -47,12 +47,12 @@
    1. [X] Checker should allow only one start node.
    2. [X] Method must always have next nodes.
    3. [X] Add grammar section (type, namespace, href)
-** TODO WADL Normalize, Builder, opt1 in a single path [4/5]
+** DONE WADL Normalize, Builder, opt1 in a single path [5/5]
    1. [X] Add Builder Library
    2. [X] Support Grammar in checker format[2/2]
       1. [X] Add support for grammar in checker format
       2. [X] Generate checker format with grammars
-   3. [-] Simple transation tests to confirm the lib is working [5/6]
+   3. [X] Simple transation tests to confirm the lib is working [6/6]
       1. [X] Test URI and Method from various WADL configurations[13/13]
          1. [X] Emtpty WADL
          2. [X] URL/Method single resource
@@ -99,7 +99,7 @@
             1. [X] In URL
             2. [X] In Method
       5. [X] Write tests for multi-method target
-      6. [-] WADL Grammar[1/2]
+      6. [X] WADL Grammar[2/2]
          1. [X] External Grammar[6/6]
             1. [X] File Available, add to checker
             2. [X] Multiple available files
@@ -107,7 +107,7 @@
             4. [X] Missing File should fail
             5. [X] Should not fail with unknown XML
             6. [X] Should not fail with unknown unparsed-text
-         2. [ ] Inline Grammar(?)
+         2. [X] Inline Grammar
    4. [X] Add Opt as an option, by pipeing through removeDups
    5. [X] Simple optimization test to confirm functionality[9/9]
         1. [X] OPT on but no duplicates

@@ -937,7 +937,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
       and("The grammar nodes are added to the checker")
-      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://app/xsd/simple.xsd' and @type='W3C_XML']")
+      assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and  @type='W3C_XML']")
+      assert (checker, "if (/chk:checker/chk:grammar/@href) then not(/chk:checker/chk:grammar/xsd:schema) else /chk:checker/chk:grammar/xsd:schema")
+      assert (checker, "if (/chk:checker/chk:grammar/@href) then /chk:checker/chk:grammar/@href='test://app/xsd/simple.xsd' else true()")
     }
 
     scenario("The WADL contains a template parameter of a custom type at the end of the path") {
@@ -971,6 +973,40 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
+      when("the wadl is translated")
+      val checker = builder.build (inWADL)
+      customTemplateAtEndAssertions(checker)
+    }
+
+    scenario("The WADL contains a template parameter of a custom type at the end of the path, the XSD is embedded") {
+      given("A WADL with a template parameter of a custom type at the end of the path, the XSD is embedded")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:tst="test://schema/a">
+           <grammars>
+               <schema elementFormDefault="qualified"
+                        attributeFormDefault="unqualified"
+                        xmlns="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                        targetNamespace="test://schema/a">
+                   <simpleType name="yesno">
+                       <restriction base="xsd:string">
+                           <enumeration value="yes"/>
+                           <enumeration value="no"/>
+                       </restriction>
+                   </simpleType>
+                </schema>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="yn" path="path/to/my/resource/{yn}">
+                   <param name="yn" style="template" type="tst:yesno"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>
       when("the wadl is translated")
       val checker = builder.build (inWADL)
       customTemplateAtEndAssertions(checker)
