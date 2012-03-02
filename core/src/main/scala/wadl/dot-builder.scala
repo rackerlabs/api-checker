@@ -44,7 +44,7 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build(in : InputStream, out: Result, removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
-    build (("",in), out, removeDups, ignoreSinks, nfaMode)
+    build (("test://mywadl.wadl",in), out, removeDups, ignoreSinks, nfaMode)
   }
 
   def build(in : Reader, out: Result, removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
@@ -66,6 +66,6 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
   def build (in: NodeSeq, removeDups : Boolean = false,
              ignoreSinks: Boolean = true,
              nfaMode: Boolean = true) : String = {
-    build (("",in), removeDups, ignoreSinks, nfaMode)
+    build (("test://mywadl.wadl",in), removeDups, ignoreSinks, nfaMode)
   }
 }

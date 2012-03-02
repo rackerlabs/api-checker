@@ -4,6 +4,7 @@
     xmlns="http://www.w3.org/2001/XMLSchema"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
+    xmlns:saxon="http://saxon.sf.net/"
     targetNamespace="http://www.rackspace.com/repose/wadl/checker">
 
     <!-- The Checker Element -->
@@ -25,6 +26,7 @@
 
     <complexType name="Checker">
         <sequence>
+            <element name="grammar" type="chk:Grammar" minOccurs="0" maxOccurs="unbounded"/>
             <element name="step" type="chk:Step" minOccurs="0" maxOccurs="unbounded">
                 <alternative test="@type eq 'START'" type="chk:StartStep"/>
                 <alternative test="@type eq 'URL_FAIL'" type="chk:URLFailStep"/>
@@ -35,6 +37,16 @@
                 <alternative test="@type eq 'URLXSD'" type="chk:URLXSDStep"/>
             </element>
         </sequence>
+        <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
+                saxon:message="There should be 1 and only 1 step of type START.">
+            <annotation>
+                <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                    <html:p>
+                        There should be a single START node.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </assert>
     </complexType>
 
     <!-- Connected Steps -->
@@ -117,14 +129,8 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step">
+            <extension base="chk:ConnectedStep">
                 <attribute name="match" type="xsd:string" use="required"/>
-                <!-- Step is only connected in one very particular
-                     case, os unlike a regular connected step, there
-                     are cases where MethodStep is terminal. Long
-                     term, MethodStep should be a regular method step,
-                     but we're not there yet.-->
-                <attribute name="next" type="xsd:IDREFS" use="optional"/>
             </extension>
         </complexContent>
     </complexType>
@@ -218,6 +224,35 @@
         </complexContent>
     </complexType>
 
+    <!-- Grammar Def -->
+    <complexType name="Grammar">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Describes a grammar needed for validation by the
+                    checker.
+                </html:p>
+            </documentation>
+        </annotation>
+        <sequence>
+            <!--
+                 Pretty lax check for now, not really any schema type
+                 we use the assertion to restrict this to
+                 xsd:schema only.
+
+                 TODO, bring in XSD 1.1 schema and actually validate.
+            -->
+            <any minOccurs="0" maxOccurs="1" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax"/>
+        </sequence>
+        <attribute name="type" type="chk:GrammarType" use="optional" default="W3C_XML"/>
+        <attribute name="ns" type="xsd:string" use="optional"/>
+        <attribute name="href" type="xsd:anyURI" use="optional"/>
+        <assert test="if (xsd:*) then xsd:schema else true()"
+                saxon:message="Only xsd:schema element is allowed!"/>
+        <assert test="if (xsd:schema and @href) then false() else true()"
+                saxon:message="Grammar can't have both an href and a schema"/>
+    </complexType>
+
     <!-- Simple Types -->
     <simpleType name="StepType">
         <restriction base="xsd:string">
@@ -228,6 +263,13 @@
             <enumeration value="URL"/>
             <enumeration value="METHOD"/>
             <enumeration value="URLXSD"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="GrammarType">
+        <restriction base="xsd:string">
+            <enumeration value="W3C_XML"/>
+            <!-- Others to follow? -->
         </restriction>
     </simpleType>
 
