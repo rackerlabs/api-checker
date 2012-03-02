@@ -1,5 +1,10 @@
 package com.rackspace.com.papi.components.checker.step
 
+import scala.util.control.Breaks._
+
+import javax.xml.namespace.QName
+import javax.xml.validation.Schema
+
 import scala.util.matching.Regex
 
 import com.rackspace.com.papi.components.checker.servlet._
@@ -58,6 +63,45 @@ class URLFailMatch(id : String, label : String, val uri : Regex) extends URLFail
         case uri() => result = None
         case _ => ; // Pass our parent's result on the match.
       }
+    }
+    result
+  }
+}
+
+//
+//  Like URLFailMatch, but fails only if the current uri path is not
+//  matched against any of a number of simple XSD types
+//
+class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QName], schema : Schema) extends URLFailMatch(id, label, uri) {
+  //
+  //  XSD validators
+  //
+  val validators : Array[XSDStringValidator] = types.map (t => new XSDStringValidator(t, schema, id))
+
+  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, uriLevel : Int) : Option[Result] = {
+    var result : Option[Result] = super.check (req, resp, uriLevel)
+    if (result != None) {
+      validators.foreach (v => if (v.validate(req.URISegment(uriLevel))) { result=None })
+    }
+    result
+  }
+}
+
+//
+//  Like URLFail, but fails only if the current uri path is not
+//  matched by any of the simple XSD types.
+//
+class URLFailXSD(id : String, label : String, types : Array[QName], schema : Schema) extends URLFail(id, label) {
+  //
+  //  XSD validators
+  //
+  val validators : Array[XSDStringValidator] = types.map (t => new XSDStringValidator(t, schema, id))
+
+
+  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, uriLevel : Int) : Option[Result] = {
+    var result : Option[Result] = super.check (req, resp, uriLevel)
+    if (result != None) {
+      validators.foreach (v => if (v.validate(req.URISegment(uriLevel))) { result=None })
     }
     result
   }

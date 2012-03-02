@@ -1,5 +1,7 @@
 package com.rackspace.com.papi.components.checker.step
 
+import javax.xml.namespace.QName
+
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -78,6 +80,68 @@ class StepSuite extends BaseStepSuite {
     val res2 = uf.check (request("GET", "/a/b"), response, 1)
     assert (res2.isDefined)
     assert (res2.get.isInstanceOf[URLFailResult])
+  }
+
+
+  test("URLFailXSD should return None if URI level has been exceeded : StepType, uuid, evenIntType") {
+    val ufx = new URLFailXSD("ufx", "ufx", Array[QName](stepType, uuidType, evenIntType), testSchema)
+    val res = ufx.check (request("GET", "/START/b"), response, 2)
+    assert (res == None)
+    val res2 = ufx.check (request("GET", "/ACCEPT/b"), response, 3)
+    assert (res2 == None)
+  }
+
+  test("URLFailXSD should return URL fail result if URI level has not been exceeded and the uri type does not match : StepType, uuid, evenIntType") {
+    val ufx = new URLFailXSD ("ufmx", "ufmx", Array[QName](stepType, uuidType, evenIntType), testSchema)
+    val res = ufx.check (request("GET", "/a/b"), response, 0)
+    assert (res.isDefined)
+    assert (res.get.isInstanceOf[URLFailResult])
+    val res2 = ufx.check (request("GET", "/a/b"), response, 1)
+    assert (res2.isDefined)
+    assert (res2.get.isInstanceOf[URLFailResult])
+  }
+
+
+  test("URLFailXSD should return URL None if URI level has not been exceeded and the uri type matches : StepType, uuid, evenIntType") {
+    val ufx = new URLFailXSD ("ufmx", "ufmx", Array[QName](stepType, uuidType, evenIntType), testSchema)
+    val res = ufx.check (request("GET", "/START/b"), response, 0)
+    assert (res == None)
+    val res2 = ufx.check (request("GET", "/eb507026-6463-11e1-b7aa-8b7b918a1623/b"), response, 0)
+    assert (res2 == None)
+    val res3 = ufx.check (request("GET", "/90/b"), response, 0)
+    assert (res3 == None)
+  }
+
+  test("URLFailXSDMatch should return None if URI level has been exceeded : StepType, uuid, evenIntType") {
+    val ufx = new URLFailXSDMatch("ufx", "ufx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchema)
+    val res = ufx.check (request("GET", "/START/b"), response, 2)
+    assert (res == None)
+    val res2 = ufx.check (request("GET", "/ACCEPT/b"), response, 3)
+    assert (res2 == None)
+    val res3 = ufx.check (request("GET", "/c/b"), response, 4)
+    assert (res3 == None)
+  }
+
+  test("URLFailXSDMatch should return URL fail result if URI level has not been exceeded and the uri type does not match : StepType, uuid, evenIntType") {
+    val ufx = new URLFailXSDMatch ("ufmx", "ufmx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchema)
+    val res = ufx.check (request("GET", "/a/b"), response, 0)
+    assert (res.isDefined)
+    assert (res.get.isInstanceOf[URLFailResult])
+    val res2 = ufx.check (request("GET", "/a/b"), response, 1)
+    assert (res2.isDefined)
+    assert (res2.get.isInstanceOf[URLFailResult])
+  }
+
+  test("URLFailXSDMatch should return URL None if URI level has not been exceeded and the uri type matches : StepType, uuid, evenIntType") {
+    val ufx = new URLFailXSDMatch ("ufmx", "ufmx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchema)
+    val res = ufx.check (request("GET", "/START/b"), response, 0)
+    assert (res == None)
+    val res2 = ufx.check (request("GET", "/eb507026-6463-11e1-b7aa-8b7b918a1623/b"), response, 0)
+    assert (res2 == None)
+    val res3 = ufx.check (request("GET", "/90/b"), response, 0)
+    assert (res3 == None)
+    val res4 = ufx.check (request("GET", "/c/b"), response, 0)
+    assert (res4 == None)
   }
 
   test("URLFail should return None if URI level has been exceeded") {
