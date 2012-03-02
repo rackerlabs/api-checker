@@ -265,7 +265,10 @@ class WADLStepSpec extends BaseStepSpec {
       }
     }
 
-    scenario("The WADL contains a template parameter of a custom type at the end of the path") {
+    //
+    // Pending getting url handlers working in this test suite.
+    //
+    ignore("The WADL contains a template parameter of a custom type at the end of the path") {
       given("A WADL with a template parameter of a custom type at the end of the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
