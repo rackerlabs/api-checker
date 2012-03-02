@@ -10,10 +10,7 @@ import org.xml.sax.Attributes
 
 import org.xml.sax.helpers.AttributesImpl
 
-trait XSDStringValidator {
-  val simpleType : QName
-  val schema : Schema
-  val elementName : String
+class XSDStringValidator(val simpleType : QName, val schema : Schema, val elementName : String) {
   lazy val attributes : Attributes = {
     val ah = new AttributesImpl()
     ah.addAttribute ("http://www.w3.org/2001/XMLSchema-instance", "type",

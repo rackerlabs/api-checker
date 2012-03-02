@@ -5,19 +5,18 @@ import javax.xml.validation.Schema
 
 import com.rackspace.com.papi.components.checker.servlet._
 
-class URIXSD(id : String, label : String, sType : QName, sch : Schema, next : Array[Step])  extends ConnectedStep(id, label, next)
-   with XSDStringValidator {
+class URIXSD(id : String, label : String, simpleType : QName, schema : Schema, next : Array[Step])  extends ConnectedStep(id, label, next) {
 
-     override val mismatchMessage : String = sType.toString;
-     override val elementName : String = id
-     override val simpleType : QName = sType
-     override val schema : Schema = sch
+     override val mismatchMessage : String = simpleType.toString
+     val xsd = new XSDStringValidator(simpleType, schema, id)
 
      override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, uriLevel : Int) : Int = {
        var ret = -1
-       if ((uriLevel < req.URISegment.size) && validate(req.URISegment(uriLevel))) {
+       if ((uriLevel < req.URISegment.size) && xsd.validate(req.URISegment(uriLevel))) {
          ret = uriLevel+1
        }
        ret
      }
+
 }
+
