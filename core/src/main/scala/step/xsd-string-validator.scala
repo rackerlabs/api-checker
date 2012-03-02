@@ -14,10 +14,10 @@ trait XSDStringValidator {
   val simpleType : QName
   val schema : Schema
   val elementName : String
-  val attributes : Attributes = {
+  lazy val attributes : Attributes = {
     val ah = new AttributesImpl()
     ah.addAttribute ("http://www.w3.org/2001/XMLSchema-instance", "type",
-                     "xsi:type", "", simpleType.toString)
+                     "xsi:type", "", simpleType.getPrefix+":"+simpleType.getLocalPart)
     ah
   }
 
@@ -37,7 +37,7 @@ trait XSDStringValidator {
     handler.endPrefixMapping("xsi")
     handler.endDocument
 
-    capture.error != None
+    return capture.error == None
   }
 }
 
@@ -48,12 +48,16 @@ private class ErrorCapture extends ErrorHandler {
   var error : Option[SAXParseException] = None
 
   def error(exception : SAXParseException) : Unit = {
+    println (exception.getMessage)
     error = Some(exception)
   }
 
   def fatalError(exception : SAXParseException) : Unit = {
+    println (exception.getMessage)
     error = Some(exception)
   }
 
-  def warning(exception : SAXParseException) : Unit = {} //Log?
+  def warning(exception : SAXParseException) : Unit = {
+    println (exception.getMessage)
+  } //Log?
 }

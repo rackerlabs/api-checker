@@ -8,7 +8,7 @@ import com.rackspace.com.papi.components.checker.servlet._
 class URIXSD(id : String, label : String, sType : QName, sch : Schema, next : Array[Step])  extends ConnectedStep(id, label, next)
    with XSDStringValidator {
 
-     override val mismatchMessage : String = simpleType.toString;
+     override val mismatchMessage : String = sType.toString;
      override val elementName : String = id
      override val simpleType : QName = sType
      override val schema : Schema = sch

@@ -119,8 +119,8 @@
         7. [X] Multiple duplicates
         8. [X] Multiple duplicates (tree)
         9. [X] Multiple duplicates (mixed)
-** TODO URLXSD types [0/2]
-   1. [ ] URLXSD node
+** TODO URLXSD types [1/2]
+   1. [X] URLXSD node
    2. [ ] URLXSD/URL Fail nodes
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Change Detector...
