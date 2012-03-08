@@ -126,6 +126,9 @@
    4. [X] WADL XSD tests
    5. [X] step handler -- inline grammar
    6. [X] WADL XSD tests -- inline
+** TODO API Checker Servlet Filter[0/2]
+   1. [ ] Default Servlet Result Handler
+   2. [ ] Initial Filter Project
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Change Detector...
 ** TODO Real tests on DOT output
