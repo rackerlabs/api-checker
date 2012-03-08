@@ -1,7 +1,12 @@
 package com.rackspace.com.papi.components.checker.step
 
+import javax.xml.transform.TransformerFactory
 import javax.xml.transform.Source
+import javax.xml.transform.sax.SAXTransformerFactory
 import javax.xml.transform.sax.SAXSource
+import javax.xml.transform.sax.TransformerHandler
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.dom.DOMResult
 
 import javax.xml.validation.Schema
 import javax.xml.validation.SchemaFactory
@@ -12,6 +17,7 @@ import org.xml.sax.ContentHandler
 import org.xml.sax.Locator
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
@@ -63,11 +69,26 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   //
   private[this] var schema : Schema = null
 
+
+  //
+  //  The document locator...
+  //
+  private[this] var locator : Locator = null
+
+
+  //
+  //  Saxon transformer factory, schemahandler and result...this is
+  //  used to capture inline schema.
+  //
+  private[this] val saxTransformerFactory : SAXTransformerFactory =
+    TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null).asInstanceOf[SAXTransformerFactory]
+  private[this] var currentSchemaHandler : TransformerHandler = null
+  private[this] var currentSchemaResult  : DOMResult = null
+
   def this() = this(null)
 
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
     localName match {
-      case "checker" => // ignore
       case "step" =>
         if (processGrammar) {
           setupGrammar
@@ -83,9 +104,27 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
         }
       case "grammar" =>
         addGrammar(atts)
+      case "schema" =>
+        startInlineSchema
+      case _ =>  // ignore
     }
     if (contentHandler != null) {
       contentHandler.startElement(uri, localName, qname, atts)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.startElement(uri, localName, qname, atts)
+    }
+  }
+
+  override def endElement(uri : String, localName : String, qname : String) = {
+    if (contentHandler != null) {
+      contentHandler.endElement(uri, localName, qname)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.endElement(uri, localName, qname)
+    }
+    if (localName == "schema") {
+      endInlineSchema
     }
   }
 
@@ -118,10 +157,41 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   }
 
   //
+  //  We add internal schema....
+  //
+  private[this] def startInlineSchema : Unit = {
+    if (currentSchemaHandler == null) {
+      currentSchemaHandler = saxTransformerFactory.newTransformerHandler()
+      currentSchemaResult  = new DOMResult()
+      currentSchemaHandler.setResult (currentSchemaResult)
+
+      currentSchemaHandler.startDocument()
+      currentSchemaHandler.setDocumentLocator(locator)
+      prefixes.foreach { case (prefix, uri) => {
+        currentSchemaHandler.startPrefixMapping (prefix, uri)
+      }}
+    }
+  }
+
+  private[this] def endInlineSchema : Unit = {
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.endDocument()
+      currentSchemaHandler = null
+
+      grammarSources += new DOMSource(currentSchemaResult.getNode())
+
+      currentSchemaResult = null
+    }
+  }
+
+
+  //
   //  Process the grammar to generate a schema.
   //
   private[this] def setupGrammar : Unit = {
-    schema = schemaFactory.newSchema(grammarSources.toArray)
+    if (grammarSources.length != 0) {
+      schema = schemaFactory.newSchema(grammarSources.toArray)
+    }
     processGrammar = false
   }
 
@@ -207,6 +277,10 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
 
+    if (schema == null) {
+      throw new SAXParseException("No schema available to validate "+_match, locator)
+    }
+
     next  += (id -> nexts)
     steps += (id -> new URIXSD(id, label, qname(_match), schema, new Array[Step](nexts.length)))
   }
@@ -227,10 +301,8 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
     if (contentHandler != null) {
       contentHandler.characters(ch, start, length)
     }
-  }
-  override def endElement(uri : String, localName : String, qname : String) = {
-    if (contentHandler != null) {
-      contentHandler.endElement(uri, localName, qname)
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.characters(ch, start, length)
     }
   }
   override def startPrefixMapping (prefix : String, uri : String) = {
@@ -239,6 +311,9 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
     if (contentHandler != null) {
       contentHandler.startPrefixMapping(prefix, uri)
     }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.startPrefixMapping(prefix, uri)
+    }
   }
   override def endPrefixMapping (prefix : String) = {
     prefixes -= prefix
@@ -246,25 +321,42 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
     if (contentHandler != null) {
       contentHandler.endPrefixMapping(prefix)
     }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.endPrefixMapping(prefix)
+    }
   }
   override def ignorableWhitespace(ch : Array[Char], start : Int, length : Int) = {
     if (contentHandler != null) {
       contentHandler.ignorableWhitespace(ch, start, length)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.ignorableWhitespace(ch, start, length)
     }
   }
   override def processingInstruction(target : String, data : String) = {
     if (contentHandler != null) {
       contentHandler.processingInstruction(target, data)
     }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.processingInstruction(target, data)
+    }
   }
   override def setDocumentLocator(locator : Locator) = {
+    this.locator = locator
+
     if (contentHandler != null) {
       contentHandler.setDocumentLocator(locator)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.setDocumentLocator(locator)
     }
   }
   override def skippedEntity (name : String) = {
     if (contentHandler != null) {
       contentHandler.skippedEntity(name)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.skippedEntity(name)
     }
   }
   override def startDocument = {
