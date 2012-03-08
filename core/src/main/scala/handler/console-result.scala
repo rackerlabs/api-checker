@@ -9,12 +9,14 @@ import com.rackspace.com.papi.components.checker.step.Result
 import com.rackspace.com.papi.components.checker.step.MultiFailResult
 import com.rackspace.com.papi.components.checker.step.MismatchResult
 
+import javax.servlet.FilterChain
+
 import org.w3c.dom.Document
 
 class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandler {
   def init (checker : Option[Document]) : Unit = {}
 
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, result : Result)  : Unit = {
+  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
     Console.withOut(out) {
       def valid(v : Boolean) = {
         var vout = "["

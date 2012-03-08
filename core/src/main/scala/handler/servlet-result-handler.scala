@@ -6,12 +6,14 @@ import com.rackspace.com.papi.components.checker.step.Result
 import com.rackspace.com.papi.components.checker.step.ErrorResult
 import com.rackspace.com.papi.components.checker.step.MultiFailResult
 
+import javax.servlet.FilterChain
+
 import org.w3c.dom.Document
 
 class ServletResultHandler extends ResultHandler {
   def init (checker : Option[Document]) : Unit = {}
 
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, result : Result)  : Unit = {
+  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
     if (!result.valid) {
       result match {
         case mrf : MultiFailResult =>

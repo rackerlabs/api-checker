@@ -2,6 +2,7 @@ package com.rackspace.com.papi.components.checker
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import javax.servlet.FilterChain
 
 import javax.xml.transform._
 import javax.xml.transform.sax._
@@ -74,12 +75,12 @@ object Validator {
 }
 
 class Validator private (val startStep : Step, val resultHandler : ResultHandler) {
-  def validate (req : HttpServletRequest, res : HttpServletResponse) : Result = {
+  def validate (req : HttpServletRequest, res : HttpServletResponse, chain : FilterChain) : Result = {
     try {
       val creq = new CheckerServletRequest (req)
       val cres = new CheckerServletResponse(res)
-      val result = startStep.check (creq, cres, 0).get
-      resultHandler.handle(creq, cres, result)
+      val result = startStep.check (creq, cres, chain, 0).get
+      resultHandler.handle(creq, cres, chain, result)
       result
     } catch {
       case v : ValidatorException => throw v
