@@ -16,6 +16,7 @@
     <modules>
         <module>core</module>
         <module>cli</module>
+        <module>filter</module>
     </modules>
 
     <properties>
