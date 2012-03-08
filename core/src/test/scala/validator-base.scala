@@ -38,7 +38,8 @@ class ResultFailedException(val msg : String, val req : CheckerServletRequest,
 class BaseValidatorSuite extends FunSuite {
 
   val assertHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(), 
-                                                                    new AssertResultHandler()))
+                                                                    new AssertResultHandler(),
+                                                                    new ServletResultHandler()))
 
   def request(method : String, url : String) : HttpServletRequest = {
     val req = mock(classOf[HttpServletRequest])
