@@ -119,13 +119,13 @@
         7. [X] Multiple duplicates
         8. [X] Multiple duplicates (tree)
         9. [X] Multiple duplicates (mixed)
-** TODO URLXSD types [4/6]
+** DONE URLXSD types [6/6]
    1. [X] URLXSD node
    2. [X] URLXSD/URL Fail nodes
    3. [X] step handler -- external grammar
    4. [X] WADL XSD tests
-   5. [ ] step handler -- inline grammar
-   6. [ ] WADL XSD tests -- inline
+   5. [X] step handler -- inline grammar
+   6. [X] WADL XSD tests -- inline
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Change Detector...
 ** TODO Real tests on DOT output
