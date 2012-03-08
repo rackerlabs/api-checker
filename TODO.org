@@ -126,12 +126,16 @@
    4. [X] WADL XSD tests
    5. [X] step handler -- inline grammar
    6. [X] WADL XSD tests -- inline
-** TODO API Checker Servlet Filter[2/4]
+** TODO API Checker Servlet Filter[4/6]
    1. [X] Default Servlet Result Handler
    2. [X] Initial Filter Project
-   3. [ ] Simple config and handler -- simple WADL.
-   4. [ ] Grup config and handler -- different WADL based on group.
+   3. [X] Simple config and handler -- simple WADL
+   4. [X] Save DOT
+   5. [ ] Propagate Errors correctly
+   6. [ ] Group config and handler -- different WADL based on group
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Change Detector...
 ** TODO Real tests on DOT output
+** TODO Expand checker to dot conversion in builder
+** TODO Bring checker to dot conversion to cli
 ** TODO Better XSD tests

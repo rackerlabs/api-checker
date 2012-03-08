@@ -1,5 +1,7 @@
 package com.rackspace.papi.components.checker.filter
 
+import java.io.File
+
 import javax.servlet.Filter
 import javax.servlet.FilterChain
 import javax.servlet.FilterConfig
@@ -27,7 +29,12 @@ class ValidatorFilter extends Filter {
       throw new ServletException ("Missing required init paramater WADLRef")
     }
 
-    val resultHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(), 
+    val dot : File = File.createTempFile("checker", ".dot")
+
+    System.out.println ("Dot file is at: "+dot)
+
+    val resultHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(),
+                                                                      new SaveDotHandler(dot, true, true),
                                                                       new ServletResultHandler()))
 
     validator = Validator(new SAXSource(new InputSource(wadlRef)), true, resultHandler)
