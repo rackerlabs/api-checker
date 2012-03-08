@@ -129,3 +129,4 @@
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Change Detector...
 ** TODO Real tests on DOT output
+** TODO Better XSD tests
