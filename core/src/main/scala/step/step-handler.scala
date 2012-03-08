@@ -12,6 +12,7 @@ import org.xml.sax.ContentHandler
 import org.xml.sax.Locator
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
@@ -63,11 +64,16 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   //
   private[this] var schema : Schema = null
 
+
+  //
+  //  The document locator...
+  //
+  private[this] var locator : Locator = null
+
   def this() = this(null)
 
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
     localName match {
-      case "checker" => // ignore
       case "step" =>
         if (processGrammar) {
           setupGrammar
@@ -83,6 +89,9 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
         }
       case "grammar" =>
         addGrammar(atts)
+      case "schema" =>
+        addSchema(atts)
+      case _ =>  // ignore
     }
     if (contentHandler != null) {
       contentHandler.startElement(uri, localName, qname, atts)
@@ -118,10 +127,20 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   }
 
   //
+  //  We add internal schema....
+  //
+  private[this] def addSchema(atts: Attributes) : Unit = {
+    System.err.println ("whoops internal schema not yet supported...");
+  }
+
+
+  //
   //  Process the grammar to generate a schema.
   //
   private[this] def setupGrammar : Unit = {
-    schema = schemaFactory.newSchema(grammarSources.toArray)
+    if (grammarSources.length != 0) {
+      schema = schemaFactory.newSchema(grammarSources.toArray)
+    }
     processGrammar = false
   }
 
@@ -207,6 +226,10 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
 
+    if (schema == null) {
+      throw new SAXParseException("No schema available to validate "+_match, locator)
+    }
+
     next  += (id -> nexts)
     steps += (id -> new URIXSD(id, label, qname(_match), schema, new Array[Step](nexts.length)))
   }
@@ -258,6 +281,8 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
     }
   }
   override def setDocumentLocator(locator : Locator) = {
+    this.locator = locator
+
     if (contentHandler != null) {
       contentHandler.setDocumentLocator(locator)
     }
