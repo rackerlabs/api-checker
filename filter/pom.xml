@@ -14,6 +14,14 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.rackspace.papi.components.api-checker</groupId>
+            <artifactId>checker-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
     <name>API Checker Servlet Filter</name>
     <description>API Checker Servlet Filter</description>
     <build>

@@ -5,12 +5,43 @@ import javax.servlet.FilterChain
 import javax.servlet.FilterConfig
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
+import javax.servlet.ServletException
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+import javax.xml.transform.sax.SAXSource
+import org.xml.sax.InputSource
+
+import com.rackspace.com.papi.components.checker.Validator
+import com.rackspace.com.papi.components.checker.ValidatorException
+import com.rackspace.com.papi.components.checker.handler._
+
 class ValidatorFilter extends Filter {
-  override def init(config : FilterConfig) : Unit = {}
-  override def doFilter (req : ServletRequest, resp : ServletResponse, chain : FilterChain) : Unit = {}
-  override def destroy : Unit = {}
+  private[this] var validator : Validator = null;
+
+  override def init(config : FilterConfig) : Unit = {
+    val wadlRef = config.getInitParameter("WADLRef")
+
+    if (wadlRef == null) {
+      throw new ServletException ("Missing required init paramater WADLRef")
+    }
+
+    val resultHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(), 
+                                                                      new ServletResultHandler()))
+
+    validator = Validator(new SAXSource(new InputSource(wadlRef)), true, resultHandler)
+  }
+
+  override def doFilter (req : ServletRequest, resp : ServletResponse, chain : FilterChain) : Unit = {
+    try {
+      validator.validate (req.asInstanceOf[HttpServletRequest], resp.asInstanceOf[HttpServletResponse], chain)
+    } catch {
+      case v : ValidatorException => throw new ServletException("Error while calling validator", v)
+    }
+  }
+
+  override def destroy : Unit = {
+    validator = null
+  }
 }
