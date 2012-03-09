@@ -2,6 +2,7 @@ package com.rackspace.com.papi.components.checker
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker.step._
 import com.rackspace.com.papi.components.checker.handler._
@@ -20,9 +21,9 @@ import org.w3c.dom.Document
  */
 class AssertResultHandler extends ResultHandler {
   def init(checker : Option[Document]) : Unit = {}
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, result : Result)  : Unit = {
+  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
     if (!result.valid) {
-      throw new ResultFailedException("Validation failed",req,resp,result)
+      throw new ResultFailedException("Validation failed",req,resp,chain,result)
     }
   }
 }
@@ -32,13 +33,14 @@ class AssertResultHandler extends ResultHandler {
  * if a request fails to validate
  */
 class ResultFailedException(val msg : String, val req : CheckerServletRequest,
-                            val resp : CheckerServletResponse, val result : Result)
+                            val resp : CheckerServletResponse, val chain : FilterChain, val result : Result)
    extends Exception(msg){}
 
 class BaseValidatorSuite extends FunSuite {
 
   val assertHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(), 
-                                                                    new AssertResultHandler()))
+                                                                    new AssertResultHandler(),
+                                                                    new ServletResultHandler()))
 
   def request(method : String, url : String) : HttpServletRequest = {
     val req = mock(classOf[HttpServletRequest])
@@ -49,6 +51,8 @@ class BaseValidatorSuite extends FunSuite {
   }
 
   def response : HttpServletResponse = mock(classOf[HttpServletResponse]);
+
+  def chain : FilterChain = mock(classOf[FilterChain])
 
   def assertResultFailed(f : => Any) : Option[ResultFailedException] = {
     val expectMsg = "Expected validation exception caused by ResultFailed"

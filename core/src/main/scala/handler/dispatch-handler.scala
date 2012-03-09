@@ -5,6 +5,8 @@ import scala.collection.immutable.List
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.Result
 
+import javax.servlet.FilterChain
+
 import org.w3c.dom.Document
 
 class DispatchResultHandler(private[this] var handlers : List[ResultHandler] = List[ResultHandler]())
@@ -16,8 +18,8 @@ class DispatchResultHandler(private[this] var handlers : List[ResultHandler] = L
   def init(checker : Option[Document]) : Unit = {
     handlers.foreach(h => h.init(checker))
   }
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, result : Result)  : Unit = {
-    handlers.foreach(h => h.handle(req,resp,result))
+  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
+    handlers.foreach(h => h.handle(req,resp,chain,result))
   }
 
 }

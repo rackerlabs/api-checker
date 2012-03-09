@@ -24,23 +24,23 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertHandler)
 
   test ("GET on / should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET","/"),response), 405)
+    assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405)
   }
 
   test ("an empty GET should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET",""),response), 405)
+    assertResultFailed(validator_EMPTY.validate(request("GET",""),response,chain), 405)
   }
 
   test ("GET on /a should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET","/a"),response), 404)
+    assertResultFailed(validator_EMPTY.validate(request("GET","/a"),response,chain), 404)
   }
 
   test ("POST on /a/b/c/hello/there should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET","/a/b/c/hello/there"),response), 404)
+    assertResultFailed(validator_EMPTY.validate(request("GET","/a/b/c/hello/there"),response,chain), 404)
   }
 
   test ("a completely empty request should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("",""),response), 405)
+    assertResultFailed(validator_EMPTY.validate(request("",""),response,chain), 405)
   }
 
   //
@@ -62,39 +62,39 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertHandler)
 
   test ("GET on /a/b should succeed on validator_AB") {
-    validator_AB.validate(request("GET","/a/b"),response)
+    validator_AB.validate(request("GET","/a/b"),response,chain)
   }
 
   test ("GET on /a/b/ should succeed on validator_AB") {
-    validator_AB.validate(request("GET","/a/b/"),response)
+    validator_AB.validate(request("GET","/a/b/"),response,chain)
   }
 
   test ("GET on a/b/ should succeed on validator_AB") {
-    validator_AB.validate(request("GET","a/b/"),response)
+    validator_AB.validate(request("GET","a/b/"),response,chain)
   }
 
   test ("GET on / should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/"),response), 405)
+    assertResultFailed(validator_AB.validate(request("GET","/"),response,chain), 405)
   }
 
   test ("an empty GET should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET",""),response), 405)
+    assertResultFailed(validator_AB.validate(request("GET",""),response,chain), 405)
   }
 
   test ("GET on /a should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/a"),response), 405)
+    assertResultFailed(validator_AB.validate(request("GET","/a"),response,chain), 405)
   }
 
   test ("GET on /a/b/c/d should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/a/b/c/d"),response), 404)
+    assertResultFailed(validator_AB.validate(request("GET","/a/b/c/d"),response,chain), 404)
   }
 
   test ("POST on /a/b should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("POST","/a/b"),response), 405)
+    assertResultFailed(validator_AB.validate(request("POST","/a/b"),response,chain), 405)
   }
 
   test ("GET on /index.html should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/index.html"),response), 404)
+    assertResultFailed(validator_AB.validate(request("GET","/index.html"),response,chain), 404)
   }
 
   //
@@ -119,42 +119,42 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertHandler)
 
   test ("GET on /a/7/c should succeed on validator_REG1") {
-    validator_REG1.validate(request("GET","/a/7/c"),response)
+    validator_REG1.validate(request("GET","/a/7/c"),response,chain)
   }
 
   test ("GET on /a/-7/c should succeed on validator_REG1") {
-    validator_REG1.validate(request("GET","/a/-7/c"),response)
+    validator_REG1.validate(request("GET","/a/-7/c"),response,chain)
   }
 
   test ("GET on /a/<randomLong>/c should succeed on validator_REG1") {
     val rl = new Random(new Date().getTime()).nextLong()
-    validator_REG1.validate(request("GET","/a/"+rl+"/c"),response)
+    validator_REG1.validate(request("GET","/a/"+rl+"/c"),response,chain)
   }
 
   test ("GET on /a/<bigInt>/c should succeed on validator_REG1") {
     val bi = new BigInteger(1024, new Random(new Date().getTime()).self)
-    validator_REG1.validate(request("GET","/a/"+bi+"/c"),response)
+    validator_REG1.validate(request("GET","/a/"+bi+"/c"),response,chain)
   }
 
   test ("GET on /a/<randomDouble>/c should fail validator_REG1") {
     val rf = new Random(new Date().getTime()).nextDouble()
-    assertResultFailed(validator_REG1.validate(request("GET","/a/"+rf+"/c"),response), 404)
+    assertResultFailed(validator_REG1.validate(request("GET","/a/"+rf+"/c"),response,chain), 404)
   }
 
   test ("GET on /a//c should fail validator_REG1") {
-    assertResultFailed(validator_REG1.validate(request("GET","/a//c"),response), 404)
+    assertResultFailed(validator_REG1.validate(request("GET","/a//c"),response,chain), 404)
   }
 
   test ("GET on /a/b/c should fail validator_REG1") {
-    assertResultFailed(validator_REG1.validate(request("GET","/a/b/c"),response), 404)
+    assertResultFailed(validator_REG1.validate(request("GET","/a/b/c"),response,chain), 404)
   }
 
   test ("GET on /a should fail validator_REG1") {
-    assertResultFailed(validator_REG1.validate(request("GET","/a"),response), 405)
+    assertResultFailed(validator_REG1.validate(request("GET","/a"),response,chain), 405)
   }
 
   test ("GET on /a/+7/c should fail validator_REG1") {
-    assertResultFailed(validator_REG1.validate(request("GET","/a/+7/c"),response), 404)
+    assertResultFailed(validator_REG1.validate(request("GET","/a/+7/c"),response,chain), 404)
   }
 
   //
@@ -179,75 +179,75 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertHandler)
 
   test ("GET on /a/7/c should succeed on validator_REG2") {
-    validator_REG2.validate(request("GET","/a/7/c"),response)
+    validator_REG2.validate(request("GET","/a/7/c"),response,chain)
   }
 
   test ("GET on /a/-7/c should succeed on validator_REG2") {
-    validator_REG2.validate(request("GET","/a/-7/c"),response)
+    validator_REG2.validate(request("GET","/a/-7/c"),response,chain)
   }
 
   test ("GET on /a/<randomLong>/c should succeed on validator_REG2") {
     val rl = new Random(new Date().getTime()).nextLong()
-    validator_REG2.validate(request("GET","/a/"+rl+"/c"),response)
+    validator_REG2.validate(request("GET","/a/"+rl+"/c"),response,chain)
   }
 
   test ("GET on /a/<bigInt>/c should succeed on validator_REG2") {
     val bi = new BigInteger(1024, new Random(new Date().getTime()).self)
-    validator_REG2.validate(request("GET","/a/"+bi+"/c"),response)
+    validator_REG2.validate(request("GET","/a/"+bi+"/c"),response,chain)
   }
 
   test ("GET on /a/<randomDouble>/c should succeed validator_REG2") {
     val rf = new Random(new Date().getTime()).nextDouble()
-    validator_REG2.validate(request("GET","/a/"+rf+"/c"),response)
+    validator_REG2.validate(request("GET","/a/"+rf+"/c"),response,chain)
   }
 
   test ("GET on /a/<uuid>/c should succeed validator_REG2") {
     val uuid = UUID.randomUUID().toString()
-    validator_REG2.validate(request("GET","/a/"+uuid+"/c"),response)
+    validator_REG2.validate(request("GET","/a/"+uuid+"/c"),response,chain)
   }
 
   test ("GET on /a/<katakana>/c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/%E3%83%84%E3%83%85%E3%83%8C%E3%82%A4/c"),response)
+    validator_REG2.validate(request("GET","/a/%E3%83%84%E3%83%85%E3%83%8C%E3%82%A4/c"),response,chain)
   }
 
   test ("GET on /a/<arrows>/c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/%E2%86%90%E2%86%91%E2%86%92%E2%86%93/c"),response)
+    validator_REG2.validate(request("GET","/a/%E2%86%90%E2%86%91%E2%86%92%E2%86%93/c"),response,chain)
   }
 
   test ("GET on /a/<snowman>/c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/%E2%98%83/c"),response)
+    validator_REG2.validate(request("GET","/a/%E2%98%83/c"),response,chain)
   }
 
   test ("GET on /a/b/c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/b/c"),response)
+    validator_REG2.validate(request("GET","/a/b/c"),response,chain)
   }
 
   test ("GET on /a/ 7/c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/+7/c"),response)
+    validator_REG2.validate(request("GET","/a/+7/c"),response,chain)
   }
 
   test ("GET on /a/+7/c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/%2B7/c"),response)
+    validator_REG2.validate(request("GET","/a/%2B7/c"),response,chain)
   }
 
   test ("GET on /a/    /c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/++++/c"),response)
+    validator_REG2.validate(request("GET","/a/++++/c"),response,chain)
   }
 
   test ("GET on /a/  hi  /c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/++hi++/c"),response)
+    validator_REG2.validate(request("GET","/a/++hi++/c"),response,chain)
   }
 
   test ("GET on /a//c should fail validator_REG2") {
-    assertResultFailed(validator_REG2.validate(request("GET","/a//c"),response), 405)
+    assertResultFailed(validator_REG2.validate(request("GET","/a//c"),response,chain), 405)
   }
 
   test ("GET on /a should fail validator_REG2") {
-    assertResultFailed(validator_REG2.validate(request("GET","/a"),response), 405)
+    assertResultFailed(validator_REG2.validate(request("GET","/a"),response,chain), 405)
   }
 
   test ("GET on /a/b/d should fail validator_REG2") {
-    assertResultFailed(validator_REG2.validate(request("GET","/a/b/d"),response), 404)
+    assertResultFailed(validator_REG2.validate(request("GET","/a/b/d"),response,chain), 404)
   }
 
   //
@@ -270,27 +270,27 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertHandler)
 
   test ("GET on /a/b should succeed on validator_REG3") {
-    validator_REG3.validate(request("GET","/a/b"),response)
+    validator_REG3.validate(request("GET","/a/b"),response,chain)
   }
 
   test ("XGET on /a/b should succeed on validator_REG3") {
-    validator_REG3.validate(request("XGET","/a/b"),response)
+    validator_REG3.validate(request("XGET","/a/b"),response,chain)
   }
 
   test ("PUT on /a/b should fail validator_REG3") {
-    assertResultFailed(validator_REG3.validate(request("PUT","/a/b"),response), 405)
+    assertResultFailed(validator_REG3.validate(request("PUT","/a/b"),response,chain), 405)
   }
 
   test ("POST on /a/b should fail validator_REG3") {
-    assertResultFailed(validator_REG3.validate(request("POST","/a/b"),response), 405)
+    assertResultFailed(validator_REG3.validate(request("POST","/a/b"),response,chain), 405)
   }
 
   test ("X on /a/b should fail validator_REG3") {
-    assertResultFailed(validator_REG3.validate(request("X-","/a/b"),response), 405)
+    assertResultFailed(validator_REG3.validate(request("X-","/a/b"),response,chain), 405)
   }
 
   test ("XPUT on /a/b should fail validator_REG3") {
-    assertResultFailed(validator_REG3.validate(request("XPUT","/a/b"),response), 405)
+    assertResultFailed(validator_REG3.validate(request("XPUT","/a/b"),response,chain), 405)
   }
 
   //
@@ -334,75 +334,75 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertHandler)
 
   test ("GET on /a/b should succeed on validator_CPLX1") {
-    validator_CPLX1.validate(request("GET","/a/b"),response)
+    validator_CPLX1.validate(request("GET","/a/b"),response,chain)
   }
 
   test ("GET on /a/b/c should succeed on validator_CPLX1") {
-    validator_CPLX1.validate(request("GET","/a/b/c"),response)
+    validator_CPLX1.validate(request("GET","/a/b/c"),response,chain)
   }
 
   test ("POST on /a/b/c should succeed on validator_CPLX1") {
-    validator_CPLX1.validate(request("POST","/a/b/c"),response)
+    validator_CPLX1.validate(request("POST","/a/b/c"),response,chain)
   }
 
   test ("GET on /a/d/c should succeed on validator_CPLX1") {
-    validator_CPLX1.validate(request("GET","/a/d/c"),response)
+    validator_CPLX1.validate(request("GET","/a/d/c"),response,chain)
   }
 
   test ("POST on /a/d/c should succeed on validator_CPLX1") {
-    validator_CPLX1.validate(request("POST","/a/d/c"),response)
+    validator_CPLX1.validate(request("POST","/a/d/c"),response,chain)
   }
 
   test ("PUT on /a/!/c should succeed validator_CPLX1") {
-    validator_CPLX1.validate(request("PUT","/a/!/c"),response)
+    validator_CPLX1.validate(request("PUT","/a/!/c"),response,chain)
   }
 
   test ("PUT on /a/z/c should succeed validator_CPLX1") {
-    validator_CPLX1.validate(request("PUT","/a/z/c"),response)
+    validator_CPLX1.validate(request("PUT","/a/z/c"),response,chain)
   }
 
   test ("PUT on /a/<katakana>/c should succeed validator_CPLX1") {
-    validator_CPLX1.validate(request("PUT","/a/%E3%83%84/c"),response)
+    validator_CPLX1.validate(request("PUT","/a/%E3%83%84/c"),response,chain)
   }
 
   test ("PUT on /a/<arrow>/c should succeed validator_CPLX1") {
-    validator_CPLX1.validate(request("PUT","/a/%E2%86%90/c"),response)
+    validator_CPLX1.validate(request("PUT","/a/%E2%86%90/c"),response,chain)
   }
 
   test ("PUT on /a/<snowman>/c should succeed validator_CPLX1") {
-    validator_CPLX1.validate(request("PUT","/a/%E2%98%83/c"),response)
+    validator_CPLX1.validate(request("PUT","/a/%E2%98%83/c"),response,chain)
   }
 
   test ("PUT on /a/b/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/b/c"),response), 405)
+    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/b/c"),response,chain), 405)
   }
 
   test ("PUT on /a/d/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/d/c"),response), 405)
+    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/d/c"),response,chain), 405)
   }
 
   test ("PUT on /a/atest/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/atest/c"),response), 404)
+    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/atest/c"),response,chain), 404)
   }
 
   test ("GET on /a/d should fail on validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/d"),response), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/d"),response,chain), 405)
   }
 
   test ("GET on /a/z should fail on validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z"),response), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z"),response,chain), 405)
   }
 
   test ("GET on /a/<katakana> should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84"),response), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84"),response,chain), 405)
   }
 
   test ("GET on /a/z/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z/c"),response), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z/c"),response,chain), 405)
   }
 
   test ("GET on /a/<katakana>/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84/c"),response), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84/c"),response,chain), 405)
   }
 
   //
@@ -433,39 +433,39 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertHandler)
 
   test ("GET on /a/b should succeed on validator_AM") {
-    validator_AM.validate(request("GET","/a/b"),response)
+    validator_AM.validate(request("GET","/a/b"),response,chain)
   }
 
   test ("PUT on /a/b should succeed on validator_AM") {
-    validator_AM.validate(request("PUT","/a/b"),response)
+    validator_AM.validate(request("PUT","/a/b"),response,chain)
   }
 
   test ("GET on /b/b should succeed on validator_AM") {
-    validator_AM.validate(request("GET","/b/b"),response)
+    validator_AM.validate(request("GET","/b/b"),response,chain)
   }
 
   test ("GET on /<katakana>/b should succeed validator_AM") {
-    validator_AM.validate(request("GET","/%E3%83%84%E3%83%85%E3%83%8C%E3%82%A4/b"),response)
+    validator_AM.validate(request("GET","/%E3%83%84%E3%83%85%E3%83%8C%E3%82%A4/b"),response,chain)
   }
 
   test ("GET on /<arrows>/b should succeed validator_AM") {
-    validator_AM.validate(request("GET","/%E2%86%90%E2%86%91%E2%86%92%E2%86%93/b"),response)
+    validator_AM.validate(request("GET","/%E2%86%90%E2%86%91%E2%86%92%E2%86%93/b"),response,chain)
   }
 
   test ("POST on /a/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("POST","/a/b"),response), 405)
+    assertResultFailed(validator_AM.validate(request("POST","/a/b"),response,chain), 405)
   }
 
   test ("DELETE on /z/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("DELETE","/z/b"),response), 405)
+    assertResultFailed(validator_AM.validate(request("DELETE","/z/b"),response,chain), 405)
   }
 
   test ("GET on /a/c should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("GET","/a/c"),response), 404)
+    assertResultFailed(validator_AM.validate(request("GET","/a/c"),response,chain), 404)
   }
 
   test ("GET on /z/c should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("GET","/z/c"),response), 404)
+    assertResultFailed(validator_AM.validate(request("GET","/z/c"),response,chain), 404)
   }
 
 }

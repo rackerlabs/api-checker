@@ -27,6 +27,14 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   val dotTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/checker2dot.xsl")))
 
+  def buildFromChecker (in : Source, out: Result, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+    val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
+    val transformer = dotHandler.getTransformer()
+    transformer.setParameter ("ignoreSinks", ignoreSinks)
+    transformer.setParameter ("nfaMode", nfaMode)
+    transformer.transform (in, out)
+  }
+
   def build (in : Source, out: Result, removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
     val transformer = dotHandler.getTransformer()
