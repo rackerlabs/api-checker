@@ -1,0 +1,27 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+      version="3.0"> 
+  <servlet>
+   <display-name>Okay Servlet</display-name>
+   <servlet-name>OkayServlet</servlet-name>
+   <servlet-class>com.rackspace.papi.components.checker.filter.OkayServlet</servlet-class>
+   <load-on-startup>1</load-on-startup>
+ </servlet>
+ <servlet-mapping>
+   <servlet-name>OkayServlet</servlet-name>
+   <url-pattern>/*</url-pattern>
+ </servlet-mapping>
+ <filter>
+    <filter-name>Validator</filter-name>
+    <filter-class>com.rackspace.papi.components.checker.filter.ValidatorFilter</filter-class>
+    <init-param>
+      <param-name>WADLRef</param-name>
+      <param-value>file:///Users/jorgew/projects/api-checker/sample/os-compute/os-compute-1.1.wadl</param-value>
+    </init-param>
+ </filter>
+ <filter-mapping>
+     <filter-name>Validator</filter-name>
+     <url-pattern>/*</url-pattern>
+ </filter-mapping>
+</web-app>
