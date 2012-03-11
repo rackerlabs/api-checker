@@ -1,0 +1,20 @@
+digraph Pipeline { rankdir=LR;
+        fontname="Helvetica";
+        labelloc=b;
+node [shape=rect, style=filled, fillcolor="#EEEEEE"]
+
+parse -> validate
+validate->normalize
+normalize->convert
+convert->optimize
+optimize->validate2
+validate2->toscala
+
+parse[label="Parse the\nWADL"]
+validate[label="Validate against\nWADL schema"]
+normalize[label="Normalize the\nWADL"]
+convert[label="Convert the WADL\nto internal NFA form\n(Checker format)"]
+optimize[label="Run through\noptimization stages"]
+validate2[label="Validate against\nchecker schema"]
+toscala[label="Convert to internal\nimmutable data structure"]
+}

@@ -1,0 +1,42 @@
+digraph Checker { rankdir=LR; fontname="Helvetica"; labelloc=b;
+       
+                    node [fontname="Helvetica", shape=ellipse, style=filled,fillcolor="#EEEEEE"]
+               
+           {
+           rank=source
+           REAL_START
+}
+               {
+               rank=same
+           S0
+           }
+           {
+           REAL_START->S0
+           S0->d16e48 [label="U (path)"];
+           d16e48->d16e49 [label="U (to)"];
+           d16e49->d16e50 [label="U (my)"];
+           d16e49->d16e58 [label="U (csapi:Progress)"];
+           d16e49->d18U [label="U!(my | csapi:Progress)"];
+           d16e50->d16e51 [label="U (resource)"];
+           d16e51->d16e52 [label="U (csapi:UUID)"];
+           d16e52->d16e65 [label="M (GET)"];
+           d16e58->d16e65 [label="M (GET)"];
+           d16e65->SA [label="ε"];
+           d18U->d18U [label="U(.*)", tailport=n, headport=ne]
+           d18U->d18U [label="M(.*)", tailport=s, headport=sw]
+           }
+
+//Nodes
+
+       REAL_START[style=invis]
+S0[label="S0", fillcolor="white"]
+d16e48[label="d16e48", fillcolor="yellowgreen"]
+d16e49[label="d16e49", fillcolor="yellowgreen"]
+d16e50[label="d16e50", fillcolor="yellowgreen"]
+d16e51[label="d16e51", fillcolor="yellowgreen"]
+d16e52[label="d16e52", fillcolor="yellowgreen"]
+d16e58[label="d16e58", fillcolor="yellowgreen"]
+d16e65[label="d16e65"]
+d18U[label="d18U", fillcolor="salmon3", shape="doublecircle"]
+SA[label="SA", shape=doublecircle, fillcolor="white"]
+}
