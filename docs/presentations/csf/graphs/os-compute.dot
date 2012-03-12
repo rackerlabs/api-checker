@@ -1,0 +1,133 @@
+digraph Checker { rankdir=LR; fontname="Helvetica"; labelloc=b;
+       
+                    node [fontname="Helvetica", shape=rect, style=filled,fillcolor="#EEEEEE"]
+               
+           {
+           rank=source
+           S0
+           }
+           {
+           S0->d17e15
+           S0->d17e88
+           S0->d17e246
+           S0->d17e5866
+           d17e15->d17e88
+           d17e15->d17e246
+           d17e15->d17e5866
+           d17e88->d17e171
+           d17e88->d17e6008
+           d17e171->d17e6086
+           d17e246->d17e248
+           d17e246->d17e315
+           d17e246->d17e2589
+           d17e246->d17e3754
+           d17e248->d17e5940
+           d17e315->d17e518
+           d17e315->d17e619
+           d17e315->d17e6616
+           d17e315->d17e6514
+           d17e518->d17e6714
+           d17e619->d17e867
+           d17e619->d17e1578
+           d17e619->d17e1785
+           d17e619->d17e6810
+           d17e619->d17e6884
+           d17e619->d17e6983
+           d17e867->POST_d17e867
+           POST_d17e867->d17e7061
+           POST_d17e867->d17e7152
+           POST_d17e867->d17e7243
+           POST_d17e867->d17e7348
+           POST_d17e867->d17e7453
+           POST_d17e867->d17e7558
+           POST_d17e867->d17e7664
+           d17e1578->d17e1681
+           d17e1578->d17e7780
+           d17e1681->d17e7878
+           d17e1785->d17e2244
+           d17e1785->d17e8517
+           d17e1785->d17e8349
+           d17e1785->d17e8237
+           d17e2244->d17e8688
+           d17e2244->d17e8794
+           d17e2244->d17e8952
+           d17e2589->d17e2699
+           d17e2589->d17e2807
+           d17e2589->d17e6265
+           d17e2699->d17e6162
+           d17e2807->d17e2950
+           d17e2807->d17e6370
+           d17e2807->d17e6444
+           d17e2950->d17e3409
+           d17e2950->d17e8517
+           d17e2950->d17e8349
+           d17e2950->d17e8237
+           d17e3409->d17e8688
+           d17e3409->d17e8794
+           d17e3409->d17e8952
+           d17e3754->d17e3852
+           d17e3754->d17e3948
+           d17e3754->d17e7977
+           d17e3852->d17e8070
+           d17e3948->d17e8162
+           }
+
+//Nodes
+
+       REAL_START[style=invis]
+S0[label="START", shape=none, fillcolor="white"]
+d17e15[label="v1\\.1", fillcolor="yellowgreen"]
+d17e88[label="extensions", fillcolor="yellowgreen"]
+d17e171[label=".* \n(alias)", fillcolor="yellowgreen"]
+d17e246[label=".* \n(tenantId)", fillcolor="yellowgreen"]
+d17e248[label="limits", fillcolor="yellowgreen"]
+d17e315[label="servers", fillcolor="yellowgreen"]
+d17e518[label="detail", fillcolor="yellowgreen"]
+d17e619[label="osapi:UUID \n(serverId)", fillcolor="yellowgreen"]
+d17e867[label="action", fillcolor="yellowgreen"]
+POST_d17e867[label="POST \n(ε)"]
+d17e1578[label="ips", fillcolor="yellowgreen"]
+d17e1681[label=".* \n(networkId)", fillcolor="yellowgreen"]
+d17e1785[label="metadata", fillcolor="yellowgreen"]
+d17e2244[label="osapi:MetadataKey \n(key)", fillcolor="yellowgreen"]
+d17e2589[label="images", fillcolor="yellowgreen"]
+d17e2699[label="detail", fillcolor="yellowgreen"]
+d17e2807[label="osapi:UUID \n(imageId)", fillcolor="yellowgreen"]
+d17e2950[label="metadata", fillcolor="yellowgreen"]
+d17e3409[label="osapi:MetadataKey \n(key)", fillcolor="yellowgreen"]
+d17e3754[label="flavors", fillcolor="yellowgreen"]
+d17e3852[label="detail", fillcolor="yellowgreen"]
+d17e3948[label="osapi:UUID \n(flavorId)", fillcolor="yellowgreen"]
+d17e5866[label="GET \n(Version Details)"]
+d17e5940[label="GET \n(List Limits)"]
+d17e6008[label="GET \n(List Extensions)"]
+d17e6086[label="GET \n(Get Extension)"]
+d17e6162[label="GET \n(List Detail Images)"]
+d17e6265[label="GET \n(List Images)"]
+d17e6370[label="GET \n(Get Image Details)"]
+d17e6444[label="DELETE \n(Delete Image)"]
+d17e6514[label="POST \n(Create Server)"]
+d17e6616[label="GET \n(List Servers)"]
+d17e6714[label="GET \n(List Detail Servers)"]
+d17e6810[label="GET \n(Get Server Details)"]
+d17e6884[label="PUT \n(Update Server Name / Administrative Password)"]
+d17e6983[label="DELETE \n(Delete Server)"]
+d17e7061[label="POST \n(Change Password)"]
+d17e7152[label="POST \n(Reboot Server)"]
+d17e7243[label="POST \n(Rebuild Server)"]
+d17e7348[label="POST \n(Resize Server)"]
+d17e7453[label="POST \n(Confirm Resized Server)"]
+d17e7558[label="POST \n(Revert Resized Server)"]
+d17e7664[label="POST \n(Create Image)"]
+d17e7780[label="GET \n(List Addresses)"]
+d17e7878[label="GET \n(List Addresses by Network)"]
+d17e7977[label="GET \n(List Flavors)"]
+d17e8070[label="GET \n(List Detail Flavors)"]
+d17e8162[label="GET \n(Get Flavor Details)"]
+d17e8237[label="GET \n(List Metadata)"]
+d17e8349[label="POST \n(Update Metadata)"]
+d17e8517[label="PUT \n(Create or Replace Metadata)"]
+d17e8688[label="GET \n(Get Metadata Item)"]
+d17e8794[label="PUT \n(Create or Update Metadata Item)"]
+d17e8952[label="DELETE \n(Delete Metadata Item)"]
+}
