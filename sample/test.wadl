@@ -1,56 +1,37 @@
-    <application xmlns="http://wadl.dev.java.net/2009/02"
-                 xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
-        <grammars>
-            <schema elementFormDefault="qualified"
-                    attributeFormDefault="unqualified"
-                    xmlns="http://www.w3.org/2001/XMLSchema"
-                    xmlns:csapi="http://docs.openstack.org/compute/api/v1.1"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    targetNamespace="http://docs.openstack.org/compute/api/v1.1">
-                <simpleType name="Progress">
-                    <annotation>
-                        <xsd:documentation
-                            xml:lang="EN"
-                            xmlns="http://www.w3.org/1999/xhtml">
-                            <p>
-                                An integer between 0 and 100 that denotes the progress of an
-                                operation.
-                            </p>
-                        </xsd:documentation>
-                    </annotation>
-                    <restriction base="xsd:int">
-                        <minInclusive value="0"/>
-                        <maxInclusive value="100" />
-                    </restriction>
-                </simpleType>
-                <simpleType name="UUID">
-                    <annotation>
-                        <xsd:documentation
-                            xml:lang="EN"
-                            xmlns="http://www.w3.org/1999/xhtml">
-                            <p>
-                                A universally unique identifier.
-                            </p>
-                        </xsd:documentation>
-                    </annotation>
-                    <restriction base="xsd:string">
-                        <length value="36" fixed="true"/>
-                        <pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
-                    </restriction>
-                </simpleType>
-            </schema>
-        </grammars>
-        <resources base="https://test.api.openstack.com">
-            <resource id="uuid" path="path/to/my/resource/{uuid}">
-                <param name="uuid" style="template" type="csapi:UUID"/>
-                <method href="#getMethod" />
-            </resource>
-            <resource id="progress" path="path/to/{progress}">
-                <param name="progress" style="template" type="csapi:Progress"/>
-                <method href="#getMethod" />
-            </resource>
-        </resources>
-        <method id="getMethod" name="GET">
-            <response status="200 203"/>
-        </method>
-    </application>
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
+    <grammars>
+        <schema elementFormDefault="qualified"
+                attributeFormDefault="unqualified"
+                xmlns="http://www.w3.org/2001/XMLSchema"
+                xmlns:csapi="http://docs.openstack.org/compute/api/v1.1"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                targetNamespace="http://docs.openstack.org/compute/api/v1.1">
+            <simpleType name="Progress">
+                <restriction base="xsd:int">
+                    <minInclusive value="0"/>
+                    <maxInclusive value="100" />
+                </restriction>
+            </simpleType>
+            <simpleType name="UUID">
+                <restriction base="xsd:string">
+                    <length value="36" fixed="true"/>
+                    <pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+                </restriction>
+            </simpleType>
+        </schema>
+    </grammars>
+    <resources base="https://test.api.openstack.com">
+        <resource id="uuid" path="path/to/my/resource/{uuid}">
+            <param name="uuid" style="template" type="csapi:UUID"/>
+            <method href="#getMethod" />
+        </resource>
+        <resource id="progress" path="path/to/{progress}">
+            <param name="progress" style="template" type="csapi:Progress"/>
+            <method href="#getMethod" />
+        </resource>
+    </resources>
+    <method id="getMethod" name="GET">
+        <response status="200 203"/>
+    </method>
+</application>
