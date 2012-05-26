@@ -18,7 +18,7 @@ class XSDStringValidator(val simpleType : QName, val schema : Schema, val elemen
     ah
   }
 
-  def validate (in : String) : Boolean = {
+  def validate (in : String) : Option[SAXParseException] = {
     val capture = new ErrorCapture
     val handler = schema.newValidatorHandler
     val inArray = in.toCharArray()
@@ -34,27 +34,30 @@ class XSDStringValidator(val simpleType : QName, val schema : Schema, val elemen
     handler.endPrefixMapping("xsi")
     handler.endDocument
 
-    return capture.error == None
+    return capture.error
   }
 }
 
 //
-//  An error handler that simply captures the last error.
+//  An error handler that simply captures the first error it sees.  It
+//  ignores warnings.
 //
 private class ErrorCapture extends ErrorHandler {
   var error : Option[SAXParseException] = None
 
   def error(exception : SAXParseException) : Unit = {
-    println (exception.getMessage)
-    error = Some(exception)
+    if (error == None) {
+      error = Some(exception)
+    }
   }
 
   def fatalError(exception : SAXParseException) : Unit = {
-    println (exception.getMessage)
-    error = Some(exception)
+    if (error == None) {
+      error = Some(exception)
+    }
   }
 
   def warning(exception : SAXParseException) : Unit = {
-    println (exception.getMessage)
-  } //Log?
+    //Log?
+  }
 }

@@ -131,8 +131,8 @@
    2. [X] Initial Filter Project
    3. [X] Simple config and handler -- simple WADL
    4. [X] Save DOT
+** DONE Propigate XSD type errors correctly
 ** TODO Modify filter to handle different groups
-** TODO Propigate XSD type errors correctly
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Change Detector...
 ** TODO Real tests on DOT output
