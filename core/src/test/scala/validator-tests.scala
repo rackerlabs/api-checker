@@ -21,7 +21,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val methodFail = new MethodFail ("MF", "MethodFail")
     val start = new Start("START", "Start", Array(urlFail, methodFail))
     start
-  }, assertHandler)
+  }, assertConfig)
 
   test ("GET on / should fail on validator_EMPTY") {
     assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405)
@@ -59,7 +59,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
     val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
-  }, assertHandler)
+  }, assertConfig)
 
   test ("GET on /a/b should succeed on validator_AB") {
     validator_AB.validate(request("GET","/a/b"),response,chain)
@@ -116,7 +116,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val a = new URI("a","a", "a".r, Array(digit, urlFailDigit, methodFail))
     val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
-  }, assertHandler)
+  }, assertConfig)
 
   test ("GET on /a/7/c should succeed on validator_REG1") {
     validator_REG1.validate(request("GET","/a/7/c"),response,chain)
@@ -176,7 +176,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val a = new URI("a","a", "a".r, Array(digit, urlFailDigit, methodFail))
     val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
-  }, assertHandler)
+  }, assertConfig)
 
   test ("GET on /a/7/c should succeed on validator_REG2") {
     validator_REG2.validate(request("GET","/a/7/c"),response,chain)
@@ -267,7 +267,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
     val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
-  }, assertHandler)
+  }, assertConfig)
 
   test ("GET on /a/b should succeed on validator_REG3") {
     validator_REG3.validate(request("GET","/a/b"),response,chain)
@@ -331,7 +331,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val a = new URI("a","a", "a".r, Array(b, d, anynotbd, urlFailABNotAB, methodFail))
     val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
-  }, assertHandler)
+  }, assertConfig)
 
   test ("GET on /a/b should succeed on validator_CPLX1") {
     validator_CPLX1.validate(request("GET","/a/b"),response,chain)
@@ -430,7 +430,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val any = new URI("any","any", ".*".r, Array(b2, urlFailB, methodFail))
     val start = new Start("START", "Start", Array(a, any,  methodFail))
     start
-  }, assertHandler)
+  }, assertConfig)
 
   test ("GET on /a/b should succeed on validator_AM") {
     validator_AM.validate(request("GET","/a/b"),response,chain)

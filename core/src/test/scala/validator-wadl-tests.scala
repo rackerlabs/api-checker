@@ -22,7 +22,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
            <resources base="https://test.api.openstack.com">
               <resource/>
            </resources>
-        </application>, false, assertHandler)
+        </application>, assertConfig)
 
   test ("GET on / should fail on validator_EMPTY") {
     assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405)
@@ -59,7 +59,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
               </resource>
            </resources>
     </application>
-    ,false, assertHandler)
+    , assertConfig)
 
   test ("GET on /a/b should succeed on validator_AB") {
     validator_AB.validate(request("GET","/a/b"),response,chain)
@@ -118,7 +118,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
               </resource>
            </resources>
     </application>
-    ,false, assertHandler)
+    , assertConfig)
 
   test ("GET on /a/b should succeed on validator_ABAC") {
     validator_ABAC.validate(request("GET","/a/b"),response,chain)
@@ -187,7 +187,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <response status="200 203"/>
            </method>
     </application>
-    ,false, assertHandler)
+    , assertConfig)
 
   test ("GET on /a/7/c should succeed on validator_REG") {
     validator_REG.validate(request("GET","/a/7/c"),response,chain)
@@ -291,7 +291,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <response status="200"/>
            </method>
     </application>
-    ,false, assertHandler)
+    , assertConfig)
 
   test ("GET on /a/b should succeed on validator_AM") {
     validator_AM.validate(request("GET","/a/b"),response,chain)
@@ -397,7 +397,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <response status="200 203"/>
            </method>
         </application>
-    ,false, assertHandler)
+    , assertConfig)
 
   WADLSchemaAssertions(validator_UUID)
 
@@ -464,7 +464,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <response status="200 203"/>
            </method>
         </application>
-    ,false, assertHandler)
+    , assertConfig)
 
   WADLSchemaAssertions(validator_UUID_inline)
 
@@ -528,7 +528,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <response status="200 203"/>
            </method>
         </application>
-    ,false, assertHandler)
+    , assertConfig)
 
   WADLSchemaAssertions(validator_UUID_inline2)
 
