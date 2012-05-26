@@ -37,7 +37,7 @@ class ValidatorFilter extends Filter {
                                                                       new SaveDotHandler(dot, true, true),
                                                                       new ServletResultHandler()))
 
-    validator = Validator(new SAXSource(new InputSource(wadlRef)), true, resultHandler)
+    validator = Validator(new SAXSource(new InputSource(wadlRef)), resultHandler)
   }
 
   override def doFilter (req : ServletRequest, resp : ServletResponse, chain : FilterChain) : Unit = {

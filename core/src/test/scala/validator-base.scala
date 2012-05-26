@@ -42,6 +42,9 @@ class BaseValidatorSuite extends FunSuite {
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
 
+  val assertConfig = new Config
+  assertConfig.resultHandler = assertHandler
+
   def request(method : String, url : String) : HttpServletRequest = {
     val req = mock(classOf[HttpServletRequest])
 
