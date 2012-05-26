@@ -40,4 +40,9 @@ class BaseStepSuite extends BaseValidatorSuite {
   override def response  : CheckerServletResponse = {
     new CheckerServletResponse (super.response)
   }
+
+  def assertMismatchResult(res :Option[Result]) : Unit = {
+    assert (res.isDefined)
+    assert (res.get.isInstanceOf[MismatchResult])
+  }
 }

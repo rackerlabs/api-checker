@@ -67,7 +67,7 @@ class URLFailMatch(id : String, label : String, val uri : Regex) extends URLFail
     if (result != None) {
       req.URISegment(uriLevel) match {
         case uri() => result = None
-        case _ => ; // Pass our parent's result on the match.
+        case _ => result = Some(new URLFailResult (result.get.message+". The URI segment does not match the pattern: '"+uri+"'", uriLevel, id)) // Augment our parents result with match info
       }
     }
     result
@@ -87,7 +87,15 @@ class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QN
   override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
     var result : Option[Result] = super.check (req, resp, chain, uriLevel)
     if (result != None) {
-      validators.foreach (v => if (v.validate(req.URISegment(uriLevel))) { result=None })
+      val in = req.URISegment(uriLevel)
+      val errors = for (validator <- validators) yield {
+        val e = validator.validate(in)
+        if (e == None) return None
+        e.get.getMessage()
+      }
+
+      val message = errors.foldLeft(result.get.message)(_ + " and "+_)
+      result = Some(new URLFailResult (message, uriLevel, id))
     }
     result
   }
@@ -107,7 +115,15 @@ class URLFailXSD(id : String, label : String, types : Array[QName], schema : Sch
   override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
     var result : Option[Result] = super.check (req, resp, chain, uriLevel)
     if (result != None) {
-      validators.foreach (v => if (v.validate(req.URISegment(uriLevel))) { result=None })
+      val in = req.URISegment(uriLevel)
+      val errors = for (validator <- validators) yield {
+        val e = validator.validate(in)
+        if (e == None) return None
+        e.get.getMessage()
+      }
+
+      val message = errors.foldLeft(result.get.message)(_ + " "+_)
+      result = Some(new URLFailResult (message, uriLevel, id))
     }
     result
   }
@@ -143,7 +159,7 @@ class MethodFailMatch(id : String, label : String, val method : Regex) extends M
     if (result != None) {
       req.getMethod() match {
         case method() => result = None
-        case _ => ; // Pass our parent's result on the match.
+        case _ => result = Some(new MethodFailResult (result.get.message+". The Method does not match the pattern: '"+method+"'", uriLevel, id)) // Augment our parents result with match info
       }
     }
     result
