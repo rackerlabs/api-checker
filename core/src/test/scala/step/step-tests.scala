@@ -181,117 +181,117 @@ class StepSuite extends BaseStepSuite {
     assert (urixsd.mismatchMessage == stepType.toString)
   }
 
-  test("In a URIXSD step, if there is a URI match, the uriLevel should increase by 1: StepType") {
+  test("In a URIXSD step, if there is a URI match, the step should proceed to the next step : StepType") {
     val urixsd = new URIXSD("uxd", "uxd", stepType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/START/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/URL_FAIL/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/METHOD_FAIL/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/ACCEPT/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/URL/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/METHOD/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/URLXSD/b"), response,chain, 0) == 1)
+    assert (urixsd.check (request("GET", "/START/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/URL_FAIL/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/METHOD_FAIL/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/ACCEPT/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/URL/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/METHOD/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/URLXSD/b"), response,chain, 0) == None)
   }
 
-  test("In a URIXSD step, if there is a mismatch, the uriLevel be -1: StepType") {
+  test("In a URIXSD step, if there is a mismatch, a MismatchResult should be returned: StepType") {
     val urixsd = new URIXSD("uxd", "uxd", stepType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/ATART/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/URL_FAI2/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/METHO4_FAIL/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/ACCCPT/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/URLL/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/METH0D/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/UR7XSD/b"), response,chain, 0) == -1)
+    assertMismatchResult (urixsd.check (request("GET", "/ATART/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/URL_FAI2/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/METHO4_FAIL/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/ACCCPT/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/URLL/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/METH0D/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/UR7XSD/b"), response,chain, 0))
   }
 
-  test("In a URIXSD step, if there is a URI match, but the level has been exceeded the uriLevel shoud be -1: StepType") {
+  test("In a URIXSD step, if there is a URI match, but the level has been exceeded a MismatchResult should be returned: StepType") {
     val urixsd = new URIXSD("uxd", "uxd", stepType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/START/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/URL_FAIL/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/METHOD_FAIL/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/ACCEPT/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/URL/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/METHOD/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/URLXSD/b"), response,chain, 2) == -1)
+    assertMismatchResult (urixsd.check (request("GET", "/START/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/URL_FAIL/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/METHOD_FAIL/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/ACCEPT/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/URL/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/METHOD/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/URLXSD/b"), response,chain, 2))
   }
 
-  test("In a URIXSD step, if there is a URI match, the uriLevel should increase by 1: UUID") {
+  test("In a URIXSD step, if there is a URI match, the step should proceed to the next step : UUID") {
     val urixsd = new URIXSD("uxd", "uxd", uuidType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/55b76e92-6450-11e1-9012-37afadb5ff61/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/56d7a1fc-6450-11e1-b360-8fe15f519bf2/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/5731bb7e-6450-11e1-9b88-6ff2691237cd/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/578952c6-6450-11e1-892b-8bae86031338/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/57e75268-6450-11e1-892e-abc2baf50960/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/58415556-6450-11e1-96f9-17b1db29daf7/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 0) == 1)
+    assert (urixsd.check (request("GET", "/55b76e92-6450-11e1-9012-37afadb5ff61/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/56d7a1fc-6450-11e1-b360-8fe15f519bf2/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/5731bb7e-6450-11e1-9b88-6ff2691237cd/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/578952c6-6450-11e1-892b-8bae86031338/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/57e75268-6450-11e1-892e-abc2baf50960/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/58415556-6450-11e1-96f9-17b1db29daf7/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 0) == None)
   }
 
-  test("In a URIXSD step, if there is a mismatch, the uriLevel be -1: UUID") {
+  test("In a URIXSD step, if there is a mismatch, a MismatchResult should be returned: UUID") {
     val urixsd = new URIXSD("uxd", "uxd", uuidType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/55b76e92-6450-11e1-9012-37afadbgff61/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/55/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/aoeee..x/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/09cgff.dehbj/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/55b76e92-6450-11e1-901237afadb5ff61/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/58415556-6450-11e1-96f9:17b1db29daf7/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/+58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 0) == -1)
+    assertMismatchResult (urixsd.check (request("GET", "/55b76e92-6450-11e1-9012-37afadbgff61/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/55/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/aoeee..x/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/09cgff.dehbj/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/55b76e92-6450-11e1-901237afadb5ff61/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/58415556-6450-11e1-96f9:17b1db29daf7/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/+58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 0))
   }
 
-  test("In a URIXSD step, if there is a URI match, but the level has been exceeded the uriLevel shoud be -1: UUID") {
+  test("In a URIXSD step, if there is a URI match, but the level has been exceeded a MismatchResult should be returned: UUID") {
     val urixsd = new URIXSD("uxd", "uxd", uuidType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/55b76e92-6450-11e1-9012-37afadb5ff61/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/56d7a1fc-6450-11e1-b360-8fe15f519bf2/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/5731bb7e-6450-11e1-9b88-6ff2691237cd/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/578952c6-6450-11e1-892b-8bae86031338/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/57e75268-6450-11e1-892e-abc2baf50960/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/58415556-6450-11e1-96f9-17b1db29daf7/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 2) == -1)
+    assertMismatchResult (urixsd.check (request("GET", "/55b76e92-6450-11e1-9012-37afadb5ff61/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/56d7a1fc-6450-11e1-b360-8fe15f519bf2/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/5731bb7e-6450-11e1-9b88-6ff2691237cd/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/578952c6-6450-11e1-892b-8bae86031338/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/57e75268-6450-11e1-892e-abc2baf50960/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/58415556-6450-11e1-96f9-17b1db29daf7/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 2))
   }
 
-  test("In a URIXSD step, if there is a URI match, the uriLevel should increase by 1: EvenInt100") {
+  test("In a URIXSD step, if there is a URI match, the step should proceed to the next step : EvenInt100") {
     val urixsd = new URIXSD("uxd", "uxd", evenIntType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/54/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/0/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/32/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/2/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/12/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/100/b"), response,chain, 0) == 1)
-    assert (urixsd.checkStep (request("GET", "/84/b"), response,chain, 0) == 1)
+    assert (urixsd.check (request("GET", "/54/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/0/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/32/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/2/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/12/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/100/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/84/b"), response,chain, 0) == None)
   }
 
   //
   //  Pending bug fix on xerces-j
   //
-  ignore("In a URIXSD step, if there is a mismatch, the uriLevel should be -1: EvenInt100, assert") {
+  ignore("In a URIXSD step, if there is a mismatch, a MismatchResult should be returned: EvenInt100, assert") {
     val urixsd = new URIXSD("uxd", "uxd", evenIntType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/55/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/1/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/33/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/3/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/15/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/101/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/85/b"), response,chain, 0) == -1)
+    assertMismatchResult (urixsd.check (request("GET", "/55/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/1/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/33/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/3/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/15/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/101/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/85/b"), response,chain, 0))
   }
 
-  test("In a URIXSD step, if there is a mismatch, the uriLevel be -1: EvenInt100") {
+  test("In a URIXSD step, if there is a mismatch, a MismatchResult should be returned: EvenInt100") {
     val urixsd = new URIXSD("uxd", "uxd", evenIntType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/101/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/555/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/hello/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/09cgff.dehbj/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/-99/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/3tecr/b"), response,chain, 0) == -1)
-    assert (urixsd.checkStep (request("GET", "/58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 0) == -1)
+    assertMismatchResult (urixsd.check (request("GET", "/101/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/555/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/hello/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/09cgff.dehbj/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/-99/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/3tecr/b"), response,chain, 0))
+    assertMismatchResult (urixsd.check (request("GET", "/58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 0))
   }
 
-  test("In a URIXSD step, if there is a URI match, but the level has been exceeded the uriLevel shoud be -1: EvenInt100") {
+  test("In a URIXSD step, if there is a URI match, but the level has been exceeded a MismatchResult should be returned: EvenInt100") {
     val urixsd = new URIXSD("uxd", "uxd", evenIntType, testSchema, Array[Step]())
-    assert (urixsd.checkStep (request("GET", "/54/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/0/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/32/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/2/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/12/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/100/b"), response,chain, 2) == -1)
-    assert (urixsd.checkStep (request("GET", "/84/b"), response,chain, 2) == -1)
+    assertMismatchResult (urixsd.check (request("GET", "/54/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/0/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/32/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/2/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/12/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/100/b"), response,chain, 2))
+    assertMismatchResult (urixsd.check (request("GET", "/84/b"), response,chain, 2))
   }
 
   test("URI mismatch message should be the same of the uri regex") {

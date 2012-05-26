@@ -97,6 +97,77 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     assertResultFailed(validator_AB.validate(request("GET","/index.html"),response,chain), 404)
   }
 
+
+  //
+  // validator_ABAC allows a GET on /a/b and /a/c. The validator is used in the
+  // following tests.
+  //
+  val validator_ABAC = Validator(
+    <application xmlns="http://wadl.dev.java.net/2009/02">
+         <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="/a/b">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+              </resource>
+              <resource path="/a/c">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+              </resource>
+           </resources>
+    </application>
+    ,false, assertHandler)
+
+  test ("GET on /a/b should succeed on validator_ABAC") {
+    validator_ABAC.validate(request("GET","/a/b"),response,chain)
+  }
+
+  test ("GET on /a/b/ should succeed on validator_ABAC") {
+    validator_ABAC.validate(request("GET","/a/b/"),response,chain)
+  }
+
+  test ("GET on a/b/ should succeed on validator_ABAC") {
+    validator_ABAC.validate(request("GET","a/b/"),response,chain)
+  }
+
+  test ("GET on /a/c should succeed on validator_ABAC") {
+    validator_ABAC.validate(request("GET","/a/c"),response,chain)
+  }
+
+  test ("GET on /a/c/ should succeed on validator_ABAC") {
+    validator_ABAC.validate(request("GET","/a/c/"),response,chain)
+  }
+
+  test ("GET on a/c/ should succeed on validator_ABAC") {
+    validator_ABAC.validate(request("GET","a/c/"),response,chain)
+  }
+
+  test ("GET on /a/d should fail on validator_ABAC") {
+    assertResultFailed(validator_ABAC.validate(request("GET","/a/d"),response,chain), 404)
+  }
+
+  test ("GET on /a/b/c/d should fail on validator_ABAC") {
+    assertResultFailed(validator_ABAC.validate(request("GET","/a/b/c/d"),response,chain), 404)
+  }
+
+  test ("POST on /a/b should fail on validator_ABAC") {
+    assertResultFailed(validator_ABAC.validate(request("POST","/a/b"),response,chain), 405)
+  }
+
+  test ("GET on /index.html should fail on validator_ABAC") {
+    assertResultFailed(validator_ABAC.validate(request("GET","/index.html"),response,chain), 404)
+  }
+
+  test ("GET on /a/c/c/d should fail on validator_ABAC") {
+    assertResultFailed(validator_ABAC.validate(request("GET","/a/c/c/d"),response,chain), 404)
+  }
+
+  test ("POST on /a/c should fail on validator_ABAC") {
+    assertResultFailed(validator_ABAC.validate(request("POST","/a/c"),response,chain), 405)
+  }
+
   //
   // validator_REG allows a GET on /a/.*/c. That is, the 2nd URI
   // component can be anything. The validator is used in the

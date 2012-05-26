@@ -30,12 +30,21 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //  Check the currest step.  If the step is a match return the next
   //  uriLevel.  If not return -1.
   //
-  def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int
+  def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = -1
 
   //
   //  The error message when there is a step mismatch.
   //
   val mismatchMessage : String = "Step Mismatch"
+
+  //
+  //  Go to the next step.
+  //
+  def nextStep (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Array[Result] = {
+    val results : Array[Result] = next.map (n =>n.check(req, resp, chain, uriLevel)).filter(s => s.isDefined).map(r => r.get)
+    results.foreach(n => if (n.valid) { return Array(n) })
+    results
+  }
 
   //
   //  Check this step, if successful, check next relevant steps.
@@ -45,9 +54,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
     val nextURILevel = checkStep(req, resp, chain, uriLevel)
 
     if (nextURILevel != -1) {
-      val results : Array[Result] = next.map (n =>n.check(req, resp, chain, nextURILevel)).filter(s => s.isDefined).map(r => r.get)
-      results.foreach(n => if (n.valid) { n.addStepId(id); return Some(n) })
-
+      val results : Array[Result] = nextStep (req, resp, chain, nextURILevel)
       if (results.size == 1) {
         results(0).addStepId(id)
         result = Some(results(0))

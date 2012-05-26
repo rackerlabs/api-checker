@@ -11,13 +11,28 @@ class URIXSD(id : String, label : String, simpleType : QName, schema : Schema, n
      override val mismatchMessage : String = simpleType.toString
      val xsd = new XSDStringValidator(simpleType, schema, id)
 
-     override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chan : FilterChain, uriLevel : Int) : Int = {
-       var ret = -1
-       if ((uriLevel < req.URISegment.size) && xsd.validate(req.URISegment(uriLevel))) {
-         ret = uriLevel+1
+     override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
+       var result : Option[Result] = None
+       if (uriLevel < req.URISegment.size) {
+         val error = xsd.validate(req.URISegment(uriLevel))
+         if (error != None) {
+           result = Some(new MismatchResult(error.get.getMessage(), uriLevel, id))
+         } else {
+           val results : Array[Result] = nextStep (req, resp, chain, uriLevel + 1)
+           results.size match {
+             case 0 =>
+               result = None
+             case 1 =>
+               results(0).addStepId(id)
+               result = Some(results(0))
+             case _ =>
+               result = Some(new MultiFailResult (results, uriLevel, id))
+           }
+         }
+       } else {
+         result = Some(new MismatchResult(mismatchMessage, uriLevel, id))
        }
-       ret
+       result
      }
-
 }
 
