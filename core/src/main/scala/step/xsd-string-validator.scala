@@ -63,12 +63,14 @@ private class ErrorCapture extends ErrorHandler {
   def error(exception : SAXParseException) : Unit = {
     if (error == None) {
       error = Some(exception)
+      throw exception
     }
   }
 
   def fatalError(exception : SAXParseException) : Unit = {
     if (error == None) {
       error = Some(exception)
+      throw exception
     }
   }
 
