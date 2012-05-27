@@ -13,8 +13,10 @@ import javax.xml.namespace.QName
 import org.mockito.Mockito._
 
 class BaseStepSuite extends BaseValidatorSuite {
+  System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema", "com.saxonica.jaxp.SchemaFactoryImpl")
 
   private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+  private val schemaFactorySaxon = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema")
 
   //
   //  Enable CTA full XPath2.0 checking in XSD 1.1
@@ -22,11 +24,17 @@ class BaseStepSuite extends BaseValidatorSuite {
   schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
 
   //
+  //  Enable 1.1 support in saxon
+  //
+  schemaFactorySaxon.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
+
+  //
   //  Test schema
   //
   val testSchema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/test-urlxsd.xsd")))
+  val testSchemaSaxon = schemaFactorySaxon.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/test-urlxsd.xsd")))
 
-  //
+  //cd
   // Test simple types
   //
   val stepType    = new QName("http://www.rackspace.com/repose/wadl/checker/step/test", "StepType", "tst")
