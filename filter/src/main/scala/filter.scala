@@ -16,6 +16,7 @@ import javax.xml.transform.sax.SAXSource
 import org.xml.sax.InputSource
 
 import com.rackspace.com.papi.components.checker.Validator
+import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.ValidatorException
 import com.rackspace.com.papi.components.checker.handler._
 
@@ -33,11 +34,14 @@ class ValidatorFilter extends Filter {
 
     System.out.println ("Dot file is at: "+dot)
 
-    val resultHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(),
-                                                                      new SaveDotHandler(dot, true, true),
+    val resultHandler = new DispatchResultHandler(List[ResultHandler](new SaveDotHandler(dot, true, true),
                                                                       new ServletResultHandler()))
 
-    validator = Validator(new SAXSource(new InputSource(wadlRef)), resultHandler)
+    val conf = new Config
+    conf.resultHandler = resultHandler
+    conf.useSaxonEEValidation = false
+
+    validator = Validator(new SAXSource(new InputSource(wadlRef)), conf)
   }
 
   override def doFilter (req : ServletRequest, resp : ServletResponse, chain : FilterChain) : Unit = {
