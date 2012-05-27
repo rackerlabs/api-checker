@@ -15,4 +15,9 @@ class Config {
   //  The result handler, recives and manages all results.
   //
   @BeanProperty var resultHandler : ResultHandler = new ServletResultHandler
+
+  //
+  //  Use SAXON-EE for XSD validation
+  //
+  @BeanProperty var useSaxonEEValidation : Boolean = false
 }

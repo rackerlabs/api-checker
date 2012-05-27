@@ -23,12 +23,14 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
 import scala.collection.mutable.ArrayBuffer
 
+import com.rackspace.com.papi.components.checker.Config
+
 //
 //  The StepHandler assumes it is receiving content that is valid
 //  according to the checker schema.  Please ensure that a validation
 //  stage occurs before the handler is called.
 //
-class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
+class StepHandler(var contentHandler : ContentHandler, val config : Config) extends ContentHandler {
   //
   // ID -> Step
   //
@@ -57,12 +59,24 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   //
   // Our schema factory...
   //
-  private[this] val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+  private[this] val schemaFactory = {
+    var sf : SchemaFactory = null
 
-  //
-  //  Enable CTA full XPath2.0 checking in XSD 1.1
-  //
-  schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
+    if (config.useSaxonEEValidation) {
+      System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema", "com.saxonica.jaxp.SchemaFactoryImpl")
+      sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema")
+
+      sf.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
+    } else {
+      sf = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+
+      //
+      //  Enable CTA full XPath2.0 checking in XSD 1.1
+      //
+      sf.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
+    }
+    sf
+  }
 
   //
   // Our schema...
@@ -85,7 +99,7 @@ class StepHandler(var contentHandler : ContentHandler) extends ContentHandler {
   private[this] var currentSchemaHandler : TransformerHandler = null
   private[this] var currentSchemaResult  : DOMResult = null
 
-  def this() = this(null)
+  def this() = this(null, new Config)
 
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
     localName match {

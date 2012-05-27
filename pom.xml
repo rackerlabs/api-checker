@@ -22,10 +22,10 @@
 
     <properties>
         <scala.version>2.9.0</scala.version>
-        <saxon.version>9.3</saxon.version>
+        <saxon-ee.version>9.4.0.3</saxon-ee.version>
         <scala.test.version>1.6.1</scala.test.version>
         <junit.version>4.10</junit.version>
-        <wadl-tools.version>1.0.1-SNAPSHOT</wadl-tools.version>
+        <wadl-tools.version>1.0.3-SNAPSHOT</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.0-SNAPSHOT</xerces.version>
         <servlet.version>3.1</servlet.version>
@@ -40,8 +40,8 @@
         </dependency>
         <dependency>
             <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon</artifactId>
-            <version>${saxon.version}</version>
+            <artifactId>saxon-ee</artifactId>
+            <version>${saxon-ee.version}</version>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
