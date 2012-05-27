@@ -14,10 +14,11 @@ import com.rackspace.cloud.api.wadl.Converters._
 
 import org.xml.sax.InputSource
 
+import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.step.Step
 import com.rackspace.com.papi.components.checker.step.StepHandler
 
-class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
+class StepBuilder(protected[wadl] var wadl : WADLNormalizer, private var config : Config) {
 
   private val checkerBuilder = new WADLCheckerBuilder(wadl)
 
@@ -25,7 +26,15 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
     wadl = checkerBuilder.wadl
   }
 
-  def this() = this(null)
+  if (config == null) {
+    config = new Config
+  }
+
+  def this() = this(null, null)
+
+  def this(config : Config) = this(null, config)
+
+  def this(wadl : WADLNormalizer) = this (wadl, null)
 
   def build (in : Source, out : SAXResult, removeDups : Boolean) : Step = {
     val nextHandler = {
@@ -35,7 +44,7 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
         null
       }
     }
-    val handler = new StepHandler(nextHandler)
+    val handler = new StepHandler(nextHandler, config)
     checkerBuilder.build(in, new SAXResult(handler), removeDups, true)
     handler.step
   }
