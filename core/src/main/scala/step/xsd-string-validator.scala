@@ -5,12 +5,14 @@ import javax.xml.validation.Schema
 import javax.xml.validation.ValidatorHandler
 
 import org.xml.sax.SAXParseException
+import org.xml.sax.SAXException
 import org.xml.sax.ErrorHandler
 import org.xml.sax.Attributes
+import org.xml.sax.Locator
 
 import org.xml.sax.helpers.AttributesImpl
 
-class XSDStringValidator(val simpleType : QName, val schema : Schema, val elementName : String) {
+class XSDStringValidator(val simpleType : QName, val schema : Schema, val elementName : String) extends Locator {
   lazy val attributes : Attributes = {
     val ah = new AttributesImpl()
     ah.addAttribute ("http://www.w3.org/2001/XMLSchema-instance", "type",
@@ -23,19 +25,32 @@ class XSDStringValidator(val simpleType : QName, val schema : Schema, val elemen
     val handler = schema.newValidatorHandler
     val inArray = in.toCharArray()
 
-    handler.setErrorHandler(capture)
-    handler.startDocument
-    handler.startPrefixMapping(simpleType.getPrefix, simpleType.getNamespaceURI)
-    handler.startPrefixMapping("xsi", "http://www.w3.org/2001/XMLSchema-instance")
-    handler.startElement("", elementName, elementName, attributes)
-    handler.characters(inArray, 0, inArray.length)
-    handler.endElement("", elementName, elementName)
-    handler.endPrefixMapping(simpleType.getPrefix)
-    handler.endPrefixMapping("xsi")
-    handler.endDocument
+    try {
+      handler.setErrorHandler(capture)
+      handler.setDocumentLocator (this)
+      handler.startDocument
+      handler.startPrefixMapping(simpleType.getPrefix, simpleType.getNamespaceURI)
+      handler.startPrefixMapping("xsi", "http://www.w3.org/2001/XMLSchema-instance")
+      handler.startElement("", elementName, elementName, attributes)
+      handler.characters(inArray, 0, inArray.length)
+      handler.endElement("", elementName, elementName)
+      handler.endPrefixMapping(simpleType.getPrefix)
+      handler.endPrefixMapping("xsi")
+      handler.endDocument
+    } catch {
+      case e : SAXException => /* Ignore */
+    }
 
     return capture.error
   }
+
+  //
+  // Locator calls
+  //
+  def getPublicId = ""
+  def getSystemId = ""
+  def getLineNumber = 1
+  def getColumnNumber = 1
 }
 
 //

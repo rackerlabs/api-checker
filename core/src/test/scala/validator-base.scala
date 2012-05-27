@@ -45,6 +45,11 @@ class BaseValidatorSuite extends FunSuite {
   val assertConfig = new Config
   assertConfig.resultHandler = assertHandler
 
+  val assertConfigSaxonEE = new Config
+  assertConfigSaxonEE.resultHandler = assertHandler
+  assertConfigSaxonEE.useSaxonEEValidation  = true
+
+
   def request(method : String, url : String) : HttpServletRequest = {
     val req = mock(classOf[HttpServletRequest])
 
