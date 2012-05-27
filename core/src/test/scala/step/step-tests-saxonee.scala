@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class StepSuiteSaxonEE extends BaseStepSuite {
+class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
 
   test("URLFailXSD should return None if URI level has been exceeded : StepType, uuid, evenIntType") {
     val ufx = new URLFailXSD("ufx", "ufx", Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon)

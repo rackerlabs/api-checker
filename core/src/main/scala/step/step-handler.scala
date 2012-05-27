@@ -63,9 +63,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     var sf : SchemaFactory = null
 
     if (config.useSaxonEEValidation) {
-      System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema", "com.saxonica.jaxp.SchemaFactoryImpl")
-      sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema")
+      sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema/saxonica")
 
+      //
+      //  Enable Schema 1.1 support
+      //
       sf.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
     } else {
       sf = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
