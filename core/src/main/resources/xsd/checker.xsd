@@ -35,6 +35,8 @@
                 <alternative test="@type eq 'URL'" type="chk:URLStep"/>
                 <alternative test="@type eq 'METHOD'" type="chk:MethodStep"/>
                 <alternative test="@type eq 'URLXSD'" type="chk:URLXSDStep"/>
+                <alternative test="@type eq 'REQ_TYPE'" type="chk:ReqTypeStep"/>
+                <alternative test="@type eq 'REQ_TYPE_FAIL'" type="chk:ReqTypeFailStep"/>
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
@@ -135,6 +137,23 @@
         </complexContent>
     </complexType>
 
+    <complexType name="ReqTypeStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A step checking the request content type.  The
+                    match attribute contains a regex that matches
+                    against the content type mimetype.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep">
+                <attribute name="match" type="xsd:string" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
     <!-- End Steps -->
     <complexType name="AcceptStep">
         <annotation>
@@ -224,6 +243,37 @@
         </complexContent>
     </complexType>
 
+    <complexType name="ReqTypeFailStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A MethodFail step, this should generate a 415
+                    (Unsupported Media Type). If the notMatch attribute is
+                    missing the step always applies.  If the attribute
+                    is present, it must be satisfied in order for the
+                    step to apply.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:Step">
+                <attribute name="notMatch" type="xsd:string" use="optional">
+                    <annotation>
+                        <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                            <html:p>
+                                A ReqTypeFailStep applies if the
+                                current request content type does
+                                <html:strong>not</html:strong>
+                                validate against the regex listed in
+                                this attribute.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
     <!-- Grammar Def -->
     <complexType name="Grammar">
         <annotation>
@@ -263,6 +313,8 @@
             <enumeration value="URL"/>
             <enumeration value="METHOD"/>
             <enumeration value="URLXSD"/>
+            <enumeration value="REQ_TYPE"/>
+            <enumeration value="REQ_TYPE_FAIL"/>
         </restriction>
     </simpleType>
 
