@@ -58,6 +58,16 @@ class BaseValidatorSuite extends FunSuite {
     return req
   }
 
+  def request(method : String, url : String, contentType : String) : HttpServletRequest = {
+    val req = mock(classOf[HttpServletRequest])
+
+    when(req.getMethod()).thenReturn(method)
+    when(req.getRequestURI()).thenReturn(url)
+    when(req.getContentType()).thenReturn(contentType)
+
+    return req
+  }
+
   def response : HttpServletResponse = mock(classOf[HttpServletResponse]);
 
   def chain : FilterChain = mock(classOf[FilterChain])

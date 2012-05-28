@@ -29,6 +29,7 @@ abstract class ErrorResult(message : String, val code : Int, uriLevel : Int, ste
 class AcceptResult(message: String, uriLevel : Int, stepId : String)  extends Result(message, true, true, uriLevel, stepId)
 class URLFailResult(message : String, uriLevel : Int, stepId : String) extends ErrorResult(message, 404, uriLevel, stepId)
 class MethodFailResult(message: String, uriLevel : Int, stepId : String) extends ErrorResult(message, 405, uriLevel, stepId)
+class BadMediaTypeResult(message: String, uriLevel : Int, stepId : String) extends ErrorResult(message, 415, uriLevel, stepId)
 class MismatchResult(message: String, uriLevel : Int, stepId : String) extends Result(message, false, false, uriLevel, stepId)
 
 class MultiFailResult(val fails : Array[Result], uriLevel : Int, stepId : String)

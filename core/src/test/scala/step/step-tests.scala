@@ -355,4 +355,16 @@ class StepSuite extends BaseStepSuite {
     assert (method2.checkStep (request("DELETE", "/a/b"), response,chain, 3) == -1)
   }
 
+  test("A ReqTestFail step should fail if the content type does not match with a BadMediaTypeResult") {
+    val rtf = new ReqTypeFail ("XML", "XML", "application/xml|application/json".r)
+    assertBadMediaType (rtf.check (request("PUT", "/a/b", "*.*"), response, chain, 1))
+    assertBadMediaType (rtf.check (request("POST", "/index.html", "application/XMLA"), response, chain, 0))
+  }
+
+  test("A ReqTestFail step should return None if the content type matchs") {
+    val rtf = new ReqTypeFail ("XML", "XML", "application/xml|application/json".r)
+    assert (rtf.check (request("PUT", "/a/b", "application/json"), response, chain, 1) == None)
+    assert (rtf.check (request("POST", "/index.html", "application/xml"), response, chain, 0) == None)
+  }
+
 }
