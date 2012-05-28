@@ -367,6 +367,9 @@
     </xsl:template>
     
     <xsl:template match="wadl:method">
+        <xsl:variable name="links" as="xsd:string*">
+            <xsl:sequence select="check:getNextReqTypeLinks(.)"/>
+        </xsl:variable>
         <!--
             Only work with source methods, not copies if possible.  
             If the source isn't available then use the first copy
@@ -378,29 +381,60 @@
             <step type="METHOD">
                 <xsl:attribute name="id" select="generate-id()"/>
                 <xsl:attribute name="match" select="check:toRegExEscaped(@name)"/>
-                <!-- for now, once we get to the method we accept -->
-                <xsl:attribute name="next" select="$ACCEPT"/>
-                <xsl:if test="@id or wadl:doc/@title">
-                    <xsl:attribute name="label">
-                        <xsl:choose>
-                            <xsl:when test="wadl:doc/@title">
-                                <xsl:value-of select="normalize-space(wadl:doc/@title)"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="normalize-space(@id)"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="count($links) &gt; 0">
+                        <xsl:attribute name="next" select="$links" separator=" "/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- for now, once we get to the method we accept -->
+                        <xsl:attribute name="next" select="$ACCEPT"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:call-template name="check:addLabel"/>
             </step>
         </xsl:if>
+        <xsl:apply-templates/>
     </xsl:template>
-    
+
+    <xsl:template match="wadl:request/wadl:representation[@mediaType]">
+        <step type="REQ_TYPE">
+            <xsl:attribute name="id" select="generate-id()"/>
+            <xsl:attribute name="match" select="check:toRegExEscaped(@mediaType)"/>
+            <!-- for now, once we get here we accept -->
+            <xsl:attribute name="next" select="$ACCEPT"/>
+            <xsl:call-template name="check:addLabel"/>
+        </step>
+    </xsl:template>
+
     <xsl:template match="text()" mode="#all"/>
     
+    <xsl:template name="check:addLabel">
+        <!--
+            If an id or doc title exists, use it as the label.
+        -->
+        <xsl:if test="@id or wadl:doc/@title">
+            <xsl:attribute name="label">
+                <xsl:choose>
+                    <xsl:when test="wadl:doc/@title">
+                        <xsl:value-of select="normalize-space(wadl:doc/@title)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="normalize-space(@id)"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+        </xsl:if>
+    </xsl:template>
+
     <xsl:function name="check:toRegExEscaped" as="xsd:string">
         <xsl:param name="in" as="xsd:string"/>
         <xsl:value-of select="replace($in,'\.|\\|\(|\)|\{|\}|\[|\]|\?|\+|\-|\^|\$|#|\*|\|','\\$0')"/>
+    </xsl:function>
+
+    <xsl:function name="check:getNextReqTypeLinks" as="xsd:string*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:sequence select="for $r in $from/wadl:request/wadl:representation[@mediaType]
+                              return generate-id($r)"/>
     </xsl:function>
         
     <xsl:function name="check:getNextURLLinks" as="xsd:string*">
