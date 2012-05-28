@@ -392,6 +392,9 @@
                 </xsl:choose>
                 <xsl:call-template name="check:addLabel"/>
             </step>
+            <xsl:if test="count($links) &gt; 0">
+                <xsl:call-template name="check:addReqTypeFail"/>
+            </xsl:if>
         </xsl:if>
         <xsl:apply-templates/>
     </xsl:template>
@@ -403,6 +406,16 @@
             <!-- for now, once we get here we accept -->
             <xsl:attribute name="next" select="$ACCEPT"/>
             <xsl:call-template name="check:addLabel"/>
+        </step>
+    </xsl:template>
+
+    <xsl:template name="check:addReqTypeFail">
+        <step type="REQ_TYPE_FAIL">
+            <xsl:attribute name="id" select="check:ReqTypeFailID(.)"/>
+            <xsl:attribute name="notMatch">
+                <xsl:value-of select="distinct-values(for $r in wadl:request/wadl:representation[@mediaType]
+                                      return check:toRegExEscaped($r/@mediaType))" separator="|"/>
+            </xsl:attribute>
         </step>
     </xsl:template>
 
@@ -431,10 +444,16 @@
         <xsl:value-of select="replace($in,'\.|\\|\(|\)|\{|\}|\[|\]|\?|\+|\-|\^|\$|#|\*|\|','\\$0')"/>
     </xsl:function>
 
+    <xsl:function name="check:ReqTypeFailID">
+        <xsl:param name="from" as="node()"/>
+        <xsl:value-of select="concat(generate-id($from),'rqt')"/>
+    </xsl:function>
+
     <xsl:function name="check:getNextReqTypeLinks" as="xsd:string*">
         <xsl:param name="from" as="node()"/>
-        <xsl:sequence select="for $r in $from/wadl:request/wadl:representation[@mediaType]
-                              return generate-id($r)"/>
+        <xsl:sequence select="if ($from/wadl:request/wadl:representation[@mediaType]) then
+                              (for $r in $from/wadl:request/wadl:representation[@mediaType]
+                              return generate-id($r), check:ReqTypeFailID($from)) else ()"/>
     </xsl:function>
         
     <xsl:function name="check:getNextURLLinks" as="xsd:string*">
