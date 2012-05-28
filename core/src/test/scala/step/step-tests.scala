@@ -381,6 +381,11 @@ class StepSuite extends BaseStepSuite {
     assert (rt2.checkStep (request("POST", "/a/b","application/junk"), response,chain, 2) == -1)
   }
 
+  test("In a ReqType step, if the content type is null, the returned URI level should be -1") {
+    val rt = new ReqType ("XML", "XML", "application/xml|application/json".r, Array[Step]())
+    assert (rt.checkStep (request("PUT", "/a/b", null), response,chain, 0) == -1)
+  }
+
   test("In a ReqType step, if the content matches, the URI level should stay the same") {
     val rt = new ReqType ("XML", "XML", "application/xml|application/json".r, Array[Step]())
     assert (rt.checkStep (request("PUT", "/a/b","application/xml"), response,chain, 0) == 0)
