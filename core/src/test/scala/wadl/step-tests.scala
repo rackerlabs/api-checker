@@ -48,6 +48,11 @@ class WADLStepSpec extends BaseStepSpec {
                    <method name="DELETE">
                       <response status="200"/>
                    </method>
+                   <method name="POST">
+                      <request>
+                          <representation mediaType="application/xml"/>
+                      </request>
+                   </method>
               </resource>
            </resources>
         </application>
@@ -55,9 +60,11 @@ class WADLStepSpec extends BaseStepSpec {
       val step = builder.build (inWADL).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqTypeFail("(?i)application/xml"))
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
       assert(step, Start, URI("path"), URLFailMatch("to"))
-      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET|POST"))
       assert(step, Start, URI("path"), MethodFail)
     }
 

@@ -105,7 +105,7 @@ class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QN
 //  Fail with a 415 if the request content type doesn't match one of
 //  the accepted types
 //
-class ReqTypeFail(id : String, label : String, types : Regex) extends Step(id, label) {
+class ReqTypeFail(id : String, label : String, val types : Regex) extends Step(id, label) {
   override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
     var result : Option[BadMediaTypeResult] = None
     req.getContentType() match {
