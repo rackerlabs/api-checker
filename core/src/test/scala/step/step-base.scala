@@ -38,6 +38,10 @@ class BaseStepSuite extends BaseValidatorSuite {
     new CheckerServletRequest (super.request(method, url))
   }
 
+  override def request(method : String, url : String, contentType : String) : CheckerServletRequest = {
+    new CheckerServletRequest (super.request(method, url, contentType))
+  }
+
   override def response  : CheckerServletResponse = {
     new CheckerServletResponse (super.response)
   }
@@ -45,5 +49,10 @@ class BaseStepSuite extends BaseValidatorSuite {
   def assertMismatchResult(res :Option[Result]) : Unit = {
     assert (res.isDefined)
     assert (res.get.isInstanceOf[MismatchResult])
+  }
+
+  def assertBadMediaType(res : Option[Result]) : Unit = {
+    assert (res.isDefined)
+    assert (res.get.isInstanceOf[BadMediaTypeResult])
   }
 }
