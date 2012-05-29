@@ -402,7 +402,8 @@
     <xsl:template match="wadl:request/wadl:representation[@mediaType]">
         <step type="REQ_TYPE">
             <xsl:attribute name="id" select="generate-id()"/>
-            <xsl:attribute name="match" select="check:toRegExEscaped(@mediaType)"/>
+            <!-- Note that matches on the media type are always case insensitive -->
+            <xsl:attribute name="match" select="concat('(?i)',check:toRegExEscaped(@mediaType))"/>
             <!-- for now, once we get here we accept -->
             <xsl:attribute name="next" select="$ACCEPT"/>
             <xsl:call-template name="check:addLabel"/>
@@ -414,7 +415,7 @@
             <xsl:attribute name="id" select="check:ReqTypeFailID(.)"/>
             <xsl:attribute name="notMatch">
                 <xsl:value-of select="distinct-values(for $r in wadl:request/wadl:representation[@mediaType]
-                                      return check:toRegExEscaped($r/@mediaType))" separator="|"/>
+                                      return concat('(?i)',check:toRegExEscaped($r/@mediaType)))" separator="|"/>
             </xsl:attribute>
         </step>
     </xsl:template>

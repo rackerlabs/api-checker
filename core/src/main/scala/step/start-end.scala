@@ -110,7 +110,7 @@ class ReqTypeFail(id : String, label : String, types : Regex) extends Step(id, l
     var result : Option[BadMediaTypeResult] = None
     req.getContentType() match {
       case types() => result = None
-      case _ => result = Some(new BadMediaTypeResult("The content type did not match the pattern: '"+types+"'", uriLevel, id))
+      case _ => result = Some(new BadMediaTypeResult("The content type did not match the pattern: '"+types.toString.replaceAll("\\(\\?i\\)","")+"'", uriLevel, id))
     }
     result
   }
