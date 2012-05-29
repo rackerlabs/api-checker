@@ -409,9 +409,11 @@ class ValidatorSuite extends BaseValidatorSuite {
   // validator_AM allows:
   //
   // GET /.*/b
-  // PUT /a/b
+  // PUT /a/b (accepting application/xml)
+  // POST /c/b (accepting application/xml and application/json)
   //
-  // The of course means that a GET on /a/b is allowed.
+  // The of course means that a GET on /a/b is allowed. As is a get on
+  // /c/b.
   //
   // The validator is used in the following tests.
   //
@@ -419,16 +421,24 @@ class ValidatorSuite extends BaseValidatorSuite {
     val accept = new Accept("A0", "Accept")
     val urlFail = new URLFail("UF", "URLFail")
     val urlFailB = new URLFailMatch("UFB", "URLFail","b".r)
+    val reqTFail = new ReqTypeFail("RTF", "RTFail", "(?i)application/xml".r)
+    val reqTFail2 = new ReqTypeFail("RTF2", "RTFail", "(?i)application/xml|(?i)application/json".r)
     val methodFail = new MethodFail ("MF", "MethodFail")
     val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", "GET".r)
     val methodFailPut = new MethodFailMatch ("MFP", "MethodFail", "PUT".r)
+    val methodFailPost = new MethodFailMatch ("MFPo", "MethodFail", "POST".r)
     val get = new Method("GET", "GET", "GET".r, Array (accept))
-    val put = new Method("PUT", "PUT", "PUT".r, Array (accept))
+    val putIn = new ReqType("ReqType", "XML", "(?i)application/xml".r, Array(accept))
+    val postIn = new ReqType("ReqType", "XML|JSON", "(?i)application/xml|(?i)application/json".r, Array(accept))
+    val put = new Method("PUT", "PUT", "PUT".r, Array (putIn, reqTFail))
+    val post = new Method("POST", "POST", "POST".r, Array (postIn, reqTFail2))
     val b = new URI("b","b", "b".r, Array(put, urlFail, methodFailPut))
     val b2 = new URI("b2","b2", "b".r, Array(get, urlFail, methodFailGet))
+    val b3 = new URI("b3","b3", "b".r, Array(post, urlFail, methodFailPost))
     val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
     val any = new URI("any","any", ".*".r, Array(b2, urlFailB, methodFail))
-    val start = new Start("START", "Start", Array(a, any,  methodFail))
+    val c = new URI("c","c", "c".r, Array(b3, urlFailB, methodFail))
+    val start = new Start("START", "Start", Array(a, c, any, methodFail))
     start
   }, assertConfig)
 
@@ -436,8 +446,68 @@ class ValidatorSuite extends BaseValidatorSuite {
     validator_AM.validate(request("GET","/a/b"),response,chain)
   }
 
-  test ("PUT on /a/b should succeed on validator_AM") {
-    validator_AM.validate(request("PUT","/a/b"),response,chain)
+  test ("GET on /c/b should succeed on validator_AM") {
+    validator_AM.validate(request("GET","/c/b"),response,chain)
+  }
+
+  test ("PUT on /a/b should succeed on validator_AM if the media type is application/xml") {
+    validator_AM.validate(request("PUT","/a/b","application/xml"),response,chain)
+  }
+
+  test ("PUT on /a/b should succeed on validator_AM if the media type is application/XML") {
+    validator_AM.validate(request("PUT","/a/b","application/XML"),response,chain)
+  }
+
+  test ("PUT on /a/b should succeed on validator_AM if the media type is AppLication/XML") {
+    validator_AM.validate(request("PUT","/a/b","AppLication/XML"),response,chain)
+  }
+
+  test ("PUT on /a/b should fail on validator_AM if the media type is application/json") {
+    assertResultFailed(validator_AM.validate(request("PUT","/a/b","application/json"),response,chain), 415)
+  }
+
+  test ("PUT on /a/b should fail on validator_AM if the media type is text/html") {
+    assertResultFailed(validator_AM.validate(request("PUT","/a/b","text/html"),response,chain), 415)
+  }
+
+  test ("PUT on /a/b should fail on validator_AM if the media type is not specified") {
+    assertResultFailed(validator_AM.validate(request("PUT","/a/b"),response,chain), 415)
+  }
+
+  test ("POST on /c/b should succeed on validator_AM if the media type is application/xml") {
+    validator_AM.validate(request("POST","/c/b","application/xml"),response,chain)
+  }
+
+  test ("POST on /c/b should succeed on validator_AM if the media type is application/XML") {
+    validator_AM.validate(request("POST","/c/b","application/XML"),response,chain)
+  }
+
+  test ("POST on /c/b should succeed on validator_AM if the media type is AppLication/XML") {
+    validator_AM.validate(request("POST","/c/b","AppLication/XML"),response,chain)
+  }
+
+  test ("POST on /c/b should succeed on validator_AM if the media type is application/json") {
+    validator_AM.validate(request("POST","/c/b","application/json"),response,chain)
+  }
+
+  test ("POST on /c/b should succeed on validator_AM if the media type is application/JSON") {
+    validator_AM.validate(request("POST","/c/b","application/JSON"),response,chain)
+  }
+
+  test ("POST on /c/b should succeed on validator_AM if the media type is AppLication/JSON") {
+    validator_AM.validate(request("POST","/c/b","AppLication/JSON"),response,chain)
+  }
+
+  test ("POST on /c/b should fail on validator_AM if the media type is application/atom+xml") {
+    assertResultFailed(validator_AM.validate(request("POST","/c/b","application/atom+xml"),response,chain), 415)
+  }
+
+  test ("POST on /c/b should fail on validator_AM if the media type is text/html") {
+    assertResultFailed(validator_AM.validate(request("POST","/c/b","text/html"),response,chain), 415)
+  }
+
+  test ("POST on /c/b should fail on validator_AM if the media type is not specified") {
+    assertResultFailed(validator_AM.validate(request("POST","/c/b"),response,chain), 415)
   }
 
   test ("GET on /b/b should succeed on validator_AM") {
@@ -453,7 +523,11 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("POST","/a/b"),response,chain), 405)
+    assertResultFailed(validator_AM.validate(request("POST","/a/b","application/xml"),response,chain), 405)
+  }
+
+  test ("PUT on /c/b should fail on validator_AM") {
+    assertResultFailed(validator_AM.validate(request("PUT","/c/b","application/xml"),response,chain), 405)
   }
 
   test ("DELETE on /z/b should fail on validator_AM") {

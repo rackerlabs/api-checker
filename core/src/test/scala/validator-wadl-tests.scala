@@ -261,6 +261,103 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     assertResultFailed(validator_REG.validate(request("GET","/a/b/d"),response,chain), 404)
   }
 
+
+  //
+  // validator_RT allows:
+  //
+  // PUT /a/b with json and xml support
+  // POST /a/b with xml support
+  //
+  // POST /c with json support
+  // GET /c
+  //
+  // The validator is used in the following tests.
+  //
+  val validator_RT = Validator(
+      <application xmlns="http://wadl.dev.java.net/2009/02">
+        <grammars/>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    , assertConfig)
+
+  test ("PUT on /a/b with application/xml should succeed on validator_RT") {
+    validator_RT.validate(request("PUT","/a/b","application/xml"),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_RT") {
+    validator_RT.validate(request("PUT","/a/b","application/json"),response,chain)
+  }
+
+  test ("PUT on /a/b with aPPlicatioN/Xml should succeed on validator_RT") {
+    validator_RT.validate(request("PUT","/a/b","aPPlication/Xml"),response,chain)
+  }
+
+  test ("PUT on /a/b with application/jSON should succeed on validator_RT") {
+    validator_RT.validate(request("PUT","/a/b","application/jSON"),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/a/b","application/xml"),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/c","application/json"),response,chain)
+  }
+
+  test ("GET on /c should succeed on validator_RT") {
+    validator_RT.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("PUT on /a/b should fail on validator_RT if the media type is not specified") {
+    assertResultFailed(validator_RT.validate(request("PUT","/a/b"),response,chain), 415)
+  }
+
+  test ("POST on /a/b should fail on validator_RT if the media type is not specified") {
+    assertResultFailed(validator_RT.validate(request("POST","/a/b"),response,chain), 415)
+  }
+
+  test ("POST on /c should fail on validator_RT if the media type is not specified") {
+    assertResultFailed(validator_RT.validate(request("POST","/c"),response,chain), 415)
+  }
+
+  test ("PUT on /c should fail on validator_RT with a 405") {
+    assertResultFailed(validator_RT.validate(request("PUT","/c","application/json"),response,chain), 405)
+  }
+
+  test ("GET on /a/b should fail on validator_RT with a 405") {
+    assertResultFailed(validator_RT.validate(request("GET","/a/b"),response,chain), 405)
+  }
+
+  test ("POST on /a/b should fail on validator_RT if the media type is application/json") {
+    assertResultFailed(validator_RT.validate(request("POST","/a/b","application/json"),response,chain), 415)
+  }
+
+  test ("POST on /c should fail on validator_RT if the media type is application/xml") {
+    assertResultFailed(validator_RT.validate(request("POST","/c","application/xml"),response,chain), 415)
+  }
+
   //
   // validator_AM allows:
   //

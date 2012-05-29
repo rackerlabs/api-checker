@@ -177,7 +177,7 @@
                 </xsl:for-each-group>
             </xsl:for-each-group>
             <!-- For each method fail, url fail, groups by not Match -->
-            <xsl:for-each-group select="$checker//check:step[(@type='METHOD_FAIL' or @type='URL_FAIL') and not(@notTypes)]" group-by="@notMatch">
+            <xsl:for-each-group select="$checker//check:step[(@type='METHOD_FAIL' or @type='URL_FAIL' or @type='REQ_TYPE_FAIL') and not(@notTypes)]" group-by="@notMatch">
                 <xsl:if test="count(current-group()) > 1">
                     <group>
                         <xsl:attribute name="include">

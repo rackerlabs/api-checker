@@ -61,14 +61,20 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithMatch (checker, methodMatch).filter(n => (n \ "@type").text == "METHOD")
   }
 
+  def stepsWithReqTypeMatch (checker : NodeSeq, reqTypeMatch : String) : NodeSeq = {
+    stepsWithMatch (checker, reqTypeMatch).filter(n => (n \ "@type").text == "REQ_TYPE")
+  }
+
   def Start : (NodeSeq) => NodeSeq = stepsWithType(_, "START")
   def Accept : (NodeSeq) => NodeSeq = stepsWithType(_, "ACCEPT")
   def URLFail : (NodeSeq) => NodeSeq = stepsWithType(_, "URL_FAIL")
   def MethodFail : (NodeSeq) => NodeSeq = stepsWithType(_, "METHOD_FAIL")
+  def ReqTypeFail : (NodeSeq) => NodeSeq = stepsWithType(_, "REQ_TYPE_FAIL")
   def URL(url : String) : (NodeSeq) => NodeSeq = stepsWithURLMatch(_, url)
   def URLXSD(url : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatch(_, url)
   def Label(label : String) : (NodeSeq) => NodeSeq = stepsWithLabel(_, label)
   def Method(method : String) : (NodeSeq) => NodeSeq = stepsWithMethodMatch(_, method)
+  def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {
 

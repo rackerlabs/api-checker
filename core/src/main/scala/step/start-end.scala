@@ -102,6 +102,21 @@ class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QN
 }
 
 //
+//  Fail with a 415 if the request content type doesn't match one of
+//  the accepted types
+//
+class ReqTypeFail(id : String, label : String, val types : Regex) extends Step(id, label) {
+  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
+    var result : Option[BadMediaTypeResult] = None
+    req.getContentType() match {
+      case types() => result = None
+      case _ => result = Some(new BadMediaTypeResult("The content type did not match the pattern: '"+types.toString.replaceAll("\\(\\?i\\)","")+"'", uriLevel, id))
+    }
+    result
+  }
+}
+
+//
 //  Like URLFail, but fails only if the current uri path is not
 //  matched by any of the simple XSD types.
 //

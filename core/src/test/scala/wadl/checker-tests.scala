@@ -51,21 +51,25 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
     //
     //  The following scenarios test a single resource located at
-    //  /path/to/my/resource with a GET and a DELETE method. They are
+    //  /path/to/my/resource with a GET, DELETE, and POST method. They are
     //  equivalent but they are written in slightly different WADL
     //  form the assertions below must apply to all of them.
+    //  Only application/xml is allowed in the POST operation
+    //
     //
 
     def singlePathAssertions (checker : NodeSeq) : Unit = {
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
-      and ("The checker should contain a GET and a DELETE method")
+      and ("The checker should contain a GET, DELETE, and POST method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE']")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='POST']")
       and ("The path from the start should contain all URL nodes in order")
       and ("it should end in the GET and a DELETE method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), ReqType("application/xml"))
       and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
@@ -77,10 +81,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("my"), MethodFail)
       assert (checker, URL("resource"), URLFail)
       assert (checker, URL("resource"), MethodFail)
+      and ("The POST method should contain an ReqTypeFail")
+      assert (checker, Method("POST"), ReqTypeFail)
     }
 
     scenario("The WADL contains a single multi-path resource") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      given("a WADL that contains a single multi-path resource with a GET, DELETE, and POST method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -92,6 +98,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    <method name="DELETE">
                       <response status="200"/>
                    </method>
+                   <method name="POST">
+                      <request>
+                         <representation mediaType="application/xml"/>
+                      </request>
+                      <response status="200"/>
+                   </method>
               </resource>
            </resources>
         </application>
@@ -101,7 +113,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     }
 
     ignore("The WADL contains a single multi-path resource ending in /") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method and ending in /")
+      given("a WADL that contains a single multi-path resource with a GET, DELETE, and POST method and ending in /")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -113,6 +125,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    <method name="DELETE">
                       <response status="200"/>
                    </method>
+                   <method name="POST">
+                      <request>
+                         <representation mediaType="application/xml"/>
+                      </request>
+                      <response status="200"/>
+                   </method>
               </resource>
            </resources>
         </application>
@@ -122,7 +140,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     }
 
     scenario("The WADL contains a single multi-path resource in tree form") {
-      given("a WADL that contains a single multi-path resource in tree form with a GET and DELETE method")
+      given("a WADL that contains a single multi-path resource in tree form with a GET, DELETE, and POST method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -137,6 +155,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                      <method name="DELETE">
                         <response status="200"/>
                      </method>
+                     <method name="POST">
+                        <request>
+                           <representation mediaType="application/xml"/>
+                        </request>
+                        <response status="200"/>
+                     </method>
                    </resource>
                  </resource>
                 </resource>
@@ -149,7 +173,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     }
 
     scenario("The WADL contains a single multi-path resource in mixed form") {
-      given("a WADL that contains a single multi-path resource in mixed form with a GET and DELETE method")
+      given("a WADL that contains a single multi-path resource in mixed form with a GET, DELETE, and POST method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -160,6 +184,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                         <response status="200 203"/>
                      </method>
                      <method name="DELETE">
+                        <response status="200"/>
+                     </method>
+                     <method name="POST">
+                        <request>
+                           <representation mediaType="application/xml"/>
+                        </request>
                         <response status="200"/>
                      </method>
                    </resource>
@@ -180,6 +210,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               <resource path="path/to/my/resource">
                    <method href="#getMethod" />
                    <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+                   <method name="POST">
+                      <request>
+                         <representation mediaType="application/xml"/>
+                      </request>
                       <response status="200"/>
                    </method>
               </resource>
@@ -208,6 +244,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               <method name="DELETE">
                   <response status="200"/>
               </method>
+              <method name="POST">
+                   <request>
+                     <representation mediaType="application/xml"/>
+                   </request>
+                     <response status="200"/>
+             </method>
            </resource_type>
         </application>
       when("the wadl is translated")
@@ -227,6 +269,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               <method href="#getMethod" />
               <method name="DELETE">
                   <response status="200"/>
+              </method>
+              <method name="POST">
+                 <request>
+                    <representation mediaType="application/xml"/>
+                 </request>
+                 <response status="200"/>
               </method>
            </resource_type>
            <method id="getMethod" name="GET">
@@ -1849,6 +1897,110 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, Start, URL("\\\\\\^\\-\\.\\$\\{\\}\\*\\+\\|\\#\\(\\)\\[\\]"), Method("\\.\\-"))
       assert (checker, Start, URL("\\^ABC\\[D\\]EFG\\#"), Method("\\-GET\\.\\.IT\\-"))
     }
+  }
+
+  //
+  //  The following assertions are used to test ReqType and
+  //  ReqTypeFail nodes, they are used in the next couple of tests.
+  //
+  def reqTypeAssertions(checker : NodeSeq) : Unit = {
+    then("The machine should contain paths to all ReqTypes")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/json"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"))
+    assert (checker, Start, URL("c"), Method("GET"))
+    and("ReqTypeFail states should be after PUT and POST states")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting various media types") {
+    given ("a WADL that contains multiple PUT and POST operation with various media types")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02">
+        <grammars/>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    when("the wadl is translated")
+    val checker = builder.build (inWADL)
+    reqTypeAssertions(checker)
+    and("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting various media types, with dups optimization on") {
+    given ("a WADL that contains multiple PUT and POST operation with various media types")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02">
+        <grammars/>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    when("the wadl is translated")
+    val checker = builder.build (inWADL, true)
+    reqTypeAssertions(checker)
+    and("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
   }
 
   //

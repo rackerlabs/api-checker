@@ -114,9 +114,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "ACCEPT"      => addAccept(atts)
           case "URL_FAIL"    => addURLFail(atts)
           case "METHOD_FAIL" => addMethodFail(atts)
+          case "REQ_TYPE_FAIL" => addReqTypeFail(atts)
           case "URL"         => addURL(atts)
           case "METHOD"      => addMethod(atts)
           case "URLXSD"      => addURLXSD(atts)
+          case "REQ_TYPE"    => addReqType(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -255,6 +257,14 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
   }
 
+  private[this] def addReqTypeFail(atts : Attributes) : Unit = {
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val notMatch : String = atts.getValue("notMatch")
+
+    steps += (id -> new ReqTypeFail(id, label, notMatch.r))
+  }
+
   private[this] def addMethodFail(atts : Attributes) : Unit = {
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
@@ -265,6 +275,16 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     } else {
       steps += (id -> new MethodFailMatch (id, label, notMatch.r))
     }
+  }
+
+  private[this] def addReqType(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+
+    next += (id -> nexts)
+    steps += (id -> new ReqType(id, label, _match.r, new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {
