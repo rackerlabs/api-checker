@@ -10,6 +10,9 @@
     version="2.0">
     
     <xsl:output indent="yes" method="xml"/>
+
+    <!-- Paramenters -->
+    <xsl:param name="enableWellFormCheck" as="xsd:boolean" select="false()"/>
     
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -400,14 +403,70 @@
     </xsl:template>
 
     <xsl:template match="wadl:request/wadl:representation[@mediaType]">
+        <xsl:variable name="defaultNext" select="$ACCEPT"/>
         <step type="REQ_TYPE">
             <xsl:attribute name="id" select="generate-id()"/>
             <!-- Note that matches on the media type are always case insensitive -->
             <xsl:attribute name="match" select="concat('(?i)',check:toRegExEscaped(@mediaType))"/>
-            <!-- for now, once we get here we accept -->
-            <xsl:attribute name="next" select="$ACCEPT"/>
+            <xsl:choose>
+                <xsl:when test="$enableWellFormCheck">
+                    <xsl:choose>
+                        <xsl:when test="check:isXML(@mediaType) or check:isJSON(@mediaType)">
+                            <xsl:call-template name="check:addWellFormNext"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="next" select="$defaultNext"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="next" select="$defaultNext"/>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:call-template name="check:addLabel"/>
         </step>
+        <xsl:choose>
+            <xsl:when test="check:isXML(@mediaType)">
+                <xsl:call-template name="check:addWellForm">
+                    <xsl:with-param name="type" select="'WELL_XML'"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="check:isJSON(@mediaType)">
+                <xsl:call-template name="check:addWellForm">
+                    <xsl:with-param name="type" select="'WELL_JSON'"/>
+                </xsl:call-template>
+            </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:function name="check:isXML" as="xsd:boolean">
+        <xsl:param name="in" as="xsd:string"/>
+        <xsl:value-of select="$in = 'application/xml' or ends-with($in,'+xml')"/>
+    </xsl:function>
+
+    <xsl:function name="check:isJSON" as="xsd:boolean">
+        <xsl:param name="in" as="xsd:string"/>
+        <xsl:value-of select="$in = 'application/json' or ends-with($in,'+json')"/>
+    </xsl:function>
+
+    <xsl:function name="check:WellFormID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(generate-id($context),'W')"/>
+    </xsl:function>
+
+    <xsl:function name="check:WellFormFailID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(generate-id($context),'WF')"/>
+    </xsl:function>
+
+    <xsl:template name="check:addWellFormNext">
+        <xsl:attribute name="next" select="(check:WellFormID(.), check:WellFormFailID(.))" separator=" "/>
+    </xsl:template>
+
+    <xsl:template name="check:addWellForm">
+        <xsl:param name="type" />
+        <step type="{$type}" id="{check:WellFormID(.)}" next="{$ACCEPT}"/>
+        <step type="CONTENT_FAIL" id="{check:WellFormFailID(.)}"/>
     </xsl:template>
 
     <xsl:template name="check:addReqTypeFail">
