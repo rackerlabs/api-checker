@@ -34,7 +34,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       then("The checker should contain a single start node")
       assert (checker, "count(//chk:step[@type='START']) = 1")
       and("The only steps accessible from start should be the fail states")
@@ -108,7 +108,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
@@ -135,7 +135,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
@@ -168,7 +168,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
@@ -197,7 +197,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
@@ -225,7 +225,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
@@ -253,7 +253,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resource_type>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
@@ -282,7 +282,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
@@ -347,7 +347,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
           </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       multiplePathAssertions(checker)
     }
 
@@ -382,7 +382,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       multiplePathAssertions(checker)
     }
 
@@ -413,7 +413,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       multiplePathAssertions(checker)
     }
 
@@ -482,7 +482,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
           </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       multipleUnrelatedPathAssertions(checker)
     }
 
@@ -523,7 +523,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       multipleUnrelatedPathAssertions(checker)
     }
 
@@ -556,7 +556,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       multipleUnrelatedPathAssertions(checker)
     }
 
@@ -577,7 +577,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
           </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       then("The method nodes should contain a resource label with the id")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD']) = 2")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET' and @label='getResource']")
@@ -611,7 +611,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       then("All paths should be available as defined in the WADL...")
       assert (checker, Start, URL("path"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
@@ -672,7 +672,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       stringTemplateAtEndAssertions(checker)
     }
 
@@ -701,7 +701,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       stringTemplateAtEndAssertions(checker)
     }
 
@@ -726,7 +726,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       stringTemplateAtEndAssertions(checker)
     }
 
@@ -747,7 +747,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       stringTemplateAtEndAssertions(checker)
     }
 
@@ -770,7 +770,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       when ("the wadl is translated")
       then ("A WADLException should be thrown")
       intercept[WADLException] {
-        val checker = builder.build (inWADL)
+        val checker = builder.build (inWADL, stdConfig)
       }
     }
 
@@ -792,7 +792,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       when ("the wadl is translated")
       then ("A WADLException should be thrown")
       intercept[WADLException] {
-        val checker = builder.build (inWADL)
+        val checker = builder.build (inWADL, stdConfig)
       }
     }
 
@@ -815,7 +815,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       when ("the wadl is translated")
       then ("A WADLException should be thrown")
       intercept[WADLException] {
-        val checker = builder.build (inWADL)
+        val checker = builder.build (inWADL, stdConfig)
       }
     }
 
@@ -837,7 +837,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       when ("the wadl is translated")
       then ("A WADLException should be thrown")
       intercept[WADLException] {
-        val checker = builder.build (inWADL)
+        val checker = builder.build (inWADL, stdConfig)
       }
     }
 
@@ -890,7 +890,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       stringTemplateInMiddleAssertions(checker)
     }
 
@@ -919,7 +919,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       stringTemplateInMiddleAssertions(checker)
     }
 
@@ -944,7 +944,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when ("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       stringTemplateInMiddleAssertions(checker)
     }
 
@@ -1022,7 +1022,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
@@ -1056,7 +1056,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
@@ -1092,7 +1092,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
@@ -1136,7 +1136,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
@@ -1176,7 +1176,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
@@ -1212,7 +1212,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
@@ -1256,7 +1256,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
@@ -1296,7 +1296,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
@@ -1338,7 +1338,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL, true)
+      val checker = builder.build (inWADL, dupConfig)
       then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 7")
       and("A single URLXSD node")
@@ -1403,7 +1403,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       when("the wadl is translated")
       then ("A WADLException should be thrown")
       intercept[WADLException] {
-        val checker = builder.build (inWADL)
+        val checker = builder.build (inWADL, dupConfig)
       }
     }
 
@@ -1435,7 +1435,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </grammar>
              )
       then ("The grammar should be ignored")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, dupConfig)
       assert (checker, "not(/chk:checker/chk:grammar)")
     }
 
@@ -1470,7 +1470,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       //          """
       //        )
       then ("The grammar should be ignored")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       assert (checker, "not(/chk:checker/chk:grammar)")
     }
 
@@ -1547,7 +1547,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateInMiddleAssertions(checker)
     }
 
@@ -1591,7 +1591,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateInMiddleAssertions(checker)
     }
 
@@ -1631,7 +1631,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplateInMiddleAssertions(checker)
     }
 
@@ -1740,7 +1740,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplatesInMiddleAssertions(checker)
     }
 
@@ -1809,7 +1809,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplatesInMiddleAssertions(checker)
     }
 
@@ -1874,7 +1874,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </simpleType>
                 </schema>)
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       customTemplatesInMiddleAssertions(checker)
     }
 
@@ -1893,7 +1893,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       assert (checker, Start, URL("\\\\\\^\\-\\.\\$\\{\\}\\*\\+\\|\\#\\(\\)\\[\\]"), Method("\\.\\-"))
       assert (checker, Start, URL("\\^ABC\\[D\\]EFG\\#"), Method("\\-GET\\.\\.IT\\-"))
     }
@@ -1947,7 +1947,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </resources>
     </application>
     when("the wadl is translated")
-    val checker = builder.build (inWADL)
+    val checker = builder.build (inWADL, stdConfig)
     reqTypeAssertions(checker)
     and("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
@@ -1990,7 +1990,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         </resources>
     </application>
     when("the wadl is translated")
-    val checker = builder.build (inWADL, true)
+    val checker = builder.build (inWADL, dupConfig)
     reqTypeAssertions(checker)
     and("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
@@ -2034,9 +2034,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     noDupAsserts(checker_dupon)
     noDupAsserts(checker_dupoff)
@@ -2062,9 +2062,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     noDupAsserts(checker_dupon)
     noDupAsserts(checker_dupoff)
@@ -2086,9 +2086,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     noDupAsserts(checker_dupon)
     noDupAsserts(checker_dupoff)
@@ -2143,9 +2143,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     singleDupAsserts(checker_dupon, checker_dupoff)
   }
@@ -2176,9 +2176,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     singleDupAsserts(checker_dupon, checker_dupoff)
   }
@@ -2205,9 +2205,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     singleDupAsserts(checker_dupon, checker_dupoff)
   }
@@ -2287,9 +2287,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     multipleDupAsserts(checker_dupon, checker_dupoff)
   }
@@ -2353,9 +2353,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     multipleDupAsserts(checker_dupon, checker_dupoff)
   }
@@ -2398,9 +2398,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </method>
         </application>
     when("the WADL is translated, with dup remove on")
-    val checker_dupon = builder.build(inWADL, true)
+    val checker_dupon = builder.build(inWADL, dupConfig)
     and ("the WADL is translated, with dup remove off")
-    val checker_dupoff = builder.build(inWADL)
+    val checker_dupoff = builder.build(inWADL, stdConfig)
 
     multipleDupAsserts(checker_dupon, checker_dupoff)
   }
@@ -2428,7 +2428,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       when("the wadl is translated")
-      val checker = builder.build (inWADL)
+      val checker = builder.build (inWADL, stdConfig)
       then("There should be a total of 5 POST method steps...4 specified plus 1 collecting them")
       assert(checker, "count(//chk:step[@type='METHOD']) = 5")
       and ("All paths should go through POST step.")

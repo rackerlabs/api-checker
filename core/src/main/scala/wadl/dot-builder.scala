@@ -15,6 +15,15 @@ import org.xml.sax.InputSource
 import com.rackspace.cloud.api.wadl.WADLNormalizer
 import com.rackspace.cloud.api.wadl.Converters._
 
+import com.rackspace.com.papi.components.checker.Config
+
+object Checker2DotXSLParams {
+  val IGNORE_SINKS = "ignoreSinks"
+  val NFA_MODE     = "nfaMode"
+}
+
+import Checker2DotXSLParams._
+
 class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   private val checkerBuilder = new WADLCheckerBuilder(wadl)
@@ -30,50 +39,51 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
   def buildFromChecker (in : Source, out: Result, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
     val transformer = dotHandler.getTransformer()
-    transformer.setParameter ("ignoreSinks", ignoreSinks)
-    transformer.setParameter ("nfaMode", nfaMode)
+    transformer.setParameter (IGNORE_SINKS, ignoreSinks)
+    transformer.setParameter (NFA_MODE, nfaMode)
     transformer.transform (in, out)
   }
 
-  def build (in : Source, out: Result, removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build (in : Source, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
     val transformer = dotHandler.getTransformer()
     dotHandler.setResult(out)
-    transformer.setParameter ("ignoreSinks", ignoreSinks)
-    transformer.setParameter ("nfaMode", nfaMode)
-    checkerBuilder.build(in, new SAXResult(dotHandler), removeDups, true)
+    transformer.setParameter (IGNORE_SINKS, ignoreSinks)
+    transformer.setParameter (NFA_MODE, nfaMode)
+
+    checkerBuilder.build(in, new SAXResult(dotHandler), config)
   }
 
-  def build(in : (String, InputStream), out: Result, removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build(in : (String, InputStream), out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
     val inputSource = new InputSource(in._2)
     inputSource.setSystemId(in._1)
-    build(new SAXSource(xmlReader, inputSource), out, removeDups, ignoreSinks, nfaMode)
+    build(new SAXSource(xmlReader, inputSource), out, config, ignoreSinks, nfaMode)
   }
 
-  def build(in : InputStream, out: Result, removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
-    build (("test://mywadl.wadl",in), out, removeDups, ignoreSinks, nfaMode)
+  def build(in : InputStream, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+    build (("test://mywadl.wadl",in), out, config, ignoreSinks, nfaMode)
   }
 
-  def build(in : Reader, out: Result, removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build(in : Reader, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out, removeDups, ignoreSinks, nfaMode)
+    build(new SAXSource(xmlReader, new InputSource(in)), out, config, ignoreSinks, nfaMode)
   }
 
-  def build(in : String, out: Result, removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build(in : String, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out, removeDups, ignoreSinks, nfaMode)
+    build(new SAXSource(xmlReader, new InputSource(in)), out, config, ignoreSinks, nfaMode)
   }
 
-  def build (in : (String, NodeSeq), removeDups : Boolean, ignoreSinks : Boolean, nfaMode : Boolean) : String = {
+  def build (in : (String, NodeSeq), config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : String = {
     val bytesOut = new ByteArrayOutputStream()
-    build (in, new StreamResult(bytesOut), removeDups, ignoreSinks, nfaMode)
+    build (in, new StreamResult(bytesOut), config, ignoreSinks, nfaMode)
     bytesOut.toString()
   }
 
-  def build (in: NodeSeq, removeDups : Boolean = false,
+  def build (in: NodeSeq, config : Config = null,
              ignoreSinks: Boolean = true,
              nfaMode: Boolean = true) : String = {
-    build (("test://mywadl.wadl",in), removeDups, ignoreSinks, nfaMode)
+    build (("test://mywadl.wadl",in), config, ignoreSinks, nfaMode)
   }
 }

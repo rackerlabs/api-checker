@@ -13,8 +13,16 @@ import org.scalatest.TestFailedException
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
 
+import com.rackspace.com.papi.components.checker.Config
+
 class BaseCheckerSpec extends BaseWADLSpec {
   val builder = new WADLCheckerBuilder(wadl)
+
+  val stdConfig = new Config
+  val dupConfig = new Config
+
+  stdConfig.removeDups = false
+  dupConfig.removeDups = true
 
   private val pathNodesTemplates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/path-nodes.xsl")))
 
