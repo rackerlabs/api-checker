@@ -132,6 +132,16 @@
    3. [X] Simple config and handler -- simple WADL
    4. [X] Save DOT
 ** DONE Propigate XSD type errors correctly
+** TODO Add stage to check well formed XML/JSON [4/7]
+   1. [X] Add support for WELL_XML, WELL_JSON, CONTET_FAIL in XSD
+   2. [X] Add support in XSLs
+   3. [X] Setup configuration to check for well formness
+   4. [X] Update cli tools with new config
+   5. [-] XML
+          1. [X] Create document parse pool
+          2. [ ] Create WELL_XML state type using parse pool
+   6. [ ] Create CONTENT_FAIL state
+   7. [ ] JSON
 ** TODO Modify filter to handle different groups
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Change Detector...

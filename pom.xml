@@ -30,6 +30,7 @@
         <xerces.version>2.12.0-SNAPSHOT</xerces.version>
         <servlet.version>3.1</servlet.version>
         <mockito.version>1.9.0</mockito.version>
+        <pool.version>1.6</pool.version>
     </properties>
 
     <dependencies>
@@ -63,6 +64,11 @@
             <groupId>com.rackspace.cloud.api</groupId>
             <artifactId>wadl-tools</artifactId>
             <version>${wadl-tools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>${pool.version}</version>
         </dependency>
          <dependency>
              <groupId>org.glassfish</groupId>
