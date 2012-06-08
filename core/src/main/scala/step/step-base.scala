@@ -1,5 +1,7 @@
 package com.rackspace.com.papi.components.checker.step
 
+import scala.collection.mutable.ListBuffer
+
 import com.rackspace.com.papi.components.checker.servlet._
 import javax.servlet.FilterChain
 
@@ -41,9 +43,19 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //  Go to the next step.
   //
   def nextStep (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Array[Result] = {
-    val results : Array[Result] = next.map (n =>n.check(req, resp, chain, uriLevel)).filter(s => s.isDefined).map(r => r.get)
-    results.foreach(n => if (n.valid) { return Array(n) })
-    results
+    val resultBuffer = new ListBuffer[Result]
+    for (i <- 0 to next.length-1) {
+      val oresult = next(i).check(req, resp, chain, uriLevel)
+      if (oresult.isDefined) {
+        val result = oresult.get
+        if (result.valid) {
+          return Array(result)
+        } else {
+          resultBuffer += result
+        }
+      }
+    }
+    return resultBuffer.toArray
   }
 
   //
