@@ -142,6 +142,7 @@
    6. [X] XML
           1. [X] Create document parse pool
           2. [X] Create WELL_XML state type using parse pool
+          3. [X] Check to make sure that the XML hasn't already been parsed.
    7. [X] Create CONTENT_FAIL state
    8. [ ] JSON
    9. [ ] Connect states with handler

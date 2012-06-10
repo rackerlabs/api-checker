@@ -17,8 +17,10 @@ class WellFormedXML(id : String, label : String, next : Array[Step]) extends Con
     var ret = -1
     var parser : DocumentBuilder = null
     try {
-      parser = borrowParser
-      req.parsedXML = parser.parse(req.getInputStream)
+      if (req.parsedXML == null) {
+        parser = borrowParser
+        req.parsedXML = parser.parse(req.getInputStream)
+      }
       ret = uriLevel
     }catch {
       case e : Exception => req.contentError = e
