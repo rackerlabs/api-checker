@@ -180,3 +180,23 @@ class MethodFailMatch(id : String, label : String, val method : Regex) extends M
     result
   }
 }
+
+//
+// Content fail state
+//
+class ContentFail(id : String, label : String) extends Step(id, label) {
+  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
+    //
+    //  If there is a contentError in the request, return it,
+    //  otherwise return NONE.
+    //
+    var result : Option[BadContentResult] = None
+
+    if (req.contentError != null) {
+      val bcr = new BadContentResult("Bad Content: "+req.contentError.getMessage(), uriLevel, id)
+      result = Some(bcr)
+    }
+
+    return result
+  }
+}
