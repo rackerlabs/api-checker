@@ -478,7 +478,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     <application xmlns="http://wadl.dev.java.net/2009/02"
                  xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
            <grammars>
-              <include href="https://raw.github.com/openstack/compute-api/master/openstack-compute-api-2/src/xsd/common.xsd"/>
+              <include href="../sample/os-compute/xsd/common.xsd"/>
            </grammars>
            <resources base="https://test.api.openstack.com">
               <resource id="uuid" path="path/to/my/resource/{uuid}">
