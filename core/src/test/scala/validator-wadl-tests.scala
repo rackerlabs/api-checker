@@ -358,6 +358,184 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     assertResultFailed(validator_RT.validate(request("POST","/c","application/xml"),response,chain), 415)
   }
 
+
+  //
+  // validator_WELL allows:
+  //
+  //
+  // PUT /a/b with json and xml support
+  // POST /a/b with xml support
+  //
+  // POST /c with json support
+  // GET /c
+  //
+  // The validator checks for wellformness in XML
+  //
+  // The validator is used in the following tests.
+  //
+  val validator_WELL = Validator(
+      <application xmlns="http://wadl.dev.java.net/2009/02">
+        <grammars/>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    , TestConfig(false, true))
+
+  //
+  //  Good XML used in the tests below
+  //
+  val goodXML = <some_xml att='1' xmlns='test.org'>
+                  <an_element>
+                    <another_element />
+                  </an_element>
+                </some_xml>
+
+  test ("PUT on /a/b with application/xml should succeed on validator_WELL") {
+    validator_WELL.validate(request("PUT","/a/b","application/xml", goodXML),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_WELL") {
+    validator_WELL.validate(request("PUT","/a/b","application/json"),response,chain)
+  }
+
+  test ("PUT on /a/b with aPPlicatioN/Xml should succeed on validator_WELL") {
+    validator_WELL.validate(request("PUT","/a/b","aPPlication/Xml", goodXML),response,chain)
+  }
+
+  test ("PUT on /a/b with application/jSON should succeed on validator_WELL") {
+    validator_WELL.validate(request("PUT","/a/b","application/jSON"),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_WELL") {
+    validator_WELL.validate(request("POST","/a/b","application/xml", goodXML),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_WELL") {
+    validator_WELL.validate(request("POST","/c","application/json"),response,chain)
+  }
+
+  test ("GET on /c should succeed on validator_WELL") {
+    validator_WELL.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("PUT on /a/b should fail on validator_WELL if the media type is not specified") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b"),response,chain), 415)
+  }
+
+  test ("POST on /a/b should fail on validator_WELL if the media type is not specified") {
+    assertResultFailed(validator_WELL.validate(request("POST","/a/b"),response,chain), 415)
+  }
+
+  test ("POST on /c should fail on validator_WELL if the media type is not specified") {
+    assertResultFailed(validator_WELL.validate(request("POST","/c"),response,chain), 415)
+  }
+
+  test ("PUT on /c should fail on validator_WELL with a 405") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/c","application/json"),response,chain), 405)
+  }
+
+  test ("GET on /a/b should fail on validator_WELL with a 405") {
+    assertResultFailed(validator_WELL.validate(request("GET","/a/b"),response,chain), 405)
+  }
+
+  test ("POST on /a/b should fail on validator_WELL if the media type is application/json") {
+    assertResultFailed(validator_WELL.validate(request("POST","/a/b","application/json"),response,chain), 415)
+  }
+
+  test ("POST on /c should fail on validator_WELL if the media type is application/xml") {
+    assertResultFailed(validator_WELL.validate(request("POST","/c","application/xml"),response,chain), 415)
+  }
+
+  test ("PUT on /a/b with valid JSON mislabed as XML should fail with 400") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/xml",
+                                                      """
+                                                      {
+                                                        \"flavor\" : {
+                                                          \"id\" : \"52415800-8b69-11e0-9b19-734f1195ff37\",
+                                                          \"name\" : \"256 MB Server\"
+                                                        }
+                                                      }
+                                                      """),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed XML should fail on validator_WELL (unclosed tag)") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/xml",
+                                   """
+                                   <some_xml att='1' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element>
+                                     </an_element>
+                                   </some_xml>
+                                   """
+                                 ),response,chain), 400)
+  }
+
+  test ("POST on /a/b with malformed XML should fail on validator_WELL (unclosed attribute)") {
+    assertResultFailed(validator_WELL.validate(request("POST","/a/b","application/xml",
+                                   """
+                                   <some_xml att='1 xmlns='test.org'>
+                                     <an_element>
+                                         <another_element/>
+                                     </an_element>
+                                   </some_xml>
+                                   """
+                                 ),response,chain), 400)
+  }
+
+  test ("POST on /a/b with malformed XML should fail on validator_WELL (bad tag)") {
+    assertResultFailed(validator_WELL.validate(request("POST","/a/b","application/xml",
+                                   """
+                                   <some_xml att='1' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element/>
+                                         <another
+                                     </an_element>
+                                   </some_xml>
+                                   """
+                                 ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed XML should fail on validator_WELL (bad namespace)") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/xml",
+                                   """
+                                   <some_xml att='1' xmlns='test.org' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element/>
+                                     </an_element>
+                                   </some_xml>
+                                   """
+                                 ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with an empty requst should fail on validator_WELL ") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/xml",""),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with an empty requst should fail on validator_WELL (spaces)") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/xml","    "),response,chain), 400)
+  }
+
   //
   // validator_AM allows:
   //
