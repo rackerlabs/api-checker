@@ -74,6 +74,13 @@ object TestConfig {
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
 
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean) : Config = {
+    val config = apply(saxoneeValidation, wellFormed)
+    config.removeDups = removeDups
+
+    config
+  }
+
   def apply (saxoneeValidation : Boolean, wellFormed : Boolean) : Config = {
     val config = new Config
     config.resultHandler = assertHandler

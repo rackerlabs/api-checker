@@ -5,6 +5,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers._
 
+import com.rackspace.com.papi.components.checker.TestConfig
 
 @RunWith(classOf[JUnitRunner])
 class WADLCheckerSpec extends BaseCheckerSpec {
@@ -2444,4 +2445,115 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert(checker, "//chk:step[@type='METHOD' and @label='action4']")
       assert(checker, "//chk:step[@type='METHOD' and @label='ε']")
     }
+
+  //
+  //  The following assertions are used to test WellFormXML and
+  //  ContentError nodes.  They are used in the next couple of tests.
+  //
+  def wellFormedAssertions(checker : NodeSeq) : Unit = {
+    and("The machine should contain paths to WellXML and WELLJSON types")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/json"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), WellJSON)
+    and("There should be content failed states")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/json"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), ContentFail)
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting various media types where well formness is checked") {
+    given ("a WADL that contains multiple PUT and POST operation with various media types")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02">
+        <grammars/>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    when("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(false, false, true))
+    reqTypeAssertions(checker)
+    wellFormedAssertions(checker)
+    and("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 4")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting various media types where well formness is checked, with dupson") {
+    given ("a WADL that contains multiple PUT and POST operation with various media types")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02">
+        <grammars/>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    when("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(true, false, true))
+    reqTypeAssertions(checker)
+    wellFormedAssertions(checker)
+    and("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
 }

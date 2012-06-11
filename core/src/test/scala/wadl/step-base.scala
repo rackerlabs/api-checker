@@ -18,6 +18,9 @@ class BaseStepSpec extends BaseWADLSpec {
   def withAccept(a : Array[Step]) : Array[Step]  = a.filter (f => f.isInstanceOf[Accept])
   def withURLFail(a : Array[Step]) : Array[Step] = a.filter (f => f.isInstanceOf[URLFail])
   def withMethodFail(a : Array[Step]) : Array[Step] = a.filter (f => f.isInstanceOf[MethodFail])
+  def withContentFail (a : Array[Step]) : Array[Step] = a.filter(f => f.isInstanceOf[ContentFail])
+  def withWellXML(a : Array[Step]) : Array[Step] = a.filter (f => f.isInstanceOf[WellFormedXML])
+  def withWellJSON(a : Array[Step]) : Array[Step] = a.filter (f => f.isInstanceOf[WellFormedJSON])
   def withURLFailMatch(a : Array[Step], mat : String) : Array[Step] =
     a.filter (f => f.isInstanceOf[URLFailMatch]).filter(f => f.asInstanceOf[URLFailMatch].uri.toString == mat)
   def withMethodFailMatch(a : Array[Step], mat : String) : Array[Step] =
@@ -38,6 +41,9 @@ class BaseStepSpec extends BaseWADLSpec {
   def Accept  : (Array[Step]) => Array[Step] = withAccept
   def URLFail : (Array[Step]) => Array[Step] = withURLFail
   def MethodFail : (Array[Step]) => Array[Step] = withMethodFail
+  def ContentFail : (Array[Step]) => Array[Step] = withContentFail
+  def WellFormedXML : (Array[Step]) => Array[Step] = withWellXML
+  def WellFormedJSON : (Array[Step]) => Array[Step] = withWellJSON
   def URLFailMatch(m : String) : (Array[Step]) => Array[Step] = withURLFailMatch(_, m)
   def MethodFailMatch(m : String) : (Array[Step]) => Array[Step] = withMethodFailMatch(_, m)
   def URI(m : String) : (Array[Step]) => Array[Step] = withURI(_, m)

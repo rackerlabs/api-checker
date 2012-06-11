@@ -132,7 +132,7 @@
    3. [X] Simple config and handler -- simple WADL
    4. [X] Save DOT
 ** DONE Propigate XSD type errors correctly
-** TODO Add stage to check well formed XML/JSON [9/12]
+** TODO Add stage to check well formed XML/JSON [9/14]
    1. [X] Add support for WELL_XML, WELL_JSON, CONTET_FAIL in XSD
    2. [X] Add support in XSLs
    3. [X] Setup configuration to check for well formness
@@ -146,17 +146,21 @@
    7. [X] Create CONTENT_FAIL state
    8. [X] JSON (Setup Skeleton Only)
    9. [X] Connect states with handler
-   10. [-] Tests [2/4]
+   10. [-] Tests [4/5]
            1. [X] States
            2. [X] Validator
-           3. [ ] Translation
-           4. [ ] WADL Validation
-   11. [ ] Complete JSON
-   12. [ ] Add JSON Tests
+           3. [X] Checker Tests
+           4. [X] Step Builder Tests
+           5. [ ] WADL Validation
+   11. [ ] Update sample filter / webapp
+   12. [ ] Complete JSON
+   13. [ ] Add JSON Tests
            1. [ ] States
            2. [ ] Validator
-           3. [ ] Translation
-           4. [ ] WADL Validation
+           3. [ ] Checker Tests
+           4. [ ] Step Builder Tests
+           5. [ ] WADL Validation
+   14. [ ] Update sample filter / webapp
 ** TODO Modify filter to handle different groups
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
 ** TODO WADL Change Detector...
