@@ -20,6 +20,14 @@ import com.rackspace.cloud.api.wadl.RType._
 import com.rackspace.cloud.api.wadl.XSDVersion._
 import com.rackspace.cloud.api.wadl.Converters._
 
+import com.rackspace.com.papi.components.checker.Config
+
+object BuilderXSLParams {
+  val ENABLE_WELL_FORM = "enableWellFormCheck"
+}
+
+import BuilderXSLParams._
+
 /**
  * An exception when transating the WADL into a checker.
  */
@@ -45,14 +53,22 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/removeDups.xsl")))
 
-  def build (in : Source, out: Result, removeDups : Boolean, validateChecker : Boolean) : Unit = {
+  def build (in : Source, out: Result, config : Config) : Unit = {
+    var c = config
+
+    if (c == null) {
+      c = new Config
+    }
+
     try {
       val transformer = wadl.newTransformer(TREE, XSD11, false, KEEP)
       val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
 
+      buildHandler.getTransformer().setParameter (ENABLE_WELL_FORM, c.checkWellFormed)
+
       var output = out;
 
-      if (validateChecker) {
+      if (c.validateChecker) {
         val outHandler = wadl.saxTransformerFactory.newTransformerHandler();
         outHandler.setResult(output)
 
@@ -62,7 +78,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
         output = new SAXResult(schemaHandler)
       }
 
-      if (removeDups) {
+      if (c.removeDups) {
         val dupsHandler = wadl.saxTransformerFactory.newTransformerHandler(dupsTemplates)
         buildHandler.setResult (new SAXResult (dupsHandler))
         dupsHandler.setResult(output)
@@ -75,35 +91,35 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
     }
   }
 
-  def build(in : (String, InputStream), out: Result, removeDups : Boolean, validateChecker : Boolean) : Unit = {
+  def build(in : (String, InputStream), out: Result, config : Config) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
     val inputSource = new InputSource(in._2)
     inputSource.setSystemId(in._1)
-    build(new SAXSource(xmlReader, inputSource), out, removeDups, validateChecker)
+    build(new SAXSource(xmlReader, inputSource), out, config)
   }
 
-  def build(in : InputStream, out: Result, removeDups : Boolean, validateChecker : Boolean) : Unit = {
-    build (("test://app/mywadl.wadl",in), out, removeDups, validateChecker)
+  def build(in : InputStream, out: Result, config : Config) : Unit = {
+    build (("test://app/mywadl.wadl",in), out, config)
   }
 
-  def build(in : Reader, out: Result, removeDups : Boolean, validateChecker : Boolean) : Unit = {
+  def build(in : Reader, out: Result, config : Config) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out, removeDups, validateChecker)
+    build(new SAXSource(xmlReader, new InputSource(in)), out, config)
   }
 
-  def build(in : String, out: Result, removeDups : Boolean, validateChecker : Boolean) : Unit = {
+  def build(in : String, out: Result, config : Config) : Unit = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out, removeDups, validateChecker)
+    build(new SAXSource(xmlReader, new InputSource(in)), out, config)
   }
 
-  def build (in : (String, NodeSeq), removeDups : Boolean, validateChecker : Boolean) : NodeSeq = {
+  def build (in : (String, NodeSeq), config : Config) : NodeSeq = {
     val bytesOut = new ByteArrayOutputStream()
-    build (in, new StreamResult(bytesOut), removeDups, validateChecker)
+    build (in, new StreamResult(bytesOut), config)
     XML.loadString (bytesOut.toString())
   }
 
-  def build (in: NodeSeq, removeDups : Boolean = false, validateChecker : Boolean = true) : NodeSeq = {
-    build (("test://app/mywadl.wadl",in), removeDups, validateChecker)
+  def build (in: NodeSeq, config : Config = null) : NodeSeq = {
+    build (("test://app/mywadl.wadl",in), config)
   }
 }
 

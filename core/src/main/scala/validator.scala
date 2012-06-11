@@ -38,7 +38,7 @@ object Validator {
   }
 
   def apply (in : Source, config : Config = new Config) : Validator = {
-    val builder = new StepBuilder(config)
+    val builder = new StepBuilder()
     val transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
 
     if (!transformerFactory.getFeature(SAXTransformerFactory.FEATURE)) {
@@ -48,7 +48,7 @@ object Validator {
     val transHandler = transformerFactory.asInstanceOf[SAXTransformerFactory].newTransformerHandler()
     val domResult = new DOMResult
     transHandler.setResult(domResult)
-    val step = builder.build(in, new SAXResult(transHandler), config.removeDups)
+    val step = builder.build(in, new SAXResult(transHandler), config)
 
     config.resultHandler.init(Some(domResult.getNode.asInstanceOf[Document]))
     new Validator(step, config)

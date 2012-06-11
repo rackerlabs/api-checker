@@ -8,11 +8,16 @@ import org.clapper.argot.ArgotUsageException
 import javax.xml.transform._
 import javax.xml.transform.stream._
 
+import com.rackspace.com.papi.components.checker.Config
+
 object Wadl2Checker {
   val parser = new ArgotParser("wadl2checker", preUsage=Some("wadl2checker: Version 1.0.0-SNAPSHOT"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
+
+  val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
+                                         "Add checks to ensure that XML and JSON are well formed. Default: false")
 
   val validate = parser.flag[Boolean] (List("v", "validate"),
                                        "Validate produced checker Default: false")
@@ -60,9 +65,13 @@ object Wadl2Checker {
     try {
       handleArgs (args)
 
-      new WADLCheckerBuilder().build (getSource, getResult,
-                                      removeDups.value.getOrElse(false),
-                                      validate.value.getOrElse(false))
+      val c = new Config
+
+      c.removeDups = removeDups.value.getOrElse(false)
+      c.validateChecker = validate.value.getOrElse(false)
+      c.checkWellFormed = wellFormed.value.getOrElse(false)
+
+      new WADLCheckerBuilder().build (getSource, getResult, c)
     } catch {
       case e: ArgotUsageException => println(e.message)
     }

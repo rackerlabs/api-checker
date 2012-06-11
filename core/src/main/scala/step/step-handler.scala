@@ -115,10 +115,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "URL_FAIL"    => addURLFail(atts)
           case "METHOD_FAIL" => addMethodFail(atts)
           case "REQ_TYPE_FAIL" => addReqTypeFail(atts)
+          case "CONTENT_FAIL" => addContentFail(atts)
           case "URL"         => addURL(atts)
           case "METHOD"      => addMethod(atts)
           case "URLXSD"      => addURLXSD(atts)
           case "REQ_TYPE"    => addReqType(atts)
+          case "WELL_XML"    => addWellXML(atts)
+          case "WELL_JSON"   => addWellJSON(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -265,6 +268,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     steps += (id -> new ReqTypeFail(id, label, notMatch.r))
   }
 
+  private[this] def addContentFail(atts : Attributes) : Unit = {
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+
+    steps += (id -> new ContentFail(id, label))
+  }
+
   private[this] def addMethodFail(atts : Attributes) : Unit = {
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
@@ -285,6 +295,24 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new ReqType(id, label, _match.r, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addWellXML(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+
+    next += (id -> nexts)
+    steps += (id -> new WellFormedXML (id, label, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addWellJSON(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+
+    next += (id -> nexts)
+    steps += (id -> new WellFormedJSON (id, label, new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {

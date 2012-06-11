@@ -1,5 +1,7 @@
 package com.rackspace.com.papi.components.checker.step
 
+import scala.xml._
+
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -40,6 +42,14 @@ class BaseStepSuite extends BaseValidatorSuite {
 
   override def request(method : String, url : String, contentType : String) : CheckerServletRequest = {
     new CheckerServletRequest (super.request(method, url, contentType))
+  }
+
+  override def request(method : String, url : String, contentType : String, content : String) : CheckerServletRequest = {
+    new CheckerServletRequest (super.request(method, url, contentType, content))
+  }
+
+  override def request(method : String, url : String, contentType : String, content : NodeSeq) : CheckerServletRequest = {
+    new CheckerServletRequest (super.request(method, url, contentType, content))
   }
 
   override def response  : CheckerServletResponse = {
