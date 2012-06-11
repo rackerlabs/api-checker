@@ -16,9 +16,12 @@ class WellFormedXML(id : String, label : String, next : Array[Step]) extends Con
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
     var ret = -1
     var parser : DocumentBuilder = null
+    val capture = new ErrorCapture
+
     try {
       if (req.parsedXML == null) {
         parser = borrowParser
+        parser.setErrorHandler(capture)
         req.parsedXML = parser.parse(req.getInputStream)
       }
       ret = uriLevel
