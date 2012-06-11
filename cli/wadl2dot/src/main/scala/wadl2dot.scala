@@ -8,11 +8,16 @@ import org.clapper.argot.ArgotUsageException
 import javax.xml.transform._
 import javax.xml.transform.stream._
 
+import com.rackspace.com.papi.components.checker.Config
+
 object Wadl2Dot {
   val parser = new ArgotParser("wadl2dot", preUsage=Some("wadl2dot: Version 1.0.0-SNAPSHOT"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
+
+  val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
+                                         "Add checks to ensure that XML and JSON are well formed. Default: false")
 
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
                                           "Show error nodes. Default: false")
@@ -63,8 +68,14 @@ object Wadl2Dot {
     try {
       handleArgs (args)
 
+      val c = new Config
+
+      c.removeDups = removeDups.value.getOrElse(false)
+      c.checkWellFormed = wellFormed.value.getOrElse(false)
+      c.validateChecker = true
+
       new WADLDotBuilder().build (getSource, getResult,
-                                  removeDups.value.getOrElse(false),
+                                  c,
                                   !showErrors.value.getOrElse(false),
                                   nfaMode.value.getOrElse(false))
     } catch {

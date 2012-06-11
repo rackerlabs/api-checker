@@ -9,6 +9,7 @@ import org.scalatest.matchers.ShouldMatchers._
 import javax.xml.namespace.QName
 
 import com.rackspace.com.papi.components.checker.step._
+import com.rackspace.com.papi.components.checker.TestConfig
 
 @RunWith(classOf[JUnitRunner])
 class WADLStepSpec extends BaseStepSpec {
@@ -61,6 +62,40 @@ class WADLStepSpec extends BaseStepSpec {
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqTypeFail("(?i)application/xml"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET|POST"))
+      assert(step, Start, URI("path"), MethodFail)
+    }
+
+    scenario("The WADL contains a single multi-path resource, XML well formness check is on") {
+      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+                   <method name="POST">
+                      <request>
+                          <representation mediaType="application/xml"/>
+                      </request>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val step = builder.build (inWADL, TestConfig(false, true)).asInstanceOf[Start]
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), withWellXML, Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), withContentFail)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqTypeFail("(?i)application/xml"))
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
       assert(step, Start, URI("path"), URLFailMatch("to"))

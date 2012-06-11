@@ -60,7 +60,7 @@ class WADLDotSpec extends BaseDotSpec {
            </resources>
         </application>
         when("the wadl is translated with nfa mode and sinks")
-        val dot = builder.build (inWADL, false, false, true)
+        val dot = builder.build (inWADL, config, false, true)
         println(dot)
         then ("It shouldn't blow up")
       }
@@ -82,7 +82,7 @@ class WADLDotSpec extends BaseDotSpec {
            </resources>
         </application>
         when("the wadl is translated with nfa mode and sinks")
-        val dot = builder.build (inWADL, false, true, true)
+        val dot = builder.build (inWADL, config, true, true)
         println(dot)
         then ("It shouldn't blow up")
       }
@@ -104,7 +104,7 @@ class WADLDotSpec extends BaseDotSpec {
            </resources>
         </application>
         when("the wadl is translated with nfa mode and sinks")
-        val dot = builder.build (inWADL, false, false, false)
+        val dot = builder.build (inWADL, config, false, false)
         println(dot)
         then ("It shouldn't blow up")
       }
@@ -126,7 +126,7 @@ class WADLDotSpec extends BaseDotSpec {
            </resources>
         </application>
         when("the wadl is translated with nfa mode and sinks")
-        val dot = builder.build (inWADL, false, true, false)
+        val dot = builder.build (inWADL, config, true, false)
         println(dot)
         then ("It shouldn't blow up")
     }

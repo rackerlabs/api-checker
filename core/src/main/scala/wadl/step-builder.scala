@@ -18,7 +18,7 @@ import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.step.Step
 import com.rackspace.com.papi.components.checker.step.StepHandler
 
-class StepBuilder(protected[wadl] var wadl : WADLNormalizer, private var config : Config) {
+class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   private val checkerBuilder = new WADLCheckerBuilder(wadl)
 
@@ -26,17 +26,18 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer, private var config 
     wadl = checkerBuilder.wadl
   }
 
-  if (config == null) {
-    config = new Config
-  }
+  def this() = this(null)
 
-  def this() = this(null, null)
+  def build (in : Source, out : SAXResult, config : Config) : Step = {
+    //
+    //  We use the default config if the config is null.
+    //
+    var c = config
 
-  def this(config : Config) = this(null, config)
+    if (c == null) {
+      c = new Config
+    }
 
-  def this(wadl : WADLNormalizer) = this (wadl, null)
-
-  def build (in : Source, out : SAXResult, removeDups : Boolean) : Step = {
     val nextHandler = {
       if (out != null) {
         out.getHandler
@@ -44,41 +45,41 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer, private var config 
         null
       }
     }
-    val handler = new StepHandler(nextHandler, config)
-    checkerBuilder.build(in, new SAXResult(handler), removeDups, true)
+    val handler = new StepHandler(nextHandler, c)
+    checkerBuilder.build(in, new SAXResult(handler), c)
     handler.step
   }
 
-  def build (in : Source, removeDups : Boolean) : Step = {
-    build(in, null, removeDups)
+  def build (in : Source, config : Config) : Step = {
+    build(in, null, config)
   }
 
-  def build (in : (String, InputStream), out : SAXResult, removeDups : Boolean) : Step = {
+  def build (in : (String, InputStream), out : SAXResult, config : Config) : Step = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
     val inputSource = new InputSource(in._2)
     inputSource.setSystemId(in._1)
-    build (new SAXSource(xmlReader, inputSource), out, removeDups)
+    build (new SAXSource(xmlReader, inputSource), out, config)
   }
 
-  def build(in : InputStream, removeDups : Boolean) : Step = {
-    build(("test://mywadl.wadl", in), null, removeDups)
+  def build(in : InputStream, config : Config) : Step = {
+    build(("test://mywadl.wadl", in), null, config)
   }
 
-  def build (in : Reader, removeDups : Boolean) : Step = {
+  def build (in : Reader, config : Config) : Step = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), removeDups)
+    build(new SAXSource(xmlReader, new InputSource(in)), config)
   }
 
-  def build (in : String, removeDups : Boolean) : Step = {
+  def build (in : String, config : Config) : Step = {
     val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), removeDups)
+    build(new SAXSource(xmlReader, new InputSource(in)), config)
   }
 
-  def build (in : (String, NodeSeq), removeDups : Boolean) : Step = {
-    build (in, null, removeDups)
+  def build (in : (String, NodeSeq), config : Config) : Step = {
+    build (in, null, config)
   }
 
-  def build (in : NodeSeq, removeDups : Boolean = false) : Step = {
-    build (("test://mywadl.wadl",in), removeDups)
+  def build (in : NodeSeq, config : Config = null) : Step = {
+    build (("test://mywadl.wadl",in), config)
   }
 }

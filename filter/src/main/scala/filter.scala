@@ -40,6 +40,7 @@ class ValidatorFilter extends Filter {
     val conf = new Config
     conf.resultHandler = resultHandler
     conf.useSaxonEEValidation = false
+    conf.checkWellFormed = true
 
     validator = Validator(new SAXSource(new InputSource(wadlRef)), conf)
   }

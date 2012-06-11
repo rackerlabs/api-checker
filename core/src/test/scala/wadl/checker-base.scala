@@ -13,8 +13,16 @@ import org.scalatest.TestFailedException
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
 
+import com.rackspace.com.papi.components.checker.Config
+
 class BaseCheckerSpec extends BaseWADLSpec {
   val builder = new WADLCheckerBuilder(wadl)
+
+  val stdConfig = new Config
+  val dupConfig = new Config
+
+  stdConfig.removeDups = false
+  dupConfig.removeDups = true
 
   private val pathNodesTemplates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/path-nodes.xsl")))
 
@@ -70,6 +78,9 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def URLFail : (NodeSeq) => NodeSeq = stepsWithType(_, "URL_FAIL")
   def MethodFail : (NodeSeq) => NodeSeq = stepsWithType(_, "METHOD_FAIL")
   def ReqTypeFail : (NodeSeq) => NodeSeq = stepsWithType(_, "REQ_TYPE_FAIL")
+  def WellXML : (NodeSeq) => NodeSeq = stepsWithType(_, "WELL_XML")
+  def WellJSON : (NodeSeq) => NodeSeq = stepsWithType(_, "WELL_JSON")
+  def ContentFail : (NodeSeq) => NodeSeq = stepsWithType(_, "CONTENT_FAIL")
   def URL(url : String) : (NodeSeq) => NodeSeq = stepsWithURLMatch(_, url)
   def URLXSD(url : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatch(_, url)
   def Label(label : String) : (NodeSeq) => NodeSeq = stepsWithLabel(_, label)

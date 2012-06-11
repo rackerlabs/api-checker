@@ -542,4 +542,131 @@ class ValidatorSuite extends BaseValidatorSuite {
     assertResultFailed(validator_AM.validate(request("GET","/z/c"),response,chain), 404)
   }
 
+
+  //
+  //  validator_XML allows:
+  //
+  //  GET /a/b
+  //  PUT /a/b (accepting valid application/xml)
+  //
+  val validator_XML = Validator({
+    val accept = new Accept("A0", "Accept")
+    val urlFail = new URLFail("UF", "URLFail")
+    val methodFail = new MethodFail ("MF", "MethodFail")
+    val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
+    val urlFailB = new URLFailMatch("UFA", "URLFail","b".r)
+    val get = new Method("GET", "GET", "GET".r, Array (accept))
+    val methodFailGetPut = new MethodFailMatch ("MFG", "MethodFail", "GET|PUT".r)
+    val reqTFail = new ReqTypeFail("RTF", "RTFail", "(?i)application/xml".r)
+    val contentFail = new ContentFail ("CF", "CONTENTFAIL")
+    val wellXML = new WellFormedXML ("WXML", "WELLXML", Array(accept))
+    val putIn = new ReqType("ReqType", "XML", "(?i)application/xml".r, Array(wellXML, contentFail))
+    val put = new Method("PUT", "PUT", "PUT".r, Array (putIn, reqTFail))
+    val b = new URI("b","b", "b".r, Array(put, get, urlFail, methodFailGetPut))
+    val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
+    start
+  }, TestConfig(false, true))
+
+  test ("GET on /a/b should succeed on validator_XML") {
+    validator_XML.validate(request("GET","/a/b"),response,chain)
+  }
+
+  test ("PUT on /a/b with valid XML should succeed on validator_XML") {
+    validator_XML.validate(request("PUT","/a/b","application/xml",
+                                   <some_xml att='1' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element />
+                                     </an_element>
+                                   </some_xml>
+                                 ),response,chain)
+  }
+
+  test ("GET on /a/c should fail on validator_XML") {
+    assertResultFailed(validator_XML.validate(request("GET","/a/c"),response,chain), 404)
+  }
+
+  test ("a POST on /a/b should fail on validator_XML") {
+    assertResultFailed(validator_XML.validate(request("POST","/a/b", "application/xml",
+                                                      <some_xml att='1' xmlns='test.org'>
+                                                        <an_element>
+                                                         <another_element />
+                                                        </an_element>
+                                                      </some_xml>
+                                                    ),response,chain), 405)
+  }
+
+  test ("PUT on /a/b with valid JSON should fail with 415") {
+    assertResultFailed(validator_XML.validate(request("PUT","/a/b","application/json",
+                                                      """
+                                                      {
+                                                        \"flavor\" : {
+                                                          \"id\" : \"52415800-8b69-11e0-9b19-734f1195ff37\",
+                                                          \"name\" : \"256 MB Server\"
+                                                        }
+                                                      }
+                                                      """),response,chain), 415)
+  }
+
+  test ("PUT on /a/b with valid JSON mislabed as XML should fail with 400") {
+    assertResultFailed(validator_XML.validate(request("PUT","/a/b","application/xml",
+                                                      """
+                                                      {
+                                                        \"flavor\" : {
+                                                          \"id\" : \"52415800-8b69-11e0-9b19-734f1195ff37\",
+                                                          \"name\" : \"256 MB Server\"
+                                                        }
+                                                      }
+                                                      """),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed XML should fail on validator_XML (unclosed tag)") {
+    assertResultFailed(validator_XML.validate(request("PUT","/a/b","application/xml",
+                                   """
+                                   <some_xml att='1' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element>
+                                     </an_element>
+                                   </some_xml>
+                                   """
+                                 ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed XML should fail on validator_XML (unclosed attribute)") {
+    assertResultFailed(validator_XML.validate(request("PUT","/a/b","application/xml",
+                                   """
+                                   <some_xml att='1 xmlns='test.org'>
+                                     <an_element>
+                                         <another_element/>
+                                     </an_element>
+                                   </some_xml>
+                                   """
+                                 ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed XML should fail on validator_XML (bad tag)") {
+    assertResultFailed(validator_XML.validate(request("PUT","/a/b","application/xml",
+                                   """
+                                   <some_xml att='1' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element/>
+                                         <another
+                                     </an_element>
+                                   </some_xml>
+                                   """
+                                 ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed XML should fail on validator_XML (bad namespace)") {
+    assertResultFailed(validator_XML.validate(request("PUT","/a/b","application/xml",
+                                   """
+                                   <some_xml att='1' xmlns='test.org' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element/>
+                                     </an_element>
+                                   </some_xml>
+                                   """
+                                 ),response,chain), 400)
+  }
+
 }
