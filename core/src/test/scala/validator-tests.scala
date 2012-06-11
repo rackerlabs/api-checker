@@ -566,7 +566,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
     val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
-  }, config(false, true))
+  }, TestConfig(false, true))
 
   test ("GET on /a/b should succeed on validator_XML") {
     validator_XML.validate(request("GET","/a/b"),response,chain)

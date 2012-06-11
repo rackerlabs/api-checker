@@ -69,20 +69,12 @@ class ResultFailedException(val msg : String, val req : CheckerServletRequest,
                             val resp : CheckerServletResponse, val chain : FilterChain, val result : Result)
    extends Exception(msg){}
 
-class BaseValidatorSuite extends FunSuite {
-
+object TestConfig {
   val assertHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(), 
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
 
-  val assertConfig = new Config
-  assertConfig.resultHandler = assertHandler
-
-  val assertConfigSaxonEE = new Config
-  assertConfigSaxonEE.resultHandler = assertHandler
-  assertConfigSaxonEE.useSaxonEEValidation  = true
-
-  def config (saxoneeValidation : Boolean, wellFormed : Boolean) : Config = {
+  def apply (saxoneeValidation : Boolean, wellFormed : Boolean) : Config = {
     val config = new Config
     config.resultHandler = assertHandler
     config.useSaxonEEValidation = saxoneeValidation
@@ -90,6 +82,16 @@ class BaseValidatorSuite extends FunSuite {
 
     config
   }
+
+  def apply() : Config = {
+    apply(false, false)
+  }
+}
+
+class BaseValidatorSuite extends FunSuite {
+
+  val assertConfig = TestConfig()
+  val assertConfigSaxonEE = TestConfig(true, false)
 
   def request(method : String, url : String) : HttpServletRequest = {
     val req = mock(classOf[HttpServletRequest])
