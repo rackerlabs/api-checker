@@ -146,8 +146,8 @@
    7. [X] Create CONTENT_FAIL state
    8. [X] JSON (Setup Skeleton Only)
    9. [X] Connect states with handler
-   10. [ ] Tests [0/4]
-           1. [ ] States
+   10. [-] Tests [1/4]
+           1. [X] States
            2. [ ] Validator
            3. [ ] Translation
            4. [ ] WADL Validation

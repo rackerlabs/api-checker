@@ -5,6 +5,11 @@ import javax.xml.namespace.QName
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+import org.w3c.dom.Document
+import org.xml.sax.SAXParseException
+
+import com.rackspace.com.papi.components.checker.util.XMLParserPool
+
 @RunWith(classOf[JUnitRunner])
 class StepSuite extends BaseStepSuite {
 
@@ -394,4 +399,94 @@ class StepSuite extends BaseStepSuite {
     assert (rt2.checkStep (request("GET", "/a/b/c","text/html"), response,chain, 2) == 2)
   }
 
+  test("In a WellFormedXML step, if the content contains well formed XML, the uriLevel should stay the same") {
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step]())
+    assert (wfx.checkStep (request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>), response, chain, 0) == 0)
+    assert (wfx.checkStep (request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"><more/></validXML>), response, chain, 1) == 1)
+  }
+
+  test("In a WellFormedXML step, the parsed DOM should be stored in the request") {
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
+    wfx.checkStep (req1, response, chain, 0)
+    assert (req1.parsedXML != null)
+    assert (req1.parsedXML.isInstanceOf[Document])
+
+    val req2 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"><more/></validXML>)
+    assert (wfx.checkStep (req2, response, chain, 1) == 1)
+    assert (req2.parsedXML != null)
+    assert (req2.parsedXML.isInstanceOf[Document])
+  }
+
+  test("In a WellFormedXML step, if the content is not well formed XML, the uriLevel should be -1") {
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step]())
+    assert (wfx.checkStep (request("PUT", "/a/b", "application/xml", """<validXML xmlns='http://valid'>"""), response, chain, 0) == -1)
+    assert (wfx.checkStep (request("PUT", "/a/b", "application/xml", """{ \"bla\" : 55 }"""), response, chain, 1) == -1)
+  }
+
+  test("In a WellFormedXML step, if the content is not well formed XML, the request should contian a SAXException") {
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml", """<validXML xmlns='http://valid'>""")
+
+    wfx.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+
+    val req2 = request("PUT", "/a/b", "application/xml", """{ \"bla\" : 55 }""")
+
+    wfx.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+  }
+
+  test("In a WellFormedXML step, XML in the same request should not be parsed twice") {
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
+    wfx.checkStep (req1, response, chain, 0)
+    assert (req1.parsedXML != null)
+    assert (req1.parsedXML.isInstanceOf[Document])
+
+    val doc = req1.parsedXML
+    wfx.checkStep (req1, response, chain, 0)
+    //
+    //  Assert that the same document is being returned.
+    //
+    assert (doc == req1.parsedXML)
+  }
+
+  test("In a WellFormedXML step, on two completely different requests the XML sholud be parsed each time"){
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
+    val req2 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
+
+    wfx.checkStep (req1, response, chain, 0)
+    assert (req1.parsedXML != null)
+    assert (req1.parsedXML.isInstanceOf[Document])
+    wfx.checkStep (req2, response, chain, 0)
+
+    assert (req1.parsedXML != req2.parsedXML)
+  }
+
+  test ("Since WellFormedXML steps are synchornous, the parser pool should contain only a single idle parser") {
+    assert (XMLParserPool.numActive == 0)
+    assert (XMLParserPool.numIdle == 1)
+  }
+
+  test ("If there is no content error ContentFail should return NONE") {
+    val cf  = new ContentFail ("CF", "CF")
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step](cf))
+    val req1 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
+    wfx.checkStep (req1, response, chain, 0)
+    assert (cf.check(req1, response, chain, 0) == None)
+  }
+
+  test ("If there is an error ContentFail should return BadContentResult") {
+    val cf  = new ContentFail ("CF", "CF")
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step](cf))
+    val req1 = request("PUT", "/a/b", "application/xml", """<validXML xmlns='http://valid'>""")
+    wfx.checkStep (req1, response, chain, 0)
+    val result = cf.check(req1, response, chain, 0)
+    assert (result.isDefined)
+    assert (result.get.isInstanceOf[BadContentResult])
+  }
 }
