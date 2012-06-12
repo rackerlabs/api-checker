@@ -403,7 +403,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     , TestConfig(false, true))
 
   //
-  //  Good XML used in the tests below
+  //  Good XML and JSON used in the tests below
   //
   val goodXML = <some_xml att='1' xmlns='test.org'>
                   <an_element>
@@ -411,12 +411,27 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                   </an_element>
                 </some_xml>
 
+  val goodJSON = """
+       {
+           "stuff" : {
+             "thing" : true,
+             "string" : "A String",
+             "array" : [ 1, 2, 3, 4],
+             "obj" : {
+               "a" : "A",
+               "b" : "B"
+             },
+            "null" : null
+           }
+       }
+  """
+
   test ("PUT on /a/b with application/xml should succeed on validator_WELL") {
     validator_WELL.validate(request("PUT","/a/b","application/xml", goodXML),response,chain)
   }
 
   test ("PUT on /a/b with application/json should succeed on validator_WELL") {
-    validator_WELL.validate(request("PUT","/a/b","application/json"),response,chain)
+    validator_WELL.validate(request("PUT","/a/b","application/json", goodJSON),response,chain)
   }
 
   test ("PUT on /a/b with aPPlicatioN/Xml should succeed on validator_WELL") {
@@ -424,7 +439,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("PUT on /a/b with application/jSON should succeed on validator_WELL") {
-    validator_WELL.validate(request("PUT","/a/b","application/jSON"),response,chain)
+    validator_WELL.validate(request("PUT","/a/b","application/jSON", goodJSON),response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_WELL") {
@@ -432,7 +447,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /c with application/json should succeed on validator_WELL") {
-    validator_WELL.validate(request("POST","/c","application/json"),response,chain)
+    validator_WELL.validate(request("POST","/c","application/json", goodJSON),response,chain)
   }
 
   test ("GET on /c should succeed on validator_WELL") {

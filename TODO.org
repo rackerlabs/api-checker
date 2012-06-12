@@ -153,9 +153,9 @@
            4. [X] Step Builder Tests
            5. [X] WADL Validation
    11. [X] Update sample filter / webapp
-** TODO Add checks for well formed JSON [1/3]
+** TODO Add checks for well formed JSON [2/3]
    1. [X] Add Parser Pool
-   2. [ ] Update JSON stage
+   2. [X] Update JSON stage
    3. [ ] Add JSON Tests
           1. [ ] States
           2. [ ] Validator
