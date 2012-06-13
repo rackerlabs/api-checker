@@ -425,18 +425,20 @@
             </xsl:choose>
             <xsl:call-template name="check:addLabel"/>
         </step>
-        <xsl:choose>
-            <xsl:when test="check:isXML(@mediaType)">
-                <xsl:call-template name="check:addWellForm">
-                    <xsl:with-param name="type" select="'WELL_XML'"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="check:isJSON(@mediaType)">
-                <xsl:call-template name="check:addWellForm">
-                    <xsl:with-param name="type" select="'WELL_JSON'"/>
-                </xsl:call-template>
-            </xsl:when>
-        </xsl:choose>
+        <xsl:if test="$enableWellFormCheck">
+            <xsl:choose>
+                <xsl:when test="check:isXML(@mediaType)">
+                    <xsl:call-template name="check:addWellForm">
+                        <xsl:with-param name="type" select="'WELL_XML'"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="check:isJSON(@mediaType)">
+                    <xsl:call-template name="check:addWellForm">
+                        <xsl:with-param name="type" select="'WELL_JSON'"/>
+                    </xsl:call-template>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:if>
     </xsl:template>
 
     <xsl:function name="check:isXML" as="xsd:boolean">
