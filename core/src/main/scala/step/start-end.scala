@@ -193,7 +193,15 @@ class ContentFail(id : String, label : String) extends Step(id, label) {
     var result : Option[BadContentResult] = None
 
     if (req.contentError != null) {
-      val bcr = new BadContentResult("Bad Content: "+req.contentError.getMessage(), uriLevel, id)
+      val msg = {
+        var m = req.contentError.getMessage()
+        if (m == null) {
+          m = req.contentError.toString()
+        }
+        m
+      }
+
+      val bcr = new BadContentResult("Bad Content: "+msg, uriLevel, id)
       result = Some(bcr)
     }
 
