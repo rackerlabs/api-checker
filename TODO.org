@@ -160,7 +160,7 @@
           1. [X] States
           2. [X] Checker Tests
           3. [X] Step Builder Tests
-          4. [ ] Validator
+          4. [X] Validator
           5. [ ] WADL Validation
 ** TODO Modify filter to handle different groups
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
