@@ -669,4 +669,118 @@ class ValidatorSuite extends BaseValidatorSuite {
                                  ),response,chain), 400)
   }
 
+  //
+  //  validator_JSON allows:
+  //
+  //  GET /a/b
+  //  PUT /a/b (accepting valid application/json)
+  //
+  val validator_JSON = Validator({
+    val accept = new Accept("A0", "Accept")
+    val urlFail = new URLFail("UF", "URLFail")
+    val methodFail = new MethodFail ("MF", "MethodFail")
+    val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
+    val urlFailB = new URLFailMatch("UFA", "URLFail","b".r)
+    val get = new Method("GET", "GET", "GET".r, Array (accept))
+    val methodFailGetPut = new MethodFailMatch ("MFG", "MethodFail", "GET|PUT".r)
+    val reqTFail = new ReqTypeFail("RTF", "RTFail", "(?i)application/json".r)
+    val contentFail = new ContentFail ("CF", "CONTENTFAIL")
+    val wellJSON = new WellFormedJSON ("WJSON", "WELLJSON", Array(accept))
+    val putIn = new ReqType("ReqType", "JSON", "(?i)application/json".r, Array(wellJSON, contentFail))
+    val put = new Method("PUT", "PUT", "PUT".r, Array (putIn, reqTFail))
+    val b = new URI("b","b", "b".r, Array(put, get, urlFail, methodFailGetPut))
+    val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
+    val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
+    start
+  }, TestConfig(false, true))
+
+  val goodJSON = """
+       {
+         "flavor" : {
+            "id" : "52415800-8b69-11e0-9b19-734f1195ff37",
+            "name" : "256 MB Server",
+            "ram" : 256,
+            "disk" : 10,
+            "vcpus" : 1
+         }
+       }
+  """
+
+  test ("GET on /a/b should succeed on validator_JSON") {
+    validator_JSON.validate(request("GET","/a/b"),response,chain)
+  }
+
+  test ("PUT on /a/b with valid JSON should succeed on validator_JSON") {
+    validator_JSON.validate(request("PUT","/a/b","application/json",goodJSON),response,chain)
+  }
+
+  test ("GET on /a/c should fail on validator_JSON") {
+    assertResultFailed(validator_JSON.validate(request("GET","/a/c"),response,chain), 404)
+  }
+
+  test ("POST on /a/b should fail on validator_JSON") {
+    assertResultFailed(validator_JSON.validate(request("POST","/a/b"),response,chain), 405)
+  }
+
+  test ("PUT on /a/b with valid XML should fail on validator_JSON with 415") {
+    assertResultFailed(validator_JSON.validate(request("PUT","/a/b","application/xml",
+                                   <some_xml att='1' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element />
+                                     </an_element>
+                                   </some_xml>
+                                 ),response,chain), 415)
+  }
+
+  test ("PUT on /a/b with valid XML labed as JSON should fail on validator_JSON with 400") {
+    assertResultFailed(validator_JSON.validate(request("PUT","/a/b","application/json",
+                                   <some_xml att='1' xmlns='test.org'>
+                                     <an_element>
+                                         <another_element />
+                                     </an_element>
+                                   </some_xml>
+                                 ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with invalid JSON should fail on validator_JSON with 400 (unclosed brace)") {
+    assertResultFailed(validator_JSON.validate(request("PUT","/a/b","application/json", """
+                                                       {
+                                                         "flavor" : {
+                                                           "id" : "52415800-8b69-11e0-9b19-734f1195ff37",
+                                                           "name" : "256 MB Server",
+                                                           "ram" : 256,
+                                                           "disk" : 10,
+                                                           "vcpus" : 1
+                                                       }
+                                 """),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with invalid JSON should fail on validator_JSON with 400 (missing value)") {
+    assertResultFailed(validator_JSON.validate(request("PUT","/a/b","application/json", """
+                                                       {
+                                                         "flavor" : {
+                                                           "id" : "52415800-8b69-11e0-9b19-734f1195ff37",
+                                                           "name" : "256 MB Server",
+                                                           "ram" : 256,
+                                                           "disk" : 10,
+                                                           "vcpus" :
+                                                         }
+                                                       }
+                                 """),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with invalid JSON should fail on validator_JSON with 400 (bad quote)") {
+    assertResultFailed(validator_JSON.validate(request("PUT","/a/b","application/json", """
+                                                       {
+                                                         'flavor' : {
+                                                           "id" : "52415800-8b69-11e0-9b19-734f1195ff37",
+                                                           "name" : "256 MB Server",
+                                                           "ram" : 256,
+                                                           "disk" : 10,
+                                                           "vcpus" : 1
+                                                         }
+                                                       }
+                                 """),response,chain), 400)
+  }
+
 }

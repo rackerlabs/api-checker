@@ -13,6 +13,7 @@ import org.w3c.dom.Document
 //
 object RequestAttributes {
   val PARSED_XML    = "com.rackspace.com.papi.components.checker.servlet.ParsedXML"
+  val PARSED_JSON   = "com.rackspace.com.papi.components.checker.servlet.ParsedJSON"
   val CONTENT_ERROR = "com.rackspace.com.papi.components.checker.servlet.ContentError"
 }
 
@@ -29,6 +30,9 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   def parsedXML : Document = request.getAttribute(PARSED_XML).asInstanceOf[Document]
   def parsedXML_= (doc : Document):Unit = request.setAttribute (PARSED_XML, doc)
+
+  def parsedJSON : Object = request.getAttribute(PARSED_JSON)
+  def parsedJSON_= (obj : Object):Unit = request.setAttribute (PARSED_JSON, obj)
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
   def contentError_= (e : Exception):Unit = request.setAttribute(CONTENT_ERROR, e)
