@@ -494,6 +494,62 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                                                       """),response,chain), 400)
   }
 
+  test ("PUT on /a/b with valid XML mislabed as JSON should fail with 400") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/json",goodXML),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed JSON should fail with 400 (unclosed tag)") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/json","""
+                                                {
+                                                  "stuff" : {
+                                                    "thing" : true,
+                                                    "string" : "A String",
+                                                    "array" : [ 1, 2, 3, 4],
+                                                    "obj" : {
+                                                      "a" : "A",
+                                                      "b" : "B"
+                                                    },
+                                                   "null" : null
+                                                  }
+                       """),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed JSON should fail with 400 (missing value)") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/json","""
+                                                {
+                                                  "stuff" : {
+                                                    "thing" : true,
+                                                    "string" : "A String",
+                                                    "array" : [ 1, 2, 3, 4],
+                                                    "obj" : {
+                                                      "a" : "A",
+                                                      "b" :
+                                                    },
+                                                   "null" : null
+                                                  }
+                                                }
+                       """),response,chain), 400)
+  }
+
+  test ("PUT on /a/b with malformed JSON should fail with 400 (bad quote)") {
+    assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/json","""
+                                                {
+                                                  "stuff" : {
+                                                    "thing" : true,
+                                                    'string' : "A String",
+                                                    "array" : [ 1, 2, 3, 4],
+                                                    "obj" : {
+                                                      "a" : "A",
+                                                      "b" : "B"
+                                                    },
+                                                   "null" : null
+                                                  }
+                                                }
+                       """),response,chain), 400)
+  }
+
+
+
   test ("PUT on /a/b with malformed XML should fail on validator_WELL (unclosed tag)") {
     assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/xml",
                                    """
