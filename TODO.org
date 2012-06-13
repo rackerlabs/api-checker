@@ -156,8 +156,8 @@
 ** TODO Add checks for well formed JSON [2/3]
    1. [X] Add Parser Pool
    2. [X] Update JSON stage
-   3. [ ] Add JSON Tests
-          1. [ ] States
+   3. [-] Add JSON Tests
+          1. [X] States
           2. [ ] Validator
           3. [ ] Checker Tests
           4. [ ] Step Builder Tests
