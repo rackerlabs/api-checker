@@ -163,8 +163,8 @@
           4. [X] Validator
           5. [X] WADL Validation
 ** DONE Respond to Xerces JIRA
-** TODO Add support for schema XML schema check
-   1. [ ] Add support for XSD_CHECK in XSD
+** TODO Add support for schema XML schema check [1/8]
+   1. [X] Add support for XSD_CHECK in XSD
    2. [ ] Add XSD check in config
    3. [ ] Add support for XSD check in XSLs
    4. [ ] Update CLI tools if nessesary
