@@ -8,7 +8,11 @@ import org.scalatest.junit.JUnitRunner
 import org.w3c.dom.Document
 import org.xml.sax.SAXParseException
 
+import org.json.simple.JSONAware
+import org.json.simple.parser.ParseException
+
 import com.rackspace.com.papi.components.checker.util.XMLParserPool
+import com.rackspace.com.papi.components.checker.util.JSONParserPool
 
 @RunWith(classOf[JUnitRunner])
 class StepSuite extends BaseStepSuite {
@@ -489,4 +493,73 @@ class StepSuite extends BaseStepSuite {
     assert (result.isDefined)
     assert (result.get.isInstanceOf[BadContentResult])
   }
+
+  test("In a WellFormedJSON step, if the content contains well formed JSON, the uriLevel should stay the same") {
+    val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
+    assert (wfj.checkStep (request("PUT", "/a/b", "application/json", """ { "valid" : true } """), response, chain, 0) == 0)
+    assert (wfj.checkStep (request("PUT", "/a/b", "application/json", """ { "valid" : [true, true, true] }"""), response, chain, 1) == 1)
+  }
+
+  test("In a WellFormedJSON step, if the content contains well formed JSON, the request should contain a JSONAware value") {
+    val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
+    wfj.checkStep (req1, response, chain, 0)
+    assert(req1.parsedJSON != null)
+    assert(req1.parsedJSON.isInstanceOf[JSONAware])
+
+    val req2 = request("PUT", "/a/b", "application/json", """ { "valid" : [true, true, true] }""")
+    wfj.checkStep (req2, response, chain, 1)
+    assert(req2.parsedJSON != null)
+    assert(req2.parsedJSON.isInstanceOf[JSONAware])
+  }
+
+  test("In a WellFormedJSON step, if the content contains JSON that is not well-formed, the uriLevel shoud be -1") {
+    val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
+    assert (wfj.checkStep (request("PUT", "/a/b", "application/json", """ { "valid" : ture } """), response, chain, 0) == -1)
+    assert (wfj.checkStep (request("PUT", "/a/b", "application/json", """ <json /> """), response, chain, 1) == -1)
+  }
+
+  test("In a WellFormedJSON step, if the content contains JSON that is not well-formed, then the request should contain a ParseException") {
+    val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : ture } """)
+    wfj.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[ParseException])
+
+    val req2 = request("PUT", "/a/b", "application/json", """ <json /> """)
+    wfj.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[ParseException])
+  }
+
+  test("In a WellFormedJSON step, if the content contains well formed JSON, the same request should not be parsed twice") {
+    val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
+    wfj.checkStep (req1, response, chain, 0)
+    assert(req1.parsedJSON != null)
+    assert(req1.parsedJSON.isInstanceOf[JSONAware])
+
+    val obj = req1.parsedJSON
+    wfj.checkStep (req1, response, chain, 0)
+    assert (obj == req1.parsedJSON)
+  }
+
+  test("In a WellFormedJSON step, on two completly differet requests the JSON should be parsed each time") {
+    val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
+    val req2 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
+
+    wfj.checkStep (req1, response, chain, 0)
+    assert(req1.parsedJSON != null)
+    assert(req1.parsedJSON.isInstanceOf[JSONAware])
+    wfj.checkStep (req2, response, chain, 0)
+
+    assert (req1.parsedJSON == req2.parsedJSON)
+  }
+
+  test ("Since WellFormedJSON steps are synchornous, the parser pool should contain only a single idle parser") {
+    assert (JSONParserPool.numActive == 0)
+    assert (JSONParserPool.numIdle == 1)
+  }
+
 }

@@ -42,7 +42,7 @@ class XMLParserPoolSuite extends FunSuite {
     }
 
     assert (XMLParserPool.numActive >= initActive+NUM_INCREASE)
-    
+
     val fullActive = XMLParserPool.numActive
 
     for (i <- 0 to NUM_INCREASE-1) {
