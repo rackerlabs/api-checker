@@ -158,9 +158,9 @@
    2. [X] Update JSON stage
    3. [-] Add JSON Tests
           1. [X] States
-          2. [ ] Validator
-          3. [ ] Checker Tests
-          4. [ ] Step Builder Tests
+          2. [X] Checker Tests
+          3. [X] Step Builder Tests
+          4. [ ] Validator
           5. [ ] WADL Validation
 ** TODO Modify filter to handle different groups
 ** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
