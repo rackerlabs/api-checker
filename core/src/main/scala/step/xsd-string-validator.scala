@@ -12,6 +12,8 @@ import org.xml.sax.Locator
 
 import org.xml.sax.helpers.AttributesImpl
 
+import com.rackspace.com.papi.components.checker.util.ValidatorHandlerPool._
+
 class XSDStringValidator(val simpleType : QName, val schema : Schema, val elementName : String) extends Locator {
   lazy val attributes : Attributes = {
     val ah = new AttributesImpl()
@@ -22,10 +24,12 @@ class XSDStringValidator(val simpleType : QName, val schema : Schema, val elemen
 
   def validate (in : String) : Option[SAXParseException] = {
     val capture = new ErrorCapture
-    val handler = schema.newValidatorHandler
-    val inArray = in.toCharArray()
+    var handler : ValidatorHandler = null
 
     try {
+      val inArray = in.toCharArray()
+
+      handler = borrowValidatorHandler(schema)
       handler.setErrorHandler(capture)
       handler.setDocumentLocator (this)
       handler.startDocument
@@ -37,8 +41,13 @@ class XSDStringValidator(val simpleType : QName, val schema : Schema, val elemen
       handler.endPrefixMapping(simpleType.getPrefix)
       handler.endPrefixMapping("xsi")
       handler.endDocument
+
     } catch {
-      case e : SAXException => /* Ignore */
+      case e : SAXException => /* Ignore here, the error is reported by capture */
+    } finally {
+      if (handler != null) {
+        returnValidatorHandler(schema, handler)
+      }
     }
 
     return capture.error

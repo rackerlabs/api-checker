@@ -10,6 +10,8 @@ import javax.xml.validation.Schema
 import javax.xml.validation.Validator
 import javax.xml.validation.ValidatorHandler
 
+import com.saxonica.jaxp.SchemaReference
+
 object ValidatorPool {
   private val validatorPools : Map[Schema, SoftReferenceObjectPool[Validator]] = new HashMap[Schema, SoftReferenceObjectPool[Validator]]
   private def pool(schema : Schema) : SoftReferenceObjectPool[Validator] = validatorPools.getOrElseUpdate(schema, new SoftReferenceObjectPool[Validator](new ValidatorFactory(schema)))
@@ -25,10 +27,43 @@ object ValidatorHandlerPool {
   private def pool(schema : Schema) : SoftReferenceObjectPool[ValidatorHandler] =
     validatorHandlerPools.getOrElseUpdate(schema, new SoftReferenceObjectPool[ValidatorHandler](new ValidatorHandlerFactory(schema)))
 
-  def borrowValidatorHandler(schema : Schema) : ValidatorHandler = pool(schema).borrowObject()
-  def returnValidatorHandler(schema : Schema, validatorHandler : ValidatorHandler) : Unit = pool(schema).returnObject(validatorHandler)
-  def numActive(schema : Schema) : Int = pool(schema).getNumActive()
-  def numIdle(schema : Schema) : Int = pool(schema).getNumIdle()
+  //
+  //  Unfortunetly, SAXON schema handlers cannot be pooled.  We detect
+  //  this and always create a new handler in this case.
+  //
+
+  def borrowValidatorHandler(schema : Schema) : ValidatorHandler = {
+    var ret : ValidatorHandler = null
+
+    if (schema.isInstanceOf[SchemaReference]) {
+      ret = schema.newValidatorHandler
+    } else {
+      ret = pool(schema).borrowObject()
+    }
+    ret
+  }
+
+  def returnValidatorHandler(schema : Schema, validatorHandler : ValidatorHandler) : Unit = {
+    if (!schema.isInstanceOf[SchemaReference]) {
+      pool(schema).returnObject(validatorHandler)
+    }
+  }
+
+  def numActive(schema : Schema) : Int = {
+    var ret = 0
+    if (!schema.isInstanceOf[SchemaReference]) {
+      ret = pool(schema).getNumActive()
+    }
+    ret
+  }
+
+  def numIdle(schema : Schema) : Int = {
+    var ret = 0
+    if (!schema.isInstanceOf[SchemaReference]) {
+      ret = pool(schema).getNumIdle()
+    }
+    ret
+  }
 }
 
 private class ValidatorFactory(private val schema : Schema) extends PoolableObjectFactory[Validator] {
