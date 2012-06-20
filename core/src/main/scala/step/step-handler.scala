@@ -122,6 +122,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "REQ_TYPE"    => addReqType(atts)
           case "WELL_XML"    => addWellXML(atts)
           case "WELL_JSON"   => addWellJSON(atts)
+          case "XSD"         => addXSD(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -313,6 +314,14 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new WellFormedJSON (id, label, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addXSD(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+
+    steps += (id -> new XSD(id, label, schema, new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {
