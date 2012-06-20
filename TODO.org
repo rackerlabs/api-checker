@@ -163,14 +163,14 @@
           4. [X] Validator
           5. [X] WADL Validation
 ** DONE Respond to Xerces JIRA
-** TODO Add support for schema XML schema check [6/9]
+** TODO Add support for schema XML schema check [7/9]
    1. [X] Add support for XSD_CHECK in XSD
    2. [X] Add XSD check in config
    3. [X] Add support for XSD check in XSLs
    4. [X] Update CLI tools if nessesary
    5. [X] Create schema parse pool if nessesary
    6. [X] Transition other XSD checks to use pool
-   7. [ ] Create XSD check state
+   7. [X] Create XSD check state
    8. [ ] Add support for check state in the builder
    9. [ ] Tests
       1. [ ] States
