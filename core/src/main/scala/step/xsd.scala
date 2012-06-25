@@ -28,6 +28,15 @@ class XSD(id : String, label : String, schema : Schema, next : Array[Step]) exte
     } finally {
       if (validator != null) returnValidator (schema, validator)
     }
+
+    //
+    //  Xerces, doesn't always propigate the ErrorCapture Fault...
+    //
+    if ((req.contentError == null) && (capture.error != None)) {
+      req.contentError = capture.error.get
+      ret = -1
+    }
+
     ret
   }
 }
