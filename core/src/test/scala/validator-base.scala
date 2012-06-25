@@ -80,6 +80,13 @@ object TestConfig {
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
 
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean, checkXSDGrammar : Boolean) : Config = {
+    val config = apply(removeDups, saxoneeValidation, wellFormed)
+    config.checkXSDGrammar = checkXSDGrammar
+
+    config
+  }
+
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean) : Config = {
     val config = apply(saxoneeValidation, wellFormed)
     config.removeDups = removeDups
