@@ -2563,8 +2563,8 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, XSD)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSD)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
   }
