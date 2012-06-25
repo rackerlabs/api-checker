@@ -52,6 +52,14 @@ class BaseStepSuite extends BaseValidatorSuite {
     new CheckerServletRequest (super.request(method, url, contentType, content))
   }
 
+  override def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean) : CheckerServletRequest = {
+    new CheckerServletRequest (super.request (method, url, contentType, content, parseContent))
+  }
+
+  override def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean) : CheckerServletRequest = {
+    new CheckerServletRequest (super.request (method, url, contentType, content, parseContent))
+  }
+
   override def response  : CheckerServletResponse = {
     new CheckerServletResponse (super.response)
   }
