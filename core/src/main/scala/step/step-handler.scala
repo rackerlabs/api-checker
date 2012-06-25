@@ -321,6 +321,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
 
+    next += (id -> nexts)
     steps += (id -> new XSD(id, label, schema, new Array[Step](nexts.length)))
   }
 
