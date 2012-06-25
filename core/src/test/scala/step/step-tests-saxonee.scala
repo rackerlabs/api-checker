@@ -186,7 +186,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assertMismatchResult (urixsd.check (request("GET", "/84/b"), response,chain, 2))
   }
 
-  ignore ("In an XSD test, if the content contains valid XML, the uriLevel should stay the same") {
+  test ("In an XSD test, if the content contains valid XML, the uriLevel should stay the same") {
     val xsd = new XSD("XSD", "XSD", testSchemaSaxon, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -204,7 +204,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == 1)
   }
 
-  ignore ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1") {
+  test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1") {
     val xsd = new XSD("XSD", "XSD", testSchemaSaxon, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -222,7 +222,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == -1)
   }
 
-  ignore ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException") {
+  test ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException") {
     val xsd = new XSD("XSD", "XSD", testSchemaSaxon, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -238,16 +238,14 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
 
     xsd.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
-    req1.contentError.printStackTrace()
     assert (req1.contentError.isInstanceOf[SAXParseException])
 
     xsd.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
-    req2.contentError.printStackTrace()
     assert (req2.contentError.isInstanceOf[SAXParseException])
   }
 
-  ignore ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1 (XSD 1.1 assert)") {
+  test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1 (XSD 1.1 assert)") {
     val xsd = new XSD("XSD", "XSD", testSchemaSaxon, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -265,7 +263,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == -1)
   }
 
-  ignore ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException (XSD 1.1 assert)") {
+  test ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException (XSD 1.1 assert)") {
     val xsd = new XSD("XSD", "XSD", testSchemaSaxon, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -281,12 +279,10 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
 
     xsd.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
-    req1.contentError.printStackTrace()
     assert (req1.contentError.isInstanceOf[SAXParseException])
 
     xsd.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
-    req2.contentError.printStackTrace()
     assert (req2.contentError.isInstanceOf[SAXParseException])
   }
 }

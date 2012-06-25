@@ -16,10 +16,44 @@ object ValidatorPool {
   private val validatorPools : Map[Schema, SoftReferenceObjectPool[Validator]] = new HashMap[Schema, SoftReferenceObjectPool[Validator]]
   private def pool(schema : Schema) : SoftReferenceObjectPool[Validator] = validatorPools.getOrElseUpdate(schema, new SoftReferenceObjectPool[Validator](new ValidatorFactory(schema)))
 
-  def borrowValidator(schema : Schema) : Validator = pool(schema).borrowObject()
-  def returnValidator(schema : Schema, validator : Validator) : Unit = pool(schema).returnObject(validator)
-  def numActive(schema : Schema) : Int = pool(schema).getNumActive()
-  def numIdle(schema : Schema) : Int = pool(schema).getNumIdle()
+  //
+  //  Unfortunetly, SAXON validators cannot be pooled.  We detect this
+  //  and always create a new handler in this case.
+  //
+
+  def borrowValidator(schema : Schema) : Validator = {
+    var ret : Validator = null
+
+    if (schema.isInstanceOf[SchemaReference]) {
+      ret = schema.newValidator
+    } else {
+      ret = pool(schema).borrowObject()
+    }
+
+    ret
+  }
+
+  def returnValidator(schema : Schema, validator : Validator) : Unit = {
+    if (!schema.isInstanceOf[SchemaReference]) {
+      pool(schema).returnObject(validator)
+    }
+  }
+
+  def numActive(schema : Schema) : Int = {
+    var ret = 0
+    if (!schema.isInstanceOf[SchemaReference]) {
+      ret = pool(schema).getNumActive()
+    }
+    ret
+  }
+
+  def numIdle(schema : Schema) : Int = {
+    var ret = 0
+    if (!schema.isInstanceOf[SchemaReference]) {
+      ret = pool(schema).getNumIdle()
+    }
+    ret
+  }
 }
 
 object ValidatorHandlerPool {
