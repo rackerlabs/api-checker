@@ -62,7 +62,7 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build(in : InputStream, config : Config) : Step = {
-    build(("test://mywadl.wadl", in), null, config)
+    build(("test://app/mywadl.wadl", in), null, config)
   }
 
   def build (in : Reader, config : Config) : Step = {
@@ -80,6 +80,6 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build (in : NodeSeq, config : Config = null) : Step = {
-    build (("test://mywadl.wadl",in), config)
+    build (("test://app/mywadl.wadl",in), config)
   }
 }

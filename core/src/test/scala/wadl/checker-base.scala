@@ -80,6 +80,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def ReqTypeFail : (NodeSeq) => NodeSeq = stepsWithType(_, "REQ_TYPE_FAIL")
   def WellXML : (NodeSeq) => NodeSeq = stepsWithType(_, "WELL_XML")
   def WellJSON : (NodeSeq) => NodeSeq = stepsWithType(_, "WELL_JSON")
+  def XSD : (NodeSeq) => NodeSeq = stepsWithType(_, "XSD")
   def ContentFail : (NodeSeq) => NodeSeq = stepsWithType(_, "CONTENT_FAIL")
   def URL(url : String) : (NodeSeq) => NodeSeq = stepsWithURLMatch(_, url)
   def URLXSD(url : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatch(_, url)

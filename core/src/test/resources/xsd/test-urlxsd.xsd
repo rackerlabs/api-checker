@@ -6,6 +6,23 @@
     xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
     targetNamespace="http://www.rackspace.com/repose/wadl/checker/step/test">
 
+    <element name="e" type="tst:SampleElement"/>
+    <element name="a" type="tst:SampleAttribute"/>
+
+    <complexType name="SampleElement">
+        <sequence>
+            <element name="id" type="tst:UUID"/>
+            <element name="stepType" type="tst:StepType" minOccurs="0"/>
+            <element name="even" type="tst:EvenInt100" minOccurs="0"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="SampleAttribute">
+        <attribute name="id" type="tst:UUID" use="required"/>
+        <attribute name="stepType" type="tst:StepType" use="optional"/>
+        <attribute name="even" type="tst:EvenInt100" use="optional"/>
+    </complexType>
+
     <!-- A simple enumeration -->
     <simpleType name="StepType">
         <restriction base="xsd:string">

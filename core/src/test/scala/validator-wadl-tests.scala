@@ -607,6 +607,200 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     assertResultFailed(validator_WELL.validate(request("PUT","/a/b","application/xml","    "),response,chain), 400)
   }
 
+
+  //
+  // validator_XSDContent allows:
+  //
+  //
+  // PUT /a/b with json and xml support
+  // POST /a/b with xml support
+  //
+  // POST /c with json support
+  // GET /c
+  //
+  // The validator checks for wellformness in XML and grammar checks
+  // XSD requests.
+  //
+  // The validator is used in the following tests.
+  //
+  val validator_XSDContent = Validator(
+      <application xmlns="http://wadl.dev.java.net/2009/02">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    , TestConfig(false, false, true, true))
+
+  val goodXML_XSD1 = <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                        <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                        <stepType>URL_FAIL</stepType>
+                        <even>22</even>
+                     </e>
+  val goodXML_XSD2 = <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                        id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"
+                        stepType="ACCEPT"
+                        even="22"/>
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContent with valid XML1") {
+    validator_XSDContent.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContent with valid XML2") {
+    validator_XSDContent.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContent with valid XML1") {
+    validator_XSDContent.validate(request("POST","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContent with valid XML2") {
+    validator_XSDContent.validate(request("POST","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_XSDContent with well formed JSON") {
+    validator_XSDContent.validate(request("PUT","/a/b","application/json", goodJSON),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_XSDContent with well formed JSON") {
+    validator_XSDContent.validate(request("POST","/c","application/json", goodJSON),response,chain)
+  }
+
+  test ("GOT on /c should succeed on validator_XSDContent") {
+    validator_XSDContent.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_XSDContent") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml", goodXML),response,chain), 400)
+  }
+
+  test ("POST on /a/b should fail with well formed XML that does not match schema on validator_XSDContent") {
+    assertResultFailed(validator_XSDContent.validate(request("POST","/a/b", "application/xml", goodXML),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (junk-1)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                             <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                                               <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                                                               <stepType>URL_FAIL</stepType>
+                                                               <even>22</even>
+                                                               <junk/>
+                                                             </e>
+                                                           ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (id-1)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                             <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                                               <id>21f1fcf6-bf38-11e1-878e-133ab65fcecz</id>
+                                                               <stepType>URL_FAIL</stepType>
+                                                               <even>22</even>
+                                                             </e>
+                                                           ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (step-1)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                             <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                                               <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                                                               <stepType>NOT</stepType>
+                                                               <even>22</even>
+                                                             </e>
+                                                           ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (even-o-1)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                             <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                                               <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                                                               <stepType>URL_FAIL</stepType>
+                                                               <even>220</even>
+                                                             </e>
+                                                           ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (even-a-1)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                             <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                                               <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                                                               <stepType>URL_FAIL</stepType>
+                                                               <even>23</even>
+                                                             </e>
+                                                           ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (junk-2)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                               <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                                                 id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"
+                                                                 stepType="ACCEPT"
+                                                                 even="22"
+                                                                 junk="true"/>
+                                                           ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (id-2)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                               <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                                                 id="21f1fcf6-bf38-11e1-878e-133ab65fcecz"
+                                                                 stepType="ACCEPT"
+                                                                 even="22"/>
+                                                           ),response,chain), 400)
+  }
+
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (step-2)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                               <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                                                 id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"
+                                                                 stepType="NOT"
+                                                                 even="22"/>
+                                                           ),response,chain), 400)
+  }
+
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (even-o-2)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                               <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                                                 id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"
+                                                                 stepType="ACCEPT"
+                                                                 even="220"/>
+                                                           ),response,chain), 400)
+  }
+
+
+  test ("PUT on /a/b should fail with well formed XML that does not validate against the schema (even-a-2)") {
+    assertResultFailed(validator_XSDContent.validate(request("PUT","/a/b", "application/xml",
+                                                               <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                                                 id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"
+                                                                 stepType="ACCEPT"
+                                                                 even="23"/>
+                                                           ),response,chain), 400)
+  }
+
+
   //
   // validator_AM allows:
   //
