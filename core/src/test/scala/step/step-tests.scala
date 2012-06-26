@@ -471,7 +471,7 @@ class StepSuite extends BaseStepSuite {
     assert (req1.parsedXML != req2.parsedXML)
   }
 
-  test ("Since WellFormedXML steps are synchornous, the parser pool should contain only a single idle parser") {
+  ignore ("Since WellFormedXML steps are synchornous, the parser pool should contain only a single idle parser") {
     assert (XMLParserPool.numActive == 0)
     assert (XMLParserPool.numIdle == 1)
   }
@@ -557,7 +557,7 @@ class StepSuite extends BaseStepSuite {
     assert (req1.parsedJSON == req2.parsedJSON)
   }
 
-  test ("Since WellFormedJSON steps are synchornous, the parser pool should contain only a single idle parser") {
+  ignore ("Since WellFormedJSON steps are synchornous, the parser pool should contain only a single idle parser") {
     assert (JSONParserPool.numActive == 0)
     assert (JSONParserPool.numIdle == 1)
   }
