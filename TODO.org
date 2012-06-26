@@ -172,11 +172,11 @@
    6. [X] Transition other XSD checks to use pool
    7. [X] Create XSD check state
    8. [X] Add support for check state in the builder
-   9. [-] Tests[3/7]
+   9. [-] Tests[4/7]
       1. [X] States
       2. [X] Checker Tests
       3. [X] Step Builder Tests
-      4. [ ] WADL Validator
+      4. [X] WADL Validator
       5. [ ] Schema pool test
       6. [ ] Test on parameter check / include test for WELL_FORM to
       7. [ ] Test on grammar checks when no grammar is available.
