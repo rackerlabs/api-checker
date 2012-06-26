@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../xslt/schema.xslt"?>
+
+<schema
+        elementFormDefault="qualified"
+        attributeFormDefault="qualified"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:rgn="http://docs.rackspacecloud.com/servers/api/ext/region/v1.0"
+        targetNamespace="http://docs.rackspacecloud.com/servers/api/ext/region/v1.0">
+    <attribute name="region" type="xsd:string">
+        <annotation>
+            <xsd:documentation
+                xml:lang="EN"
+                xmlns="http://www.w3.org/1999/xhtml">
+                <p>
+                    The attribute provides a region identifier that is
+                    used to provide a hint as to the geographical
+                    region of server.
+                </p>
+            </xsd:documentation>
+        </annotation>
+    </attribute>
+</schema>

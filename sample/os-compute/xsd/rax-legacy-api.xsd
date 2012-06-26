@@ -1,0 +1,50 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:csapi="http://docs.openstack.org/compute/api/v1.1"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+    xmlns:dcf="http://docs.rackspacecloud.com/servers/api/ext/diskConfig/v1.0"
+    xmlns:rgn="http://docs.rackspacecloud.com/servers/api/ext/region/v1.0"
+    targetNamespace="http://docs.openstack.org/compute/api/v1.1"
+>
+    <!-- Import additional namespace -->
+    <import namespace="http://docs.rackspace.com/servers/api/ext/backup/v1.0" schemaLocation="ext/rax-bak/rax-backup.xsd"/>
+    <import namespace="http://docs.rackspacecloud.com/servers/api/ext/diskConfig/v1.0" schemaLocation="ext/rax-dcf/rax-dcf.xsd"/>
+    <import namespace="http://docs.rackspacecloud.com/servers/api/ext/region/v1.0" schemaLocation="ext/rax-rgn/rax-rgn.xsd"/>
+
+    <!-- Include/Redefine core schema -->
+    <include vc:minVersion="1.0" vc:maxVersion="1.1" schemaLocation="api.xsd"/>
+
+    <redefine vc:minVersion="1.1" schemaLocation="api.xsd">
+        <complexType name="Image">
+            <complexContent>
+                <extension base="csapi:Image">
+                    <attribute ref="dcf:diskConfig" use="optional" default="AUTO"/>
+                </extension>
+            </complexContent>
+        </complexType>
+        <complexType name="Server">
+            <complexContent>
+                <extension base="csapi:Server">
+                    <attribute ref="dcf:diskConfig" use="optional" default="AUTO"/>
+                    <attribute ref="rgn:region" use="optional"/>
+                </extension>
+            </complexContent>
+        </complexType>
+        <complexType name="Rebuild">
+            <complexContent>
+                <extension base="csapi:Rebuild">
+                    <attribute ref="dcf:diskConfig" use="optional" default="AUTO"/>
+                </extension>
+            </complexContent>
+        </complexType>
+        <complexType name="Resize">
+            <complexContent>
+                <extension base="csapi:Resize">
+                    <attribute ref="dcf:diskConfig" use="optional" default="AUTO"/>
+                </extension>
+            </complexContent>
+        </complexType>
+    </redefine>
+</schema>

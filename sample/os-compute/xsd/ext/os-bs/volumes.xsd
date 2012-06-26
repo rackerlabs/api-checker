@@ -1,0 +1,223 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:csapi="http://docs.openstack.org/compute/api/v1.1"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:bs="http://docs.openstack.org/servers/api/ext/volumes/v1.0"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+    targetNamespace="http://docs.openstack.org/servers/api/ext/volumes/v1.0"
+>
+    <!-- Import ATOM specific schema definitions -->
+    <import namespace="http://www.w3.org/2005/Atom" schemaLocation="../../atom/atom.xsd" />
+    <import namespace="http://docs.openstack.org/compute/api/v1.1" schemaLocation="../../common.xsd">
+        <annotation>
+            <xsd:documentation
+                xml:lang="EN"
+                xmlns="http://www.w3.org/1999/xhtml">
+                <p>
+                    Common types used by multiple entities and possibly spanning
+                    several types of requests.
+                </p>
+            </xsd:documentation>
+        </annotation>
+    </import>
+    <import namespace="http://docs.openstack.org/compute/api/v1.1" schemaLocation="../../server.xsd">
+        <annotation>
+            <xsd:documentation
+                xml:lang="EN"
+                xmlns="http://www.w3.org/1999/xhtml">
+                <p>
+                    Servers and all internal Entities including Addresses and
+                    Files.
+                </p>
+            </xsd:documentation>
+        </annotation>
+    </import>
+
+    <!-- Elements -->
+    <element name="volume" type="bs:Volume"/>
+    <element name="volumes" type="bs:Volumes"/>
+
+    <!-- Complex Types -->
+    <complexType name="Volume">
+        <sequence>
+            <element name="attachments" type="bs:Attachments" minOccurs="0"/>
+            <element name="metadata" type="csapi:Metadata" minOccurs="0">
+                <annotation>
+                    <xsd:documentation
+                        xml:lang="EN"
+                        xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            A collection of meta data items associated with the volume.
+                        </p>
+                    </xsd:documentation>
+                </annotation>
+            </element>
+            <element vc:minVersion="1.1" ref="atom:link" minOccurs="0" maxOccurs="unbounded" />
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+        <attribute type="csapi:UUID" name="id" use="optional"/>
+        <attribute type="xsd:string" name="name" use="optional"/>
+        <attribute type="csapi:UUID" name="typeId" use="optional"/>
+        <attribute type="csapi:UUID" name="backupId" use="optional"/>
+        <attribute type="xsd:dateTime" name="updated" use="optional"/>
+        <attribute type="xsd:dateTime" name="created" use="optional"/>
+        <attribute type="xsd:dateTime" name="attached" use="optional"/>
+        <attribute type="xsd:string" name="tenantId" use="optional"/>
+        <attribute type="xsd:string" name="userId" use="optional"/>
+        <attribute type="xsd:unsignedInt" name="size" use="optional"/>
+        <attribute type="csapi:Progress" name="progress"  use="optional"/>
+        <attribute type="bs:ExtensibleVolumeStatus" name="status" use="optional"/>
+        <anyAttribute namespace="##other" processContents="lax"/>
+    </complexType>
+
+    <complexType name="VolumeForCreate">
+        <complexContent>
+            <restriction base="bs:Volume">
+                <sequence>
+                    <element name="metadata" type="csapi:Metadata" minOccurs="0"/>
+                    <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+                </sequence>
+                <attribute type="csapi:UUID" name="id" use="prohibited"/>
+                <attribute type="xsd:string" name="name" use="optional"/>
+                <attribute type="csapi:UUID" name="typeId" use="required"/>
+                <attribute type="csapi:UUID" name="backupId" use="optional"/>
+                <attribute type="xsd:dateTime" name="updated" use="prohibited"/>
+                <attribute type="xsd:dateTime" name="created" use="prohibited"/>
+                <attribute type="xsd:dateTime" name="attached" use="prohibited"/>
+                <attribute type="xsd:string" name="tenantId" use="prohibited"/>
+                <attribute type="xsd:string" name="userId" use="prohibited"/>
+                <attribute type="csapi:Progress" name="progress"  use="prohibited"/>
+                <attribute type="xsd:unsignedInt" name="size" use="optional"/>
+                <attribute type="bs:ExtensibleVolumeStatus" name="status" use="prohibited"/>
+                <anyAttribute namespace="##other" processContents="lax"/>
+                <assert vc:minVersion="1.1" test="if (not(@backupId) and not(@size)) then false() else true()"
+                        saxon:message="A backupId or a size must be specified on create.">
+                    <annotation>
+                        <xsd:documentation
+                            xml:lang="EN"
+                            xmlns="http://www.w3.org/1999/xhtml">
+                            <p>
+                                On create, size is optional only if
+                                the backup ID is supplied, otherwise
+                                the size is required!
+                            </p>
+                        </xsd:documentation>
+                    </annotation>
+                </assert>
+            </restriction>
+        </complexContent>
+    </complexType>
+
+    <complexType name="VolumeForUpdate">
+        <complexContent>
+            <extension base="bs:Volume">
+                <assert vc:minVersion="1.1" test="@name"
+                        saxon:message="A name must be specified.">
+                    <annotation>
+                        <xsd:documentation
+                            xml:lang="EN"
+                            xmlns="http://www.w3.org/1999/xhtml">
+                            <p>
+                                When updating a volume, The volume
+                                <strong>MUST</strong> contain a
+                                name. The other fields are not
+                                editabile on an update.
+                            </p>
+                        </xsd:documentation>
+                    </annotation>
+                </assert>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="VolumeWithOnlyIDNameLinks">
+        <complexContent>
+            <restriction base="bs:Volume">
+                <sequence>
+                    <element ref="atom:link" minOccurs="1" maxOccurs="unbounded" />
+                    <any vc:minVersion="1.1" namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+                </sequence>
+                <attribute type="csapi:UUID" name="id" use="required"/>
+                <attribute type="xsd:string" name="name" use="required"/>
+                <attribute type="csapi:UUID" name="typeId" use="prohibited"/>
+                <attribute type="csapi:UUID" name="backupId" use="prohibited"/>
+                <attribute type="xsd:dateTime" name="updated" use="prohibited"/>
+                <attribute type="xsd:dateTime" name="created" use="prohibited"/>
+                <attribute type="xsd:dateTime" name="attached" use="prohibited"/>
+                <attribute type="xsd:string" name="tenantId" use="prohibited"/>
+                <attribute type="xsd:string" name="userId" use="prohibited"/>
+                <attribute type="csapi:Progress" name="progress"  use="prohibited"/>
+                <attribute type="xsd:unsignedInt" name="size" use="prohibited"/>
+                <attribute type="bs:ExtensibleVolumeStatus" name="status" use="prohibited"/>
+                <anyAttribute namespace="##other" processContents="lax"/>
+                <assert vc:minVersion="1.1" test="atom:link[@rel='self']/@href and atom:link[@rel='bookmark']/@href"
+                        saxon:message="In this context, the volume MUST contain a name, ID, and bookmark and self links.">
+                    <annotation>
+                        <xsd:documentation
+                            xml:lang="EN"
+                            xmlns="http://www.w3.org/1999/xhtml">
+                            <p>
+                                Here the volume <strong>MUST</strong>
+                                contain a name, an ID, a bookmark link,
+                                and a self link.
+                            </p>
+                        </xsd:documentation>
+                    </annotation>
+                </assert>
+            </restriction>
+        </complexContent>
+    </complexType>
+
+    <complexType name="Volumes">
+        <sequence>
+            <element name="volume" type="bs:Volume" minOccurs="0" maxOccurs="1000"/>
+            <element vc:minVersion="1.1" ref="atom:link" minOccurs="0" maxOccurs="unbounded" />
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+        <anyAttribute namespace="##other" processContents="lax"/>
+    </complexType>
+
+    <complexType name="VolumesWithOnlyIDsNamesLinks">
+        <complexContent>
+            <restriction base="bs:Volumes">
+                <sequence>
+                    <element name="volume" type="bs:VolumeWithOnlyIDNameLinks" minOccurs="0" maxOccurs="1000"/>
+                    <element vc:minVersion="1.1" ref="atom:link" minOccurs="0" maxOccurs="unbounded" />
+                    <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+                </sequence>
+                <anyAttribute namespace="##other" processContents="lax"/>
+            </restriction>
+        </complexContent>
+    </complexType>
+
+    <complexType name="Attachments">
+        <sequence>
+            <element name="server" type="csapi:ServerWithOnlyIDLinks" minOccurs="0" maxOccurs="1000"/>
+            <element vc:minVersion="1.1" ref="atom:link" minOccurs="0" maxOccurs="unbounded" />
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+        <anyAttribute namespace="##other" processContents="lax"/>
+    </complexType>
+
+    <!-- Simple Types -->
+    <simpleType name="ExtensibleVolumeStatus">
+        <union memberTypes="bs:VolumeStatus csapi:ExtendedStatus"/>
+    </simpleType>
+    <simpleType name="VolumeStatus">
+        <restriction base="xsd:string">
+            <enumeration value="CREATING"/>
+            <enumeration value="AVAILABLE"/>
+            <enumeration value="ATTACHING"/>
+            <enumeration value="ATTACHED"/>
+            <enumeration value="DETACHING"/>
+            <enumeration value="DELETING"/>
+            <enumeration value="DELETED"/>
+            <enumeration value="UNKNOWN"/>
+            <enumeration value="ERROR"/>
+        </restriction>
+    </simpleType>
+</schema>

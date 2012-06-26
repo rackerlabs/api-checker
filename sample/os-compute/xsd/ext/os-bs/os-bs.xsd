@@ -1,0 +1,12 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:csapi="http://docs.openstack.org/compute/api/v1.1"
+    xmlns:bs="http://docs.openstack.org/servers/api/ext/volumes/v1.0"
+    targetNamespace="http://docs.openstack.org/servers/api/ext/volumes/v1.0"
+>
+    <include schemaLocation="volumes.xsd"/>
+    <include schemaLocation="types.xsd"/>
+    <include schemaLocation="backups.xsd"/>
+</schema>

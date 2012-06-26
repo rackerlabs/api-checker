@@ -1,0 +1,13 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:csapi="http://docs.openstack.org/compute/api/v1.1"
+    targetNamespace="http://docs.openstack.org/compute/api/v1.1"
+>
+    <!-- Import additional namespace -->
+    <import namespace="http://docs.openstack.org/servers/api/ext/volumes/v1.0" schemaLocation="os-bs.xsd"/>
+
+    <!-- Include/Redefine core schema -->
+    <include schemaLocation="../../api.xsd"/>
+</schema>

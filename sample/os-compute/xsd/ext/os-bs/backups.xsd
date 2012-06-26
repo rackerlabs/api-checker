@@ -1,0 +1,178 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:csapi="http://docs.openstack.org/compute/api/v1.1"
+    xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:bs="http://docs.openstack.org/servers/api/ext/volumes/v1.0"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+    targetNamespace="http://docs.openstack.org/servers/api/ext/volumes/v1.0"
+>
+    <!-- Import ATOM specific schema definitions -->
+    <import namespace="http://www.w3.org/2005/Atom" schemaLocation="../../atom/atom.xsd" />
+    <import namespace="http://docs.openstack.org/compute/api/v1.1" schemaLocation="../../common.xsd">
+        <annotation>
+            <xsd:documentation
+                xml:lang="EN"
+                xmlns="http://www.w3.org/1999/xhtml">
+                <p>
+                    Common types used by multiple entities and possibly spanning
+                    several types of requests.
+                </p>
+            </xsd:documentation>
+        </annotation>
+    </import>
+
+    <!-- Elements -->
+    <element name="backup" type="bs:Backup"/>
+    <element name="backups" type="bs:Backups"/>
+
+    <!-- Complex Types -->
+    <complexType name="Backup">
+        <sequence>
+            <element name="metadata" type="csapi:Metadata" minOccurs="0">
+                <annotation>
+                    <xsd:documentation
+                        xml:lang="EN"
+                        xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            A collection of meta data items associated with the backup.
+                        </p>
+                    </xsd:documentation>
+                </annotation>
+            </element>
+            <element vc:minVersion="1.1" ref="atom:link" minOccurs="0" maxOccurs="unbounded" />
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+        <attribute type="csapi:UUID" name="id" use="optional"/>
+        <attribute type="xsd:string" name="name" use="optional"/>
+        <attribute type="csapi:UUID" name="volumeId" use="optional"/>
+        <attribute type="xsd:dateTime" name="updated" use="optional"/>
+        <attribute type="xsd:dateTime" name="created" use="optional"/>
+        <attribute type="xsd:string" name="tenantId" use="optional"/>
+        <attribute type="xsd:string" name="userId" use="optional"/>
+        <attribute type="csapi:Progress" name="progress"  use="optional"/>
+        <attribute type="xsd:unsignedInt" name="size" use="optional"/>
+        <attribute type="bs:ExtensibleBackupStatus" name="status" use="optional"/>
+        <anyAttribute namespace="##other" processContents="lax"/>
+    </complexType>
+
+    <complexType name="BackupForCreate">
+        <complexContent>
+            <restriction base="bs:Backup">
+                <sequence>
+                    <element name="metadata" type="csapi:Metadata" minOccurs="0"/>
+                    <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+                </sequence>
+                <attribute type="csapi:UUID" name="id" use="prohibited"/>
+                <attribute type="xsd:string" name="name" use="optional"/>
+                <attribute type="csapi:UUID" name="volumeId" use="required"/>
+                <attribute type="xsd:dateTime" name="updated" use="prohibited"/>
+                <attribute type="xsd:dateTime" name="created" use="prohibited"/>
+                <attribute type="xsd:string" name="tenantId" use="prohibited"/>
+                <attribute type="xsd:string" name="userId" use="prohibited"/>
+                <attribute type="csapi:Progress" name="progress"  use="prohibited"/>
+                <attribute type="xsd:unsignedInt" name="size" use="prohibited"/>
+                <attribute type="bs:ExtensibleBackupStatus" name="status" use="prohibited"/>
+                <anyAttribute namespace="##other" processContents="lax"/>
+            </restriction>
+        </complexContent>
+    </complexType>
+
+    <complexType name="BackupForUpdate">
+        <complexContent>
+            <extension base="bs:Backup">
+                <assert vc:minVersion="1.1" test="@name"
+                        saxon:message="A name must be specified.">
+                    <annotation>
+                        <xsd:documentation
+                            xml:lang="EN"
+                            xmlns="http://www.w3.org/1999/xhtml">
+                            <p>
+                                When updating a backup, The backup
+                                <strong>MUST</strong> contain a
+                                name. The other fields are not
+                                editabile on an update.
+                            </p>
+                        </xsd:documentation>
+                    </annotation>
+                </assert>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="BackupWithOnlyIDNameLinks">
+        <complexContent>
+            <restriction base="bs:Backup">
+                <sequence>
+                    <element ref="atom:link" minOccurs="1" maxOccurs="unbounded" />
+                    <any vc:minVersion="1.1" namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+                </sequence>
+                <attribute type="csapi:UUID" name="id" use="required"/>
+                <attribute type="xsd:string" name="name" use="required"/>
+                <attribute type="csapi:UUID" name="volumeId" use="prohibited"/>
+                <attribute type="xsd:dateTime" name="updated" use="prohibited"/>
+                <attribute type="xsd:dateTime" name="created" use="prohibited"/>
+                <attribute type="xsd:string" name="tenantId" use="prohibited"/>
+                <attribute type="xsd:string" name="userId" use="prohibited"/>
+                <attribute type="csapi:Progress" name="progress"  use="prohibited"/>
+                <attribute type="xsd:unsignedInt" name="size" use="prohibited"/>
+                <attribute type="bs:ExtensibleBackupStatus" name="status" use="prohibited"/>
+                <anyAttribute namespace="##other" processContents="lax"/>
+                <assert vc:minVersion="1.1" test="atom:link[@rel='self']/@href and atom:link[@rel='bookmark']/@href"
+                        saxon:message="In this context, the backup MUST contain a name, ID, and bookmark and self links.">
+                    <annotation>
+                        <xsd:documentation
+                            xml:lang="EN"
+                            xmlns="http://www.w3.org/1999/xhtml">
+                            <p>
+                                Here the backup <strong>MUST</strong>
+                                contain a name, an ID, a bookmark link,
+                                and a self link.
+                            </p>
+                        </xsd:documentation>
+                    </annotation>
+                </assert>
+            </restriction>
+        </complexContent>
+    </complexType>
+
+    <complexType name="Backups">
+        <sequence>
+            <element name="backup" type="bs:Backup" minOccurs="0" maxOccurs="1000"/>
+            <element vc:minVersion="1.1" ref="atom:link" minOccurs="0" maxOccurs="unbounded" />
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+        <anyAttribute namespace="##other" processContents="lax"/>
+    </complexType>
+
+    <complexType name="BackupsWithOnlyIDsNamesLinks">
+        <complexContent>
+            <restriction base="bs:Backups">
+                <sequence>
+                    <element name="backup" type="bs:BackupWithOnlyIDNameLinks" minOccurs="0" maxOccurs="1000"/>
+                    <element vc:minVersion="1.1" ref="atom:link" minOccurs="0" maxOccurs="unbounded" />
+                    <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+                </sequence>
+                <anyAttribute namespace="##other" processContents="lax"/>
+            </restriction>
+        </complexContent>
+    </complexType>
+
+    <!-- Simple Types -->
+    <simpleType name="ExtensibleBackupStatus">
+        <union memberTypes="bs:BackupStatus csapi:ExtendedStatus"/>
+    </simpleType>
+    <simpleType name="BackupStatus">
+        <restriction base="xsd:string">
+            <enumeration value="AVAILABLE"/>
+            <enumeration value="SAVING"/>
+            <enumeration value="ERROR"/>
+            <enumeration value="DELETED"/>
+            <enumeration value="DELETING"/>
+            <enumeration value="UNKNOWN"/>
+        </restriction>
+    </simpleType>
+</schema>
