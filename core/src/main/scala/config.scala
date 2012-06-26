@@ -30,7 +30,10 @@ class Config {
   @BeanProperty var resultHandler : ResultHandler = new ServletResultHandler
 
   //
-  //  Use SAXON-EE for XSD validation
+  //  Use SAXON-EE for XSD validation: This means that in cases where
+  //  XSD validation needs to be done use the Saxon XSD validator
+  //  instead of the default Xerces validator.  Note that the Saxon
+  //  validator requires a license.
   //
   @BeanProperty var useSaxonEEValidation : Boolean = false
 
@@ -38,4 +41,9 @@ class Config {
   //  Check Well-Formed XML and JSON
   //
   @BeanProperty var checkWellFormed : Boolean = false
+
+  //
+  //  Check all XML against XSD Grammars
+  //
+  @BeanProperty var checkXSDGrammar : Boolean = false
 }

@@ -40,6 +40,7 @@
                 <alternative test="@type eq 'REQ_TYPE_FAIL'" type="chk:ReqTypeFailStep"/>
                 <alternative test="@type eq 'WELL_XML'" type="chk:WellFormedXMLStep"/>
                 <alternative test="@type eq 'WELL_JSON'" type="chk:WellFormedJSONStep"/>
+                <alternative test="@type eq 'XSD'" type="chk:XSDStep"/>
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
@@ -101,6 +102,20 @@
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
                     Ensures that the content contains well formed JSON.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="XSDStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Ensures that the XML content validates against the
+                    XSDs provided in the grammar.
                 </html:p>
             </documentation>
         </annotation>
@@ -359,6 +374,7 @@
             <enumeration value="WELL_XML"/>
             <enumeration value="WELL_JSON"/>
             <enumeration value="CONTENT_FAIL"/>
+            <enumeration value="XSD"/>
         </restriction>
     </simpleType>
 

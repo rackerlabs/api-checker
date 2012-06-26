@@ -9,12 +9,18 @@ import javax.servlet.http.HttpServletResponse
 import javax.servlet.ServletInputStream
 import javax.servlet.FilterChain
 
+import javax.xml.parsers.DocumentBuilder
+import org.json.simple.parser.JSONParser
+
 import scala.collection.mutable.HashMap
 
 import com.rackspace.com.papi.components.checker.step._
 import com.rackspace.com.papi.components.checker.handler._
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
+
+import com.rackspace.com.papi.components.checker.util.XMLParserPool
+import com.rackspace.com.papi.components.checker.util.JSONParserPool
 
 import org.scalatest.FunSuite
 import org.scalatest.TestFailedException
@@ -73,6 +79,13 @@ object TestConfig {
   val assertHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(), 
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
+
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean, checkXSDGrammar : Boolean) : Config = {
+    val config = apply(removeDups, saxoneeValidation, wellFormed)
+    config.checkXSDGrammar = checkXSDGrammar
+
+    config
+  }
 
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean) : Config = {
     val config = apply(saxoneeValidation, wellFormed)
@@ -159,6 +172,35 @@ class BaseValidatorSuite extends FunSuite {
     when(req.getInputStream()).thenReturn(new ByteArrayServletInputStream(content))
 
     return req
+  }
+
+  def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean) : HttpServletRequest = {
+    val req = request (method, url, contentType, content)
+    var xmlParser : DocumentBuilder = null
+    var jsonParser : JSONParser = null
+
+    try {
+      if (parseContent) {
+        contentType match {
+          case "application/xml"  =>
+            xmlParser = XMLParserPool.borrowParser
+            req.setAttribute (PARSED_XML, xmlParser.parse(new ByteArrayInputStream(content.getBytes())))
+          case "application/json" =>
+            jsonParser = JSONParserPool.borrowParser
+            req.setAttribute (PARSED_JSON, jsonParser.parse(content))
+        }
+      }
+    } finally {
+      if (xmlParser != null) XMLParserPool.returnParser(xmlParser)
+      if (jsonParser != null) JSONParserPool.returnParser(jsonParser)
+    }
+
+    return req
+  }
+
+
+  def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean) : HttpServletRequest = {
+    request (method, url, contentType, content.toString(), parseContent)
   }
 
   def response : HttpServletResponse = mock(classOf[HttpServletResponse]);

@@ -12,8 +12,23 @@
     <xsl:output indent="yes" method="xml"/>
 
     <!-- Paramenters -->
+    <xsl:param name="enableXSDContentCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableWellFormCheck" as="xsd:boolean" select="false()"/>
-    
+
+    <!-- Do we have an XSD? -->
+    <xsl:variable name="WADLhasXSD" as="xsd:boolean"
+                  select="
+                          if (//wadl:grammars/xsd:schema) then true() else
+                            if (//wadl:grammars/wadl:include[doc-available(@href) and doc(@href)/xsd:schema]) then true() else
+                              false()
+                          " />
+
+    <!-- Actual Config Flags -->
+    <xsl:variable name="useXSDContentCheck" as="xsd:boolean"
+                  select="$enableXSDContentCheck and $WADLhasXSD"/>
+    <xsl:variable name="useWellFormCheck" as="xsd:boolean"
+                  select="$enableWellFormCheck or $useXSDContentCheck"/>
+
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
     <xsl:variable name="URL_FAIL"    select="'SE0'"/>
@@ -409,7 +424,7 @@
             <!-- Note that matches on the media type are always case insensitive -->
             <xsl:attribute name="match" select="concat('(?i)',check:toRegExEscaped(@mediaType))"/>
             <xsl:choose>
-                <xsl:when test="$enableWellFormCheck">
+                <xsl:when test="$useWellFormCheck">
                     <xsl:choose>
                         <xsl:when test="check:isXML(@mediaType) or check:isJSON(@mediaType)">
                             <xsl:call-template name="check:addWellFormNext"/>
@@ -425,7 +440,7 @@
             </xsl:choose>
             <xsl:call-template name="check:addLabel"/>
         </step>
-        <xsl:if test="$enableWellFormCheck">
+        <xsl:if test="$useWellFormCheck">
             <xsl:choose>
                 <xsl:when test="check:isXML(@mediaType)">
                     <xsl:call-template name="check:addWellForm">
@@ -461,14 +476,39 @@
         <xsl:value-of select="concat(generate-id($context),'WF')"/>
     </xsl:function>
 
+    <xsl:function name="check:XSDID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(generate-id($context),'XSD')"/>
+    </xsl:function>
+
     <xsl:template name="check:addWellFormNext">
         <xsl:attribute name="next" select="(check:WellFormID(.), check:WellFormFailID(.))" separator=" "/>
     </xsl:template>
 
     <xsl:template name="check:addWellForm">
         <xsl:param name="type" />
-        <step type="{$type}" id="{check:WellFormID(.)}" next="{$ACCEPT}"/>
-        <step type="CONTENT_FAIL" id="{check:WellFormFailID(.)}"/>
+        <xsl:variable name="doXSD" as="xsd:boolean"
+                      select="($type = 'WELL_XML') and $useXSDContentCheck"/>
+        <xsl:variable name="XSDID" as="xsd:string"
+                      select="check:XSDID(.)"/>
+        <xsl:variable name="FAILID" as="xsd:string"
+                      select="check:WellFormFailID(.)"/>
+        <step type="{$type}" id="{check:WellFormID(.)}">
+            <xsl:choose>
+                <xsl:when test="$doXSD">
+                    <xsl:attribute name="next"
+                                   select="($XSDID, $FAILID)"
+                                   separator=" "/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="next" select="$ACCEPT"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </step>
+        <xsl:if test="$doXSD">
+            <step type="XSD" id="{$XSDID}" next="{$ACCEPT}"/>
+        </xsl:if>
+        <step type="CONTENT_FAIL" id="{$FAILID}"/>
     </xsl:template>
 
     <xsl:template name="check:addReqTypeFail">
