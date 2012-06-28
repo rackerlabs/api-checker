@@ -182,16 +182,19 @@
       7. [X] Test on grammar checks when no grammar is available.
    10. [X] Update sample filter / webapp
 ** DONE Bean attributes for config
-** TODO Extend machine to handle correct element in XML [2/7]
+** TODO Extend machine to handle correct element in XML [3/7]
    1. [X] Add support for XPATH step in XSD
    2. [X] Add Element Check in config
-   3. [ ] Add support for Element check in XSLs
+   3. [X] Add support for Element check in XSLs
    4. [ ] Update CLI tools
    5. [ ] Create XPath State
    6. [ ] Add support XPath sate in builder
    7. [ ] Tests[0/4]
       1. [ ] States
       2. [ ] Checker Tests
+         1. [ ] Should check case no element is specified.
+         2. [ ] Tests with XSD stages.
+         3. [ ] Tests without XSD stages.
       3. [ ] Step Builder Tests
       4. [ ] WADL Validator
 ** TODO Fix test error, where register is not working in step-test.scala
