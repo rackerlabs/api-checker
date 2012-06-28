@@ -41,6 +41,7 @@
                 <alternative test="@type eq 'WELL_XML'" type="chk:WellFormedXMLStep"/>
                 <alternative test="@type eq 'WELL_JSON'" type="chk:WellFormedJSONStep"/>
                 <alternative test="@type eq 'XSD'" type="chk:XSDStep"/>
+                <alternative test="@type eq 'XPATH'" type="chk:XPathStep"/>
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
@@ -121,6 +122,25 @@
         </annotation>
         <complexContent>
             <extension base="chk:ConnectedStep"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="XPathStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Ensures that the XPATH evaluates to true() in the
+                    XML content.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep">
+                <sequence>
+                    <element name="ns" type="chk:Namespace" minOccurs="0" maxOccurs="1000"/>
+                </sequence>
+                <attribute name="match" type="xsd:string" use="required"/>
+            </extension>
         </complexContent>
     </complexType>
 
@@ -357,6 +377,11 @@
                 saxon:message="Only xsd:schema element is allowed!"/>
         <assert test="if (xsd:schema and @href) then false() else true()"
                 saxon:message="Grammar can't have both an href and a schema"/>
+    </complexType>
+
+    <complexType name="Namespace">
+        <attribute name="prefix" type="xsd:string" use="required"/>
+        <attribute name="uri" type="xsd:anyURI" use="required"/>
     </complexType>
 
     <!-- Simple Types -->
