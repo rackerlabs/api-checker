@@ -392,6 +392,7 @@
             <enumeration value="WELL_JSON"/>
             <enumeration value="CONTENT_FAIL"/>
             <enumeration value="XSD"/>
+            <enumeration value="XPATH"/>
         </restriction>
     </simpleType>
 
