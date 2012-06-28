@@ -46,4 +46,9 @@ class Config {
   //  Check all XML against XSD Grammars
   //
   @BeanProperty var checkXSDGrammar : Boolean = false
+
+  //
+  //  Ensure elemets are correct
+  //
+  @BeanProperty var checkElements : Boolean = false
 }
