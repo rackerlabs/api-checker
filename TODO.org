@@ -182,6 +182,7 @@
       7. [X] Test on grammar checks when no grammar is available.
    10. [X] Update sample filter / webapp
 ** DONE Bean attributes for config
+** DONE New Join Optimization stage.
 ** TODO Extend machine to handle correct element in XML [4/7]
    1. [X] Add support for XPATH step in XSD
    2. [X] Add Element Check in config
