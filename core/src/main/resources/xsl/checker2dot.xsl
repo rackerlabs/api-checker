@@ -12,10 +12,10 @@
    <xsl:variable name="sink_types" as="xsd:string*">
        <xsl:choose>
            <xsl:when test="$nfaMode">
-               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL')"/>
+               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL', 'CONTENT_FAIL', 'REQ_TYPE_FAIL')"/>
            </xsl:when>
            <xsl:otherwise>
-               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')"/>
+               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL', 'CONTENT_FAIL', 'REQ_TYPE_FAIL', 'ACCEPT')"/>
            </xsl:otherwise>
        </xsl:choose>
    </xsl:variable>
