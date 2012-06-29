@@ -146,7 +146,7 @@
                 <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts]"/>
                 <xsl:if test="every $s in $nextStep satisfies $s/@type='METHOD'">
                     <group>
-                        <xsl:attribute name="include" select="$nexts[1]"/>
+                        <xsl:attribute name="include" select="$nexts" separator=" "/>
                         <xsl:attribute name="exclude" select="@id"/>
                     </group>
                 </xsl:if>
