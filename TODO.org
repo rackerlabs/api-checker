@@ -183,14 +183,15 @@
    10. [X] Update sample filter / webapp
 ** DONE Bean attributes for config
 ** DONE New Join Optimization stage.
-** TODO Extend machine to handle correct element in XML [4/7]
+** TODO Extend machine to handle correct element in XML [5/8]
    1. [X] Add support for XPATH step in XSD
    2. [X] Add Element Check in config
    3. [X] Add support for Element check in XSLs
    4. [X] Update CLI tools
-   5. [ ] Create XPath State
-   6. [ ] Add support XPath sate in builder
-   7. [ ] Tests[0/4]
+   5. [X] Add XPath Pool
+   6. [ ] Create XPath State
+   7. [ ] Add support XPath sate in builder
+   8. [ ] Tests[0/5]
       1. [ ] States
       2. [ ] Checker Tests
          1. [ ] Should check case no element is specified.
@@ -198,6 +199,7 @@
          3. [ ] Tests without XSD stages.
       3. [ ] Step Builder Tests
       4. [ ] WADL Validator
+      5. [ ] XPath parser pool
 ** TODO Fix test error, where register is not working in step-test.scala
 ** TODO Review Skipped Tests[0/2]
    1. [ ] Saxon validation
