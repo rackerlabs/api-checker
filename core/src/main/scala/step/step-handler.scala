@@ -24,6 +24,7 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.ArrayBuffer
 
 import com.rackspace.com.papi.components.checker.Config
+import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
 
 //
 //  The StepHandler assumes it is receiving content that is valid
@@ -123,6 +124,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "WELL_XML"    => addWellXML(atts)
           case "WELL_JSON"   => addWellJSON(atts)
           case "XSD"         => addXSD(atts)
+          case "XPATH"       => addXPath(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -323,6 +325,16 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new XSD(id, label, schema, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addXPath(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+
+    next += (id -> nexts)
+    steps += (id -> new XPath(id, label, _match, ImmutableNamespaceContext(prefixes), new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {
