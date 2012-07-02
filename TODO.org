@@ -183,7 +183,7 @@
    10. [X] Update sample filter / webapp
 ** DONE Bean attributes for config
 ** DONE New Join Optimization stage.
-** TODO Extend machine to handle correct element in XML [8/10]
+** TODO Extend machine to handle correct element in XML [8/11]
    1. [X] Add support for XPATH step in XSD
    2. [X] Add Element Check in config
    3. [X] Add support for Element check in XSLs
@@ -196,21 +196,30 @@
       2. [X] 2.0 based on Saxon (non-schema aware -- unless you have license)
       3. [X] Allow setting of version in checker format.
       4. [X] Take version into account when optimizing states
-   9. [-] Tests[3/6]
+   9. [-] Tests[4/7]
       1. [X] XPath parser pool
       2. [X] ImmutableNamespaceContext
       3. [X] States[2/2]
          1. [X] XPath 1.0
          2. [X] XPath 2.0
-      4. [ ] Checker Tests
-         1. [ ] Should check case no element is specified.
-         2. [ ] Tests with XSD stages.
-         3. [ ] Tests without XSD stages.
-         4. [ ] Tests with dups in XPath (with/without version)
+      4. [X] Checker Tests
+         1. [X] Tests with XSD stages.
+         2. [X] Tests without XSD stages.
+         3. [X] Element test without well formed specified.
+         4. [X] Should check case no element is specified.
+         5. [X] Check with dups vs no-dups
       5. [ ] Step Builder Tests
+         1. [ ] Confirm XPath 2.0 Setting
       6. [ ] WADL Validator
+         1. [ ] XPath 1.0
+         2. [ ] XPath 2.0
    10. [ ] Better errors when multiple XPath expressions fail.
        1. [ ] Test, to prove that that's working.
+   11. [ ] Update filter / filter app
+** TODO Extend machine to check required plain parameters
+   1. [ ] Tests
+         1. [ ] Tests with dups in XPath (with/without version)
+         2. [ ] Test Bad XPaths
 ** TODO Namespace cleanup task should look into XPath expressions...
 ** TODO Namespace cleanup task should account for default namespaces.
 ** TODO Fix test error, where register is not working in step-test.scala
