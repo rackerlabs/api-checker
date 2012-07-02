@@ -30,6 +30,8 @@ class BaseStepSpec extends BaseWADLSpec {
     a.filter (f => f.isInstanceOf[URI]).filter(f => f.asInstanceOf[URI].uri.toString == uri)
   def withReqType(a : Array[Step], reqType : String) : Array[Step] =
     a.filter (f => f.isInstanceOf[ReqType]).filter(f => f.asInstanceOf[ReqType].rtype.toString == reqType)
+  def withXPath(a : Array[Step], exp : String) : Array[Step] =
+    a.filter (f => f.isInstanceOf[XPath]).filter(f => f.asInstanceOf[XPath].expression == exp)
   def withReqTypeFail(a : Array[Step], types : String) : Array[Step] =
     a.filter (f => f.isInstanceOf[ReqTypeFail]).filter(f => f.asInstanceOf[ReqTypeFail].types.toString == types)
   def withURIXSD(a : Array[Step], qname : QName) : Array[Step] =
@@ -54,6 +56,7 @@ class BaseStepSpec extends BaseWADLSpec {
   def Label(m : String) : (Array[Step]) => Array[Step] = withLabel(_, m)
   def ReqType(m : String) : (Array[Step]) => Array[Step] = withReqType(_, m)
   def ReqTypeFail(m : String) : (Array[Step]) => Array[Step] = withReqTypeFail(_, m)
+  def XPath(m : String) : (Array[Step]) => Array[Step] = withXPath(_, m)
 
   def assert(s : Step, step_funs : ((Array[Step]) => Array[Step])*) : Unit = {
     if (step_funs.length == 0) throw new TestFailedException("Path assertion should contain at least one step!",4)

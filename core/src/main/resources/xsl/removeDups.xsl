@@ -146,7 +146,7 @@
                 <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts]"/>
                 <xsl:if test="every $s in $nextStep satisfies $s/@type='METHOD'">
                     <group>
-                        <xsl:attribute name="include" select="$nexts[1]"/>
+                        <xsl:attribute name="include" select="$nexts" separator=" "/>
                         <xsl:attribute name="exclude" select="@id"/>
                     </group>
                 </xsl:if>
@@ -157,8 +157,8 @@
     <xsl:template name="getDups" as="node()">
         <xsl:param name="checker" as="node()"/>
         <checker>
-            <!-- Groups by type, next, match -->
-            <xsl:for-each-group select="$checker//check:step" group-by="@type">
+            <!-- Groups by type, next, match for all regular steps except those that are versioned -->
+            <xsl:for-each-group select="$checker//check:step[not(@version)]" group-by="@type">
                 <xsl:for-each-group select="current-group()" group-by="@next">
                     <xsl:for-each-group select="current-group()" group-by="@match">
                         <xsl:if test="count(current-group()) > 1">
@@ -173,6 +173,27 @@
                                 </xsl:attribute>
                             </group>
                         </xsl:if>
+                    </xsl:for-each-group>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
+            <!-- For steps that have a version, take that into account -->
+            <xsl:for-each-group select="$checker//check:step[@version]" group-by="@type">
+                <xsl:for-each-group select="current-group()" group-by="@next">
+                    <xsl:for-each-group select="current-group()" group-by="@match">
+                        <xsl:for-each-group select="current-group()" group-by="@version">
+                            <xsl:if test="count(current-group()) > 1">
+                                <group>
+                                    <xsl:attribute name="include">
+                                        <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="exclude">
+                                        <xsl:value-of separator=" ">
+                                            <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                                        </xsl:value-of>
+                                    </xsl:attribute>
+                                </group>
+                            </xsl:if>
+                        </xsl:for-each-group>
                     </xsl:for-each-group>
                 </xsl:for-each-group>
             </xsl:for-each-group>

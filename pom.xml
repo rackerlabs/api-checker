@@ -32,6 +32,7 @@
         <mockito.version>1.9.0</mockito.version>
         <pool.version>1.6</pool.version>
         <json-simple.version>1.1.1</json-simple.version>
+        <xalan.version>2.7.1</xalan.version>
     </properties>
 
     <dependencies>
@@ -49,6 +50,11 @@
             <groupId>xerces</groupId>
             <artifactId>xerces-xsd11</artifactId>
             <version>${xerces.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>${xalan.version}</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>

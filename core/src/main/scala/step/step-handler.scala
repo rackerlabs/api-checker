@@ -8,9 +8,12 @@ import javax.xml.transform.sax.TransformerHandler
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.dom.DOMResult
 
+import javax.xml.xpath.XPathExpression
+
 import javax.xml.validation.Schema
 import javax.xml.validation.SchemaFactory
 
+import javax.xml.namespace.NamespaceContext
 import javax.xml.namespace.QName
 
 import org.xml.sax.ContentHandler
@@ -24,6 +27,8 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.ArrayBuffer
 
 import com.rackspace.com.papi.components.checker.Config
+import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
+import com.rackspace.com.papi.components.checker.util.XPathExpressionPool
 
 //
 //  The StepHandler assumes it is receiving content that is valid
@@ -123,6 +128,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "WELL_XML"    => addWellXML(atts)
           case "WELL_JSON"   => addWellJSON(atts)
           case "XSD"         => addXSD(atts)
+          case "XPATH"       => addXPath(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -323,6 +329,40 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new XSD(id, label, schema, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addXPath(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val context : NamespaceContext = ImmutableNamespaceContext(prefixes)
+    val version : Int = {
+      val sversion = atts.getValue("version")
+
+      if (sversion == null) {
+        config.xpathVersion
+      } else {
+        sversion.toInt
+      }
+    }
+
+    //
+    //  Make an attempt to compile the XPath expression. Throw a
+    //  SAXParseException if something goes wrong.
+    //
+    var expression : XPathExpression = null
+    try {
+      expression = XPathExpressionPool.borrowExpression(_match, context, version)
+    } catch {
+      case spe : SAXParseException => throw spe
+      case e : Exception => throw new SAXParseException ("Error while compiling XPath expression", locator, e)
+    } finally {
+      if (expression != null) XPathExpressionPool.returnExpression(_match, version, expression)
+    }
+
+    next += (id -> nexts)
+    steps += (id -> new XPath(id, label, _match, context, version, new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {

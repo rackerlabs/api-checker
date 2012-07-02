@@ -22,6 +22,9 @@ object Wadl2Checker {
   val xsdCheck = parser.flag[Boolean] (List("x", "xsd"),
                                          "Add checks to ensure that XML validates against XSD grammar Default: false")
 
+  val element = parser.flag[Boolean] (List("l", "element"),
+                                         "Add checks to ensure that XML requests use the correct element : false")
+
   val validate = parser.flag[Boolean] (List("v", "validate"),
                                        "Validate produced checker Default: false")
 
@@ -74,6 +77,7 @@ object Wadl2Checker {
       c.validateChecker = validate.value.getOrElse(false)
       c.checkWellFormed = wellFormed.value.getOrElse(false)
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
+      c.checkElements = element.value.getOrElse(false)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)
     } catch {

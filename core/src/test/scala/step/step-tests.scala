@@ -11,8 +11,11 @@ import org.xml.sax.SAXParseException
 import org.json.simple.JSONAware
 import org.json.simple.parser.ParseException
 
+import scala.collection.mutable.Map
+
 import com.rackspace.com.papi.components.checker.util.XMLParserPool
 import com.rackspace.com.papi.components.checker.util.JSONParserPool
+import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
 
 @RunWith(classOf[JUnitRunner])
 class StepSuite extends BaseStepSuite {
@@ -658,6 +661,113 @@ class StepSuite extends BaseStepSuite {
     assert (req1.contentError.isInstanceOf[SAXParseException])
 
     xsd.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+  }
+
+
+  test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root", context, 1, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <root xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </root>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:root xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:root>, true)
+    assert (xpath.checkStep (req1, response, chain, 0) == 0)
+    assert (xpath.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test("In an XPath test, if the XPath resolves to false the uriLevel should be -1") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root", context, 1, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <foot xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </foot>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:foot xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:foot>, true)
+    assert (xpath.checkStep (req1, response, chain, 0) == -1)
+    assert (xpath.checkStep (req2, response, chain, 1) == -1)
+  }
+
+  test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root", context, 1, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <foot xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </foot>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:foot xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:foot>, true)
+    xpath.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+
+    xpath.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+  }
+
+  test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same (XPath 2)") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", context, 2, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <root xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </root>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:root xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:root>, true)
+    assert (xpath.checkStep (req1, response, chain, 0) == 0)
+    assert (xpath.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test("In an XPath test, if the XPath resolves to false the uriLevel should be -1 (XPath 2)") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", context, 2, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <foot xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </foot>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:foot xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:foot>, true)
+    assert (xpath.checkStep (req1, response, chain, 0) == -1)
+    assert (xpath.checkStep (req2, response, chain, 1) == -1)
+  }
+
+  test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException (XPath 2)") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", context, 2, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <foot xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </foot>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:foot xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:foot>, true)
+    xpath.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+
+    xpath.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[SAXParseException])
   }

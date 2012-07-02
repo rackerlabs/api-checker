@@ -29,7 +29,7 @@ class XMLSchemaPoolSuite extends FunSuite {
     }
   }
 
-  test ("NumIdle should be zero soon after returning a validator") {
+  test ("NumIdle should not be zero soon after returning a validator") {
     var validator : Validator = null
     try {
       validator = ValidatorPool.borrowValidator(testSchema)
@@ -71,7 +71,7 @@ class XMLSchemaPoolSuite extends FunSuite {
     }
   }
 
-  test ("NumIdle should be zero soon after returning a validatorHandler") {
+  test ("NumIdle should not be zero soon after returning a validatorHandler") {
     var validatorHandler : ValidatorHandler = null
     try {
       validatorHandler = ValidatorHandlerPool.borrowValidatorHandler(testSchema)
