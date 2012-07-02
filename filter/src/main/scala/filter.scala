@@ -42,6 +42,8 @@ class ValidatorFilter extends Filter {
     conf.useSaxonEEValidation = false
     conf.checkWellFormed = true
     conf.checkXSDGrammar = true
+    conf.checkElements = true
+    conf.xpathVersion = 2
 
     validator = Validator(new SAXSource(new InputSource(wadlRef)), conf)
   }
