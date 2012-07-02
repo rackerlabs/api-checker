@@ -2,9 +2,13 @@ package com.rackspace.com.papi.components.checker.util
 
 import java.util.Iterator
 import java.util.ArrayList
+
 import javax.xml.namespace.NamespaceContext
+import javax.xml.XMLConstants._
 
 import scala.collection.mutable.Map
+
+import scala.collection.JavaConversions._
 
 object ImmutableNamespaceContext {
   def apply (inputNS : Map[String, String]) : ImmutableNamespaceContext = {
@@ -26,26 +30,46 @@ class ImmutableNamespaceContext private (private val inputNS : Map[String, Strin
   //
   //  A map form ns URI to prefix
   //
-  private val uriToPrefix : scala.collection.immutable.Map[String, String] = {
-    val uriMap = Map.empty[String, String]
+  private val uriToPrefix : scala.collection.immutable.Map[String, Set[String]] = {
+    val uriMap = Map.empty[String, Set[String]]
 
-    for (key <- prefixToURI.keys) {
-      uriMap += (prefixToURI(key) -> key)
+    for (prefix <- prefixToURI.keys) {
+      val uri = prefixToURI(prefix)
+      val uriSet = uriMap.getOrElseUpdate(uri, Set[String]())
+      uriMap += (uri -> (uriSet + prefix))
     }
 
     uriMap.toMap
   }
 
-  override def getNamespaceURI(prefix : String) : String = prefixToURI(prefix)
-  override def getPrefix(namespaceURI : String) : String = uriToPrefix(namespaceURI)
-  override def getPrefixes(namespaceURI : String) : Iterator[String] = {
-    val l : ArrayList[String] = new ArrayList[String]()
-    val p : String = uriToPrefix(namespaceURI)
+  override def getNamespaceURI(prefix : String) : String = {
+    if (prefix == null) {
+      throw new IllegalArgumentException("Can't pass null to getNamespaceURI")
+    }
+    prefixToURI.getOrElse(prefix, NULL_NS_URI)
+  }
 
-    if (p != null) {
-      l.add(p)
+  override def getPrefix(namespaceURI : String) : String = {
+    if (namespaceURI == null) {
+      throw new IllegalArgumentException("Can't pass null to getPrefix")
     }
 
-    l.iterator()
+    if (uriToPrefix.contains(namespaceURI)) {
+      uriToPrefix(namespaceURI).head
+    } else {
+      null
+    }
+  }
+
+  override def getPrefixes(namespaceURI : String) : Iterator[String] = {
+    if (namespaceURI == null) {
+      throw new IllegalArgumentException("Can't pass null to getPrefixes")
+    }
+
+    if (uriToPrefix.contains(namespaceURI)) {
+      uriToPrefix(namespaceURI).toIterator
+    } else {
+      Set[String]().toIterator //an empty string iterator
+    }
   }
 }

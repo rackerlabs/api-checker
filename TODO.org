@@ -196,9 +196,9 @@
       2. [X] 2.0 based on Saxon (non-schema aware -- unless you have license)
       3. [X] Allow setting of version in checker format.
       4. [X] Take version into account when optimizing states
-   9. [-] Tests[1/6]
+   9. [-] Tests[2/6]
       1. [X] XPath parser pool
-      2. [ ] ImmutableNamespaceContext
+      2. [X] ImmutableNamespaceContext
       3. [ ] States[0/2]
          1. [ ] XPath 1.0
          2. [ ] XPath 2.0
