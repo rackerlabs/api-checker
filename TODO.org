@@ -183,7 +183,7 @@
    10. [X] Update sample filter / webapp
 ** DONE Bean attributes for config
 ** DONE New Join Optimization stage.
-** TODO Extend machine to handle correct element in XML [8/11]
+** TODO Extend machine to handle correct element in XML [9/11]
    1. [X] Add support for XPATH step in XSD
    2. [X] Add Element Check in config
    3. [X] Add support for Element check in XSLs
@@ -196,7 +196,7 @@
       2. [X] 2.0 based on Saxon (non-schema aware -- unless you have license)
       3. [X] Allow setting of version in checker format.
       4. [X] Take version into account when optimizing states
-   9. [-] Tests[5/6]
+   9. [X] Tests[6/6]
       1. [X] XPath parser pool
       2. [X] ImmutableNamespaceContext
       3. [X] States[2/2]
@@ -209,9 +209,9 @@
          4. [X] Should check case no element is specified.
          5. [X] Check with dups vs no-dups
       5. [X] Step Builder Tests
-      6. [ ] WADL Validator
-         1. [ ] XPath 1.0
-         2. [ ] XPath 2.0
+      6. [X] WADL Validator
+         1. [X] XPath 1.0
+         2. [X] XPath 2.0
    10. [ ] Better errors when multiple XPath expressions fail.
        1. [ ] Test, to prove that that's working.
    11. [ ] Update filter / filter app
