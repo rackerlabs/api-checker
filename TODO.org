@@ -196,7 +196,7 @@
       2. [X] 2.0 based on Saxon (non-schema aware -- unless you have license)
       3. [X] Allow setting of version in checker format.
       4. [X] Take version into account when optimizing states
-   9. [-] Tests[4/7]
+   9. [-] Tests[5/6]
       1. [X] XPath parser pool
       2. [X] ImmutableNamespaceContext
       3. [X] States[2/2]
@@ -208,8 +208,7 @@
          3. [X] Element test without well formed specified.
          4. [X] Should check case no element is specified.
          5. [X] Check with dups vs no-dups
-      5. [ ] Step Builder Tests
-         1. [ ] Confirm XPath 2.0 Setting
+      5. [X] Step Builder Tests
       6. [ ] WADL Validator
          1. [ ] XPath 1.0
          2. [ ] XPath 2.0

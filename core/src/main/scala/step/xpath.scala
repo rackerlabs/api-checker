@@ -11,7 +11,7 @@ import com.rackspace.com.papi.components.checker.util.XPathExpressionPool._
 
 import org.xml.sax.SAXParseException
 
-class XPath(id : String, label : String, expression : String, nc : NamespaceContext, version : Int, next : Array[Step]) extends ConnectedStep(id, label, next) {
+class XPath(id : String, label : String, val expression : String, val nc : NamespaceContext, val version : Int, next : Array[Step]) extends ConnectedStep(id, label, next) {
 
   override val mismatchMessage : String = "The expression "+expression+" does not evaluate to true"
 
