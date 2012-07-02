@@ -183,7 +183,7 @@
    10. [X] Update sample filter / webapp
 ** DONE Bean attributes for config
 ** DONE New Join Optimization stage.
-** TODO Extend machine to handle correct element in XML [7/9]
+** TODO Extend machine to handle correct element in XML [8/9]
    1. [X] Add support for XPATH step in XSD
    2. [X] Add Element Check in config
    3. [X] Add support for Element check in XSLs
@@ -191,18 +191,22 @@
    5. [X] Add XPath Pool
    6. [X] Create XPath State
    7. [X] Add support XPath sate in builder
-   8. [ ] New Config XPath version [0/2]
-      1. [ ] 1.0 based on Xalan (default)
-      2. [ ] 2.0 based on Saxon (non-schema aware -- unless you have license)
-   9. [-] Tests[1/7]
+   8. [X] New Config XPath version [4/4]
+      1. [X] 1.0 based on Xalan (default)
+      2. [X] 2.0 based on Saxon (non-schema aware -- unless you have license)
+      3. [X] Allow setting of version in checker format.
+      4. [X] Take version into account when optimizing states
+   9. [-] Tests[1/6]
       1. [X] XPath parser pool
-      2. [ ] Tests on XPath 1.0 and 2.0
-      3. [ ] ImmutableNamespaceContext
-      4. [ ] States
-      5. [ ] Checker Tests
+      2. [ ] ImmutableNamespaceContext
+      3. [ ] States[0/2]
+         1. [ ] XPath 1.0
+         2. [ ] XPath 2.0
+      4. [ ] Checker Tests
          1. [ ] Should check case no element is specified.
          2. [ ] Tests with XSD stages.
          3. [ ] Tests without XSD stages.
+         4. [ ] Tests with dups in XPath (with/without version)
       6. [ ] Step Builder Tests
       7. [ ] WADL Validator
 ** TODO Namespace cleanup task should look into XPath expressions...

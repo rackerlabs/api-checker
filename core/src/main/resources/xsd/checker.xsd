@@ -137,6 +137,7 @@
         <complexContent>
             <extension base="chk:ConnectedStep">
                 <attribute name="match" type="xsd:string" use="required"/>
+                <attribute name="version" type="chk:XPathVersion" use="optional"/>
             </extension>
         </complexContent>
     </complexType>
@@ -393,6 +394,13 @@
             <enumeration value="CONTENT_FAIL"/>
             <enumeration value="XSD"/>
             <enumeration value="XPATH"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="XPathVersion">
+        <restriction base="xsd:byte">
+            <minInclusive value="1"/>
+            <maxInclusive value="2"/>
         </restriction>
     </simpleType>
 
