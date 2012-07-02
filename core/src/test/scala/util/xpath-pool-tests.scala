@@ -6,6 +6,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
 import javax.xml.xpath.XPathExpression
+import javax.xml.xpath.XPathExpressionException
 
 import scala.collection.mutable.Map
 
@@ -22,6 +23,32 @@ class XPathExpressionPoolSuite extends FunSuite {
     try {
       xpath = XPathExpressionPool.borrowExpression(expression, ImmutableNamespaceContext(ns), XPATH_VERSION_1)
       assert (xpath != null)
+    } finally {
+      if (xpath != null) XPathExpressionPool.returnExpression(expression, XPATH_VERSION_1, xpath)
+    }
+  }
+
+  test ("The pool should fail to create an xpath expression if there's an error in the expression") {
+    val ns = Map[String,String]()
+    val expression = "/ns:root()"
+    var xpath : XPathExpression = null
+    try {
+      intercept[XPathExpressionException] {
+        xpath = XPathExpressionPool.borrowExpression(expression, ImmutableNamespaceContext(ns), XPATH_VERSION_1)
+      }
+    } finally {
+      if (xpath != null) XPathExpressionPool.returnExpression(expression, XPATH_VERSION_1, xpath)
+    }
+  }
+
+  test ("The pool should fail to create an xpath expression if a valid XPath 2 expression is passed with version == 1") {
+    val ns = Map("ns" -> "http://my/namespace")
+    val expression = "if (/ns:root) then true() else false()"
+    var xpath : XPathExpression = null
+    try {
+      intercept[XPathExpressionException] {
+        xpath = XPathExpressionPool.borrowExpression(expression, ImmutableNamespaceContext(ns), XPATH_VERSION_1)
+      }
     } finally {
       if (xpath != null) XPathExpressionPool.returnExpression(expression, XPATH_VERSION_1, xpath)
     }
@@ -70,6 +97,19 @@ class XPathExpressionPoolSuite extends FunSuite {
     try {
       xpath = XPathExpressionPool.borrowExpression(expression, ImmutableNamespaceContext(ns), XPATH_VERSION_2)
       assert (xpath != null)
+    } finally {
+      if (xpath != null) XPathExpressionPool.returnExpression(expression, XPATH_VERSION_2, xpath)
+    }
+  }
+
+  test ("The pool should fail to create an xpath expression if there's an error in the expression (XPath 2)") {
+    val ns = Map[String,String]()
+    val expression = "/ns:root()"
+    var xpath : XPathExpression = null
+    try {
+      intercept[XPathExpressionException] {
+        xpath = XPathExpressionPool.borrowExpression(expression, ImmutableNamespaceContext(ns), XPATH_VERSION_2)
+      }
     } finally {
       if (xpath != null) XPathExpressionPool.returnExpression(expression, XPATH_VERSION_2, xpath)
     }
