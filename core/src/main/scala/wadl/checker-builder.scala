@@ -25,6 +25,7 @@ import com.rackspace.com.papi.components.checker.Config
 object BuilderXSLParams {
   val ENABLE_WELL_FORM = "enableWellFormCheck"
   val ENABLE_XSD       = "enableXSDContentCheck"
+  val ENABLE_ELEMENT   = "enableElementCheck"
 }
 
 import BuilderXSLParams._
@@ -53,6 +54,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/removeDups.xsl")))
+  val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/join.xsl")))
 
   def build (in : Source, out: Result, config : Config) : Unit = {
     var c = config
@@ -67,6 +69,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
       buildHandler.getTransformer().setParameter (ENABLE_WELL_FORM, c.checkWellFormed)
       buildHandler.getTransformer().setParameter (ENABLE_XSD, c.checkXSDGrammar)
+      buildHandler.getTransformer().setParameter (ENABLE_ELEMENT, c.checkElements)
 
       var output = out;
 
@@ -82,8 +85,11 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
       if (c.removeDups) {
         val dupsHandler = wadl.saxTransformerFactory.newTransformerHandler(dupsTemplates)
+        val joinHandler = wadl.saxTransformerFactory.newTransformerHandler(joinTemplates)
+
         buildHandler.setResult (new SAXResult (dupsHandler))
-        dupsHandler.setResult(output)
+        dupsHandler.setResult(new SAXResult(joinHandler))
+        joinHandler.setResult(output)
       } else {
         buildHandler.setResult (output)
       }

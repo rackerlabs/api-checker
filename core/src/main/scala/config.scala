@@ -46,4 +46,27 @@ class Config {
   //  Check all XML against XSD Grammars
   //
   @BeanProperty var checkXSDGrammar : Boolean = false
+
+  //
+  //  Ensure elemets are correct
+  //
+  @BeanProperty var checkElements : Boolean = false
+
+
+  //
+  //  XPath version used in the WADL.  Can be 1 or 2. If 1 is set the
+  //  Xalan implementation will be used, if 2 then Saxon will be used.
+  //  Note that XPath 2 with schema awareness requires a Saxon
+  //  license.
+  //
+  private var xpv : Int = 1
+
+  def xpathVersion : Int = xpv
+  def xpathVersion_= (version : Int) : Unit = {
+    if ((version != 1) && (version != 2))
+      throw new IllegalArgumentException("XPath version can only be 1 or 2.")
+  }
+
+  def setXPathVersion (version : Int) : Unit = { xpathVersion_=(version) }
+  def getXPathVersion : Int = xpathVersion
 }

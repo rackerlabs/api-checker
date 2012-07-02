@@ -12,10 +12,10 @@
    <xsl:variable name="sink_types" as="xsd:string*">
        <xsl:choose>
            <xsl:when test="$nfaMode">
-               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL')"/>
+               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL', 'CONTENT_FAIL', 'REQ_TYPE_FAIL')"/>
            </xsl:when>
            <xsl:otherwise>
-               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL', 'ACCEPT')"/>
+               <xsl:sequence select="('URL_FAIL', 'METHOD_FAIL', 'CONTENT_FAIL', 'REQ_TYPE_FAIL', 'ACCEPT')"/>
            </xsl:otherwise>
        </xsl:choose>
    </xsl:variable>
@@ -23,6 +23,8 @@
    <xsl:variable name="indent" select='"           "'/>
    <xsl:variable name="methodFail" select="concat(generate-id(),'M')"/>
    <xsl:variable name="urlFail" select="concat(generate-id(),'U')"/>
+   <xsl:variable name="contentFail" select="concat(generate-id(),'C')"/>
+   <xsl:variable name="reqFail" select="concat(generate-id(),'R')"/>
    <xsl:template match="check:checker">
        <xsl:text>digraph Checker { rankdir=LR; fontname="Helvetica"; labelloc=b;
        </xsl:text>
@@ -84,6 +86,8 @@
        <xsl:if test="not($ignoreSinks) and $nfaMode">
            <xsl:value-of select="check:nodeLabel($methodFail,'salmon','doublecircle')"/>
            <xsl:value-of select="check:nodeLabel($urlFail,'salmon3', 'doublecircle')"/>
+           <xsl:value-of select="check:nodeLabel($contentFail,'salmon3', 'doublecircle')"/>
+           <xsl:value-of select="check:nodeLabel($reqFail,'salmon3', 'doublecircle')"/>
        </xsl:if>
        <xsl:text>}</xsl:text>
    </xsl:template>
@@ -198,7 +202,7 @@
                      <xsl:when test="@type = 'METHOD_FAIL'">
                          <xsl:text>, shape=ellipse, fillcolor="salmon"</xsl:text>
                      </xsl:when>
-                     <xsl:when test="@type= 'URL_FAIL'">
+                     <xsl:when test="@type = ('URL_FAIL', 'CONTENT_FAIL', 'REQ_TYPE_FAIL')">
                          <xsl:text>, shape=ellipse, fillcolor="salmon3"</xsl:text>
                      </xsl:when>
                      <xsl:when test="@type = 'URL'">
@@ -260,6 +264,12 @@
                    </xsl:when>
                    <xsl:when test="$nextStep/@type = 'URL_FAIL'">
                        <xsl:value-of select="$urlFail"/>
+                   </xsl:when>
+                   <xsl:when test="$nextStep/@type = 'CONTENT_FAIL'">
+                       <xsl:value-of select="$contentFail"/>
+                   </xsl:when>
+                   <xsl:when test="$nextStep/@type = 'REQ_TYPE_FAIL'">
+                       <xsl:value-of select="$reqFail"/>
                    </xsl:when>
                    <xsl:otherwise>
                        <xsl:value-of select="$nextStep/@id"/>

@@ -182,6 +182,45 @@
       7. [X] Test on grammar checks when no grammar is available.
    10. [X] Update sample filter / webapp
 ** DONE Bean attributes for config
+** DONE New Join Optimization stage.
+** DONE Extend machine to handle correct element in XML [10/10]
+   1. [X] Add support for XPATH step in XSD
+   2. [X] Add Element Check in config
+   3. [X] Add support for Element check in XSLs
+   4. [X] Update CLI tools
+   5. [X] Add XPath Pool
+   6. [X] Create XPath State
+   7. [X] Add support XPath sate in builder
+   8. [X] New Config XPath version [4/4]
+      1. [X] 1.0 based on Xalan (default)
+      2. [X] 2.0 based on Saxon (non-schema aware -- unless you have license)
+      3. [X] Allow setting of version in checker format.
+      4. [X] Take version into account when optimizing states
+   9. [X] Tests[6/6]
+      1. [X] XPath parser pool
+      2. [X] ImmutableNamespaceContext
+      3. [X] States[2/2]
+         1. [X] XPath 1.0
+         2. [X] XPath 2.0
+      4. [X] Checker Tests
+         1. [X] Tests with XSD stages.
+         2. [X] Tests without XSD stages.
+         3. [X] Element test without well formed specified.
+         4. [X] Should check case no element is specified.
+         5. [X] Check with dups vs no-dups
+      5. [X] Step Builder Tests
+      6. [X] WADL Validator
+         1. [X] XPath 1.0
+         2. [X] XPath 2.0
+   10. [X] Update filter / filter app
+** TODO Extend machine to check required plain parameters
+   1. [ ] Better errors when multiple XPath expressions fail.
+       1. [ ] Test, to prove that that's working.
+   2. [ ] Tests
+         1. [ ] Tests with dups in XPath (with/without version)
+         2. [ ] Test Bad XPaths
+** TODO Namespace cleanup task should look into XPath expressions...
+** TODO Namespace cleanup task should account for default namespaces.
 ** TODO Fix test error, where register is not working in step-test.scala
 ** TODO Review Skipped Tests[0/2]
    1. [ ] Saxon validation

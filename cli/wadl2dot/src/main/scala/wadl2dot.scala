@@ -22,6 +22,9 @@ object Wadl2Dot {
   val xsdCheck = parser.flag[Boolean] (List("x", "xsd"),
                                          "Add checks to ensure that XML validates against XSD grammar Default: false")
 
+  val element = parser.flag[Boolean] (List("l", "element"),
+                                         "Add checks to ensure that XML requests use the correct element : false")
+
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
                                           "Show error nodes. Default: false")
 
@@ -76,6 +79,7 @@ object Wadl2Dot {
       c.removeDups = removeDups.value.getOrElse(false)
       c.checkWellFormed = wellFormed.value.getOrElse(false)
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
+      c.checkElements   = element.value.getOrElse(false)
       c.validateChecker = true
 
       new WADLDotBuilder().build (getSource, getResult,

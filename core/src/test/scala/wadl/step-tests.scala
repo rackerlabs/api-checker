@@ -136,6 +136,234 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
 
+    scenario("The WADL contains a single multi-path resource, XML well formness, element, and XSD checks are on") {
+      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                  xmlns:tst="http://www.rackspace.com/xerces/test">
+           <grammars>
+              <schema
+                  elementFormDefault="qualified"
+                  attributeFormDefault="unqualified"
+                  xmlns="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  targetNamespace="http://www.rackspace.com/xerces/test">
+
+                 <element name="e" type="tst:SampleElement"/>
+                 <element name="a" type="tst:SampleAttribute"/>
+
+                 <complexType name="SampleElement">
+                   <sequence>
+                     <element name="even" type="tst:EvenInt100" minOccurs="0"/>
+                   </sequence>
+                 </complexType>
+
+                 <complexType name="SampleAttribute">
+                   <attribute name="even" type="tst:EvenInt100" use="optional"/>
+                 </complexType>
+
+                <!-- XSD 1.1 assert -->
+                <simpleType name="EvenInt100">
+                  <restriction base="xsd:integer">
+                    <minInclusive value="0" />
+                    <maxInclusive value="100" />
+                    <assertion test="$value mod 2 = 0" />
+                  </restriction>
+                </simpleType>
+            </schema>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+                   <method name="POST">
+                      <request>
+                          <representation mediaType="application/xml" element="tst:a"/>
+                      </request>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val step = builder.build (inWADL, TestConfig(false, false, true, true, true)).asInstanceOf[Start]
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), WellFormedXML, XPath("/tst:a"), XSD, Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), WellFormedXML, ContentFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), ContentFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), WellFormedXML, XPath("/tst:a"), ContentFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqTypeFail("(?i)application/xml"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET|POST"))
+      assert(step, Start, URI("path"), MethodFail)
+    }
+
+    scenario("The WADL contains a single multi-path resource, element, and XSD checks are on, well formness is off") {
+      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                  xmlns:tst="http://www.rackspace.com/xerces/test">
+           <grammars>
+              <schema
+                  elementFormDefault="qualified"
+                  attributeFormDefault="unqualified"
+                  xmlns="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  targetNamespace="http://www.rackspace.com/xerces/test">
+
+                 <element name="e" type="tst:SampleElement"/>
+                 <element name="a" type="tst:SampleAttribute"/>
+
+                 <complexType name="SampleElement">
+                   <sequence>
+                     <element name="even" type="tst:EvenInt100" minOccurs="0"/>
+                   </sequence>
+                 </complexType>
+
+                 <complexType name="SampleAttribute">
+                   <attribute name="even" type="tst:EvenInt100" use="optional"/>
+                 </complexType>
+
+                <!-- XSD 1.1 assert -->
+                <simpleType name="EvenInt100">
+                  <restriction base="xsd:integer">
+                    <minInclusive value="0" />
+                    <maxInclusive value="100" />
+                    <assertion test="$value mod 2 = 0" />
+                  </restriction>
+                </simpleType>
+            </schema>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+                   <method name="POST">
+                      <request>
+                          <representation mediaType="application/xml" element="tst:a"/>
+                      </request>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val step = builder.build (inWADL, TestConfig(false, false, false, true, true)).asInstanceOf[Start]
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), WellFormedXML, XPath("/tst:a"), XSD, Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), WellFormedXML, ContentFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), ContentFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), WellFormedXML, XPath("/tst:a"), ContentFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqTypeFail("(?i)application/xml"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET|POST"))
+      assert(step, Start, URI("path"), MethodFail)
+    }
+
+    scenario("The WADL contains a single multi-path resource, with element checks on but XSD and well formness checks are off") {
+      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                  xmlns:tst="http://www.rackspace.com/xerces/test">
+           <grammars>
+              <schema
+                  elementFormDefault="qualified"
+                  attributeFormDefault="unqualified"
+                  xmlns="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  targetNamespace="http://www.rackspace.com/xerces/test">
+
+                 <element name="e" type="tst:SampleElement"/>
+                 <element name="a" type="tst:SampleAttribute"/>
+
+                 <complexType name="SampleElement">
+                   <sequence>
+                     <element name="even" type="tst:EvenInt100" minOccurs="0"/>
+                   </sequence>
+                 </complexType>
+
+                 <complexType name="SampleAttribute">
+                   <attribute name="even" type="tst:EvenInt100" use="optional"/>
+                 </complexType>
+
+                <!-- XSD 1.1 assert -->
+                <simpleType name="EvenInt100">
+                  <restriction base="xsd:integer">
+                    <minInclusive value="0" />
+                    <maxInclusive value="100" />
+                    <assertion test="$value mod 2 = 0" />
+                  </restriction>
+                </simpleType>
+            </schema>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+                   <method name="POST">
+                      <request>
+                          <representation mediaType="application/xml" element="tst:a"/>
+                      </request>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      val step = builder.build (inWADL, TestConfig(false, false, false, false, true)).asInstanceOf[Start]
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), WellFormedXML, XPath("/tst:a"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), WellFormedXML, ContentFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqType("(?i)application/xml"), ContentFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("POST"), ReqTypeFail("(?i)application/xml"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET|POST"))
+      assert(step, Start, URI("path"), MethodFail)
+    }
+
+    scenario("The WADL contains a single multi-path resource, with element checks but bad QName for element") {
+      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method name="DELETE">
+                      <response status="200"/>
+                   </method>
+                   <method name="POST">
+                      <request>
+                          <representation mediaType="application/xml" element="tst:foo"/>
+                      </request>
+                   </method>
+              </resource>
+           </resources>
+        </application>
+      when("the wadl is translated")
+      intercept[WADLException] {
+        val step = builder.build (inWADL, TestConfig(false, false, false, false, true)).asInstanceOf[Start]
+      }
+    }
+
     scenario("The WADL contains a single multi-path resource, XSD checks are on, but well formness is not specified") {
       given("a WADL that contains a single multi-path resource with a GET and DELETE method")
       val inWADL =

@@ -14,6 +14,7 @@
     <!-- Paramenters -->
     <xsl:param name="enableXSDContentCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableWellFormCheck" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enableElementCheck" as="xsd:boolean" select="false()"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -26,8 +27,10 @@
     <!-- Actual Config Flags -->
     <xsl:variable name="useXSDContentCheck" as="xsd:boolean"
                   select="$enableXSDContentCheck and $WADLhasXSD"/>
+    <xsl:variable name="useElementCheck" as="xsd:boolean"
+                  select="$enableElementCheck"/>
     <xsl:variable name="useWellFormCheck" as="xsd:boolean"
-                  select="$enableWellFormCheck or $useXSDContentCheck"/>
+                  select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -481,6 +484,11 @@
         <xsl:value-of select="concat(generate-id($context),'XSD')"/>
     </xsl:function>
 
+    <xsl:function name="check:XPathID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(generate-id($context),'XPTH')"/>
+    </xsl:function>
+
     <xsl:template name="check:addWellFormNext">
         <xsl:attribute name="next" select="(check:WellFormID(.), check:WellFormFailID(.))" separator=" "/>
     </xsl:template>
@@ -489,12 +497,21 @@
         <xsl:param name="type" />
         <xsl:variable name="doXSD" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $useXSDContentCheck"/>
+        <xsl:variable name="doElement" as="xsd:boolean"
+                      select="($type = 'WELL_XML') and $useElementCheck and @element"/>
         <xsl:variable name="XSDID" as="xsd:string"
                       select="check:XSDID(.)"/>
+        <xsl:variable name="XPathID" as="xsd:string"
+                      select="check:XPathID(.)"/>
         <xsl:variable name="FAILID" as="xsd:string"
                       select="check:WellFormFailID(.)"/>
         <step type="{$type}" id="{check:WellFormID(.)}">
             <xsl:choose>
+                <xsl:when test="$doElement">
+                    <xsl:attribute name="next"
+                                   select="($XPathID, $FAILID)"
+                                   separator=" "/>
+                </xsl:when>
                 <xsl:when test="$doXSD">
                     <xsl:attribute name="next"
                                    select="($XSDID, $FAILID)"
@@ -505,6 +522,21 @@
                 </xsl:otherwise>
             </xsl:choose>
         </step>
+        <xsl:if test="$doElement">
+            <step type="XPATH" id="{$XPathID}">
+                <xsl:choose>
+                    <xsl:when test="$doXSD">
+                        <xsl:attribute name="next"
+                                       select="($XSDID, $FAILID)"
+                                       separator=" "/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="next" select="$ACCEPT"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:attribute name="match" select="concat('/',check:normType(resolve-QName(@element,.)))"/>
+            </step>
+        </xsl:if>
         <xsl:if test="$doXSD">
             <step type="XSD" id="{$XSDID}" next="{$ACCEPT}"/>
         </xsl:if>

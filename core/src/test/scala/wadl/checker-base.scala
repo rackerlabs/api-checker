@@ -65,6 +65,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithMatch (checker, urlMatch).filter(n => (n \ "@type").text == "URLXSD")
   }
 
+  def stepsWithXPathMatch (checker : NodeSeq, xpathMatch : String) : NodeSeq = {
+    stepsWithMatch (checker, xpathMatch).filter(n => (n \ "@type").text == "XPATH")
+  }
+
   def stepsWithMethodMatch (checker : NodeSeq, methodMatch  : String) : NodeSeq = {
     stepsWithMatch (checker, methodMatch).filter(n => (n \ "@type").text == "METHOD")
   }
@@ -86,6 +90,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def URLXSD(url : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatch(_, url)
   def Label(label : String) : (NodeSeq) => NodeSeq = stepsWithLabel(_, label)
   def Method(method : String) : (NodeSeq) => NodeSeq = stepsWithMethodMatch(_, method)
+  def XPath(expression : String) : (NodeSeq) => NodeSeq = stepsWithXPathMatch (_, expression)
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {
