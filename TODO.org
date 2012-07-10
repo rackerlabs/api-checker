@@ -213,12 +213,31 @@
          1. [X] XPath 1.0
          2. [X] XPath 2.0
    10. [X] Update filter / filter app
-** TODO Extend machine to check required plain parameters
-   1. [ ] Better errors when multiple XPath expressions fail.
-       1. [ ] Test, to prove that that's working.
-   2. [ ] Tests
-         1. [ ] Tests with dups in XPath (with/without version)
-         2. [ ] Test Bad XPaths
+** TODO Extend machine to check required plain parameters[0/4]
+   1. [ ] Add required plain param in config
+   2. [ ] Add support for check in XSLs
+   3. [ ] Update CLI tools
+   4. [ ] Tests[0/2]
+      1. [ ] Checker Tests[0/2]
+         1. [ ] Dups vs NoDups
+         2. [ ] With / Without XSD checks
+      2. [ ] WADL Validator tests
+         1. [ ] XPath 1.0
+         2. [ ] XPath 2.0
+         3. [ ] XPath 2.0 complex (assertions, etc)
+** TODO XPath check enhancements[0/5]
+   1. [ ] Better errors when multiple XPath expressions fail --
+      display.
+   2. [ ] WADL extension to support XPath 2.0 (xpathversion=2.0)
+   3. [ ] Clark notation for error messages.
+   4. [ ] Combine XPath optimization
+   5. [ ] Tests
+      1. [ ] Prove that better error messages are working correctly
+         with test.
+      2. [ ] Tests with dups in XPath (with/without version).  Dups
+         should work well at detecting XPath with version number.
+      3. [ ] Test Bad XPaths
+      4. [ ] Combined XPath opt tests
 ** TODO Namespace cleanup task should look into XPath expressions...
 ** TODO Namespace cleanup task should account for default namespaces.
 ** TODO Fix test error, where register is not working in step-test.scala
