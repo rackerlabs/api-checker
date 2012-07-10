@@ -213,8 +213,8 @@
          1. [X] XPath 1.0
          2. [X] XPath 2.0
    10. [X] Update filter / filter app
-** TODO Extend machine to check required plain parameters[0/4]
-   1. [ ] Add required plain param in config
+** TODO Extend machine to check required plain parameters[1/4]
+   1. [X] Add required plain param in config
    2. [ ] Add support for check in XSLs
    3. [ ] Update CLI tools
    4. [ ] Tests[0/2]

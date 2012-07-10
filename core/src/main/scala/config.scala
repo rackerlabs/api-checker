@@ -52,7 +52,6 @@ class Config {
   //
   @BeanProperty var checkElements : Boolean = false
 
-
   //
   //  XPath version used in the WADL.  Can be 1 or 2. If 1 is set the
   //  Xalan implementation will be used, if 2 then Saxon will be used.
@@ -69,4 +68,9 @@ class Config {
 
   def setXPathVersion (version : Int) : Unit = { xpathVersion_=(version) }
   def getXPathVersion : Int = xpathVersion
+
+  //
+  //  Check plain parameters
+  //
+  @BeanProperty var checkPlainParams : Boolean = false
 }
