@@ -133,7 +133,7 @@
         <xsl:param name="excludes" as="xsd:string*"/>
         <xsl:param name="dups" as="node()"/>
         <xsl:sequence select="for $n in $nexts return if ($excludes = $n) then 
-                              $dups/check:group/@include[contains(../@exclude,$n)] 
+                              $dups/check:group/@include[tokenize(../@exclude,' ') = $n]
                               else $n"/>
     </xsl:function>
     
