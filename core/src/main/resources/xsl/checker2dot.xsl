@@ -92,19 +92,19 @@
        <xsl:text>}</xsl:text>
    </xsl:template>
     
-   <xsl:template match="check:step[count(index-of($source_types,@type)) != 0]" mode="source">
+   <xsl:template match="check:step[@type = $source_types]" mode="source">
         <xsl:value-of select="concat($indent,@id,'&#x0a;')"/>
    </xsl:template>
-   <xsl:template match="check:step[count(index-of($sink_types,@type)) != 0]" mode="sink">
+   <xsl:template match="check:step[@type = $sink_types]" mode="sink">
        <xsl:value-of select="concat($indent,@id,'&#x0a;')"/>
    </xsl:template>
-   <xsl:template match="check:step[$source_types = @type]" mode="nfa_connections">
+   <xsl:template match="check:step[@type = $source_types]" mode="nfa_connections">
        <xsl:value-of select="concat($indent,$real_start,'-&gt;',@id,'&#x0a;')"/>
    </xsl:template>
    <xsl:template match="check:step" mode="connections">
        <xsl:variable name="step" select="."/>
        <xsl:choose>
-           <xsl:when test="($ignoreSinks or $nfaMode) and count(index-of($sink_types,@type)) != 0"/>
+           <xsl:when test="($ignoreSinks or $nfaMode) and (@type = $sink_types)"/>
            <xsl:otherwise>
                <xsl:variable name="label" select="@label"/>
                <xsl:variable name="id" select="@id"/>
@@ -114,7 +114,7 @@
                    <xsl:variable name="nextStep" select="$step/../check:step[@id = $next]" as="node()"/>
                    <xsl:variable name="dest" as="xsd:string" select="check:nextDest($nextStep)"/>
                    <xsl:choose>
-                       <xsl:when test="$ignoreSinks and count(index-of($sink_types,$nextStep/@type)) != 0"/>
+                       <xsl:when test="$ignoreSinks and ($nextStep/@type = $sink_types)"/>
                        <xsl:otherwise>
                            <xsl:value-of select="check:connect($id, $dest)"/>
                            <xsl:choose>
@@ -157,7 +157,7 @@
    </xsl:template>
      <xsl:template match="check:step">
          <xsl:choose>
-             <xsl:when test="($ignoreSinks or $nfaMode) and count(index-of($sink_types,@type)) != 0"/>
+             <xsl:when test="($ignoreSinks or $nfaMode) and (@type = $sink_types)"/>
              <xsl:otherwise>
                  <xsl:value-of select="concat(@id,'[')"/>
                  <xsl:value-of select="'label=&quot;'"/>
@@ -186,7 +186,7 @@
                  </xsl:choose>
                  <xsl:value-of select="'&quot;'"/>
                  <xsl:choose>
-                     <xsl:when test="(count(index-of($source_types,@type)) != 0)">
+                     <xsl:when test="@type = $source_types">
                          <xsl:choose>
                              <xsl:when test="$nfaMode">
                                  <xsl:text>, fillcolor="white"</xsl:text>
