@@ -213,25 +213,31 @@
          1. [X] XPath 1.0
          2. [X] XPath 2.0
    10. [X] Update filter / filter app
-** TODO Extend machine to check required plain parameters[1/4]
+** TODO Extend machine to check required plain parameters[3/4]
    1. [X] Add required plain param in config
-   2. [ ] Add support for check in XSLs
-   3. [ ] Update CLI tools
+   2. [X] Add support for check in XSLs
+   3. [X] Update CLI tools
    4. [ ] Tests[0/2]
-      1. [ ] Checker Tests[0/2]
-         1. [ ] Dups vs NoDups
-         2. [ ] With / Without XSD checks
+      1. [ ] Checker Tests[0/6]
+         1. [ ] Multiple xpaths in a single rep
+         2. [ ] Multiple rep with single xpath
+         3. [ ] Mix number of xpath and rep
+         4. [ ] With / Without XSD checks
+         5. [ ] With / Without Element checks
+         6. [ ] Dups vs NoDups
       2. [ ] WADL Validator tests
          1. [ ] XPath 1.0
          2. [ ] XPath 2.0
          3. [ ] XPath 2.0 complex (assertions, etc)
-** TODO XPath check enhancements[0/5]
+** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
       display.
-   2. [ ] WADL extension to support XPath 2.0 (xpathversion=2.0)
-   3. [ ] Clark notation for error messages.
-   4. [ ] Combine XPath optimization
-   5. [ ] Tests
+   2. [ ] Normalize namespaces correctly in XPATHs from WADL -- prune
+      only the namespaces that you use.
+   3. [ ] WADL extension to support XPath 2.0 (xpathversion=2.0)
+   4. [ ] Clark notation for error messages.
+   5. [ ] Combine XPath optimization
+   6. [ ] Tests
       1. [ ] Prove that better error messages are working correctly
          with test.
       2. [ ] Tests with dups in XPath (with/without version).  Dups
