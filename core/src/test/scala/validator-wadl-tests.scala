@@ -970,6 +970,207 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   //
+  // validator_XSDElementContentPlain allows:
+  //
+  //
+  // PUT /a/b with json and xml support
+  // POST /a/b with xml support
+  //
+  // POST /c with json support
+  // GET /c
+  //
+  // The validator checks for wellformness in XML and grammar checks
+  // XSD requests.  It also checks the element type, and it checks
+  // constraints against required plain params.  You can PUT an a in
+  // /a/b and POST an e in /a/b
+  //
+  // The validator is used in the following tests.
+  //
+  val validator_XSDElementContentPlain = Validator(
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:a">
+                          <param style="plain" path="tst:a/@stepType" required="true"/>
+                      </representation>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:e">
+                          <param style="plain" path="tst:e/tst:stepType" required="true"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    , TestConfig(false, false, true, true, true, 1, true))
+
+  //
+  //  Like validator_XSDElementContentPlain, but using an XPath 2 engine.
+  //
+  val validator_XSDElementContentPlain2 = Validator(
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:a">
+                          <param style="plain" path="tst:a/@stepType" required="true"/>
+                      </representation>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:e">
+                          <param style="plain" path="tst:e/tst:stepType" required="true"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    , TestConfig(false, false, true, true, true, 2, true))
+
+  val badXML_Plain1 = <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                        <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                        <even>22</even>
+                     </e>
+  val badXML_Plain2 = <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                        id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"
+                        even="22"/>
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDElementContentPlain with valid XML1") {
+    validator_XSDElementContentPlain.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDElementContentPlain2 with valid XML1") {
+    validator_XSDElementContentPlain2.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDElementContentPlain with valid XML1") {
+    validator_XSDElementContentPlain.validate(request("POST","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDElementContentPlain2 with valid XML1") {
+    validator_XSDElementContentPlain2.validate(request("POST","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_XSDElementContentPlain with well formed JSON") {
+    validator_XSDElementContentPlain.validate(request("PUT","/a/b","application/json", goodJSON),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_XSDElementContentPlain2 with well formed JSON") {
+    validator_XSDElementContentPlain2.validate(request("PUT","/a/b","application/json", goodJSON),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_XSDElementContentPlain with well formed JSON") {
+    validator_XSDElementContentPlain.validate(request("POST","/c","application/json", goodJSON),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_XSDElementContentPlain2 with well formed JSON") {
+    validator_XSDElementContentPlain2.validate(request("POST","/c","application/json", goodJSON),response,chain)
+  }
+
+  test ("GOT on /c should succeed on validator_XSDElementContentPlain") {
+    validator_XSDElementContentPlain.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("GOT on /c should succeed on validator_XSDElementContentPlain2") {
+    validator_XSDElementContentPlain2.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT in the wrong location in validator_XSDElementContentPlain") {
+    assertResultFailed(validator_XSDElementContentPlain.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT in the wrong location in validator_XSDElementContentPlain2") {
+    assertResultFailed(validator_XSDElementContentPlain2.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT with missing required plain params on validator_XSDElementContentPlain") {
+    assertResultFailed(validator_XSDElementContentPlain.validate(request("PUT","/a/b", "application/xml", badXML_Plain2),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT with missing required plain params on validator_XSDElementContentPlain2") {
+    assertResultFailed(validator_XSDElementContentPlain2.validate(request("PUT","/a/b", "application/xml", badXML_Plain2),response,chain), 400)
+  }
+
+  test ("POST on /a/b should fail with well formed XML POST in the wrong location in validator_XSDElementContentPlain") {
+    assertResultFailed(validator_XSDElementContentPlain.validate(request("POST","/a/b", "application/xml", goodXML_XSD2),response,chain), 400)
+  }
+
+  test ("POST on /a/b should fail with well formed XML POST in the wrong location in validator_XSDElementContentPlain2") {
+    assertResultFailed(validator_XSDElementContentPlain2.validate(request("POST","/a/b", "application/xml", goodXML_XSD2),response,chain), 400)
+  }
+
+  test ("POST on /a/b should fail with well formed XML POST with missing required plain params on validator_XSDElementContentPlain") {
+    assertResultFailed(validator_XSDElementContentPlain.validate(request("POST","/a/b", "application/xml", badXML_Plain1),response,chain), 400)
+  }
+
+  test ("POST on /a/b should fail with well formed XML POST with missing required plain params on validator_XSDElementContentPlain2") {
+    assertResultFailed(validator_XSDElementContentPlain2.validate(request("POST","/a/b", "application/xml", badXML_Plain1),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_XSDElementContentPlain") {
+    assertResultFailed(validator_XSDElementContentPlain.validate(request("PUT","/a/b", "application/xml", goodXML),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_XSDElementContentPlain2") {
+    assertResultFailed(validator_XSDElementContentPlain2.validate(request("PUT","/a/b", "application/xml", goodXML),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML, correct element, but does not validate against the schema in validator_XSDElementContentPlain") {
+    assertResultFailed(validator_XSDElementContentPlain.validate(request("PUT","/a/b", "application/xml",
+                                                             <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test" stepType="foo">
+                                                                <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                                                                <stepType>URL_FAIL</stepType>
+                                                                <even>22</even>
+                                                              </a>
+                                                            ),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML, correct element, butdoes not validate against the schema in validator_XSDElementContentPlain2") {
+    assertResultFailed(validator_XSDElementContentPlain2.validate(request("PUT","/a/b", "application/xml",
+                                                             <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test" stepType="foo">
+                                                                <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                                                                <stepType>URL_FAIL</stepType>
+                                                                <even>22</even>
+                                                              </a>
+                                                            ),response,chain), 400)
+  }
+
+
+  //
   // validator_AM allows:
   //
   // GET /.*/b
