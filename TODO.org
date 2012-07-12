@@ -218,7 +218,7 @@
    2. [X] Add support for check in XSLs
    3. [X] Update CLI tools
    4. [ ] Tests[0/2]
-      1. [-] Checker Tests[8/11]
+      1. [-] Checker Tests[9/11]
          1. [X] Multiple xpaths in a single rep
          2. [X] Multiple rep with single xpath
          3. [X] Mix number of xpath and rep
@@ -227,7 +227,7 @@
          6. [X] Without Element checks
          7. [X] With No Element, but element checks on
          8. [X] No Well-form checks
-         9. [ ] Without XSD and Element checks
+         9. [X] Without XSD and Element checks
          10. [ ] Namespace copy test
          11. [ ] Dups
       2. [ ] WADL Validator tests
