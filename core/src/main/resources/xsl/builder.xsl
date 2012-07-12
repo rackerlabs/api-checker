@@ -8,13 +8,14 @@
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     exclude-result-prefixes="xsd wadl rax check"
     version="2.0">
-    
+
     <xsl:output indent="yes" method="xml"/>
 
     <!-- Paramenters -->
     <xsl:param name="enableXSDContentCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableWellFormCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableElementCheck" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enablePlainParamCheck" as="xsd:boolean" select="false()"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -29,8 +30,10 @@
                   select="$enableXSDContentCheck and $WADLhasXSD"/>
     <xsl:variable name="useElementCheck" as="xsd:boolean"
                   select="$enableElementCheck"/>
+    <xsl:variable name="usePlainParamCheck" as="xsd:boolean"
+                  select="$enablePlainParamCheck"/>
     <xsl:variable name="useWellFormCheck" as="xsd:boolean"
-                  select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck"/>
+                  select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or $enablePlainParamCheck"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -43,6 +46,9 @@
     
     <!-- Useful matches -->
     <xsl:variable name="matchAll" select="'.*'"/>
+
+    <!-- Default prefix -->
+    <xsl:variable name="defaultPrefix" select="generate-id(/element()[1])"/>
 
     <!-- A list of namespaces -->
     <xsl:variable name="namespaces">
@@ -155,12 +161,20 @@
         </xsl:variable>
 
         <!--
-            Return only unique ones.
+            Return only unique ones, if don't prune is false and usePlainParamCheck is false, 
+            otherwise return all.
         -->
         <namespaces>
-            <xsl:for-each-group select="$ns//check:ns" group-by="@uri">
-                <xsl:copy-of select="current-group()[1]"/>
-            </xsl:for-each-group>
+            <xsl:choose>
+                <xsl:when test="$ns//check:dont_prune">
+                    <xsl:copy-of select="$ns//check:ns"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:for-each-group select="$ns//check:ns" group-by="@uri">
+                        <xsl:copy-of select="current-group()[1]"/>
+                    </xsl:for-each-group>
+                </xsl:otherwise>
+            </xsl:choose>
         </namespaces>
     </xsl:template>
 
@@ -170,28 +184,58 @@
         </xsl:for-each>
     </xsl:template>
 
-    <xsl:template match="wadl:param[@type]" mode="ns">
+    <xsl:template match="wadl:param[@type]" priority="1" mode="ns">
         <xsl:variable name="qname" select="resolve-QName(@type,.)" as="xsd:QName"/>
+        <xsl:variable name="pfix" select="prefix-from-QName($qname)"/>
         <xsl:call-template name="check:printns">
-            <xsl:with-param name="qname" select="$qname"/>
+            <xsl:with-param name="pfix" select="if (empty($pfix)) then '' else $pfix"/>
+            <xsl:with-param name="uri" select="namespace-uri-from-QName($qname)"/>
         </xsl:call-template>
     </xsl:template>
 
     <xsl:template match="wadl:representation[@element]" mode="ns">
         <xsl:variable name="qname" select="resolve-QName(@element,.)" as="xsd:QName"/>
+        <xsl:variable name="pfix" select="prefix-from-QName($qname)"/>
         <xsl:call-template name="check:printns">
-            <xsl:with-param name="qname" select="$qname"/>
+            <xsl:with-param name="pfix" select="if (empty($pfix)) then '' else $pfix"/>
+            <xsl:with-param name="uri" select="namespace-uri-from-QName($qname)"/>
         </xsl:call-template>
+        <xsl:apply-templates mode="ns"/>
+    </xsl:template>
+
+    <xsl:template match="wadl:representation[check:isXML(@mediaType)]/wadl:param[(@style = 'plain') and @path]" priority="2" mode="ns">
+        <!--
+            If we have an XPath param in an XML representation, then
+            copy all namespace nodes in that param. And enure that we
+            don't prune the namespaces.
+
+            A nicer thing to do would be to parse out the XPath,
+            include only those namespaces referenced and allow for
+            pruning...
+        -->
+        <xsl:if test="$usePlainParamCheck">
+            <xsl:variable name="this" as="node()" select="."/>
+            <xsl:for-each select="in-scope-prefixes($this)">
+                <xsl:call-template name="check:printns">
+                    <xsl:with-param name="pfix" select="."/>
+                    <xsl:with-param name="uri" select="namespace-uri-for-prefix(.,$this)"/>
+                    <xsl:with-param name="node" select="$this"/>
+                </xsl:call-template>
+            </xsl:for-each>
+            <dont_prune/>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="check:printns">
-        <xsl:param name="qname" as="xsd:QName"/>
+        <xsl:param name="pfix" as="xsd:string" />
+        <xsl:param name="uri" as="xsd:string"/>
+        <xsl:param name="node" as="node()" select="."/>
         <ns>
             <xsl:attribute name="prefix">
-                <xsl:variable name="prefix" select="prefix-from-QName($qname)"/>
+                <xsl:variable name="prefix" select="$pfix"/>
                 <xsl:choose>
                     <xsl:when test="not($prefix)">
-                        <xsl:value-of select="generate-id()"/>
+                        <xsl:value-of select="$defaultPrefix"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="$prefix"/>
@@ -199,7 +243,7 @@
                 </xsl:choose>
             </xsl:attribute>
             <xsl:attribute name="uri">
-                <xsl:value-of select="namespace-uri-from-QName($qname)"/>
+                <xsl:value-of select="$uri"/>
             </xsl:attribute>
         </ns>
     </xsl:template>
@@ -486,7 +530,8 @@
 
     <xsl:function name="check:XPathID" as="xsd:string">
         <xsl:param name="context" as="node()"/>
-        <xsl:value-of select="concat(generate-id($context),'XPTH')"/>
+        <xsl:param name="number" as="xsd:integer"/>
+        <xsl:value-of select="concat(generate-id($context),$number,'XPTH')"/>
     </xsl:function>
 
     <xsl:template name="check:addWellFormNext">
@@ -495,14 +540,19 @@
 
     <xsl:template name="check:addWellForm">
         <xsl:param name="type" />
+        <xsl:variable name="this" as="node()" select="."/>
+        <xsl:variable name="defaultPlainParams" as="node()*"
+                      select="wadl:param[xsd:boolean(@required) and @path and (@style='plain')]"/>
         <xsl:variable name="doXSD" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $useXSDContentCheck"/>
         <xsl:variable name="doElement" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $useElementCheck and @element"/>
+        <xsl:variable name="doReqPlainParam" as="xsd:boolean"
+                      select="($type = 'WELL_XML') and $usePlainParamCheck and exists($defaultPlainParams)"/>
         <xsl:variable name="XSDID" as="xsd:string"
                       select="check:XSDID(.)"/>
         <xsl:variable name="XPathID" as="xsd:string"
-                      select="check:XPathID(.)"/>
+                      select="check:XPathID(.,0)"/>
         <xsl:variable name="FAILID" as="xsd:string"
                       select="check:WellFormFailID(.)"/>
         <step type="{$type}" id="{check:WellFormID(.)}">
@@ -510,6 +560,11 @@
                 <xsl:when test="$doElement">
                     <xsl:attribute name="next"
                                    select="($XPathID, $FAILID)"
+                                   separator=" "/>
+                </xsl:when>
+                <xsl:when test="$doReqPlainParam">
+                    <xsl:attribute name="next"
+                                   select="(check:XPathID(.,1), $FAILID)"
                                    separator=" "/>
                 </xsl:when>
                 <xsl:when test="$doXSD">
@@ -525,6 +580,11 @@
         <xsl:if test="$doElement">
             <step type="XPATH" id="{$XPathID}">
                 <xsl:choose>
+                    <xsl:when test="$doReqPlainParam">
+                        <xsl:attribute name="next"
+                                       select="(check:XPathID(.,1), $FAILID)"
+                                       separator=" "/>
+                    </xsl:when>
                     <xsl:when test="$doXSD">
                         <xsl:attribute name="next"
                                        select="($XSDID, $FAILID)"
@@ -536,6 +596,31 @@
                 </xsl:choose>
                 <xsl:attribute name="match" select="concat('/',check:normType(resolve-QName(@element,.)))"/>
             </step>
+        </xsl:if>
+        <xsl:if test="$doReqPlainParam">
+            <xsl:for-each select="$defaultPlainParams">
+                <step type="XPATH" id="{check:XPathID($this,position())}" match="{@path}">
+                    <xsl:choose>
+                        <xsl:when test="position() = last()">
+                            <xsl:choose>
+                                <xsl:when test="$doXSD">
+                                    <xsl:attribute name="next"
+                                                   select="($XSDID, $FAILID)"
+                                                   separator=" "/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="next" select="$ACCEPT"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="next"
+                                           select="(check:XPathID($this,position()+1), $FAILID)"
+                                           separator=" "/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </step>
+            </xsl:for-each>
         </xsl:if>
         <xsl:if test="$doXSD">
             <step type="XSD" id="{$XSDID}" next="{$ACCEPT}"/>
@@ -650,7 +735,7 @@
 
     <xsl:function name="check:normType" as="xsd:string">
         <xsl:param name="type" as="xsd:QName"/>
-        <xsl:value-of select="concat($namespaces//check:ns[@uri = namespace-uri-from-QName($type)]/@prefix,':',local-name-from-QName($type))"/>
+        <xsl:value-of select="concat($namespaces//check:ns[@uri = namespace-uri-from-QName($type)][1]/@prefix,':',local-name-from-QName($type))"/>
     </xsl:function>
 
     <xsl:function name="check:sort" as="xsd:string*">

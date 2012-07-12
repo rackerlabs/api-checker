@@ -81,6 +81,15 @@ object TestConfig {
                                                                     new ServletResultHandler()))
 
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean) : Config = {
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements, xpathVersion)
+    config.checkPlainParams = checkPlainParams
+
+    config
+  }
+
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
              checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int) : Config = {
     val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements)
     config.xpathVersion = xpathVersion

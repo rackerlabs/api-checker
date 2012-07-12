@@ -11,15 +11,13 @@
 
     <xsl:template match="check:checker" name="joinDups">
         <xsl:param name="checker" select="." as="node()"/>
-        <xsl:variable name="joins" as="node()">
-            <checker>
+        <xsl:variable name="joins" as="node()*">
                <xsl:apply-templates mode="getJoins" select="$checker//check:step">
                 <xsl:with-param name="checker" select="$checker"/>
                </xsl:apply-templates>
-            </checker>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="not($joins/check:join)">
+            <xsl:when test="empty($joins)">
                 <checker>
                     <xsl:copy-of select="/check:checker/namespace::*"/>
                     <xsl:copy-of select="/check:checker/check:grammar"/>
@@ -41,7 +39,7 @@
 
     <xsl:template name="doJoin">
         <xsl:param name="checker" as="node()"/>
-        <xsl:param name="joins" as="node()"/>
+        <xsl:param name="joins" as="node()*"/>
         <xsl:variable name="excludes" as="xsd:string*">
             <xsl:sequence select="tokenize(string-join($joins//@steps, ' '), ' ')"/>
         </xsl:variable>
@@ -53,28 +51,33 @@
             </xsl:apply-templates>
             <xsl:apply-templates select="$joins" mode="join">
                 <xsl:with-param name="checker" select="$checker"/>
+                <xsl:with-param name="joins" select="$joins"/>
             </xsl:apply-templates>
         </checker>
     </xsl:template>
 
     <xsl:template match="check:join" mode="join">
         <xsl:param name="checker" as="node()"/>
+        <xsl:param name="joins" as="node()*"/>
         <xsl:variable name="joinSteps" as="xsd:string*" select="tokenize(@steps,' ')"/>
         <xsl:variable name="steps" as="node()*" select="$checker//check:step[@id = $joinSteps]"/>
+        
         <step id="{generate-id(.)}">
             <xsl:apply-templates select="$steps[1]/@*[not(name() = ('next','label','id'))]" mode="copy"/>
             <xsl:call-template name="joinNext">
+                <xsl:with-param name="joins" select="$joins"/>
                 <xsl:with-param name="steps" select="$steps"/>
                 <xsl:with-param name="nexts" select="()"/>
-            </xsl:call-template>
-        </step>
+             </xsl:call-template>
+        </step> 
     </xsl:template>
 
     <xsl:template name="joinNext">
+        <xsl:param name="joins" as="node()*"/>
         <xsl:param name="steps" as="node()*"/>
         <xsl:param name="nexts" as="xsd:string*"/>
         <xsl:choose>
-            <xsl:when test="count($steps) = 0">
+            <xsl:when test="empty($steps)">
                 <xsl:attribute name="next">
                     <xsl:value-of separator=" ">
                         <xsl:sequence select="$nexts"/>
@@ -82,19 +85,19 @@
                 </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="snexts" as="xsd:string*" select="tokenize($steps[1]/@next,' ')"/>
+                <xsl:variable name="snexts" as="xsd:string*" select="check:getNexts($joins,tokenize($steps[1]/@next,' '))"/>
                 <xsl:call-template name="joinNext">
                     <xsl:with-param name="steps" select="$steps[position() != 1]"/>
                     <xsl:with-param name="nexts"
                                     select="(for $s in $snexts
-                                             return if (not($s = $nexts)) then normalize-space($s) else (), $nexts)"/>
+                                             return if (not($s = $nexts)) then $s else (), $nexts)"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <xsl:template match="check:step" mode="copy">
-        <xsl:param name="joins" as="node()"/>
+        <xsl:param name="joins" as="node()*"/>
         <xsl:param name="excludes" as="xsd:string*"/>
         <xsl:choose>
             <xsl:when test="$excludes = @id"/>
@@ -112,29 +115,39 @@
     <xsl:template match="@*" mode="copy">
         <xsl:copy/>
     </xsl:template>
-
-    <xsl:template match="@next" mode="copy">
-        <xsl:param name="joins" as="node()"/>
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(string(.),' ')"/>
-        <xsl:attribute name="next">
-            <xsl:for-each select="$joins/check:join">
-                <xsl:variable name="njoin" as="node()" select="."/>
-                <xsl:variable name="steps" as="xsd:string*" select="tokenize(@steps,' ')"/>
-                <xsl:for-each-group select="$nexts" group-by=". = $steps">
-                    <xsl:choose>
-                        <xsl:when test=". = $steps">
-                            <xsl:value-of select="concat(generate-id($njoin),' ')"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of separator=" ">
-                                <xsl:sequence select="current-group()"/>
-                            </xsl:value-of>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:for-each-group>
-            </xsl:for-each>
-        </xsl:attribute>
+    
+    <xsl:template match="@next" name="updateNext" mode="copy">
+        <xsl:param name="joins" as="node()*"/>
+        <xsl:param name="nexts" as="xsd:string*" select="tokenize(string(.),' ')"/>
+        <xsl:attribute name="next"  separator=" " select="check:getNexts($joins,$nexts)"/>
     </xsl:template>
+
+    <xsl:function name="check:getNexts" as="xsd:string*">
+        <xsl:param name="joins" as="node()*"/>
+        <xsl:param name="nexts" as="xsd:string*"/>
+        <xsl:choose>
+            <xsl:when test="empty($joins)">
+                <xsl:sequence select="$nexts"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="join" select="$joins[1]" as="node()"/>
+                <xsl:variable name="steps" select="tokenize($join/@steps,' ')"/>
+                <xsl:variable name="next_out" as="xsd:string*">
+                    <xsl:for-each-group select="$nexts" group-by=". = $steps">
+                        <xsl:choose>
+                            <xsl:when test=". = $steps">
+                                <xsl:value-of select="generate-id($join)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:sequence select="current-group()"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:for-each-group>
+                </xsl:variable>
+                <xsl:sequence select="check:getNexts($joins[position() != 1],$next_out)"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
 
     <xsl:template match="check:step[@next]" mode="getJoins">
         <xsl:param name="checker" as="node()"/>
