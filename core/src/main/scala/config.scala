@@ -64,6 +64,7 @@ class Config {
   def xpathVersion_= (version : Int) : Unit = {
     if ((version != 1) && (version != 2))
       throw new IllegalArgumentException("XPath version can only be 1 or 2.")
+    xpv = version
   }
 
   def setXPathVersion (version : Int) : Unit = { xpathVersion_=(version) }
