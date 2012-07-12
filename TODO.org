@@ -218,8 +218,8 @@
    2. [X] Add support for check in XSLs
    3. [X] Update CLI tools
    4. [ ] Tests[0/2]
-      1. [ ] Checker Tests[0/6]
-         1. [ ] Multiple xpaths in a single rep
+      1. [-] Checker Tests[1/6]
+         1. [X] Multiple xpaths in a single rep
          2. [ ] Multiple rep with single xpath
          3. [ ] Mix number of xpath and rep
          4. [ ] With / Without XSD checks
