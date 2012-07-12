@@ -18,6 +18,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   register ("xsd", "http://www.w3.org/2001/XMLSchema")
   register ("wadl","http://wadl.dev.java.net/2009/02")
   register ("chk","http://www.rackspace.com/repose/wadl/checker")
+  register ("tst","http://www.rackspace.com/repose/wadl/checker/step/test")
 
   feature ("The WADLCheckerBuilder can correctly transforma a WADL into checker format") {
 
@@ -3130,6 +3131,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 3")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
@@ -3144,6 +3151,51 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
   }
+
+  scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different namespaces)") {
+    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    val inWADL =
+      <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02">
+        <wadl:grammars>
+            <wadl:include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </wadl:grammars>
+        <wadl:resources base="https://test.api.openstack.com" xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+           <wadl:resource path="/a/b">
+               <wadl:method name="POST">
+                  <wadl:request>
+                      <wadl:representation mediaType="application/xml" element="tst:a">
+                         <wadl:param name="id" style="plain" path="/tst:a/@id" required="true"/>
+                         <wadl:param name="stepType" style="plain" path="/tst:a/@stepType" required="true"/>
+                      </wadl:representation>
+                  </wadl:request>
+               </wadl:method>
+           </wadl:resource>
+        </wadl:resources>
+    </wadl:application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 3")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+            XPath("/tst:a/@id"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
+  }
+
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (wellform checks to false)") {
     given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
@@ -3169,6 +3221,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, false, true, true, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 3")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
@@ -3210,6 +3268,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 4")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
@@ -3256,6 +3320,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 5")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
@@ -3305,6 +3377,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 4")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
@@ -3349,6 +3427,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, true, false, true, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XSD']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 3")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
@@ -3387,6 +3471,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, false, false, false, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XSD']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
@@ -3423,6 +3511,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, false, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
@@ -3460,6 +3552,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
