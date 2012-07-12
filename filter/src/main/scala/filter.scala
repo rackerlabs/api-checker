@@ -44,6 +44,7 @@ class ValidatorFilter extends Filter {
     conf.checkXSDGrammar = true
     conf.checkElements = true
     conf.xpathVersion = 2
+    conf.checkPlainParams = true
 
     validator = Validator(new SAXSource(new InputSource(wadlRef)), conf)
   }
