@@ -217,8 +217,8 @@
    1. [X] Add required plain param in config
    2. [X] Add support for check in XSLs
    3. [X] Update CLI tools
-   4. [ ] Tests[0/2]
-      1. [-] Checker Tests[10/11]
+   4. [-] Tests[1/2]
+      1. [X] Checker Tests[12/12]
          1. [X] Multiple xpaths in a single rep
          2. [X] Multiple rep with single xpath
          3. [X] Mix number of xpath and rep
@@ -229,7 +229,8 @@
          8. [X] No Well-form checks
          9. [X] Without XSD and Element checks
          10. [X] Namespace copy test
-         11. [ ] Dups
+         11. [X] Same element multiple representations
+         12. [X] Dups
       2. [ ] WADL Validator tests
          1. [ ] XPath 1.0
          2. [ ] XPath 2.0
