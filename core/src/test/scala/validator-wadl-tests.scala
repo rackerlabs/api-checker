@@ -1045,6 +1045,8 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                   <request>
                       <representation mediaType="application/xml" element="tst:e">
                           <param style="plain" path="tst:e/tst:stepType" required="true"/>
+                          <!-- a silly xpath assertion that will always return true -->
+                          <param style="plain" path="string(current-dateTime())" required="true"/>
                       </representation>
                   </request>
                </method>

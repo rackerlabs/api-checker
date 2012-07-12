@@ -213,11 +213,11 @@
          1. [X] XPath 1.0
          2. [X] XPath 2.0
    10. [X] Update filter / filter app
-** TODO Extend machine to check required plain parameters[3/5]
+** TODO Extend machine to check required plain parameters[4/5]
    1. [X] Add required plain param in config
    2. [X] Add support for check in XSLs
    3. [X] Update CLI tools
-   4. [-] Tests[1/2]
+   4. [X] Tests[2/2]
       1. [X] Checker Tests[12/12]
          1. [X] Multiple xpaths in a single rep
          2. [X] Multiple rep with single xpath
@@ -231,10 +231,10 @@
          10. [X] Namespace copy test
          11. [X] Same element multiple representations
          12. [X] Dups
-      2. [-] WADL Validator tests
+      2. [X] WADL Validator tests
          1. [X] XPath 1.0
          2. [X] XPath 2.0
-         3. [ ] XPath 2.0 complex (assertions, etc)
+         3. [X] XPath 2.0 (only 2.0 capa)
    5. [ ] Update to filter-app
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
