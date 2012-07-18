@@ -236,7 +236,23 @@
          2. [X] XPath 2.0
          3. [X] XPath 2.0 (only 2.0 capa)
    5. [X] Update to filter-app
-** TODO Log on failures
+** TODO XSD Transform [0/6]
+   1. [ ] Add XSD transform option to config
+   2. [ ] Add support for XSD transform in XSD
+   3. [ ] Add support for XSD transform in XSD step
+   4. [ ] Add support for XSD transform in Handler
+   5. [ ] Add support for communicationg content upstream [0/3]
+      1. [ ] XML
+      2. [ ] JSON
+      3. [ ] Other / None
+   6. [ ] Tests [0/2]
+      1. [ ] Ensure that checker moves option
+      2. [ ] Make sure content is communicated upstream [0/4]
+         1. [ ] Validate with options on XML
+         2. [ ] Validate with options off XML
+         3. [ ] Well-Form XML
+         4. [ ] Well-Form JSON
+** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
       display.
@@ -254,6 +270,7 @@
       4. [ ] Combined XPath opt tests
 ** TODO Namespace cleanup task should look into XPath expressions...
 ** TODO Namespace cleanup task should account for default namespaces.
+** TODO Log on failures
 ** TODO Fix test error, where register is not working in step-test.scala
 ** TODO Review Skipped Tests[0/2]
    1. [ ] Saxon validation
