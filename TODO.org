@@ -236,8 +236,8 @@
          2. [X] XPath 2.0
          3. [X] XPath 2.0 (only 2.0 capa)
    5. [X] Update to filter-app
-** TODO XSD Transform [0/6]
-   1. [ ] Add XSD transform option to config
+** TODO XSD Transform [1/6]
+   1. [X] Add XSD transform option to config
    2. [ ] Add support for XSD transform in XSD
    3. [ ] Add support for XSD transform in XSD step
    4. [ ] Add support for XSD transform in Handler
