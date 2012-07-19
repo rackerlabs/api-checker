@@ -1,5 +1,6 @@
 package com.rackspace.com.papi.components.checker.servlet
 
+import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 import javax.servlet.http.HttpServletResponse
@@ -36,6 +37,17 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
   def contentError_= (e : Exception):Unit = request.setAttribute(CONTENT_ERROR, e)
+
+  override def getInputStream : ServletInputStream = {
+    if (parsedXML != null) {
+      printf ("XML has been parsed!")
+    } else if (parsedJSON != null) {
+      printf ("JSON has been parsed!")
+    } else {
+      printf ("Original XML")
+    }
+    super.getInputStream()
+  }
 }
 
 //
