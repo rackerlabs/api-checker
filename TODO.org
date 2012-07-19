@@ -249,8 +249,8 @@
       3. [X] JSON
       4. [X] Other / None
    8. [X] Update filter-app return data optionally
-   9. [ ] Tests [0/2]
-      1. [ ] Ensure that checker sets options correctly
+   9. [-] Tests [1/2]
+      1. [X] Ensure that checker sets options correctly
       2. [ ] Make sure content is communicated upstream [0/5]
          1. [ ] Transform fatory identity test.
          2. [ ] Validate with transforms and options on XML (Xerces / Saxon)
