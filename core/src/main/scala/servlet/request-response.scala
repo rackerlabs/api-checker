@@ -3,6 +3,8 @@ package com.rackspace.com.papi.components.checker.servlet
 import java.io.IOException
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
@@ -66,6 +68,16 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       new ByteArrayServletInputStream(parsedJSON.asInstanceOf[JSONAware].toJSONString().getBytes())
     } else {
       super.getInputStream()
+    }
+  }
+
+  override def getReader : BufferedReader = {
+    if (parsedXML != null) {
+      new BufferedReader(new InputStreamReader (getInputStream(), parsedXML.getInputEncoding()))
+    } else if (parsedJSON != null) {
+      new BufferedReader(new InputStreamReader (getInputStream(), "UTF-8"))
+    }else {
+      super.getReader
     }
   }
 }

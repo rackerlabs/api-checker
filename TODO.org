@@ -248,7 +248,8 @@
       2. [X] XML
       3. [X] JSON
       4. [X] Other / None
-   8. [ ] Tests [0/2]
+   8. [ ] Update filter-app return data optionally
+   9. [ ] Tests [0/2]
       1. [ ] Ensure that checker sets options correctly
       2. [ ] Make sure content is communicated upstream [0/5]
          1. [ ] Transform fatory identity test.
@@ -256,7 +257,6 @@
          3. [ ] Validate with transforms and no options XML (Xerces / Saxon)
          4. [ ] Well-Form XML (Xerces / Saxon)
          5. [ ] Well-Form JSON
-   9. [ ] Update filter-app
 ** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
