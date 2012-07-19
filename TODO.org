@@ -251,12 +251,20 @@
    8. [X] Update filter-app return data optionally
    9. [-] Tests [1/2]
       1. [X] Ensure that checker sets options correctly
-      2. [-] Make sure content is communicated upstream [1/5]
+      2. [-] Make sure content is communicated upstream [1/3]
          1. [X] Transform fatory identity test.
-         2. [ ] Validate with transforms and options on XML (Xerces / Saxon)
-         3. [ ] Validate with transforms and no options XML (Xerces / Saxon)
-         4. [ ] Well-Form XML (Xerces / Saxon)
-         5. [ ] Well-Form JSON
+         2. [-] New validator step tests [2/4]
+            1. [X] Existing TESTs with transform == true
+            2. [X] Existing TESTs with transform == true (SAXON)
+            3. [ ] Confirm options are filled in
+            4. [ ] Confirm options are filled in (SAXON)
+         3. [ ] WADL Validator Tests [0/4]
+            1. [ ] Validate with transforms and options on XML (Xerces /
+               Saxon), new tests.
+            2. [ ] Validate with transforms and no options XML (Xerces /
+               Saxon), new assertions
+            3. [ ] Well-Form XML (Xerces / Saxon), new assertions
+            4. [ ] Well-Form JSON, new assertions
 ** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --

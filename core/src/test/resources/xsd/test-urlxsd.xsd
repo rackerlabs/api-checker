@@ -19,8 +19,8 @@
 
     <complexType name="SampleAttribute">
         <attribute name="id" type="tst:UUID" use="required"/>
-        <attribute name="stepType" type="tst:StepType" use="optional"/>
-        <attribute name="even" type="tst:EvenInt100" use="optional"/>
+        <attribute name="stepType" type="tst:StepType" use="optional" default="START"/>
+        <attribute name="even" type="tst:EvenInt100" use="optional" default="50"/>
     </complexType>
 
     <!-- A simple enumeration -->
