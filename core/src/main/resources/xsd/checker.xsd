@@ -121,7 +121,19 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep"/>
+            <extension base="chk:ConnectedStep">
+                <attribute name="transform" type="xsd:boolean" use="optional">
+                    <annotation>
+                        <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                            <html:p>
+                                If transform is 'true' then the
+                                validation step will transform the
+                                input, to fill in default values.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
         </complexContent>
     </complexType>
 
