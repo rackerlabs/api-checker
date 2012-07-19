@@ -236,25 +236,27 @@
          2. [X] XPath 2.0
          3. [X] XPath 2.0 (only 2.0 capa)
    5. [X] Update to filter-app
-** TODO XSD Transform [6/9]
+** TODO XSD Transform [7/9]
    1. [X] Add XSD transform option to config
    2. [X] Add support for XSD transform in XSD
    3. [X] Add support for XSD transform in XSD step
    4. [X] Add support for XSD transform in Handler
    5. [X] Handle config change correctly in XSL
    6. [X] Handle set and not set in dups options
-   7. [ ] Add support for communicationg content upstream [0/3]
-      1. [ ] XML
-      2. [ ] JSON
-      3. [ ] Other / None
-   8. [ ] Update filter-app
-   9. [ ] Tests [0/2]
+   7. [X] Add support for communicationg content upstream [4/4]
+      1. [X] Identity transform pool -- just pick a factory (Xalan, XalanC, Saxon)
+      2. [X] XML
+      3. [X] JSON
+      4. [X] Other / None
+   8. [ ] Tests [0/2]
       1. [ ] Ensure that checker sets options correctly
-      2. [ ] Make sure content is communicated upstream [0/4]
-         1. [ ] Validate with transforms and options on XML (Xerces / Saxon)
+      2. [ ] Make sure content is communicated upstream [0/5]
+         1. [ ] Transform fatory identity test.
+         2. [ ] Validate with transforms and options on XML (Xerces / Saxon)
          3. [ ] Validate with transforms and no options XML (Xerces / Saxon)
          4. [ ] Well-Form XML (Xerces / Saxon)
          5. [ ] Well-Form JSON
+   9. [ ] Update filter-app
 ** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --

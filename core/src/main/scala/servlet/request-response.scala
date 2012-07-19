@@ -1,13 +1,23 @@
 package com.rackspace.com.papi.components.checker.servlet
 
+import java.io.IOException
+import java.io.ByteArrayOutputStream
+import java.net.URLDecoder
+
 import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpServletResponseWrapper
-import java.net.URLDecoder
 
+import javax.xml.transform.Transformer
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+
+import org.json.simple.JSONAware
 import org.w3c.dom.Document
+
+import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 
 //
 //  Request Keys
@@ -40,13 +50,22 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   override def getInputStream : ServletInputStream = {
     if (parsedXML != null) {
-      printf ("XML has been parsed!")
+      var transformer : Transformer = null
+      val bout = new ByteArrayOutputStream()
+      try {
+        transformer = borrowTransformer
+        transformer.transform (new DOMSource(parsedXML), new StreamResult(bout))
+        new ByteArrayServletInputStream(bout.toByteArray())
+      } catch {
+        case e : Exception => throw new IOException("Error while serializing!", e)
+      } finally {
+        returnTransformer(transformer)
+      }
     } else if (parsedJSON != null) {
-      printf ("JSON has been parsed!")
+      new ByteArrayServletInputStream(parsedJSON.asInstanceOf[JSONAware].toJSONString().getBytes())
     } else {
-      printf ("Original XML")
+      super.getInputStream()
     }
-    super.getInputStream()
   }
 }
 
