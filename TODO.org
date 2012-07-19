@@ -236,7 +236,7 @@
          2. [X] XPath 2.0
          3. [X] XPath 2.0 (only 2.0 capa)
    5. [X] Update to filter-app
-** TODO XSD Transform [7/9]
+** TODO XSD Transform [8/9]
    1. [X] Add XSD transform option to config
    2. [X] Add support for XSD transform in XSD
    3. [X] Add support for XSD transform in XSD step
@@ -248,7 +248,7 @@
       2. [X] XML
       3. [X] JSON
       4. [X] Other / None
-   8. [ ] Update filter-app return data optionally
+   8. [X] Update filter-app return data optionally
    9. [ ] Tests [0/2]
       1. [ ] Ensure that checker sets options correctly
       2. [ ] Make sure content is communicated upstream [0/5]
