@@ -13,6 +13,7 @@
 
     <!-- Paramenters -->
     <xsl:param name="enableXSDContentCheck" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enableXSDTransform" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableWellFormCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableElementCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePlainParamCheck" as="xsd:boolean" select="false()"/>
@@ -27,7 +28,9 @@
 
     <!-- Actual Config Flags -->
     <xsl:variable name="useXSDContentCheck" as="xsd:boolean"
-                  select="$enableXSDContentCheck and $WADLhasXSD"/>
+                  select="($enableXSDContentCheck or $enableXSDTransform) and $WADLhasXSD"/>
+    <xsl:variable name="useXSDTransform" as="xsd:boolean"
+                  select="$enableXSDTransform and $useXSDContentCheck"/>
     <xsl:variable name="useElementCheck" as="xsd:boolean"
                   select="$enableElementCheck"/>
     <xsl:variable name="usePlainParamCheck" as="xsd:boolean"
