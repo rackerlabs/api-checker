@@ -4,13 +4,16 @@ import javax.xml.validation.Schema
 import javax.xml.validation.Validator
 
 import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.dom.DOMResult
 
 import javax.servlet.FilterChain
+
+import org.w3c.dom.Document
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.util.ValidatorPool._
 
-class XSD(id : String, label : String, schema : Schema, next : Array[Step]) extends ConnectedStep(id, label, next) {
+class XSD(id : String, label : String, schema : Schema, transform : Boolean, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The XML does not validate against the schema."
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
@@ -22,7 +25,14 @@ class XSD(id : String, label : String, schema : Schema, next : Array[Step]) exte
     try {
       validator = borrowValidator (schema)
       validator.setErrorHandler(capture)
-      validator.validate (new DOMSource (req.parsedXML))
+      if (transform) {
+        val result = new DOMResult
+
+        validator.validate (new DOMSource (req.parsedXML), result)
+        req.parsedXML = result.getNode().asInstanceOf[Document]
+      } else {
+        validator.validate (new DOMSource (req.parsedXML))
+      }
       ret = uriLevel
     } catch {
       case e : Exception => error = e

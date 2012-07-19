@@ -566,7 +566,7 @@ class StepSuite extends BaseStepSuite {
   }
 
   test ("In an XSD test, if the content contains valid XML, the uriLevel should stay the same") {
-    val xsd = new XSD("XSD", "XSD", testSchema, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchema, false, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64a</id>
@@ -584,7 +584,7 @@ class StepSuite extends BaseStepSuite {
   }
 
   test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1") {
-    val xsd = new XSD("XSD", "XSD", testSchema, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchema, false, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64aaa</id>
@@ -602,7 +602,7 @@ class StepSuite extends BaseStepSuite {
   }
 
   test ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException") {
-    val xsd = new XSD("XSD", "XSD", testSchema, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchema, false, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64aaa</id>
@@ -625,7 +625,7 @@ class StepSuite extends BaseStepSuite {
   }
 
   test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1 (XSD 1.1 assert)") {
-    val xsd = new XSD("XSD", "XSD", testSchema, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchema, false, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>309a8f1e-bb52-11e1-b9d9-b7652ca2118a</id>
@@ -643,7 +643,7 @@ class StepSuite extends BaseStepSuite {
   }
 
   test ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException (XSD 1.1 assert)") {
-    val xsd = new XSD("XSD", "XSD", testSchema, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchema, false, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>309a8f1e-bb52-11e1-b9d9-b7652ca2118a</id>
