@@ -53,6 +53,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       var transformer : Transformer = null
       val bout = new ByteArrayOutputStream()
       try {
+        parsedXML.normalizeDocument
         transformer = borrowTransformer
         transformer.transform (new DOMSource(parsedXML), new StreamResult(bout))
         new ByteArrayServletInputStream(bout.toByteArray())
