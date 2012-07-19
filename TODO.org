@@ -251,8 +251,8 @@
    8. [X] Update filter-app return data optionally
    9. [-] Tests [1/2]
       1. [X] Ensure that checker sets options correctly
-      2. [ ] Make sure content is communicated upstream [0/5]
-         1. [ ] Transform fatory identity test.
+      2. [-] Make sure content is communicated upstream [1/5]
+         1. [X] Transform fatory identity test.
          2. [ ] Validate with transforms and options on XML (Xerces / Saxon)
          3. [ ] Validate with transforms and no options XML (Xerces / Saxon)
          4. [ ] Well-Form XML (Xerces / Saxon)
