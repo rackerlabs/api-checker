@@ -5,6 +5,8 @@ import javax.xml.namespace.QName
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+import scala.xml._
+
 import org.xml.sax.SAXParseException
 
 @RunWith(classOf[JUnitRunner])
@@ -302,6 +304,19 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
 
     assert (xsd.checkStep (req1, response, chain, 0) == 0)
     assert (xsd.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In an XSD test, if the content contains valid XML, with transform == true, then default values should be filled in") {
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/xml",
+                        <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                           id="f76d5638-bb4f-11e1-abb0-539c4b93e64a"/>, true)
+
+    xsd.checkStep (req1, response, chain, 0)
+
+    val updatedRequest = XML.load(req1.getInputStream())
+    assert ((updatedRequest \ "@stepType").text == "START")
+    assert ((updatedRequest \ "@even").text == "50")
   }
 
   test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1 (transform == true)") {
