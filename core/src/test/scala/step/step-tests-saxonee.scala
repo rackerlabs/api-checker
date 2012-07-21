@@ -306,7 +306,23 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == 1)
   }
 
-  test ("In an XSD test, if the content contains valid XML, with transform == true, then default values should be filled in") {
+  test ("In an XSD test, if the content contains valid XML1, with transform == true, then default values should be filled in") {
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/xml",
+                        <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                         <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                        <stepType/>
+                        <even/>
+                       </e>, true)
+
+    xsd.checkStep (req1, response, chain, 0)
+
+    val updatedRequest = XML.load(req1.getInputStream())
+    assert ((updatedRequest \ "stepType").text == "START")
+    assert ((updatedRequest \ "even").text == "50")
+  }
+
+  test ("In an XSD test, if the content contains valid XML2, with transform == true, then default values should be filled in") {
     val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
