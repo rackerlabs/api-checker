@@ -1,5 +1,7 @@
 package com.rackspace.com.papi.components.checker.step
 
+import java.io.InputStreamReader
+
 import javax.xml.namespace.QName
 
 import org.junit.runner.RunWith
@@ -9,6 +11,7 @@ import org.w3c.dom.Document
 import org.xml.sax.SAXParseException
 
 import org.json.simple.JSONAware
+import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
 
 import scala.collection.mutable.Map
@@ -426,6 +429,21 @@ class StepSuite extends BaseStepSuite {
     assert (req2.parsedXML.isInstanceOf[Document])
   }
 
+
+  test("In a WellFormedXML step, one should be able to reparse the XML by calling getInputStream") {
+    val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
+    wfx.checkStep (req1, response, chain, 0)
+    val xml1 = XML.load(req1.getInputStream())
+    assert (xml1 != null)
+
+    val req2 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"><more/></validXML>)
+    wfx.checkStep (req2, response, chain, 1)
+    val xml2 = XML.load(req2.getInputStream())
+    assert (xml2 != null)
+    assert ((xml2 \ "more") != null)
+  }
+
   test("In a WellFormedXML step, if the content is not well formed XML, the uriLevel should be -1") {
     val wfx = new WellFormedXML("WFXML", "WFXML", Array[Step]())
     assert (wfx.checkStep (request("PUT", "/a/b", "application/xml", """<validXML xmlns='http://valid'>"""), response, chain, 0) == -1)
@@ -515,6 +533,28 @@ class StepSuite extends BaseStepSuite {
     wfj.checkStep (req2, response, chain, 1)
     assert(req2.parsedJSON != null)
     assert(req2.parsedJSON.isInstanceOf[JSONAware])
+  }
+
+  test("In a WellFormedJSON step, if the content contains well formed JSON, you should be able to reparse the JSON by calling getInputStream") {
+    val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
+    val req2 = request("PUT", "/a/b", "application/json", """ { "valid" : [true, true, true] }""")
+    var jparser : JSONParser = null
+
+    wfj.checkStep (req1, response, chain, 0)
+    wfj.checkStep (req2, response, chain, 1)
+
+    try {
+      jparser = JSONParserPool.borrowParser
+      val j1 = jparser.parse(new InputStreamReader(req1.getInputStream(), "UTF-8"))
+      val j2 = jparser.parse(new InputStreamReader(req2.getInputStream(), "UTF-8"))
+
+      assert (j1 != null)
+      assert (j2 != null)
+      assert (j2.asInstanceOf[java.util.Map[Object,Object]].get("valid") != null)
+    } finally {
+      if (jparser != null) JSONParserPool.returnParser(jparser)
+    }
   }
 
   test("In a WellFormedJSON step, if the content contains JSON that is not well-formed, the uriLevel shoud be -1") {

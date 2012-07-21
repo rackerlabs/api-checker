@@ -236,7 +236,7 @@
          2. [X] XPath 2.0
          3. [X] XPath 2.0 (only 2.0 capa)
    5. [X] Update to filter-app
-** TODO XSD Transform [8/9]
+** DONE XSD Transform [9/9]
    1. [X] Add XSD transform option to config
    2. [X] Add support for XSD transform in XSD
    3. [X] Add support for XSD transform in XSD step
@@ -249,21 +249,21 @@
       3. [X] JSON
       4. [X] Other / None
    8. [X] Update filter-app return data optionally
-   9. [-] Tests [1/2]
+   9. [X] Tests [2/2]
       1. [X] Ensure that checker sets options correctly
-      2. [-] Make sure content is communicated upstream [2/3]
+      2. [X] Make sure content is communicated upstream [3/3]
          1. [X] Transform fatory identity test.
-         2. [X] New validator step tests [4/4]
+         2. [X] New validator step tests [6/6]
             1. [X] Existing TESTs with transform == true
             2. [X] Existing TESTs with transform == true (SAXON)
             3. [X] Confirm options are filled in
             4. [X] Confirm options are filled in (SAXON)
-         3. [-] WADL Validator Tests [2/4]
+            3. [X] Well-Form XML -- reparse XML
+            4. [X] Well-Form JSON -- reparse JSON
+         3. [X] WADL Validator Tests [2/2]
             1. [X] Existing XSD tests with transform == true (Xerces / Saxon)
             2. [X] Validate with transforms and options on XML (Xerces /
                Saxon), new tests.
-            3. [ ] Well-Form XML (Xerces / Saxon), new assertions
-            4. [ ] Well-Form JSON, new assertions
 ** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
