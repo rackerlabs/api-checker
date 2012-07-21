@@ -236,7 +236,35 @@
          2. [X] XPath 2.0
          3. [X] XPath 2.0 (only 2.0 capa)
    5. [X] Update to filter-app
-** TODO Log on failures
+** DONE XSD Transform [9/9]
+   1. [X] Add XSD transform option to config
+   2. [X] Add support for XSD transform in XSD
+   3. [X] Add support for XSD transform in XSD step
+   4. [X] Add support for XSD transform in Handler
+   5. [X] Handle config change correctly in XSL
+   6. [X] Handle set and not set in dups options
+   7. [X] Add support for communicationg content upstream [4/4]
+      1. [X] Identity transform pool -- just pick a factory (Xalan, XalanC, Saxon)
+      2. [X] XML
+      3. [X] JSON
+      4. [X] Other / None
+   8. [X] Update filter-app return data optionally
+   9. [X] Tests [2/2]
+      1. [X] Ensure that checker sets options correctly
+      2. [X] Make sure content is communicated upstream [3/3]
+         1. [X] Transform fatory identity test.
+         2. [X] New validator step tests [6/6]
+            1. [X] Existing TESTs with transform == true
+            2. [X] Existing TESTs with transform == true (SAXON)
+            3. [X] Confirm options are filled in
+            4. [X] Confirm options are filled in (SAXON)
+            3. [X] Well-Form XML -- reparse XML
+            4. [X] Well-Form JSON -- reparse JSON
+         3. [X] WADL Validator Tests [2/2]
+            1. [X] Existing XSD tests with transform == true (Xerces / Saxon)
+            2. [X] Validate with transforms and options on XML (Xerces /
+               Saxon), new tests.
+** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
       display.
@@ -254,6 +282,7 @@
       4. [ ] Combined XPath opt tests
 ** TODO Namespace cleanup task should look into XPath expressions...
 ** TODO Namespace cleanup task should account for default namespaces.
+** TODO Log on failures
 ** TODO Fix test error, where register is not working in step-test.scala
 ** TODO Review Skipped Tests[0/2]
    1. [ ] Saxon validation

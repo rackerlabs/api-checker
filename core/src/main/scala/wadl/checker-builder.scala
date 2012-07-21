@@ -25,6 +25,7 @@ import com.rackspace.com.papi.components.checker.Config
 object BuilderXSLParams {
   val ENABLE_WELL_FORM = "enableWellFormCheck"
   val ENABLE_XSD       = "enableXSDContentCheck"
+  val ENABLE_XSD_TRANSFORM = "enableXSDTransform"
   val ENABLE_ELEMENT   = "enableElementCheck"
   val ENABLE_PLAIN_PARAM = "enablePlainParamCheck"
 }
@@ -70,6 +71,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
       buildHandler.getTransformer().setParameter (ENABLE_WELL_FORM, c.checkWellFormed)
       buildHandler.getTransformer().setParameter (ENABLE_XSD, c.checkXSDGrammar)
+      buildHandler.getTransformer().setParameter (ENABLE_XSD_TRANSFORM, c.doXSDGrammarTransform)
       buildHandler.getTransformer().setParameter (ENABLE_ELEMENT, c.checkElements)
       buildHandler.getTransformer().setParameter (ENABLE_PLAIN_PARAM, c.checkPlainParams)
 

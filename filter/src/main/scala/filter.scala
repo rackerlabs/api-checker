@@ -39,12 +39,13 @@ class ValidatorFilter extends Filter {
 
     val conf = new Config
     conf.resultHandler = resultHandler
-    conf.useSaxonEEValidation = false
+    conf.useSaxonEEValidation = true
     conf.checkWellFormed = true
     conf.checkXSDGrammar = true
     conf.checkElements = true
     conf.xpathVersion = 2
     conf.checkPlainParams = true
+    conf.doXSDGrammarTransform = true
 
     validator = Validator(new SAXSource(new InputSource(wadlRef)), conf)
   }

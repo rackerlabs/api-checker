@@ -183,8 +183,22 @@
                 </xsl:for-each-group>
             </xsl:for-each-group>
         </xsl:for-each-group>
-        <!-- Steps with no @match -->
-        <xsl:for-each-group select="$nextStep[not(@match)]" group-by="@type">
+        <!-- XSD Steps with transform -->
+        <xsl:for-each-group select="$nextStep[@transform]" group-by="@type">
+            <xsl:for-each-group select="current-group()" group-by="@transform">
+                <xsl:if test="count(current-group()) &gt; 1">
+                    <join>
+                        <xsl:attribute name="steps">
+                            <xsl:value-of separator=" ">
+                                <xsl:sequence select="current-group()/@id"/>
+                            </xsl:value-of>
+                        </xsl:attribute>
+                    </join>
+                </xsl:if>
+            </xsl:for-each-group>
+        </xsl:for-each-group>
+        <!-- Steps with no @match and no @transform-->
+        <xsl:for-each-group select="$nextStep[not(@match) and not(@transform)]" group-by="@type">
             <xsl:if test="count(current-group()) &gt; 1">
                 <join>
                     <xsl:attribute name="steps">

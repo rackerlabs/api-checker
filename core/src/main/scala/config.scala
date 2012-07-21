@@ -48,6 +48,12 @@ class Config {
   @BeanProperty var checkXSDGrammar : Boolean = false
 
   //
+  //  Allow XSD grammar transform.  Transform the XML after
+  //  validation, to fill in things like default values etc.
+  //
+  @BeanProperty var doXSDGrammarTransform : Boolean = false
+
+  //
   //  Ensure elemets are correct
   //
   @BeanProperty var checkElements : Boolean = false

@@ -197,6 +197,39 @@
                     </xsl:for-each-group>
                 </xsl:for-each-group>
             </xsl:for-each-group>
+            <!-- For XSD steps, where we don't want to mix transform  -->
+            <xsl:for-each-group select="$checker//check:step[@type='XSD' and @transform]" group-by="@transform">
+                <xsl:for-each-group select="current-group()" group-by="@next">
+                    <xsl:if test="count(current-group()) > 1">
+                        <group>
+                            <xsl:attribute name="include">
+                                <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                            </xsl:attribute>
+                            <xsl:attribute name="exclude">
+                                <xsl:value-of separator=" ">
+                                    <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                                </xsl:value-of>
+                            </xsl:attribute>
+                        </group>
+                    </xsl:if>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
+            <xsl:for-each-group select="$checker//check:step[@type='XSD' and not(@tranform)]" group-by="@type">
+                <xsl:for-each-group select="current-group()" group-by="@next">
+                    <xsl:if test="count(current-group()) > 1">
+                        <group>
+                            <xsl:attribute name="include">
+                                <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                            </xsl:attribute>
+                            <xsl:attribute name="exclude">
+                                <xsl:value-of separator=" ">
+                                    <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                                </xsl:value-of>
+                            </xsl:attribute>
+                        </group>
+                    </xsl:if>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
             <!-- For each method fail, url fail, groups by not Match -->
             <xsl:for-each-group select="$checker//check:step[(@type='METHOD_FAIL' or @type='URL_FAIL' or @type='REQ_TYPE_FAIL') and not(@notTypes)]" group-by="@notMatch">
                 <xsl:if test="count(current-group()) > 1">
@@ -245,7 +278,7 @@
                 </xsl:for-each-group>
             </xsl:for-each-group>
             <!-- Connected nodes with no match -->
-            <xsl:for-each-group select="$checker//check:step[@type='WELL_XML' or @type='WELL_JSON' or @type='XSD']" group-by="@type">
+            <xsl:for-each-group select="$checker//check:step[@type='WELL_XML' or @type='WELL_JSON']" group-by="@type">
                 <xsl:for-each-group select="current-group()" group-by="@next">
                     <xsl:if test="count(current-group()) > 1">
                         <group>
