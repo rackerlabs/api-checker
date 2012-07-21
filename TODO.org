@@ -264,10 +264,10 @@
             1. [X] Existing XSD tests with transform == true (Xerces / Saxon)
             2. [X] Validate with transforms and options on XML (Xerces /
                    Saxon), new tests.
-** TODO Preprocess Step [1/10]
+** TODO Preprocess Step [3/10]
    1. [X] Add support for XSL step in XSD
-   2. [ ] Add support for preprocess in config
-   3. [ ] Add support for XSL 1.0 engine
+   2. [X] Add support for preprocess in config
+   3. [X] Add support for XSL 1.0 engine
    4. [ ] Add support for preprocess in XSLs
    5. [ ] Update CLI tools
    6. [ ] Add Transform Pool
