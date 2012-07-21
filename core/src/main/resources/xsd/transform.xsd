@@ -1,0 +1,33 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    targetNamespace="http://www.w3.org/1999/XSL/Transform">
+
+    <element name="stylesheet" type="xsl:Transform" />
+    <element name="transform" type="xsl:Transform" />
+
+    <!--
+        An extreamly loose schema for XSL in checker format.  TODO:
+        replace with actual XSL 1.0/XSL 2.0 schema.
+    -->
+
+    <!-- Transform Def -->
+    <complexType name="Transform" mixed="true">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Pretty lax definition of a transform, but works
+                    for now.  Should eventually be able to validate
+                    inline XSLs.
+                </html:p>
+            </documentation>
+        </annotation>
+        <sequence>
+            <any minOccurs="0" maxOccurs="1" processContents="lax"/>
+        </sequence>
+        <anyAttribute processContents="lax"/>
+    </complexType>
+</schema>

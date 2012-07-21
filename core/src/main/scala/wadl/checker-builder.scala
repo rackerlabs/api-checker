@@ -52,7 +52,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
   //
   schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
 
-  val checkerSchema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/checker.xsd")))
+  val checkerSchemaSource  = new Array[Source](2);
+
+  checkerSchemaSource(0) = new StreamSource(getClass().getResourceAsStream("/xsd/transform.xsd"))
+  checkerSchemaSource(1) = new StreamSource(getClass().getResourceAsStream("/xsd/checker.xsd"))
+
+  val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
 
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/removeDups.xsl")))
