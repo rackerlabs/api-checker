@@ -1,12 +1,25 @@
 package com.rackspace.com.papi.components.checker.servlet
 
+import java.io.IOException
+import java.io.ByteArrayOutputStream
+import java.net.URLDecoder
+import java.io.BufferedReader
+import java.io.InputStreamReader
+
+import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpServletResponseWrapper
-import java.net.URLDecoder
 
+import javax.xml.transform.Transformer
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+
+import org.json.simple.JSONAware
 import org.w3c.dom.Document
+
+import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 
 //
 //  Request Keys
@@ -36,6 +49,37 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
   def contentError_= (e : Exception):Unit = request.setAttribute(CONTENT_ERROR, e)
+
+  override def getInputStream : ServletInputStream = {
+    if (parsedXML != null) {
+      var transformer : Transformer = null
+      val bout = new ByteArrayOutputStream()
+      try {
+        parsedXML.normalizeDocument
+        transformer = borrowTransformer
+        transformer.transform (new DOMSource(parsedXML), new StreamResult(bout))
+        new ByteArrayServletInputStream(bout.toByteArray())
+      } catch {
+        case e : Exception => throw new IOException("Error while serializing!", e)
+      } finally {
+        returnTransformer(transformer)
+      }
+    } else if (parsedJSON != null) {
+      new ByteArrayServletInputStream(parsedJSON.asInstanceOf[JSONAware].toJSONString().getBytes())
+    } else {
+      super.getInputStream()
+    }
+  }
+
+  override def getReader : BufferedReader = {
+    if (parsedXML != null) {
+      new BufferedReader(new InputStreamReader (getInputStream(), parsedXML.getInputEncoding()))
+    } else if (parsedJSON != null) {
+      new BufferedReader(new InputStreamReader (getInputStream(), "UTF-8"))
+    }else {
+      super.getReader
+    }
+  }
 }
 
 //

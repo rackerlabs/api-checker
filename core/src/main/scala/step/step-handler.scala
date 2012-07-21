@@ -326,9 +326,18 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val transform : Boolean = {
+      val stransform = atts.getValue("transform")
+
+      if (stransform == null) {
+        config.doXSDGrammarTransform
+      } else {
+        stransform.toBoolean
+      }
+    }
 
     next += (id -> nexts)
-    steps += (id -> new XSD(id, label, schema, new Array[Step](nexts.length)))
+    steps += (id -> new XSD(id, label, schema, transform, new Array[Step](nexts.length)))
   }
 
   private[this] def addXPath(atts : Attributes) : Unit = {

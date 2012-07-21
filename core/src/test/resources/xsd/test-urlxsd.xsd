@@ -12,15 +12,15 @@
     <complexType name="SampleElement">
         <sequence>
             <element name="id" type="tst:UUID"/>
-            <element name="stepType" type="tst:StepType" minOccurs="0"/>
-            <element name="even" type="tst:EvenInt100" minOccurs="0"/>
+            <element name="stepType" type="tst:StepType" default="START" minOccurs="0"/>
+            <element name="even" type="tst:EvenInt100" default="50" minOccurs="0"/>
         </sequence>
     </complexType>
 
     <complexType name="SampleAttribute">
         <attribute name="id" type="tst:UUID" use="required"/>
-        <attribute name="stepType" type="tst:StepType" use="optional"/>
-        <attribute name="even" type="tst:EvenInt100" use="optional"/>
+        <attribute name="stepType" type="tst:StepType" use="optional" default="START"/>
+        <attribute name="even" type="tst:EvenInt100" use="optional" default="50"/>
     </complexType>
 
     <!-- A simple enumeration -->
