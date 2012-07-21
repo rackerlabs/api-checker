@@ -8,7 +8,13 @@ import scala.util.Random
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+import scala.xml._
+
+import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import com.rackspace.cloud.api.wadl.Converters._
+import Converters._
+
+import org.w3c.dom.Document
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorWADLSuite extends BaseValidatorSuite {
@@ -857,6 +863,29 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
 
   test ("POST on /a/b with application/xml should succeed on validator_XSDContentT with valid XML1") {
     validator_XSDContentT.validate(request("POST","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentT with valid XML1, default values should be filled in") {
+    val req = request("POST","/a/b","application/xml",
+                      <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                      <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                        <stepType/>
+                        <even/>
+                      </e>)
+    validator_XSDContentT.validate(req,response,chain)
+    val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
+    assert ((dom \ "stepType").text == "START")
+    assert ((dom \ "even").text == "50")
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentT with valid XML2, default values should be filled in") {
+    val req = request("POST","/a/b","application/xml",
+                      <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                        id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"/>)
+    validator_XSDContentT.validate(req,response,chain)
+    val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
+    assert ((dom \ "@stepType").text == "START")
+    assert ((dom \ "@even").text == "50")
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_XSDContentT with valid XML2") {

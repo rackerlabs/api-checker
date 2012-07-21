@@ -28,6 +28,7 @@ object ValidatorPool {
       ret = schema.newValidator
     } else {
       ret = pool(schema).borrowObject()
+      ret.setFeature("http://apache.org/xml/features/validation/schema/element-default", true)
     }
 
     ret

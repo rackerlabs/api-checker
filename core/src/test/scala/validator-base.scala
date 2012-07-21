@@ -3,6 +3,7 @@ package com.rackspace.com.papi.components.checker
 import scala.xml._
 
 import java.io.ByteArrayInputStream
+import java.io.StringWriter
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -10,6 +11,10 @@ import javax.servlet.ServletInputStream
 import javax.servlet.FilterChain
 
 import javax.xml.parsers.DocumentBuilder
+import javax.xml.transform.Transformer
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+
 import org.json.simple.parser.JSONParser
 
 import scala.collection.mutable.HashMap
@@ -21,6 +26,7 @@ import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 
 import com.rackspace.com.papi.components.checker.util.XMLParserPool
 import com.rackspace.com.papi.components.checker.util.JSONParserPool
+import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
 
 import org.scalatest.FunSuite
 import org.scalatest.TestFailedException
@@ -66,6 +72,24 @@ class ByteArrayServletInputStream(val content : String) extends ServletInputStre
   override def reset : Unit = bais.reset
   override def skip (n : Long) : Long = bais.skip(n)
 }
+
+object Converters {
+  //
+  //  Convert a W3C dom node to a node seq.
+  //
+  implicit def doc2NodeSeq (doc : Document) : NodeSeq = {
+    var transf : Transformer = null
+    val swriter = new StringWriter()
+    try {
+      transf = IdentityTransformPool.borrowTransformer
+      transf.transform(new DOMSource(doc), new StreamResult(swriter))
+      XML.loadString (swriter.toString())
+    } finally {
+      if (transf != null) IdentityTransformPool.returnTransformer(transf)
+    }
+  }
+}
+
 
 /**
  * Exception thrown by the assert result handler,

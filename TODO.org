@@ -258,9 +258,9 @@
             2. [X] Existing TESTs with transform == true (SAXON)
             3. [X] Confirm options are filled in
             4. [X] Confirm options are filled in (SAXON)
-         3. [-] WADL Validator Tests [1/4]
+         3. [-] WADL Validator Tests [2/4]
             1. [X] Existing XSD tests with transform == true (Xerces / Saxon)
-            2. [ ] Validate with transforms and options on XML (Xerces /
+            2. [X] Validate with transforms and options on XML (Xerces /
                Saxon), new tests.
             3. [ ] Well-Form XML (Xerces / Saxon), new assertions
             4. [ ] Well-Form JSON, new assertions
