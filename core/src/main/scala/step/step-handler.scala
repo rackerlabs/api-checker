@@ -88,20 +88,26 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   }
 
   //
+  //  XSL 2.0 schema factory
+  //
+  private[this] val transformFactoryXSL2 : TransformerFactory = {
+    if (config.useSaxonEEValidation) {
+      TransformerFactory.newInstance("com.saxonica.config.EnterpriseTransformerFactory", null)
+    } else {
+      TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+    }
+  }
+
+  //
   //  XSL 1.0 schema factory
   //
   private[this] val transformFactoryXSL1 : TransformerFactory = {
     config.xslEngine match  {
       case "Xalan" => TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl", null)
       case "XalanC" => TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
-      case "Saxon" => TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+      case "Saxon" => transformFactoryXSL2
     }
   }
-
-  //
-  //  XSL 2.0 schema factory
-  //
-  private[this] val transformFactoryXSL2 = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
 
 
   //
