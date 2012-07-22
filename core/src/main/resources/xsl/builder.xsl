@@ -589,8 +589,7 @@
                 </xsl:when>
                 <xsl:when test="$doPreProcess">
                     <xsl:attribute name="next"
-                                   select="(check:PreProcID(.,1), $FAILID)"
-                                   separator=" "/>
+                                   select="check:PreProcID(.,1)"/>
                 </xsl:when>
                 <xsl:when test="$doXSD">
                     <xsl:attribute name="next"
@@ -612,8 +611,7 @@
                     </xsl:when>
                     <xsl:when test="$doPreProcess">
                         <xsl:attribute name="next"
-                                       select="(check:PreProcID($this, 1), $FAILID)"
-                                       separator=" "/>
+                                       select="check:PreProcID($this, 1)"/>
                     </xsl:when>
                     <xsl:when test="$doXSD">
                         <xsl:attribute name="next"
@@ -635,8 +633,7 @@
                             <xsl:choose>
                                 <xsl:when test="$doPreProcess">
                                     <xsl:attribute name="next"
-                                                   select="(check:PreProcID($this, 1), $FAILID)"
-                                                   separator=" "/>
+                                                   select="check:PreProcID($this, 1)"/>
                                 </xsl:when>
                                 <xsl:when test="$doXSD">
                                     <xsl:attribute name="next"
@@ -684,7 +681,8 @@
                         <xsl:when test="position() = last()">
                             <xsl:choose>
                                 <xsl:when test="$doXSD">
-                                    <xsl:attribute name="next" select="$XSDID"/>
+                                    <xsl:attribute name="next" select="($XSDID, $FAILID)"
+                                                   separator=" "/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:attribute name="next" select="$ACCEPT"/>
