@@ -264,32 +264,33 @@
             1. [X] Existing XSD tests with transform == true (Xerces / Saxon)
             2. [X] Validate with transforms and options on XML (Xerces /
                    Saxon), new tests.
-** TODO Preprocess Step [4/10]
+** TODO Preprocess Step [6/11]
    1. [X] Add support for XSL step in XSD
    2. [X] Add support for preprocess in config
    3. [X] Add support for XSL 1.0 engine
    4. [X] Add support for preprocess in XSLs
-   5. [ ] Update CLI tools
-   6. [ ] Add Transform Pool
-   7. [ ] Create Transform State
-   8. [ ] Add support for preprocess in Transform state
-   9. [ ] Tests[0/5]
-      1. [ ] Transform pool
-      2. [ ] States
-         1. [ ] XSL 1.0 (Xerces)
-         2. [ ] XSL 1.0 (Xerces-C)
-         3. [ ] XSL 2.0
-      3. [ ] Checker Tests
-         1. [ ] Tests with XSL Stages
-         2. [ ] Tests without XSL stanges
-         3. [ ] Preprocess without well formed specified
-         4. [ ] Dups vs noDups
-      4. [ ] Step Builder Tests
-      5. [ ] WADL Validator
-         1. [ ] XSLT 1.0 (Xalan)
-         2. [ ] XSLT 1.0 (Xalan-C)
-         3. [ ] XSLT 2.0 (Saxon)
-   10. [ ] Update filter / filter app
+   5. [X] Update CLI tools
+   6. [X] Update WADL tools to handle @href in rax:* extensions
+   7. [ ] Add Transform Pool
+   8. [ ] Create Transform State
+   9. [ ] Add support for preprocess in Transform state
+   10. [ ] Tests[0/5]
+       1. [ ] Transform pool
+       2. [ ] States
+          1. [ ] XSL 1.0 (Xerces)
+          2. [ ] XSL 1.0 (Xerces-C)
+          3. [ ] XSL 2.0
+       3. [ ] Checker Tests
+          1. [ ] Tests with XSL Stages
+          2. [ ] Tests without XSL stanges
+          3. [ ] Preprocess without well formed specified
+          4. [ ] Dups vs noDups
+       4. [ ] Step Builder Tests
+       5. [ ] WADL Validator
+          1. [ ] XSLT 1.0 (Xalan)
+          2. [ ] XSLT 1.0 (Xalan-C)
+          3. [ ] XSLT 2.0 (Saxon)
+   11. [ ] Update filter / filter app
 ** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
