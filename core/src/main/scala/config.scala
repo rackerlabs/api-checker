@@ -102,4 +102,7 @@ class Config {
     }
     xsle = engine
   }
+
+  def setXSLEngine (engine : String) : Unit = { xslEngine_=(engine) }
+  def getXSLEngine : String = xslEngine
 }
