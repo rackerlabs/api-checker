@@ -264,7 +264,7 @@
             1. [X] Existing XSD tests with transform == true (Xerces / Saxon)
             2. [X] Validate with transforms and options on XML (Xerces /
                    Saxon), new tests.
-** TODO Preprocess Step [9/12]
+** TODO Preprocess Step [10/12]
    1. [X] Add support for XSL step in XSD
    2. [X] Add support for preprocess in config
    3. [X] Add support for XSL 1.0 engine
@@ -274,7 +274,7 @@
    7. [X] Add Transform Pool
    8. [X] Create Transform State
    9. [X] Add XSLT version (1, 2)?
-   10. [ ] Add support for preprocess in builder
+   10. [X] Add support for preprocess in builder
    11. [ ] Update filter / filter app
    12. [ ] Tests[0/5]
        1. [ ] Transform pool
@@ -292,8 +292,10 @@
           1. [ ] XSLT 1.0 (Xalan)
           2. [ ] XSLT 1.0 (Xalan-C)
           3. [ ] XSLT 2.0 (Saxon)
+** TODO Preproc and XSL step should be able to change content type
 ** TODO XSL add support for parameters in XSL step and extension.
 ** TODO XSL support for inline XSLs.
+** TODO JSONx in XSL step
 ** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
