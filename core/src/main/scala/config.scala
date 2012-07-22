@@ -91,7 +91,7 @@ class Config {
   //  and Saxon. Note that Saxon is an XSL 2.0 engine, but most 1.0
   //  XSLs should work fine.
   //
-  private var xsle : String = "Xalan"
+  private var xsle : String = "XalanC"
   private val supportedXSLEngines = Set("Xalan", "XalanC", "Saxon")
 
   def xslEngine : String = xsle
