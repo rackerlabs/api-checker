@@ -276,16 +276,18 @@
    9. [X] Add XSLT version (1, 2)?
    10. [X] Add support for preprocess in builder
    11. [X] Update filter / filter app
-   12. [-] Tests[2/5]
+   12. [-] Tests[3/5]
        1. [X] Transform pool
        2. [X] Steps
           1. [X] XSL 1.0
           2. [X] XSL 2.0
-       3. [ ] Checker Tests
-          1. [ ] Tests with XSL Stages
-          2. [ ] Tests without XSL stanges
-          3. [ ] Preprocess without well formed specified
-          4. [ ] Dups vs noDups
+       3. [X] Checker Tests [6/6]
+          1. [X] Tests with XSL Stages
+          2. [X] Tests with multiple XSLs in the same representation
+          3. [X] Tests with multiple XSLs in different representations
+          4. [X] Dups vs noDups
+          5. [X] Tests without XSD stanges
+          6. [X] Preprocess without well formed specified, etc
        4. [ ] Step Builder Tests
        5. [ ] WADL Validator
           1. [ ] XSLT 1.0 (Xalan)
