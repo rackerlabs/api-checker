@@ -264,16 +264,16 @@
             1. [X] Existing XSD tests with transform == true (Xerces / Saxon)
             2. [X] Validate with transforms and options on XML (Xerces /
                    Saxon), new tests.
-** TODO Preprocess Step [6/11]
+** TODO Preprocess Step [7/11]
    1. [X] Add support for XSL step in XSD
    2. [X] Add support for preprocess in config
    3. [X] Add support for XSL 1.0 engine
    4. [X] Add support for preprocess in XSLs
    5. [X] Update CLI tools
    6. [X] Update WADL tools to handle @href in rax:* extensions
-   7. [ ] Add Transform Pool
+   7. [X] Add Transform Pool
    8. [ ] Create Transform State
-   9. [ ] Add support for preprocess in Transform state
+   9. [ ] Add support for preprocess in builder
    10. [ ] Tests[0/5]
        1. [ ] Transform pool
        2. [ ] States
@@ -291,6 +291,7 @@
           2. [ ] XSLT 1.0 (Xalan-C)
           3. [ ] XSLT 2.0 (Saxon)
    11. [ ] Update filter / filter app
+** TODO XSL add support for parameters in XSL step and extension.
 ** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
