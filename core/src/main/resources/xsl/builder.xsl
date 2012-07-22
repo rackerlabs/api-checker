@@ -17,6 +17,7 @@
     <xsl:param name="enableWellFormCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableElementCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePlainParamCheck" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enablePreProcessExtension" as="xsd:boolean" select="false()"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -31,12 +32,15 @@
                   select="($enableXSDContentCheck or $enableXSDTransform) and $WADLhasXSD"/>
     <xsl:variable name="useXSDTransform" as="xsd:boolean"
                   select="$enableXSDTransform and $useXSDContentCheck"/>
+    <xsl:variable name="usePreProcessExtension" as="xsd:boolean"
+                  select="$enablePreProcessExtension"/>
     <xsl:variable name="useElementCheck" as="xsd:boolean"
                   select="$enableElementCheck"/>
     <xsl:variable name="usePlainParamCheck" as="xsd:boolean"
                   select="$enablePlainParamCheck"/>
     <xsl:variable name="useWellFormCheck" as="xsd:boolean"
-                  select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or $enablePlainParamCheck"/>
+                  select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or
+                          $enablePlainParamCheck or $enablePreProcessExtension"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -537,6 +541,12 @@
         <xsl:value-of select="concat(generate-id($context),$number,'XPTH')"/>
     </xsl:function>
 
+    <xsl:function name="check:PreProcID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:param name="number" as="xsd:integer"/>
+        <xsl:value-of select="concat(generate-id($context),$number,'PPROC')"/>
+    </xsl:function>
+
     <xsl:template name="check:addWellFormNext">
         <xsl:attribute name="next" select="(check:WellFormID(.), check:WellFormFailID(.))" separator=" "/>
     </xsl:template>
@@ -548,6 +558,8 @@
                       select="wadl:param[xsd:boolean(@required) and @path and (@style='plain')]"/>
         <xsl:variable name="doXSD" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $useXSDContentCheck"/>
+        <xsl:variable name="doPreProcess" as="xsd:boolean"
+                      select="($type = 'WELL_XML') and $usePreProcessExtension and exists(rax:preprocess)"/>
         <xsl:variable name="doElement" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $useElementCheck and @element"/>
         <xsl:variable name="doReqPlainParam" as="xsd:boolean"
@@ -570,6 +582,11 @@
                                    select="(check:XPathID(.,1), $FAILID)"
                                    separator=" "/>
                 </xsl:when>
+                <xsl:when test="$doPreProcess">
+                    <xsl:attribute name="next"
+                                   select="(check:PreProcID(.,1), $FAILID)"
+                                   separator=" "/>
+                </xsl:when>
                 <xsl:when test="$doXSD">
                     <xsl:attribute name="next"
                                    select="($XSDID, $FAILID)"
@@ -586,6 +603,11 @@
                     <xsl:when test="$doReqPlainParam">
                         <xsl:attribute name="next"
                                        select="(check:XPathID(.,1), $FAILID)"
+                                       separator=" "/>
+                    </xsl:when>
+                    <xsl:when test="$doPreProcess">
+                        <xsl:attribute name="next"
+                                       select="(check:PreProcID($this, 1), $FAILID)"
                                        separator=" "/>
                     </xsl:when>
                     <xsl:when test="$doXSD">
@@ -606,6 +628,11 @@
                     <xsl:choose>
                         <xsl:when test="position() = last()">
                             <xsl:choose>
+                                <xsl:when test="$doPreProcess">
+                                    <xsl:attribute name="next"
+                                                   select="(check:PreProcID($this, 1), $FAILID)"
+                                                   separator=" "/>
+                                </xsl:when>
                                 <xsl:when test="$doXSD">
                                     <xsl:attribute name="next"
                                                    select="($XSDID, $FAILID)"
@@ -622,6 +649,39 @@
                                            separator=" "/>
                         </xsl:otherwise>
                     </xsl:choose>
+                </step>
+            </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="$doPreProcess">
+            <xsl:for-each select="rax:preprocess">
+                <step type="XSL" id="{check:PreProcID($this, position())}">
+                    <xsl:if test="@href">
+                        <xsl:choose>
+                            <xsl:when test="not(doc-available(@href))">
+                                <xsl:message terminate="yes">[ERROR] Couldn't access transform <xsl:value-of select="@href"/></xsl:message>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href" select="@href"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="position() = last()">
+                            <xsl:choose>
+                                <xsl:when test="$doXSD">
+                                    <xsl:attribute name="next" select="$XSDID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="next" select="$ACCEPT"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="next"
+                                           select="check:PreProcID($this, position()+1)"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:copy-of select="child::*"/>
                 </step>
             </xsl:for-each>
         </xsl:if>
