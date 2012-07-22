@@ -299,7 +299,7 @@
                 of comparing the content of nodes.  Only if href is
                 the same, do we merge.
             -->
-            <xsl:for-each-group select="$checker//check:step[@type='XSL' and @href]" group-by="@href">
+            <xsl:for-each-group select="$checker//check:step[@type='XSL' and @href and not(@version)]" group-by="@href">
                 <xsl:for-each-group select="current-group()" group-by="@next">
                     <xsl:if test="count(current-group()) > 1">
                         <group>
@@ -313,6 +313,24 @@
                             </xsl:attribute>
                         </group>
                     </xsl:if>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
+            <xsl:for-each-group select="$checker//check:step[@type='XSL' and @href and @version]" group-by="@href">
+                <xsl:for-each-group select="current-group()" group-by="@version">
+                    <xsl:for-each-group select="current-group()" group-by="@next">
+                        <xsl:if test="count(current-group()) > 1">
+                            <group>
+                                <xsl:attribute name="include">
+                                    <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                                </xsl:attribute>
+                                <xsl:attribute name="exclude">
+                                    <xsl:value-of separator=" ">
+                                        <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                                    </xsl:value-of>
+                                </xsl:attribute>
+                            </group>
+                        </xsl:if>
+                    </xsl:for-each-group>
                 </xsl:for-each-group>
             </xsl:for-each-group>
             <!-- NonConnected nodes with no match -->

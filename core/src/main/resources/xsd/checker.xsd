@@ -159,6 +159,7 @@
                     </choice>
                 </sequence>
                 <attribute name="href" type="xsd:anyURI" use="optional"/>
+                <attribute name="version" type="chk:XSLVersion" use="required"/>
                 <assert test="if (@href and (xsl:stylesheet or xsl:transform)) then false() else true() "
                         saxon:message="Can't define an inline transform and also include a href"/>
             </extension>
@@ -439,6 +440,13 @@
     </simpleType>
 
     <simpleType name="XPathVersion">
+        <restriction base="xsd:byte">
+            <minInclusive value="1"/>
+            <maxInclusive value="2"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="XSLVersion">
         <restriction base="xsd:byte">
             <minInclusive value="1"/>
             <maxInclusive value="2"/>

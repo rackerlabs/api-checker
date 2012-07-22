@@ -547,6 +547,11 @@
         <xsl:value-of select="concat(generate-id($context),$number,'PPROC')"/>
     </xsl:function>
 
+    <xsl:function name="check:getXSLVersion" as="xsd:integer">
+        <xsl:param name="root" as="node()"/>
+        <xsl:value-of select="xsd:integer(substring($root/(xsl:transform | xsl:stylesheet)/@version,1,1))"/>
+    </xsl:function>
+
     <xsl:template name="check:addWellFormNext">
         <xsl:attribute name="next" select="(check:WellFormID(.), check:WellFormFailID(.))" separator=" "/>
     </xsl:template>
@@ -665,6 +670,16 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:if>
+                    <xsl:attribute name="version">
+                        <xsl:choose>
+                            <xsl:when test="@href">
+                                <xsl:value-of select="check:getXSLVersion(doc(@href))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="check:getXSLVersion(.)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="position() = last()">
                             <xsl:choose>
