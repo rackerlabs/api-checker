@@ -276,8 +276,8 @@
    9. [X] Add XSLT version (1, 2)?
    10. [X] Add support for preprocess in builder
    11. [X] Update filter / filter app
-   12. [ ] Tests[0/5]
-       1. [ ] Transform pool
+   12. [-] Tests[1/5]
+       1. [X] Transform pool
        2. [ ] States
           1. [ ] XSL 1.0 (Xerces)
           2. [ ] XSL 1.0 (Xerces-C)
