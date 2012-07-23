@@ -28,6 +28,7 @@ object BuilderXSLParams {
   val ENABLE_XSD_TRANSFORM = "enableXSDTransform"
   val ENABLE_ELEMENT   = "enableElementCheck"
   val ENABLE_PLAIN_PARAM = "enablePlainParamCheck"
+  val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
 }
 
 import BuilderXSLParams._
@@ -52,7 +53,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
   //
   schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
 
-  val checkerSchema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/checker.xsd")))
+  val checkerSchemaSource  = new Array[Source](2);
+
+  checkerSchemaSource(0) = new StreamSource(getClass().getResourceAsStream("/xsd/transform.xsd"))
+  checkerSchemaSource(1) = new StreamSource(getClass().getResourceAsStream("/xsd/checker.xsd"))
+
+  val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
 
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/removeDups.xsl")))
@@ -74,6 +80,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_XSD_TRANSFORM, c.doXSDGrammarTransform)
       buildHandler.getTransformer().setParameter (ENABLE_ELEMENT, c.checkElements)
       buildHandler.getTransformer().setParameter (ENABLE_PLAIN_PARAM, c.checkPlainParams)
+      buildHandler.getTransformer().setParameter (ENABLE_PRE_PROCESS_EXT, c.enablePreProcessExtension)
 
       var output = out;
 

@@ -168,7 +168,7 @@
             </xsl:for-each-group>
         </xsl:for-each-group>
         <!-- Versioned groups -->
-        <xsl:for-each-group select="$nextStep[@version]" group-by="@type">
+        <xsl:for-each-group select="$nextStep[@version and @match]" group-by="@type">
             <xsl:for-each-group select="current-group()" group-by="@match">
                 <xsl:for-each-group select="current-group()" group-by="@version">
                     <xsl:if test="count(current-group()) &gt; 1">
@@ -195,6 +195,35 @@
                         </xsl:attribute>
                     </join>
                 </xsl:if>
+            </xsl:for-each-group>
+        </xsl:for-each-group>
+        <!-- XSL Steps, steps with href by type -->
+        <xsl:for-each-group select="$nextStep[@href and not(@version)]" group-by="@type">
+            <xsl:for-each-group select="current-group()" group-by="@href">
+                <xsl:if test="count(current-group()) &gt; 1">
+                    <join>
+                        <xsl:attribute name="steps">
+                            <xsl:value-of separator=" ">
+                                <xsl:sequence select="current-group()/@id"/>
+                            </xsl:value-of>
+                        </xsl:attribute>
+                    </join>
+                </xsl:if>
+            </xsl:for-each-group>
+        </xsl:for-each-group>
+        <xsl:for-each-group select="$nextStep[@href and @version]" group-by="@type">
+            <xsl:for-each-group select="current-group()" group-by="@version">
+                <xsl:for-each-group select="current-group()" group-by="@href">
+                    <xsl:if test="count(current-group()) &gt; 1">
+                        <join>
+                            <xsl:attribute name="steps">
+                                <xsl:value-of separator=" ">
+                                    <xsl:sequence select="current-group()/@id"/>
+                                </xsl:value-of>
+                            </xsl:attribute>
+                        </join>
+                    </xsl:if>
+                </xsl:for-each-group>
             </xsl:for-each-group>
         </xsl:for-each-group>
         <!-- Steps with no @match and no @transform-->

@@ -28,6 +28,9 @@ object Wadl2Dot {
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
 
+  val preProc  = parser.flag[Boolean] (List("P", "preproc"),
+                                       "Enable preprocess extension : false")
+
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
                                           "Show error nodes. Default: false")
 
@@ -84,6 +87,7 @@ object Wadl2Dot {
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
       c.checkElements   = element.value.getOrElse(false)
       c.checkPlainParams = plainParam.value.getOrElse(false)
+      c.enablePreProcessExtension = preProc.value.getOrElse(false)
       c.validateChecker = true
 
       new WADLDotBuilder().build (getSource, getResult,

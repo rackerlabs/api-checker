@@ -2,6 +2,11 @@ package com.rackspace.com.papi.components.checker.step
 
 import scala.xml._
 
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.Templates
+import javax.xml.transform.Transformer
+import javax.xml.transform.stream.StreamSource
+
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -18,6 +23,12 @@ class BaseStepSuite extends BaseValidatorSuite {
   System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory")
 
   private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+
+  val xsl1Factory = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
+  val xsl2Factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+
+  val xsl1Templates = xsl1Factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/testXSL1.xsl")))
+  val xsl2Templates = xsl2Factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/testXSL2.xsl")))
 
   //
   //  Enable CTA full XPath2.0 checking in XSD 1.1
