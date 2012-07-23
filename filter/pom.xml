@@ -60,11 +60,6 @@
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.jteigen</groupId>
-                <artifactId>maven-scalatest-plugin</artifactId>
-                <version>1.1-SNAPSHOT</version>
-            </plugin>
         </plugins>
     </build>
 </project>
