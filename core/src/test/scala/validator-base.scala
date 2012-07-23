@@ -104,6 +104,30 @@ object TestConfig {
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
 
+
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
+             enablePreProcessExtension : Boolean, xslEngine : String) : Config = {
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
+                       xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension)
+
+    config.xslEngine = xslEngine
+
+    config
+  }
+
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
+             enablePreProcessExtension : Boolean) : Config = {
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements, xpathVersion, checkPlainParams, doXSDGrammarTransform)
+
+    config.enablePreProcessExtension = enablePreProcessExtension
+
+    config
+  }
+
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
              checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
              checkPlainParams : Boolean, doXSDGrammarTransform : Boolean) : Config = {

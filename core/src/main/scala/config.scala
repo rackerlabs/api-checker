@@ -80,4 +80,29 @@ class Config {
   //  Check plain parameters
   //
   @BeanProperty var checkPlainParams : Boolean = false
+
+  //
+  //  Enable preprocess extension
+  //
+  @BeanProperty var enablePreProcessExtension : Boolean = false
+
+  //
+  //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,
+  //  and Saxon. Note that Saxon is an XSL 2.0 engine, but most 1.0
+  //  XSLs should work fine.
+  //
+  private var xsle : String = "XalanC"
+  private val supportedXSLEngines = Set("Xalan", "XalanC", "Saxon")
+
+  def xslEngine : String = xsle
+  def xslEngine_= (engine : String) : Unit = {
+    if (!supportedXSLEngines.contains(engine)) {
+      throw new IllegalArgumentException("Unrecognized XSL engine: "+
+                                         engine+" supported engines: "+supportedXSLEngines)
+    }
+    xsle = engine
+  }
+
+  def setXSLEngine (engine : String) : Unit = { xslEngine_=(engine) }
+  def getXSLEngine : String = xslEngine
 }

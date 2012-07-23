@@ -638,4 +638,136 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                                                                  even="23"/>
                                                            ),response,chain), 400)
   }
+
+  //
+  // validator_XSDContentTT allows:
+  //
+  //
+  // PUT /a/b with json and xml support
+  // POST /a/b with xml support
+  //
+  // POST /c with json support
+  // GET /c
+  //
+  // The validator checks for wellformness in XML and grammar checks
+  // XSD requests. The XML grammar checks should fill in default
+  // values. A simple transform is attached to change the
+  // stepType:BEGIN to START.
+  //
+  // The validator is used in the following tests.
+  //
+  val validator_XSDContentTT = Validator(
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess href="src/test/resources/xsl/beginStart.xsl"/>
+                      </representation>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess href="src/test/resources/xsl/beginStart2.xsl"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    , TestConfig(false, true, true, true, false, 1, false, true, true, "Saxon"))
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML1") {
+    validator_XSDContentTT.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML2") {
+    validator_XSDContentTT.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML1") {
+    validator_XSDContentTT.validate(request("POST","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML1, default values should be filled in") {
+    val req = request("POST","/a/b","application/xml",
+                      <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                      <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                        <stepType/>
+                        <even/>
+                      </e>)
+    validator_XSDContentTT.validate(req,response,chain)
+    val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
+    assert ((dom \ "stepType").text == "START")
+    assert ((dom \ "even").text == "50")
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML2, default values should be filled in") {
+    val req = request("POST","/a/b","application/xml",
+                      <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                        id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"/>)
+    validator_XSDContentTT.validate(req,response,chain)
+    val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
+    assert ((dom \ "@stepType").text == "START")
+    assert ((dom \ "@even").text == "50")
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML2") {
+    validator_XSDContentTT.validate(request("POST","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_XSDContentTT with well formed JSON") {
+    validator_XSDContentTT.validate(request("PUT","/a/b","application/json", goodJSON),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_XSDContentTT with well formed JSON") {
+    validator_XSDContentTT.validate(request("POST","/c","application/json", goodJSON),response,chain)
+  }
+
+  test ("GOT on /c should succeed on validator_XSDContentTT") {
+    validator_XSDContentTT.validate(request("GET","/c"),response,chain)
+  }
+
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT because BEGIN is not an accepted stepType, but it's converted to START") {
+    val req = request("POST","/a/b","application/xml",
+                      <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                      <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                        <stepType>BEGIN</stepType>
+                        <even/>
+                      </e>)
+    validator_XSDContentTT.validate(req,response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT because BEGIN is not an accepted @stepType, but it's converted to START") {
+    val req = request("POST","/a/b","application/xml",
+                      <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                        id="21f1fcf6-bf38-11e1-878e-133ab65fcec3" stepType="BEGIN"/>)
+    validator_XSDContentTT.validate(req,response,chain)
+  }
+
+
+  test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_XSDContentTT") {
+    assertResultFailed(validator_XSDContentTT.validate(request("PUT","/a/b", "application/xml", goodXML),response,chain), 400)
+  }
+
+  test ("POST on /a/b should fail with well formed XML that does not match schema on validator_XSDContentTT") {
+    assertResultFailed(validator_XSDContentTT.validate(request("POST","/a/b", "application/xml", goodXML),response,chain), 400)
+  }
+
 }

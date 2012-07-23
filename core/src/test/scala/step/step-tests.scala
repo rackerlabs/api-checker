@@ -942,4 +942,31 @@ class StepSuite extends BaseStepSuite {
     assert (req2.contentError.isInstanceOf[SAXParseException])
   }
 
+  test ("An XSL should correctly transfrom request XML (XSL 1.0)") {
+    val xsl = new XSL("XSL", "XSL", xsl1Templates, Array[Step]())
+    val req = request("PUT", "/a/b", "application/xml",
+                      <foot xmlns="http://test.org/test">
+                      <child attribute="value"/>
+                      </foot>, true)
+    xsl.checkStep (req, response, chain, 0)
+    val transXML = XML.load(req.getInputStream())
+    assert (transXML.label == "success")
+    assert (transXML.namespace == "http://www.rackspace.com/repose/wadl/checker/step/test")
+    assert ((transXML \ "@didIt").text == "true")
+  }
+
+  test ("An XSL should correctly transfrom request XML (XSL 2.0)") {
+    val xsl = new XSL("XSL", "XSL", xsl2Templates, Array[Step]())
+    val req = request("PUT", "/a/b", "application/xml",
+                      <foot xmlns="http://test.org/test">
+                      <child attribute="value"/>
+                      </foot>, true)
+    xsl.checkStep (req, response, chain, 0)
+    val transXML = XML.load(req.getInputStream())
+    assert (transXML.label == "success")
+    assert (transXML.namespace == "http://www.rackspace.com/repose/wadl/checker/step/test")
+    assert ((transXML \ "@didIt").text == "true")
+    assert ((transXML \ "@currentTime").text.contains(":"))
+  }
+
 }

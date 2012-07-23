@@ -28,6 +28,9 @@ object Wadl2Checker {
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
 
+  val preProc  = parser.flag[Boolean] (List("P", "preproc"),
+                                       "Enable preprocess extension : false")
+
   val validate = parser.flag[Boolean] (List("v", "validate"),
                                        "Validate produced checker Default: false")
 
@@ -82,6 +85,7 @@ object Wadl2Checker {
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
       c.checkElements = element.value.getOrElse(false)
       c.checkPlainParams = plainParam.value.getOrElse(false)
+      c.enablePreProcessExtension = preProc.value.getOrElse(false)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)
     } catch {

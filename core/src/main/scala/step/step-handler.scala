@@ -2,9 +2,11 @@ package com.rackspace.com.papi.components.checker.step
 
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.Source
+import javax.xml.transform.Templates
 import javax.xml.transform.sax.SAXTransformerFactory
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.sax.TransformerHandler
+import javax.xml.transform.stream.StreamSource
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.dom.DOMResult
 
@@ -86,6 +88,29 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   }
 
   //
+  //  XSL 2.0 schema factory
+  //
+  private[this] val transformFactoryXSL2 : TransformerFactory = {
+    if (config.useSaxonEEValidation) {
+      TransformerFactory.newInstance("com.saxonica.config.EnterpriseTransformerFactory", null)
+    } else {
+      TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+    }
+  }
+
+  //
+  //  XSL 1.0 schema factory
+  //
+  private[this] val transformFactoryXSL1 : TransformerFactory = {
+    config.xslEngine match  {
+      case "Xalan" => TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl", null)
+      case "XalanC" => TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
+      case "Saxon" => transformFactoryXSL2
+    }
+  }
+
+
+  //
   // Our schema...
   //
   private[this] var schema : Schema = null
@@ -129,6 +154,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "WELL_JSON"   => addWellJSON(atts)
           case "XSD"         => addXSD(atts)
           case "XPATH"       => addXPath(atts)
+          case "XSL"         => addXSLT(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -338,6 +364,28 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new XSD(id, label, schema, transform, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addXSLT(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val href : String = atts.getValue("href")
+    val version : String = atts.getValue("version")
+
+    try {
+      val templates : Templates = {
+        version match {
+          case "1" => transformFactoryXSL1.newTemplates(new StreamSource(href))
+          case "2" => transformFactoryXSL2.newTemplates(new StreamSource(href))
+        }
+      }
+
+      next += (id -> nexts)
+      steps += (id -> new XSL(id, label, templates, new Array[Step](nexts.length)))
+    } catch {
+      case e : Exception => throw new SAXParseException("Error while parsing XSLT", locator, e)
+    }
   }
 
   private[this] def addXPath(atts : Attributes) : Unit = {

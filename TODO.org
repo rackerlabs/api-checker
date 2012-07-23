@@ -263,7 +263,34 @@
          3. [X] WADL Validator Tests [2/2]
             1. [X] Existing XSD tests with transform == true (Xerces / Saxon)
             2. [X] Validate with transforms and options on XML (Xerces /
-               Saxon), new tests.
+                   Saxon), new tests.
+** DONE Preprocess Step [12/12]
+   1. [X] Add support for XSL step in XSD
+   2. [X] Add support for preprocess in config
+   3. [X] Add support for XSL 1.0 engine
+   4. [X] Add support for preprocess in XSLs
+   5. [X] Update CLI tools
+   6. [X] Update WADL tools to handle @href in rax:* extensions
+   7. [X] Add Transform Pool
+   8. [X] Create Transform State
+   9. [X] Add XSLT version (1, 2)?
+   10. [X] Add support for preprocess in builder
+   11. [X] Update filter / filter app
+   12. [X] Tests[4/4]
+       1. [X] Transform pool
+       2. [X] Steps
+          1. [X] XSL 1.0
+          2. [X] XSL 2.0
+       3. [X] Checker Tests [6/6]
+          1. [X] Tests with XSL Stages
+          2. [X] Tests with multiple XSLs in the same representation
+          3. [X] Tests with multiple XSLs in different representations
+          4. [X] Dups vs noDups
+          5. [X] Tests without XSD stanges
+          6. [X] Preprocess without well formed specified, etc
+       4. [X] WADL Validator [2/2]
+          1. [X] XSLT 1.0 (Xalan-C)
+          2. [X] XSLT 2.0 (Saxon)
 ** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
@@ -280,8 +307,15 @@
          should work well at detecting XPath with version number.
       3. [ ] Test Bad XPaths
       4. [ ] Combined XPath opt tests
-** TODO Namespace cleanup task should look into XPath expressions...
-** TODO Namespace cleanup task should account for default namespaces.
+** TODO PreProc Enhancements [0/5]
+   1. [ ] Preproc and XSL step should be able to change content type
+   2. [ ] Preporc should support XSL parameters
+   3. [ ] Inline XSLs should be supported
+   4. [ ] JSONx should be supported
+   5. [ ] Should be able touse in not xml types
+** TODO Namespace Enhancements [0/2]
+   1. [ ] Namespace cleanup task should look into XPath expressions
+   2. [ ] Namespace cleanup task should account for default namespaces.
 ** TODO Log on failures
 ** TODO Fix test error, where register is not working in step-test.scala
 ** TODO Review Skipped Tests[0/2]
