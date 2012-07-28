@@ -46,7 +46,7 @@
 
     <properties>
         <scala.version>2.9.0</scala.version>
-        <saxon-ee.version>9.4.0.3</saxon-ee.version>
+        <saxon-ee.version>9.4.0.4</saxon-ee.version>
         <scala.test.version>1.6.1</scala.test.version>
         <junit.version>4.10</junit.version>
         <wadl-tools.version>1.0.4-SNAPSHOT</wadl-tools.version>
