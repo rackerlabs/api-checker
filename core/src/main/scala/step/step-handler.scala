@@ -70,7 +70,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     var sf : SchemaFactory = null
 
     if (config.useSaxonEEValidation) {
-      sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema/saxonica")
+      sf = new com.saxonica.jaxp.SchemaFactoryImpl()
 
       //
       //  Enable Schema 1.1 support
