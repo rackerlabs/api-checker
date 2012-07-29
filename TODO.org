@@ -296,8 +296,8 @@
    1. [X] Confirm that XSL servies WADL tools translation / fix if not.
    2. [X] Confirm builder copies emebed xsl
    3. [X] Modify step handler to compile templates
-   4. [ ] Tests [0/4]
-      1. [ ] Add builder XSL test
+   4. [-] Tests [1/4]
+      1. [X] Add builder XSL test
       2. [ ] Add step handler test
       3. [ ] Add validator tests: embeded namespaces
       4. [ ] Add validator tests: parent namespaces
