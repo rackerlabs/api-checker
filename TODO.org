@@ -291,16 +291,16 @@
        4. [X] WADL Validator [2/2]
           1. [X] XSLT 1.0 (Xalan-C)
           2. [X] XSLT 2.0 (Saxon)
-** TODO Inline XSL should be supported in XSL step [2/4]
+** DONE Reintroduce THROW exception behavior in ErrorCapture
+** TODO Inline XSL should be supported in XSL step [3/4]
    1. [X] Confirm that XSL servies WADL tools translation / fix if not.
    2. [X] Confirm builder copies emebed xsl
-   3. [ ] Modify step handler to compile templates
+   3. [X] Modify step handler to compile templates
    4. [ ] Tests [0/4]
       1. [ ] Add builder XSL test
       2. [ ] Add step handler test
       3. [ ] Add validator tests: embeded namespaces
       4. [ ] Add validator tests: parent namespaces
-** TODO Reintroduce THROW exception behavior in ErrorCapture
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
       display.
