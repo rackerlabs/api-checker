@@ -72,22 +72,16 @@ private class ErrorCapture extends ErrorHandler {
   def error(exception : SAXParseException) : Unit = {
     if (error == None) {
       error = Some(exception)
-      //
-      //  Throwing the exceptions speeds things up, but xerces doesn't
-      //  propigate correctly in some off cases.
-      //
-      //throw exception
+
+      throw exception
     }
   }
 
   def fatalError(exception : SAXParseException) : Unit = {
     if (error == None) {
       error = Some(exception)
-      //
-      //  Throwing the exceptions speeds things up, but xerces doesn't
-      //  propigate correctly in some off cases.
-      //
-      //throw exception
+
+      throw exception
     }
   }
 
