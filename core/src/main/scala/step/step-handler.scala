@@ -113,7 +113,6 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
   }
 
-
   //
   // Our schema...
   //
@@ -124,7 +123,6 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //  The document locator...
   //
   private[this] var locator : Locator = null
-
 
   //
   //  Saxon transformer factory, schemahandler and result...this is
@@ -142,6 +140,63 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   def this() = this(null, new Config)
 
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
+    uri match {
+      case "http://www.rackspace.com/repose/wadl/checker" => startCheckerElement(uri, localName, qname, atts)
+      case "http://www.w3.org/2001/XMLSchema" => startSchemaElement(uri, localName, qname, atts)
+      case "http://www.w3.org/1999/XSL/Transform" => startTransformElement(uri, localName, qname, atts)
+      case _ => // ignore
+    }
+    if (contentHandler != null) {
+      contentHandler.startElement(uri, localName, qname, atts)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.startElement(uri, localName, qname, atts)
+    }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.startElement(uri, localName, qname, atts)
+    }
+  }
+
+  override def endElement(uri : String, localName : String, qname : String) = {
+    uri match {
+      case "http://www.w3.org/2001/XMLSchema" => endSchemaElement(uri, localName, qname)
+      case "http://www.w3.org/1999/XSL/Transform" => endTransformElement(uri, localName, qname)
+      case _ => // ignore
+    }
+
+    if (contentHandler != null) {
+      contentHandler.endElement(uri, localName, qname)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.endElement(uri, localName, qname)
+    }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.endElement(uri, localName, qname)
+    }
+  }
+
+  override def endDocument = {
+    next.foreach { case (id, nexts) => {
+      val step = steps(id).asInstanceOf[ConnectedStep]
+      for ( i <- 0 to (nexts.length - 1)) {
+        step.next(i) = steps(nexts(i))
+      }
+    }}
+    next.clear
+    if (contentHandler != null) {
+      contentHandler.endDocument()
+    }
+  }
+
+  //
+  //  Returns the start step after the document has been parsed.
+  //
+  def step : Step = start
+
+  //
+  //  Element handlers
+  //
+  private[this] def startCheckerElement (uri : String, localName : String, qname : String, atts : Attributes) = {
     localName match {
       case "step" =>
         if (processGrammar) {
@@ -166,60 +221,39 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         }
       case "grammar" =>
         addGrammar(atts)
-      case "schema" =>
-        startInlineSchema
-      case "transform" =>
-        startInlineXSL
-      case "stylesheet" =>
-        startInlineXSL
       case _ =>  // ignore
     }
-    if (contentHandler != null) {
-      contentHandler.startElement(uri, localName, qname, atts)
-    }
-    if (currentSchemaHandler != null) {
-      currentSchemaHandler.startElement(uri, localName, qname, atts)
-    }
-    if (currentXSLHandler != null) {
-      currentXSLHandler.startElement(uri, localName, qname, atts)
+  }
+
+  private[this] def startSchemaElement (uri : String, localName : String, qname : String, atts : Attributes) = {
+    localName match {
+      case "schema" => startInlineSchema
+      case _ => //ignore
     }
   }
 
-  override def endElement(uri : String, localName : String, qname : String) = {
-    if (contentHandler != null) {
-      contentHandler.endElement(uri, localName, qname)
-    }
-    if (currentSchemaHandler != null) {
-      currentSchemaHandler.endElement(uri, localName, qname)
-    }
-    if (currentXSLHandler != null) {
-      currentXSLHandler.endElement(uri, localName, qname)
-    }
-    if (localName == "schema") {
-      endInlineSchema
-    }
-    if ((localName == "transform") || (localName == "stylesheet")) {
-      endInlineXSL
+  private[this] def endSchemaElement (uri : String, localName : String, qname : String) = {
+    localName match {
+      case "schema" => endInlineSchema
+      case _ => //ignore
     }
   }
 
-  override def endDocument = {
-    next.foreach { case (id, nexts) => {
-      val step = steps(id).asInstanceOf[ConnectedStep]
-      for ( i <- 0 to (nexts.length - 1)) {
-        step.next(i) = steps(nexts(i))
-      }
-    }}
-    next.clear
-    if (contentHandler != null) {
-      contentHandler.endDocument()
+  private[this] def startTransformElement (uri : String, localName : String, qname : String, atts : Attributes) = {
+    localName match {
+      case "transform" => startInlineXSL
+      case "stylesheet" => startInlineXSL
+      case _ => //ignore
     }
   }
 
-  //
-  //  Returns the start step after the document has been parsed.
-  //
-  def step : Step = start
+  private[this] def endTransformElement (uri : String, localName : String, qname : String) = {
+    localName match {
+      case "transform" => endInlineXSL
+      case "stylesheet" => endInlineXSL
+      case _ => //ignore
+    }
+  }
 
   //
   //  We add new grammar source, we use it for processing later.
