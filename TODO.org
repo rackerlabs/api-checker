@@ -291,9 +291,9 @@
        4. [X] WADL Validator [2/2]
           1. [X] XSLT 1.0 (Xalan-C)
           2. [X] XSLT 2.0 (Saxon)
-** TODO Inline XSL should be supported in XSL step [1/4]
+** TODO Inline XSL should be supported in XSL step [2/4]
    1. [X] Confirm that XSL servies WADL tools translation / fix if not.
-   2. [ ] Modify builder to copy emebed xsl
+   2. [X] Confirm builder copies emebed xsl
    3. [ ] Modify step handler to compile templates
    4. [ ] Tests [0/4]
       1. [ ] Add builder XSL test
