@@ -68,7 +68,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
     <application xmlns="http://wadl.dev.java.net/2009/02"
                  xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
            <grammars>
-              <include href="../sample/os-compute/xsd/common.xsd"/>
+              <include href="src/test/resources/xsd/common.xsd"/>
            </grammars>
            <resources base="https://test.api.openstack.com">
               <resource id="uuid" path="path/to/my/resource/{uuid}">
