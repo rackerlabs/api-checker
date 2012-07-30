@@ -31,7 +31,12 @@ object BuilderXSLParams {
   val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
 }
 
+object XPathJoinParams {
+  val DEFAULT_XPATH_VERSION = "defaultXPathVersion"
+}
+
 import BuilderXSLParams._
+import XPathJoinParams._
 
 /**
  * An exception when transating the WADL into a checker.
@@ -63,6 +68,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/removeDups.xsl")))
   val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/join.xsl")))
+  val joinXPathTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/xpathJoin.xsl")))
 
   def build (in : Source, out: Result, config : Config) : Unit = {
     var c = config
@@ -94,13 +100,23 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
         output = new SAXResult(schemaHandler)
       }
 
-      if (c.removeDups) {
+      if (c.removeDups || c.joinXPathChecks) {
         val dupsHandler = wadl.saxTransformerFactory.newTransformerHandler(dupsTemplates)
         val joinHandler = wadl.saxTransformerFactory.newTransformerHandler(joinTemplates)
 
         buildHandler.setResult (new SAXResult (dupsHandler))
         dupsHandler.setResult(new SAXResult(joinHandler))
-        joinHandler.setResult(output)
+
+        if (c.joinXPathChecks) {
+          val xpathHandler = wadl.saxTransformerFactory.newTransformerHandler(joinXPathTemplates)
+
+          xpathHandler.getTransformer().setParameter(DEFAULT_XPATH_VERSION, c.xpathVersion)
+
+          joinHandler.setResult(new SAXResult(xpathHandler))
+          xpathHandler.setResult(output)
+        } else {
+          joinHandler.setResult(output)
+        }
       } else {
         buildHandler.setResult (output)
       }
