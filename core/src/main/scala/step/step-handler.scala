@@ -24,6 +24,8 @@ import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 
+import org.w3c.dom.Document
+
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
 import scala.collection.mutable.ArrayBuffer
@@ -36,6 +38,8 @@ import com.rackspace.com.papi.components.checker.util.XPathExpressionPool
 //  The StepHandler assumes it is receiving content that is valid
 //  according to the checker schema.  Please ensure that a validation
 //  stage occurs before the handler is called.
+//
+//  The StepHandler is also *not* thread safe.
 //
 class StepHandler(var contentHandler : ContentHandler, val config : Config) extends ContentHandler {
   //
@@ -109,7 +113,6 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
   }
 
-
   //
   // Our schema...
   //
@@ -121,19 +124,87 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //
   private[this] var locator : Locator = null
 
-
   //
   //  Saxon transformer factory, schemahandler and result...this is
-  //  used to capture inline schema.
+  //  used to capture inline schema and inline XSL.
   //
   private[this] val saxTransformerFactory : SAXTransformerFactory =
     TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null).asInstanceOf[SAXTransformerFactory]
+
   private[this] var currentSchemaHandler : TransformerHandler = null
   private[this] var currentSchemaResult  : DOMResult = null
+
+  private[this] var currentXSLHandler : TransformerHandler = null
+  private[this] var currentXSLResult  : DOMResult = null
+
+  //
+  //  The last XSL step processed, we may need to fill in the
+  //  stylesheet.
+  //
+  private[this] var lastXSL : XSL = null
+  private[this] var lastXSLVersion : String = null
 
   def this() = this(null, new Config)
 
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
+    uri match {
+      case "http://www.rackspace.com/repose/wadl/checker" => startCheckerElement(uri, localName, qname, atts)
+      case "http://www.w3.org/2001/XMLSchema" => startSchemaElement(uri, localName, qname, atts)
+      case "http://www.w3.org/1999/XSL/Transform" => startTransformElement(uri, localName, qname, atts)
+      case _ => // ignore
+    }
+    if (contentHandler != null) {
+      contentHandler.startElement(uri, localName, qname, atts)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.startElement(uri, localName, qname, atts)
+    }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.startElement(uri, localName, qname, atts)
+    }
+  }
+
+  override def endElement(uri : String, localName : String, qname : String) = {
+    uri match {
+      case "http://www.rackspace.com/repose/wadl/checker" => endCheckerElement(uri, localName, qname)
+      case "http://www.w3.org/2001/XMLSchema" => endSchemaElement(uri, localName, qname)
+      case "http://www.w3.org/1999/XSL/Transform" => endTransformElement(uri, localName, qname)
+      case _ => // ignore
+    }
+
+    if (contentHandler != null) {
+      contentHandler.endElement(uri, localName, qname)
+    }
+    if (currentSchemaHandler != null) {
+      currentSchemaHandler.endElement(uri, localName, qname)
+    }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.endElement(uri, localName, qname)
+    }
+  }
+
+  override def endDocument = {
+    next.foreach { case (id, nexts) => {
+      val step = steps(id).asInstanceOf[ConnectedStep]
+      for ( i <- 0 to (nexts.length - 1)) {
+        step.next(i) = steps(nexts(i))
+      }
+    }}
+    next.clear
+    if (contentHandler != null) {
+      contentHandler.endDocument()
+    }
+  }
+
+  //
+  //  Returns the start step after the document has been parsed.
+  //
+  def step : Step = start
+
+  //
+  //  Element handlers
+  //
+  private[this] def startCheckerElement (uri : String, localName : String, qname : String, atts : Attributes) = {
     localName match {
       case "step" =>
         if (processGrammar) {
@@ -158,47 +229,46 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         }
       case "grammar" =>
         addGrammar(atts)
-      case "schema" =>
-        startInlineSchema
       case _ =>  // ignore
     }
-    if (contentHandler != null) {
-      contentHandler.startElement(uri, localName, qname, atts)
-    }
-    if (currentSchemaHandler != null) {
-      currentSchemaHandler.startElement(uri, localName, qname, atts)
+  }
+
+  private[this] def endCheckerElement (uri : String, localName : String, qname : String) = {
+    localName match {
+      case "step" => if (lastXSL != null) closeXSLTStep
+      case _ => //ignore
     }
   }
 
-  override def endElement(uri : String, localName : String, qname : String) = {
-    if (contentHandler != null) {
-      contentHandler.endElement(uri, localName, qname)
-    }
-    if (currentSchemaHandler != null) {
-      currentSchemaHandler.endElement(uri, localName, qname)
-    }
-    if (localName == "schema") {
-      endInlineSchema
+  private[this] def startSchemaElement (uri : String, localName : String, qname : String, atts : Attributes) = {
+    localName match {
+      case "schema" => startInlineSchema
+      case _ => //ignore
     }
   }
 
-  override def endDocument = {
-    next.foreach { case (id, nexts) => {
-      val step = steps(id).asInstanceOf[ConnectedStep]
-      for ( i <- 0 to (nexts.length - 1)) {
-        step.next(i) = steps(nexts(i))
-      }
-    }}
-    next.clear
-    if (contentHandler != null) {
-      contentHandler.endDocument()
+  private[this] def endSchemaElement (uri : String, localName : String, qname : String) = {
+    localName match {
+      case "schema" => endInlineSchema
+      case _ => //ignore
     }
   }
 
-  //
-  //  Returns the start step after the document has been parsed.
-  //
-  def step : Step = start
+  private[this] def startTransformElement (uri : String, localName : String, qname : String, atts : Attributes) = {
+    localName match {
+      case "transform" => startInlineXSL
+      case "stylesheet" => startInlineXSL
+      case _ => //ignore
+    }
+  }
+
+  private[this] def endTransformElement (uri : String, localName : String, qname : String) = {
+    localName match {
+      case "transform" => endInlineXSL
+      case "stylesheet" => endInlineXSL
+      case _ => //ignore
+    }
+  }
 
   //
   //  We add new grammar source, we use it for processing later.
@@ -211,7 +281,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   }
 
   //
-  //  We add internal schema....
+  //  Handle internal schema....
   //
   private[this] def startInlineSchema : Unit = {
     if (currentSchemaHandler == null) {
@@ -238,6 +308,34 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
   }
 
+  //
+  //  Handle internal XSL...
+  //
+  private[this] def startInlineXSL : Unit = {
+    if (currentXSLHandler == null) {
+      currentXSLHandler = saxTransformerFactory.newTransformerHandler()
+      currentXSLResult = new DOMResult()
+      currentXSLHandler.setResult (currentXSLResult)
+
+      currentXSLHandler.startDocument()
+      currentXSLHandler.setDocumentLocator(locator)
+      prefixes.foreach { case (prefix, uri) => {
+        currentXSLHandler.startPrefixMapping (prefix, uri)
+      }}
+    }
+  }
+
+  private[this] def endInlineXSL : Unit = {
+    if (currentXSLHandler != null) {
+      currentXSLHandler.endDocument()
+      currentXSLHandler = null
+
+      //
+      //  The currentXSLResult is cleared by the step that consumes
+      //  it.
+      //
+    }
+  }
 
   //
   //  Process the grammar to generate a schema.
@@ -375,16 +473,48 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     try {
       val templates : Templates = {
-        version match {
-          case "1" => transformFactoryXSL1.newTemplates(new StreamSource(href))
-          case "2" => transformFactoryXSL2.newTemplates(new StreamSource(href))
+        if (href != null) {
+          version match {
+            case "1" => transformFactoryXSL1.newTemplates(new StreamSource(href))
+            case "2" => transformFactoryXSL2.newTemplates(new StreamSource(href))
+          }
+        } else {
+          null
         }
       }
 
+      val xsl = new XSL(id, label, templates, new Array[Step](nexts.length))
+
       next += (id -> nexts)
-      steps += (id -> new XSL(id, label, templates, new Array[Step](nexts.length)))
+      steps += (id -> xsl)
+
+      if (templates == null) {
+        lastXSL = xsl
+        lastXSLVersion = version
+      }
     } catch {
       case e : Exception => throw new SAXParseException("Error while parsing XSLT", locator, e)
+    }
+  }
+
+  private[this] def closeXSLTStep : Unit = {
+    try {
+      val templates : Templates = {
+        val xslDoc = currentXSLResult.getNode().asInstanceOf[Document]
+        lastXSLVersion match {
+          case "1" => transformFactoryXSL1.newTemplates(new DOMSource(xslDoc))
+          case "2" => transformFactoryXSL2.newTemplates(new DOMSource(xslDoc))
+        }
+      }
+
+      steps += (lastXSL.id -> new XSL(lastXSL.id, lastXSL.label, templates, lastXSL.next))
+
+    } catch {
+      case e : Exception => throw new SAXParseException("Error while parsing XSLT", locator, e)
+    } finally {
+      lastXSL = null
+      lastXSLVersion = null
+      currentXSLResult = null
     }
   }
 
@@ -475,6 +605,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     if (currentSchemaHandler != null) {
       currentSchemaHandler.characters(ch, start, length)
     }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.characters(ch, start, length)
+    }
   }
   override def startPrefixMapping (prefix : String, uri : String) = {
     prefixes += (prefix -> uri)
@@ -484,6 +617,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
     if (currentSchemaHandler != null) {
       currentSchemaHandler.startPrefixMapping(prefix, uri)
+    }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.startPrefixMapping(prefix, uri)
     }
   }
   override def endPrefixMapping (prefix : String) = {
@@ -495,6 +631,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     if (currentSchemaHandler != null) {
       currentSchemaHandler.endPrefixMapping(prefix)
     }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.endPrefixMapping(prefix)
+    }
   }
   override def ignorableWhitespace(ch : Array[Char], start : Int, length : Int) = {
     if (contentHandler != null) {
@@ -503,6 +642,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     if (currentSchemaHandler != null) {
       currentSchemaHandler.ignorableWhitespace(ch, start, length)
     }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.ignorableWhitespace(ch, start, length)
+    }
   }
   override def processingInstruction(target : String, data : String) = {
     if (contentHandler != null) {
@@ -510,6 +652,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
     if (currentSchemaHandler != null) {
       currentSchemaHandler.processingInstruction(target, data)
+    }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.processingInstruction(target, data)
     }
   }
   override def setDocumentLocator(locator : Locator) = {
@@ -521,6 +666,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     if (currentSchemaHandler != null) {
       currentSchemaHandler.setDocumentLocator(locator)
     }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.setDocumentLocator(locator)
+    }
   }
   override def skippedEntity (name : String) = {
     if (contentHandler != null) {
@@ -528,6 +676,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
     if (currentSchemaHandler != null) {
       currentSchemaHandler.skippedEntity(name)
+    }
+    if (currentXSLHandler != null) {
+      currentXSLHandler.skippedEntity(name)
     }
   }
   override def startDocument = {

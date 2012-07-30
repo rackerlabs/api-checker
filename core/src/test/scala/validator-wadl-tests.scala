@@ -1727,6 +1727,117 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     </application>
     , TestConfig(false, false, true, true, false, 1, false, true, true, "XalanC"))
 
+  //
+  //  Like validator_XSDContentTT except it uses embeded XSLs
+  //
+
+  val validator_XSDContentTTE = Validator(
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess>
+                              <xsl:stylesheet
+                                  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                                  xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                  xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                  version="1.0">
+
+                                    <xsl:template match="node() | @*">
+                                        <xsl:copy>
+                                          <xsl:apply-templates select="@* | node()"/>
+                                        </xsl:copy>
+                                    </xsl:template>
+
+                                    <xsl:template match="tst:stepType">
+                                      <xsl:choose>
+                                        <xsl:when test=". = 'BEGIN'">
+                                          <stepType>START</stepType>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                          <stepType><xsl:value-of select="."/></stepType>
+                                        </xsl:otherwise>
+                                      </xsl:choose>
+                                    </xsl:template>
+
+                                    <xsl:template match="@stepType">
+                                        <xsl:choose>
+                                          <xsl:when test=". = 'BEGIN'">
+                                            <xsl:attribute name="stepType">START</xsl:attribute>
+                                          </xsl:when>
+                                          <xsl:otherwise>
+                                            <xsl:attribute name="stepType"><xsl:value-of select="."/></xsl:attribute>
+                                          </xsl:otherwise>
+                                      </xsl:choose>
+                                    </xsl:template>
+
+                                </xsl:stylesheet>
+                          </rax:preprocess>
+                      </representation>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess>
+                              <xsl:stylesheet
+                                  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                                  xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                  xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                  version="2.0" exclude-result-prefixes="tst">
+
+                                  <xsl:template match="node() | @*">
+                                    <xsl:copy>
+                                        <xsl:apply-templates select="@* | node()"/>
+                                    </xsl:copy>
+                                  </xsl:template>
+
+                                  <xsl:template match="tst:stepType">
+                                    <xsl:choose>
+                                      <xsl:when test=". = 'BEGIN'">
+                                          <stepType>START</stepType>
+                                      </xsl:when>
+                                    <xsl:otherwise>
+                                        <stepType><xsl:value-of select="."/></stepType>
+                                    </xsl:otherwise>
+                                  </xsl:choose>
+                                </xsl:template>
+
+                                <xsl:template match="@stepType">
+                                  <xsl:choose>
+                                    <xsl:when test=". = 'BEGIN'">
+                                        <xsl:attribute name="stepType">START</xsl:attribute>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="stepType"><xsl:value-of select="."/></xsl:attribute>
+                                    </xsl:otherwise>
+                                  </xsl:choose>
+                                </xsl:template>
+
+                              </xsl:stylesheet>
+                          </rax:preprocess>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    , TestConfig(false, false, true, true, false, 1, false, true, true, "XalanC"))
 
   //
   //  Like validator_XSDContentTT except uses Xalan instead of XalanC for XSL 1.0 engine.
@@ -1858,7 +1969,6 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     validator_XSDContentTT.validate(request("GET","/c"),response,chain)
   }
 
-
   test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT because BEGIN is not an accepted stepType, but it's converted to START") {
     val req = request("POST","/a/b","application/xml",
                       <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -1885,6 +1995,82 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     assertResultFailed(validator_XSDContentTT.validate(request("POST","/a/b", "application/xml", goodXML),response,chain), 400)
   }
 
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTTE with valid XML1") {
+    validator_XSDContentTTE.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTTE with valid XML2") {
+    validator_XSDContentTTE.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTTE with valid XML1") {
+    validator_XSDContentTTE.validate(request("POST","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTTE with valid XML1, default values should be filled in") {
+    val req = request("POST","/a/b","application/xml",
+                      <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                      <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                        <stepType/>
+                        <even/>
+                      </e>)
+    validator_XSDContentTTE.validate(req,response,chain)
+    val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
+    assert ((dom \ "stepType").text == "START")
+    assert ((dom \ "even").text == "50")
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTTE with valid XML2, default values should be filled in") {
+    val req = request("POST","/a/b","application/xml",
+                      <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                        id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"/>)
+    validator_XSDContentTTE.validate(req,response,chain)
+    val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
+    assert ((dom \ "@stepType").text == "START")
+    assert ((dom \ "@even").text == "50")
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTTE with valid XML2") {
+    validator_XSDContentTTE.validate(request("POST","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_XSDContentTTE with well formed JSON") {
+    validator_XSDContentTTE.validate(request("PUT","/a/b","application/json", goodJSON),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_XSDContentTTE with well formed JSON") {
+    validator_XSDContentTTE.validate(request("POST","/c","application/json", goodJSON),response,chain)
+  }
+
+  test ("GOT on /c should succeed on validator_XSDContentTTE") {
+    validator_XSDContentTTE.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTTE because BEGIN is not an accepted stepType, but it's converted to START") {
+    val req = request("POST","/a/b","application/xml",
+                      <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                      <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                        <stepType>BEGIN</stepType>
+                        <even/>
+                      </e>)
+    validator_XSDContentTTE.validate(req,response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTTE because BEGIN is not an accepted @stepType, but it's converted to START") {
+    val req = request("POST","/a/b","application/xml",
+                      <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                        id="21f1fcf6-bf38-11e1-878e-133ab65fcec3" stepType="BEGIN"/>)
+    validator_XSDContentTTE.validate(req,response,chain)
+  }
+
+
+  test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_XSDContentTTE") {
+    assertResultFailed(validator_XSDContentTTE.validate(request("PUT","/a/b", "application/xml", goodXML),response,chain), 400)
+  }
+
+  test ("POST on /a/b should fail with well formed XML that does not match schema on validator_XSDContentTTE") {
+    assertResultFailed(validator_XSDContentTTE.validate(request("POST","/a/b", "application/xml", goodXML),response,chain), 400)
+  }
 
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTTX with valid XML1") {
     validator_XSDContentTTX.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
