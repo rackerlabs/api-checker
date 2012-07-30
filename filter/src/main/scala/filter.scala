@@ -43,7 +43,7 @@ class ValidatorFilter extends Filter {
     conf.checkWellFormed = true
     conf.checkXSDGrammar = true
     conf.checkElements = true
-    conf.xpathVersion = 2
+    conf.xpathVersion = 1
     conf.checkPlainParams = true
     conf.doXSDGrammarTransform = true
     conf.enablePreProcessExtension = true
