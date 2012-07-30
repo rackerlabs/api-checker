@@ -47,6 +47,7 @@ class ValidatorFilter extends Filter {
     conf.checkPlainParams = true
     conf.doXSDGrammarTransform = true
     conf.enablePreProcessExtension = true
+    conf.joinXPathChecks = true
     conf.xslEngine = "XalanC"
 
     validator = Validator(new SAXSource(new InputSource(wadlRef)), conf)
