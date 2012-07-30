@@ -3,8 +3,12 @@ package com.rackspace.com.papi.components.checker.step
 import javax.xml.transform.Templates
 import javax.xml.transform.Transformer
 
+import javax.xml.transform.Source
+
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.dom.DOMResult
+
+import javax.xml.transform.stream.StreamSource
 
 import javax.xml.parsers.DocumentBuilder
 
@@ -40,7 +44,15 @@ class XSL(id : String, label : String, templates : Templates, next : Array[Step]
       val result = parser.newDocument()
       returnParser(parser) ; parser = null
 
-      transform.transform (new DOMSource (req.parsedXML), new DOMResult(result))
+      val source : Source = {
+        if (req.parsedXML != null) {
+          new DOMSource(req.parsedXML)
+        } else {
+          new StreamSource(req.getInputStream())
+        }
+      }
+
+      transform.transform (source, new DOMResult(result))
       req.parsedXML = result
     } finally {
       if (transform != null) returnTransformer(templates, transform)
