@@ -138,7 +138,7 @@
                     </xslout:choose>
 
                     <xslout:copy>
-                        <xslout:apply-templates select="@* | node()"/>
+                        <xslout:apply-templates select="node()"/>
                     </xslout:copy>
                 </xslout:template>
 
