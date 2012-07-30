@@ -300,6 +300,25 @@
       1. [X] Add builder XSL test
       2. [X] Add validator tests: embeded namespaces
       3. [X] Add validator tests: parent namespaces
+** DONE XPath join optimization [9/9]
+   1. [X] Create XPath join XSL
+   2. [X] Add XPath join config option
+   3. [X] Extend XSL stage to read from IOStream is there is no parsed XML
+   4. [X] Add new optional stage to builder
+   5. [X] Update CLI tools
+   6. [X] Update Filter / Filter Test App
+   7. [X] Extend XSL stage to handle error messages
+   8. [X] If any step is XSL2 or XPath2, then use XPath2 for the XSL.
+   9. [X] Test [3/3]
+      1. [X] Enable Optimization in multi-xpath checker tests
+      2. [X] Checker tests with xpath 2
+      3. [X] Ensure that validaTor Xpath tests work with validator
+** TODO PreProc Enhancements [0/5]
+   1. [ ] Preproc and XSL step should be able to change content type
+   2. [ ] Preporc should support XSL parameters
+   3. [ ] JSONx should be supported
+   4. [ ] Should be able to use in not xml types
+   5. [ ] Write test with noJoin on actual error message produced.
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
       display.
@@ -315,11 +334,6 @@
          should work well at detecting XPath with version number.
       3. [ ] Test Bad XPaths
       4. [ ] Combined XPath opt tests
-** TODO PreProc Enhancements [0/4]
-   1. [ ] Preproc and XSL step should be able to change content type
-   2. [ ] Preporc should support XSL parameters
-   3. [ ] JSONx should be supported
-   4. [ ] Should be able to use in not xml types
 ** TODO Namespace Enhancements [0/2]
    1. [ ] Namespace cleanup task should look into XPath expressions
    2. [ ] Namespace cleanup task should account for default namespaces.

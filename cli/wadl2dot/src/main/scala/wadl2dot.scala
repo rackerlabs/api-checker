@@ -19,6 +19,9 @@ object Wadl2Dot {
   val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
                                          "Add checks to ensure that XML and JSON are well formed. Default: false")
 
+  val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
+                                         "Join multiple XPath and XML well-formed checks into a single check: false")
+
   val xsdCheck = parser.flag[Boolean] (List("x", "xsd"),
                                          "Add checks to ensure that XML validates against XSD grammar Default: false")
 
@@ -88,6 +91,7 @@ object Wadl2Dot {
       c.checkElements   = element.value.getOrElse(false)
       c.checkPlainParams = plainParam.value.getOrElse(false)
       c.enablePreProcessExtension = preProc.value.getOrElse(false)
+      c.joinXPathChecks = joinXPaths.value.getOrElse(false)
       c.validateChecker = true
 
       new WADLDotBuilder().build (getSource, getResult,

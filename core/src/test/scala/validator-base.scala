@@ -108,6 +108,20 @@ object TestConfig {
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
              checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
              checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
+             enablePreProcessExtension : Boolean, xslEngine : String, 
+             joinXPathChecks : Boolean) : Config = {
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
+                       xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension,
+                       xslEngine)
+
+    config.joinXPathChecks = joinXPathChecks
+
+    config
+  }
+
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
              enablePreProcessExtension : Boolean, xslEngine : String) : Config = {
     val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
                        xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension)
