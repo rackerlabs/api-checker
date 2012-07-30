@@ -4103,6 +4103,52 @@ class WADLCheckerSpec extends BaseCheckerSpec {
             XSL, ContentFail)
   }
 
+  scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps (dups on, join on)") {
+    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on)")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:a">
+                         <param name="id" style="plain" path="/tst:a/@id" required="true"/>
+                         <param name="stepType" style="plain" path="/tst:a/@stepType" required="true"/>
+                         <rax:preprocess href="src/test/resources/xsl/testXSL1.xsl"/>
+                      </representation>
+                      <representation mediaType="application/atom+xml" element="tst:a">
+                         <rax:preprocess href="src/test/resources/xsl/testXSL2.xsl"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    register("test://app/src/test/resources/xsl/testXSL1.xsl",
+             XML.loadFile("src/test/resources/xsl/testXSL1.xsl"))
+    register("test://app/src/test/resources/xsl/testXSL2.xsl",
+             XML.loadFile("src/test/resources/xsl/testXSL2.xsl"))
+    val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true))
+    assert(checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSL']) = 4")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='1']) = 3")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='2']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 0")
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), XSL, XSL, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), XSL,
+           XSL, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), XSL, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), XSL, ContentFail)
+  }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps (dups on 2)") {
     given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on 2)")

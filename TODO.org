@@ -308,10 +308,15 @@
    5. [X] Update CLI tools
    6. [X] Update Filter / Filter Test App
    7. [X] Extend XSL stage to handle error messages
-   8. [ ] Test [0/3]
-      1. [ ] Enable Optimization in multi-xpath checker tests
+   8. [-] Test [1/2]
+      1. [X] Enable Optimization in multi-xpath checker tests
       2. [ ] Enable Optimization in validator tests
-      3. [ ] Test to ensure that error message is outputting correctly
+** TODO PreProc Enhancements [0/5]
+   1. [ ] Preproc and XSL step should be able to change content type
+   2. [ ] Preporc should support XSL parameters
+   3. [ ] JSONx should be supported
+   4. [ ] Should be able to use in not xml types
+   5. [ ] Write test with noJoin on actual error message produced.
 ** TODO XPath check enhancements[0/6]
    1. [ ] Better errors when multiple XPath expressions fail --
       display.
@@ -327,11 +332,6 @@
          should work well at detecting XPath with version number.
       3. [ ] Test Bad XPaths
       4. [ ] Combined XPath opt tests
-** TODO PreProc Enhancements [0/4]
-   1. [ ] Preproc and XSL step should be able to change content type
-   2. [ ] Preporc should support XSL parameters
-   3. [ ] JSONx should be supported
-   4. [ ] Should be able to use in not xml types
 ** TODO Namespace Enhancements [0/2]
    1. [ ] Namespace cleanup task should look into XPath expressions
    2. [ ] Namespace cleanup task should account for default namespaces.
