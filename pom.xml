@@ -49,7 +49,7 @@
         <saxon-ee.version>9.4.0.4</saxon-ee.version>
         <scala.test.version>1.6.1</scala.test.version>
         <junit.version>4.10</junit.version>
-        <wadl-tools.version>1.0.4-SNAPSHOT</wadl-tools.version>
+        <wadl-tools.version>1.0.4</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.0-rax</xerces.version>
         <servlet.version>3.1</servlet.version>
