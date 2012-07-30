@@ -10,6 +10,9 @@ import javax.xml.transform.Templates
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.Transformer
 
+import net.sf.saxon.Controller
+import net.sf.saxon.serialize.MessageWarner
+
 object IdentityTransformPool {
   private val tf = TransformerFactory.newInstance()
   private val pool = new SoftReferenceObjectPool[Transformer](new IdentityTransformerFactory(tf))
@@ -56,7 +59,17 @@ private class XSLTransformerFactory(private val templates : Templates) extends P
     //
   }
 
-  def validateObject (trans : Transformer) : Boolean = trans != null
+  def validateObject (trans : Transformer) : Boolean = {
+    val valid = trans != null
+
+    //
+    //  Ask Saxon to behave like xalan when emitting messages.
+    //
+    if (valid && trans.isInstanceOf[Controller]) {
+      trans.asInstanceOf[Controller].setMessageEmitter(new MessageWarner)
+    }
+    valid
+  }
 
   def passivateObject (trans : Transformer) : Unit = {
     trans.reset()

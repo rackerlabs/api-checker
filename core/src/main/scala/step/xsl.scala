@@ -2,6 +2,8 @@ package com.rackspace.com.papi.components.checker.step
 
 import javax.xml.transform.Templates
 import javax.xml.transform.Transformer
+import javax.xml.transform.TransformerException
+import javax.xml.transform.ErrorListener
 
 import javax.xml.transform.Source
 
@@ -28,9 +30,11 @@ class XSL(id : String, label : String, templates : Templates, next : Array[Step]
   override val mismatchMessage : String = "Error while performing translation"
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    val ret = uriLevel
+    var ret = uriLevel
     var parser : DocumentBuilder = null
     var transform : Transformer = null
+    val capture = new TransformErrorCapture
+    var error : Exception = null
 
     try {
       transform = borrowTransformer(templates)
@@ -52,12 +56,55 @@ class XSL(id : String, label : String, templates : Templates, next : Array[Step]
         }
       }
 
+      transform.setErrorListener (capture)
       transform.transform (source, new DOMResult(result))
       req.parsedXML = result
+    } catch {
+      case e : Exception => error = e
     } finally {
       if (transform != null) returnTransformer(templates, transform)
       if (parser != null) returnParser(parser)
     }
+
+    if (capture.error != None) {
+      req.contentError = capture.error.get
+      ret = -1
+    } else if (error != null) {
+      req.contentError = error
+      ret = -1
+    }
+
     ret
+  }
+}
+
+private class TransformErrorCapture extends ErrorListener {
+  var error : Option[TransformerException] = None
+  var msg : Option[String] = None
+
+  def error (exception : TransformerException) : Unit = {
+    if (error == None) {
+      error = Some(exception)
+
+      val message = exception.getMessage()
+      if (message.contains("xsl:message") && msg != None) {
+        error = Some(new TransformerException(msg.get, error.get))
+      }
+    }
+  }
+
+  def fatalError (exception : TransformerException) : Unit = {
+    if (error == None) {
+      error = Some(exception)
+
+      val message = exception.getMessage()
+      if (message.contains("termination") && msg != None) {
+        error = Some(new TransformerException(msg.get, error.get))
+      }
+    }
+  }
+
+  def warning (exception : TransformerException) : Unit = {
+    msg = Some(exception.getMessage())
   }
 }
