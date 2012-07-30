@@ -105,4 +105,10 @@ class Config {
 
   def setXSLEngine (engine : String) : Unit = { xslEngine_=(engine) }
   def getXSLEngine : String = xslEngine
+
+  //
+  //  This is an optimization where the well formness check and
+  //  multiple XPath checks can be merged into a single check.
+  //
+  @BeanProperty var joinXPathChecks : Boolean = false
 }

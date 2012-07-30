@@ -300,16 +300,15 @@
       1. [X] Add builder XSL test
       2. [X] Add validator tests: embeded namespaces
       3. [X] Add validator tests: parent namespaces
-** TODO XPath join optimization [1/9]
+** TODO XPath join optimization [2/8]
    1. [X] Create XPath join XSL
-   2. [ ] Add XPath join config option
+   2. [X] Add XPath join config option
    3. [ ] Extend XSL stage to read from IOStream is there is no parsed XML
-   4. [ ] Add new config option
-   5. [ ] Add new optional stage to builder
-   6. [ ] Update CLI tools
-   7. [ ] Update Filter / Filter Test App
-   8. [ ] Extend XSL stage to handle error messages
-   9. [ ] Test [0/2]
+   4. [ ] Add new optional stage to builder
+   5. [ ] Update CLI tools
+   6. [ ] Update Filter / Filter Test App
+   7. [ ] Extend XSL stage to handle error messages
+   8. [ ] Test [0/2]
       1. [ ] Enable Optimization in multi-xpath checker tests
       2. [ ] Enable Optimization in validator tests
 ** TODO XPath check enhancements[0/6]
