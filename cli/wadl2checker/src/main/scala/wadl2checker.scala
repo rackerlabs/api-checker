@@ -16,6 +16,9 @@ object Wadl2Checker {
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
 
+  val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
+                                         "Join multiple XPath and XML well-formed checks into a single check: false")
+
   val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
                                          "Add checks to ensure that XML and JSON are well formed. Default: false")
 
@@ -86,6 +89,7 @@ object Wadl2Checker {
       c.checkElements = element.value.getOrElse(false)
       c.checkPlainParams = plainParam.value.getOrElse(false)
       c.enablePreProcessExtension = preProc.value.getOrElse(false)
+      c.joinXPathChecks = joinXPaths.value.getOrElse(false)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)
     } catch {
