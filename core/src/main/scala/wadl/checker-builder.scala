@@ -31,7 +31,12 @@ object BuilderXSLParams {
   val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
 }
 
+object XPathJoinParams {
+  val DEFAULT_XPATH_VERSION = "defaultXPathVersion"
+}
+
 import BuilderXSLParams._
+import XPathJoinParams._
 
 /**
  * An exception when transating the WADL into a checker.
@@ -104,6 +109,9 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
         if (c.joinXPathChecks) {
           val xpathHandler = wadl.saxTransformerFactory.newTransformerHandler(joinXPathTemplates)
+
+          xpathHandler.getTransformer().setParameter(DEFAULT_XPATH_VERSION, c.xpathVersion)
+
           joinHandler.setResult(new SAXResult(xpathHandler))
           xpathHandler.setResult(output)
         } else {

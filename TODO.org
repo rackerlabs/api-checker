@@ -300,7 +300,7 @@
       1. [X] Add builder XSL test
       2. [X] Add validator tests: embeded namespaces
       3. [X] Add validator tests: parent namespaces
-** TODO XPath join optimization [7/8]
+** TODO XPath join optimization [8/9]
    1. [X] Create XPath join XSL
    2. [X] Add XPath join config option
    3. [X] Extend XSL stage to read from IOStream is there is no parsed XML
@@ -308,9 +308,12 @@
    5. [X] Update CLI tools
    6. [X] Update Filter / Filter Test App
    7. [X] Extend XSL stage to handle error messages
-   8. [-] Test [1/2]
+   8. [X] If any step is XSL2 or XPath2, then use XPath2 for the XSL.
+   9. [-] Test [1/4]
       1. [X] Enable Optimization in multi-xpath checker tests
-      2. [ ] Enable Optimization in validator tests
+      2. [ ] Checker tests with mix of xpath1 and xpath2
+      3. [ ] Ensure that validator XPath tests work with validator
+      4. [ ] Enable Optimization in validator tests Well, XSD, XSLT in mix
 ** TODO PreProc Enhancements [0/5]
    1. [ ] Preproc and XSL step should be able to change content type
    2. [ ] Preporc should support XSL parameters

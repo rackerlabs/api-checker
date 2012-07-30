@@ -8,6 +8,8 @@
     exclude-result-prefixes="xsd check"
     version="2.0">
 
+    <xsl:param name="defaultXPathVersion" as="xsd:integer" select="1"/>
+
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
 
     <xsl:output indent="yes" method="xml"/>
@@ -119,10 +121,18 @@
         <xsl:variable name="joinSteps" as="xsd:string*" select="tokenize(@steps,' ')"/>
         <xsl:variable name="steps" as="node()*" select="$checker//check:step[@id = $joinSteps]"/>
         <xsl:variable name="root" as="node()" select="$checker//check:step[@id = $rootID]"/>
+        <xsl:variable name="version" as="xsd:integer">
+            <xsl:choose>
+                <xsl:when test="$root/@type = 'XSL' and $root/@version='2'">2</xsl:when>
+                <xsl:when test="$steps[@version='2']">2</xsl:when>
+                <xsl:when test="$steps[not(@version)] and $defaultXPathVersion=2">2</xsl:when>
+                <xsl:otherwise>1</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
-        <step id="{generate-id(.)}" type="XSL" version="1">
+        <step id="{generate-id(.)}" type="XSL" version="{$version}">
             <xsl:attribute name="next" select="check:joinNext($root, $steps)" separator=" "/>
-            <xslout:transform version="1.0" check:mergable="true">
+            <xslout:transform version="{$version}.0" check:mergable="true">
                 <xslout:template match="/">
                     <xsl:if test="$root/@type = 'XSL'">
                         <xsl:copy-of select="$root/xsl:transform/xsl:template[@match='/']/xsl:choose"/>
