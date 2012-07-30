@@ -137,6 +137,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   private[this] var currentXSLHandler : TransformerHandler = null
   private[this] var currentXSLResult  : DOMResult = null
 
+  //
+  //  The last XSL step processed, we may need to fill in the
+  //  stylesheet.
+  //
+  private[this] var lastXSL : XSL = null
+  private[this] var lastXSLVersion : String = null
+
   def this() = this(null, new Config)
 
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
@@ -159,6 +166,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
   override def endElement(uri : String, localName : String, qname : String) = {
     uri match {
+      case "http://www.rackspace.com/repose/wadl/checker" => endCheckerElement(uri, localName, qname)
       case "http://www.w3.org/2001/XMLSchema" => endSchemaElement(uri, localName, qname)
       case "http://www.w3.org/1999/XSL/Transform" => endTransformElement(uri, localName, qname)
       case _ => // ignore
@@ -222,6 +230,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       case "grammar" =>
         addGrammar(atts)
       case _ =>  // ignore
+    }
+  }
+
+  private[this] def endCheckerElement (uri : String, localName : String, qname : String) = {
+    localName match {
+      case "step" => if (lastXSL != null) closeXSLTStep
+      case _ => //ignore
     }
   }
 
@@ -464,19 +479,42 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
             case "2" => transformFactoryXSL2.newTemplates(new StreamSource(href))
           }
         } else {
-          val xslDoc = currentXSLResult.getNode().asInstanceOf[Document]
-          currentXSLResult = null
-          version match {
-            case "1" => transformFactoryXSL1.newTemplates(new DOMSource(xslDoc))
-            case "2" => transformFactoryXSL2.newTemplates(new DOMSource(xslDoc))
-          }
+          null
         }
       }
 
+      val xsl = new XSL(id, label, templates, new Array[Step](nexts.length))
+
       next += (id -> nexts)
-      steps += (id -> new XSL(id, label, templates, new Array[Step](nexts.length)))
+      steps += (id -> xsl)
+
+      if (templates == null) {
+        lastXSL = xsl
+        lastXSLVersion = version
+      }
     } catch {
       case e : Exception => throw new SAXParseException("Error while parsing XSLT", locator, e)
+    }
+  }
+
+  private[this] def closeXSLTStep : Unit = {
+    try {
+      val templates : Templates = {
+        val xslDoc = currentXSLResult.getNode().asInstanceOf[Document]
+        lastXSLVersion match {
+          case "1" => transformFactoryXSL1.newTemplates(new DOMSource(xslDoc))
+          case "2" => transformFactoryXSL2.newTemplates(new DOMSource(xslDoc))
+        }
+      }
+
+      steps += (lastXSL.id -> new XSL(lastXSL.id, lastXSL.label, templates, lastXSL.next))
+
+    } catch {
+      case e : Exception => throw new SAXParseException("Error while parsing XSLT", locator, e)
+    } finally {
+      lastXSL = null
+      lastXSLVersion = null
+      currentXSLResult = null
     }
   }
 
