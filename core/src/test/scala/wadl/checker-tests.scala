@@ -17,6 +17,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   register ("xsd", "http://www.w3.org/2001/XMLSchema")
   register ("wadl","http://wadl.dev.java.net/2009/02")
+  register ("xsl","http://www.w3.org/1999/XSL/Transform")
   register ("chk","http://www.rackspace.com/repose/wadl/checker")
   register ("tst","http://www.rackspace.com/repose/wadl/checker/step/test")
 
@@ -3847,6 +3848,70 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
   }
+
+  scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a single embeded XSL transform") {
+    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:a">
+                         <param name="id" style="plain" path="/tst:a/@id" required="true"/>
+                         <param name="stepType" style="plain" path="/tst:a/@stepType" required="true"/>
+                         <rax:preprocess>
+                            <xsl:stylesheet
+                                  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                                  xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                                  version="1.0">
+                              <xsl:template match="/">
+                                  <tst:success didIt="true">Yup, that worked</tst:success>
+                              </xsl:template>
+                            </xsl:stylesheet>
+                         </rax:preprocess>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1, true, true, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSL']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 3")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
+    assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet")
+    assert(checker, "chk:checker/chk:step[@type='XSL' and not(@href)]/xsl:stylesheet")
+    assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template")
+    assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success")
+    assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success/@didIt")
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+            XPath("/tst:a/@id"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
+  }
+
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transform") {
     given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform")
