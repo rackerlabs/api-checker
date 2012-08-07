@@ -353,7 +353,7 @@
     
     <xsl:template match="wadl:resource">
         <xsl:variable name="haveHeaders" as="xsd:boolean"
-                      select="$useHeaderCheck and wadl:param[@style='header' and required='true']"/>
+                      select="$useHeaderCheck and wadl:param[@style='header' and @required='true']"/>
         <xsl:variable name="links" as="xsd:string*">
             <xsl:choose>
                 <xsl:when test="$haveHeaders">
@@ -463,9 +463,9 @@
 
     <xsl:template name="check:addHeaderSteps">
         <xsl:variable name="from" select="." as="node()"/>
-        <xsl:variable name="ids" select="for $p in wadl:param[@style='header' and required='true']
+        <xsl:variable name="ids" select="for $p in wadl:param[@style='header' and @required='true']
                                          return generate-id($p)" as="xsd:string*"/>
-        <xsl:for-each select="wadl:param[@style='header' and required='true']">
+        <xsl:for-each select="wadl:param[@style='header' and @required='true']">
             <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
             <xsl:variable name="pos" select="position()"/>
             <step id="{generate-id()}" value="{@name}">
@@ -829,7 +829,7 @@
         <xsl:param name="from" as="node()"/>
         <xsl:choose>
             <xsl:when test="$useHeaderCheck">
-                <xsl:sequence select="for $h in $from/wadl:param[@style='header' and required='true']
+                <xsl:sequence select="for $h in $from/wadl:param[@style='header' and @required='true']
                                       return generate-id($h)"/>
             </xsl:when>
             <xsl:otherwise>
