@@ -316,9 +316,11 @@
 ** TODO Check Headers [2/8]
    1. [X] Added option to config
    2. [X] Extends XSD
-   3. [ ] Add support in XSL
-   4. [ ] Add support in opt XSLs
-   5. [ ] Handle config in CLI tools
+   3. [-] Add support in XSL [1/2]
+      1. [ ] Headers on request
+      2. [X] Headers on resource
+   4. [ ] Handle config in CLI tools
+   5. [ ] Add support in opt XSLs
    6. [ ] Add Header Steps
    7. [ ] Update handler for new steps
    8. [ ] Tests
@@ -327,8 +329,9 @@
       3. [ ] .* Test
       4. [ ] XSD Test
       5. [ ] Default Header
-** TODO Header Enhancements [0/1]
+** TODO Header Enhancements [0/2]
    1. [ ] Add default / fixed headers
+   2. [ ] Hadle headers on response
 ** TODO PreProc Enhancements [0/5]
    1. [ ] Preproc and XSL step should be able to change content type
    2. [ ] Preporc should support XSL parameters
