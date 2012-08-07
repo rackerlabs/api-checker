@@ -473,6 +473,8 @@
             <enumeration value="XSD"/>
             <enumeration value="XPATH"/>
             <enumeration value="XSL"/>
+            <enumeration value="HEADER"/>
+            <enumeration value="HEADERXSD"/>
         </restriction>
     </simpleType>
 
