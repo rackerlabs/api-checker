@@ -313,8 +313,8 @@
       1. [X] Enable Optimization in multi-xpath checker tests
       2. [X] Checker tests with xpath 2
       3. [X] Ensure that validaTor Xpath tests work with validator
-** TODO Check Headers [0/7]
-   1. [ ] Added option to config
+** TODO Check Headers [1/7]
+   1. [X] Added option to config
    2. [ ] Extends XSD
    3. [ ] Add support in XSL
    4. [ ] Handle config in CLI tools
