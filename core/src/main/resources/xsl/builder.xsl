@@ -275,7 +275,7 @@
 
     <xsl:template match="check:step" mode="addErrorStates">
         <xsl:choose>
-            <xsl:when test="@type=('URL','URLXSD','START')">
+            <xsl:when test="@type=('URL','URLXSD','START','HEADER','HEADERXSD')">
                 <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
                 <xsl:variable name="doConnect" as="xsd:boolean" 
                     select="not((for $n in $nexts return 
