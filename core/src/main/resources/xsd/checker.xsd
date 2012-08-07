@@ -47,6 +47,8 @@
                 <alternative test="@type eq 'XSD'" type="chk:XSDStep"/>
                 <alternative test="@type eq 'XPATH'" type="chk:XPathStep"/>
                 <alternative test="@type eq 'XSL'" type="chk:XSLStep"/>
+                <alternative test="@type eq 'HEADER'" type="chk:HeaderStep"/>
+                <alternative test="@type eq 'HEADERXSD'" type="chk:HeaderXSDStep"/>
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
@@ -218,6 +220,41 @@
         </annotation>
         <complexContent>
             <extension base="chk:ConnectedStep">
+                <attribute name="match" type="xsd:QName" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="HeaderStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A check on a required header. The match attribute
+                    contains a regex that matches the header value.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep">
+                <attribute name="value" type="xsd:string" use="required"/>
+                <attribute name="match" type="xsd:string" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="HeaderXSDStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A check on a required header. The match attribute
+                    contains a QName that is used to represent an XSD
+                    simple type that validates the header value.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep">
+                <attribute name="value" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:QName" use="required"/>
             </extension>
         </complexContent>
