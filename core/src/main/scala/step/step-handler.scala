@@ -116,7 +116,24 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //
   // Our schema...
   //
-  private[this] var schema : Schema = null
+  private[this] var _schema : Schema = null
+  private[this] val _blankSchema : Schema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/blank.xsd")))
+
+  private[this] def schema(qn : QName) : Schema = {
+    if ((_schema == null) && (qn.getNamespaceURI() != "http://www.w3.org/2001/XMLSchema")) {
+      throw new SAXParseException("No schema available.", locator)
+    } else if (_schema == null) {
+      schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/blank.xsd")))
+    } else {
+      _schema
+    }
+  }
+  private[this] def schema : Schema = {
+    _schema
+  }
+  private[this] def schema_= (sch : Schema) : Unit = {
+    _schema = sch
+  }
 
 
   //
@@ -581,13 +598,10 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
     val name : String = atts.getValue("name")
-
-    if (schema == null) {
-      throw new SAXParseException("No schema available to validate "+_match, locator)
-    }
+    val qn : QName = qname(_match)
 
     next += (id -> nexts)
-    steps += (id -> new HeaderXSD(id, label, name, qname(_match), schema, new Array[Step](nexts.length)))
+    steps += (id -> new HeaderXSD(id, label, name, qn, schema(qn), new Array[Step](nexts.length)))
   }
 
   private[this] def addMethod(atts : Attributes) : Unit = {
@@ -605,13 +619,10 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
-
-    if (schema == null) {
-      throw new SAXParseException("No schema available to validate "+_match, locator)
-    }
+    val qn : QName = qname(_match)
 
     next  += (id -> nexts)
-    steps += (id -> new URIXSD(id, label, qname(_match), schema, new Array[Step](nexts.length)))
+    steps += (id -> new URIXSD(id, label, qn, schema, new Array[Step](nexts.length)))
   }
 
   private[this] def qname(_match : String)  : QName = {
