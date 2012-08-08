@@ -28,6 +28,10 @@ object Wadl2Dot {
   val element = parser.flag[Boolean] (List("l", "element"),
                                          "Add checks to ensure that XML requests use the correct element : false")
 
+  val header = parser.flag[Boolean] (List("H", "header"),
+                                         "Add checks to ensure that required headers are passed in: false")
+
+
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
 
@@ -92,6 +96,7 @@ object Wadl2Dot {
       c.checkPlainParams = plainParam.value.getOrElse(false)
       c.enablePreProcessExtension = preProc.value.getOrElse(false)
       c.joinXPathChecks = joinXPaths.value.getOrElse(false)
+      c.checkHeaders = header.value.getOrElse(false)
       c.validateChecker = true
 
       new WADLDotBuilder().build (getSource, getResult,

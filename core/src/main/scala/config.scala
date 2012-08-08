@@ -111,4 +111,10 @@ class Config {
   //  multiple XPath checks can be merged into a single check.
   //
   @BeanProperty var joinXPathChecks : Boolean = false
+
+  //
+  //  Check that required headers are set.
+  //
+
+  @BeanProperty var checkHeaders : Boolean = false
 }

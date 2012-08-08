@@ -1,0 +1,11 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:chk="http://www.rackspace.com/repose/wadl/checker/blank"
+    targetNamespace="http://www.rackspace.com/repose/wadl/checker/blank">
+
+    <element name="string" type="xsd:string"/>
+
+</schema>
