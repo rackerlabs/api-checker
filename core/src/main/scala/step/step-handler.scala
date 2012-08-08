@@ -226,6 +226,8 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "XSD"         => addXSD(atts)
           case "XPATH"       => addXPath(atts)
           case "XSL"         => addXSLT(atts)
+          case "HEADER"      => addHeader(atts)
+          case "HEADERXSD"   => addHeaderXSD(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -560,6 +562,32 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next  += (id -> nexts)
     steps += (id -> new URI(id, label, _match.r, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addHeader(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val name : String = atts.getValue("name")
+
+    next += (id -> nexts)
+    steps += (id -> new Header(id, label, name, _match.r, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addHeaderXSD(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val name : String = atts.getValue("name")
+
+    if (schema == null) {
+      throw new SAXParseException("No schema available to validate "+_match, locator)
+    }
+
+    next += (id -> nexts)
+    steps += (id -> new HeaderXSD(id, label, name, qname(_match), schema, new Array[Step](nexts.length)))
   }
 
   private[this] def addMethod(atts : Attributes) : Unit = {
