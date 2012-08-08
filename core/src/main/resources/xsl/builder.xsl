@@ -353,7 +353,7 @@
     
     <xsl:template match="wadl:resource">
         <xsl:variable name="haveHeaders" as="xsd:boolean"
-                      select="$useHeaderCheck and wadl:param[@style='header' and @required='true']"/>
+                      select="$useHeaderCheck and check:getHeaders(.)"/>
         <xsl:variable name="links" as="xsd:string*">
             <xsl:choose>
                 <xsl:when test="$haveHeaders">
@@ -463,12 +463,11 @@
 
     <xsl:template name="check:addHeaderSteps">
         <xsl:variable name="from" select="." as="node()"/>
-        <xsl:variable name="ids" select="for $p in wadl:param[@style='header' and @required='true']
-                                         return generate-id($p)" as="xsd:string*"/>
-        <xsl:for-each select="wadl:param[@style='header' and @required='true']">
+        <xsl:variable name="headers" select="check:getHeaders($from)" as="node()*"/>
+        <xsl:for-each select="$headers">
             <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
             <xsl:variable name="pos" select="position()"/>
-            <step id="{generate-id()}" value="{@name}">
+            <step id="{check:HeaderID(.)}" value="{@name}">
                 <xsl:attribute name="type">
                     <xsl:choose>
                         <xsl:when test="$isXSD">HEADERXSD</xsl:when>
@@ -494,11 +493,13 @@
                             </xsl:value-of>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="$ids[position() = $pos]"/>
+                            <xsl:value-of separator=" "
+                                          select="(check:HeaderID($headers[position() = ($pos+1)]), check:HeaderFailID($headers[position() = ($pos+1)]))"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
             </step>
+            <step type="CONTENT_FAIL" id="{check:HeaderFailID(.)}"/>
         </xsl:for-each>
         <xsl:apply-templates/>
         <xsl:call-template name="check:addMethodSets"/>
@@ -594,6 +595,16 @@
     <xsl:function name="check:WellFormFailID" as="xsd:string">
         <xsl:param name="context" as="node()"/>
         <xsl:value-of select="concat(generate-id($context),'WF')"/>
+    </xsl:function>
+
+    <xsl:function name="check:HeaderID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="generate-id($context)"/>
+    </xsl:function>
+
+    <xsl:function name="check:HeaderFailID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(check:HeaderID($context), 'HF')"/>
     </xsl:function>
 
     <xsl:function name="check:XSDID" as="xsd:string">
@@ -829,13 +840,18 @@
         <xsl:param name="from" as="node()"/>
         <xsl:choose>
             <xsl:when test="$useHeaderCheck">
-                <xsl:sequence select="for $h in $from/wadl:param[@style='header' and @required='true']
-                                      return generate-id($h)"/>
+                <xsl:variable name="firstHeader" select="check:getHeaders($from)[1]"/>
+                <xsl:value-of select="(check:HeaderID($firstHeader), check:HeaderFailID($firstHeader))"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="()"/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="check:getHeaders" as="node()*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:sequence select="$from/wadl:param[@style='header' and @required='true']"/>
     </xsl:function>
     
     <xsl:function name="check:getNextMethodLinks" as="xsd:string*">
