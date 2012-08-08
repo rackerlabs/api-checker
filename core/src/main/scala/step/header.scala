@@ -18,7 +18,7 @@ class Header(id : String, label : String, val name : String, val value : Regex, 
       }
     }
     if (ret == -1) {
-      req.contentError = new Exception("Expecting an HTTP header "+name+" with value matching "+value.toString)
+      req.contentError = new Exception("Expecting an HTTP header "+name+" with value matching "+value.toString())
     }
     ret
   }
