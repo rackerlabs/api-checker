@@ -475,14 +475,7 @@
                     </xsl:choose>
                 </xsl:attribute>
                 <xsl:attribute name="match">
-                    <xsl:choose>
-                        <xsl:when test="$isXSD">
-                            <xsl:value-of select="check:getMatch(resolve-QName(@type,.))"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="check:toRegExEscaped(@name)"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:value-of select="check:getMatchForPlainXSDType(resolve-QName(@type,.))"/>
                 </xsl:attribute>
                 <xsl:attribute name="next">
                     <xsl:choose>
