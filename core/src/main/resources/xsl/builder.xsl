@@ -467,7 +467,7 @@
         <xsl:for-each select="$headers">
             <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
             <xsl:variable name="pos" select="position()"/>
-            <step id="{check:HeaderID(.)}" value="{@name}">
+            <step id="{check:HeaderID(.)}" name="{@name}">
                 <xsl:attribute name="type">
                     <xsl:choose>
                         <xsl:when test="$isXSD">HEADERXSD</xsl:when>

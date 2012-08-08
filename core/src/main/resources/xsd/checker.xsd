@@ -236,7 +236,7 @@
         </annotation>
         <complexContent>
             <extension base="chk:ConnectedStep">
-                <attribute name="value" type="xsd:string" use="required"/>
+                <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:string" use="required"/>
             </extension>
         </complexContent>
@@ -254,7 +254,7 @@
         </annotation>
         <complexContent>
             <extension base="chk:ConnectedStep">
-                <attribute name="value" type="xsd:string" use="required"/>
+                <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:QName" use="required"/>
             </extension>
         </complexContent>
