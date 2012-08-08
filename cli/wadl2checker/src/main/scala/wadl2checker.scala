@@ -28,6 +28,9 @@ object Wadl2Checker {
   val element = parser.flag[Boolean] (List("l", "element"),
                                          "Add checks to ensure that XML requests use the correct element : false")
 
+  val header = parser.flag[Boolean] (List("H", "header"),
+                                         "Add checks to ensure that required headers are passed in: false")
+
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
 
@@ -90,6 +93,7 @@ object Wadl2Checker {
       c.checkPlainParams = plainParam.value.getOrElse(false)
       c.enablePreProcessExtension = preProc.value.getOrElse(false)
       c.joinXPathChecks = joinXPaths.value.getOrElse(false)
+      c.checkHeaders = header.value.getOrElse(false)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)
     } catch {

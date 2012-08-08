@@ -116,7 +116,24 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //
   // Our schema...
   //
-  private[this] var schema : Schema = null
+  private[this] var _schema : Schema = null
+  private[this] val _blankSchema : Schema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/blank.xsd")))
+
+  private[this] def schema(qn : QName) : Schema = {
+    if ((_schema == null) && (qn.getNamespaceURI() != "http://www.w3.org/2001/XMLSchema")) {
+      throw new SAXParseException("No schema available.", locator)
+    } else if (_schema == null) {
+      schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/blank.xsd")))
+    } else {
+      _schema
+    }
+  }
+  private[this] def schema : Schema = {
+    _schema
+  }
+  private[this] def schema_= (sch : Schema) : Unit = {
+    _schema = sch
+  }
 
 
   //
@@ -226,6 +243,8 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "XSD"         => addXSD(atts)
           case "XPATH"       => addXPath(atts)
           case "XSL"         => addXSLT(atts)
+          case "HEADER"      => addHeader(atts)
+          case "HEADERXSD"   => addHeaderXSD(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -562,6 +581,29 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     steps += (id -> new URI(id, label, _match.r, new Array[Step](nexts.length)))
   }
 
+  private[this] def addHeader(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val name : String = atts.getValue("name")
+
+    next += (id -> nexts)
+    steps += (id -> new Header(id, label, name, _match.r, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addHeaderXSD(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val name : String = atts.getValue("name")
+    val qn : QName = qname(_match)
+
+    next += (id -> nexts)
+    steps += (id -> new HeaderXSD(id, label, name, qn, schema(qn), new Array[Step](nexts.length)))
+  }
+
   private[this] def addMethod(atts : Attributes) : Unit = {
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
@@ -577,13 +619,10 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
-
-    if (schema == null) {
-      throw new SAXParseException("No schema available to validate "+_match, locator)
-    }
+    val qn : QName = qname(_match)
 
     next  += (id -> nexts)
-    steps += (id -> new URIXSD(id, label, qname(_match), schema, new Array[Step](nexts.length)))
+    steps += (id -> new URIXSD(id, label, qn, schema, new Array[Step](nexts.length)))
   }
 
   private[this] def qname(_match : String)  : QName = {

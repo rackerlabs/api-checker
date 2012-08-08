@@ -18,6 +18,7 @@
     <xsl:param name="enableElementCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePlainParamCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePreProcessExtension" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enableHeaderCheck" as="xsd:boolean" select="false()"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -41,6 +42,8 @@
     <xsl:variable name="useWellFormCheck" as="xsd:boolean"
                   select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or
                           $enablePlainParamCheck or $enablePreProcessExtension"/>
+    <xsl:variable name="useHeaderCheck" as="xsd:boolean"
+                  select="$enableHeaderCheck"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -272,7 +275,7 @@
 
     <xsl:template match="check:step" mode="addErrorStates">
         <xsl:choose>
-            <xsl:when test="@type=('URL','URLXSD','START')">
+            <xsl:when test="@type=('URL','URLXSD','START','HEADER','HEADERXSD')">
                 <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
                 <xsl:variable name="doConnect" as="xsd:boolean" 
                     select="not((for $n in $nexts return 
@@ -349,9 +352,18 @@
     </xsl:template>
     
     <xsl:template match="wadl:resource">
+        <xsl:variable name="haveHeaders" as="xsd:boolean"
+                      select="$useHeaderCheck and check:getHeaders(.)"/>
         <xsl:variable name="links" as="xsd:string*">
-            <xsl:sequence select="check:getNextURLLinks(.)"/>
-            <xsl:sequence select="check:getNextMethodLinks(.)"/>
+            <xsl:choose>
+                <xsl:when test="$haveHeaders">
+                    <xsl:sequence select="check:getNextHeaderLinks(.)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:sequence select="check:getNextURLLinks(.)"/>
+                    <xsl:sequence select="check:getNextMethodLinks(.)"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
         <xsl:variable name="templatePath" select="starts-with(@path,'{')" as="xsd:boolean"/>
         <step>
@@ -383,12 +395,23 @@
                 </xsl:attribute>
             </xsl:if>
         </step>
-        <xsl:apply-templates/>
-        <xsl:call-template name="check:addMethodSets"/>
+        <xsl:choose>
+            <xsl:when test="$haveHeaders">
+                <xsl:call-template name="check:addHeaderSteps"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates/>
+                <xsl:call-template name="check:addMethodSets"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     <xsl:function name="check:isXSDURL" as="xsd:boolean">
         <xsl:param name="path" as="node()"/>
         <xsl:variable name="param" select="check:paramForTemplatePath($path)"/>
+        <xsl:value-of select="check:isXSDParam($param)"/>
+    </xsl:function>
+    <xsl:function name="check:isXSDParam" as="xsd:boolean">
+        <xsl:param name="param" as="node()"/>
         <xsl:variable name="type" select="resolve-QName($param/@type,$param)" as="xsd:QName"/>
         <xsl:choose>
             <xsl:when test="(namespace-uri-from-QName($type) = $schemaNS) and (local-name-from-QName($type) = 'string')">
@@ -436,6 +459,43 @@
                 </step>
             </xsl:if>
         </xsl:for-each-group>
+    </xsl:template>
+
+    <xsl:template name="check:addHeaderSteps">
+        <xsl:variable name="from" select="." as="node()"/>
+        <xsl:variable name="headers" select="check:getHeaders($from)" as="node()*"/>
+        <xsl:for-each select="$headers">
+            <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
+            <xsl:variable name="pos" select="position()"/>
+            <step id="{check:HeaderID(.)}" name="{@name}">
+                <xsl:attribute name="type">
+                    <xsl:choose>
+                        <xsl:when test="$isXSD">HEADERXSD</xsl:when>
+                        <xsl:otherwise>HEADER</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+                <xsl:attribute name="match">
+                    <xsl:value-of select="check:getMatchForPlainXSDType(resolve-QName(@type,.))"/>
+                </xsl:attribute>
+                <xsl:attribute name="next">
+                    <xsl:choose>
+                        <xsl:when test="$pos = last()">
+                            <xsl:value-of separator=" ">
+                                <xsl:sequence select="check:getNextURLLinks($from)"/>
+                                <xsl:sequence select="check:getNextMethodLinks($from)"/>
+                            </xsl:value-of>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of separator=" "
+                                          select="(check:HeaderID($headers[position() = ($pos+1)]), check:HeaderFailID($headers[position() = ($pos+1)]))"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+            </step>
+            <step type="CONTENT_FAIL" id="{check:HeaderFailID(.)}"/>
+        </xsl:for-each>
+        <xsl:apply-templates/>
+        <xsl:call-template name="check:addMethodSets"/>
     </xsl:template>
     
     <xsl:template match="wadl:method">
@@ -528,6 +588,16 @@
     <xsl:function name="check:WellFormFailID" as="xsd:string">
         <xsl:param name="context" as="node()"/>
         <xsl:value-of select="concat(generate-id($context),'WF')"/>
+    </xsl:function>
+
+    <xsl:function name="check:HeaderID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="generate-id($context)"/>
+    </xsl:function>
+
+    <xsl:function name="check:HeaderFailID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(check:HeaderID($context), 'HF')"/>
     </xsl:function>
 
     <xsl:function name="check:XSDID" as="xsd:string">
@@ -757,6 +827,24 @@
             if (xsd:boolean($r/@rax:invisible)) then
             (generate-id($r), check:getNextURLLinks($r))
             else generate-id($r)"/>
+    </xsl:function>
+
+    <xsl:function name="check:getNextHeaderLinks" as="xsd:string*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:choose>
+            <xsl:when test="$useHeaderCheck">
+                <xsl:variable name="firstHeader" select="check:getHeaders($from)[1]"/>
+                <xsl:value-of select="(check:HeaderID($firstHeader), check:HeaderFailID($firstHeader))"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="()"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="check:getHeaders" as="node()*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:sequence select="$from/wadl:param[@style='header' and @required='true']"/>
     </xsl:function>
     
     <xsl:function name="check:getNextMethodLinks" as="xsd:string*">

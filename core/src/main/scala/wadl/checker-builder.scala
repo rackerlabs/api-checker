@@ -29,6 +29,7 @@ object BuilderXSLParams {
   val ENABLE_ELEMENT   = "enableElementCheck"
   val ENABLE_PLAIN_PARAM = "enablePlainParamCheck"
   val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
+  val ENABLE_HEADER         = "enableHeaderCheck"
 }
 
 object XPathJoinParams {
@@ -87,6 +88,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_ELEMENT, c.checkElements)
       buildHandler.getTransformer().setParameter (ENABLE_PLAIN_PARAM, c.checkPlainParams)
       buildHandler.getTransformer().setParameter (ENABLE_PRE_PROCESS_EXT, c.enablePreProcessExtension)
+      buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
 
       var output = out;
 
