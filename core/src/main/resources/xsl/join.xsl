@@ -154,7 +154,7 @@
         <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
         <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts]"/>
         <!-- Steps with the same @match, not versioned -->
-        <xsl:for-each-group select="$nextStep[not(@version) and @match]" group-by="@type">
+        <xsl:for-each-group select="$nextStep[not(@version) and not(@name) and @match]" group-by="@type">
             <xsl:for-each-group select="current-group()" group-by="@match">
                 <xsl:if test="count(current-group()) &gt; 1">
                     <join>
@@ -171,6 +171,22 @@
         <xsl:for-each-group select="$nextStep[@version and @match]" group-by="@type">
             <xsl:for-each-group select="current-group()" group-by="@match">
                 <xsl:for-each-group select="current-group()" group-by="@version">
+                    <xsl:if test="count(current-group()) &gt; 1">
+                        <join>
+                            <xsl:attribute name="steps">
+                                <xsl:value-of separator=" ">
+                                    <xsl:sequence select="current-group()/@id"/>
+                                </xsl:value-of>
+                            </xsl:attribute>
+                        </join>
+                    </xsl:if>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
+        </xsl:for-each-group>
+        <!-- Name groups -->
+        <xsl:for-each-group select="$nextStep[@name and @match]" group-by="@type">
+            <xsl:for-each-group select="current-group()" group-by="@match">
+                <xsl:for-each-group select="current-group()" group-by="@name">
                     <xsl:if test="count(current-group()) &gt; 1">
                         <join>
                             <xsl:attribute name="steps">
