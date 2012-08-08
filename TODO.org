@@ -313,24 +313,27 @@
       1. [X] Enable Optimization in multi-xpath checker tests
       2. [X] Checker tests with xpath 2
       3. [X] Ensure that validaTor Xpath tests work with validator
-** TODO Check Headers [5/8]
+** TODO Check Headers [6/8]
    1. [X] Added option to config
    2. [X] Extends XSD
    3. [X] Add support in XSL [1/1]
       1. [X] Headers on resource
    4. [X] Handle config in CLI tools
    5. [X] Add support in opt XSLs
-   6. [ ] Add Header Steps
+   6. [X] Add Header Steps
    7. [ ] Update handler for new steps
-   8. [ ] Tests
-      1. [ ] Handler tests
-      2. [ ] WADL validator tests
-      3. [ ] .* Test
-      4. [ ] XSD Test
-      5. [ ] Default Header
-** TODO Header Enhancements [0/2]
+   8. [ ] Tests[0/7]
+      1. [ ] Extend HTTP request mocks to handle headers
+      2. [ ] Add step tests
+      3. [ ] Handler tests
+      4. [ ] WADL validator tests
+      5. [ ] .* Test
+      6. [ ] XSD Test
+      7. [ ] Default Header
+** TODO Header Enhancements [0/3]
    1. [ ] Add default / fixed headers
    2. [ ] Hadle headers on request
+   3. [ ] Multiple header checks with the same name.
 ** TODO PreProc Enhancements [0/5]
    1. [ ] Preproc and XSL step should be able to change content type
    2. [ ] Preporc should support XSL parameters
