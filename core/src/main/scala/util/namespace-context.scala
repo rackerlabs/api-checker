@@ -12,18 +12,22 @@ import scala.collection.JavaConversions._
 
 object ImmutableNamespaceContext {
   def apply (inputNS : Map[String, String]) : ImmutableNamespaceContext = {
+    new ImmutableNamespaceContext (inputNS.toMap)
+  }
+
+  def apply (inputNS : scala.collection.immutable.Map[String, String]) : ImmutableNamespaceContext = {
     new ImmutableNamespaceContext (inputNS)
   }
 }
 
-class ImmutableNamespaceContext private (private val inputNS : Map[String, String]) extends NamespaceContext {
+class ImmutableNamespaceContext private (private val inputNS : scala.collection.immutable.Map[String, String]) extends NamespaceContext {
 
   //
   //  A map from prefix to ns URI.
   //
   private val prefixToURI : scala.collection.immutable.Map[String, String] = {
-    inputNS.toMap ++ List("xml" -> "http://www.w3.org/XML/1998/namespace",
-                          "xmlns" -> "http://www.w3.org/2000/xmlns/")
+    inputNS ++ List("xml" -> "http://www.w3.org/XML/1998/namespace",
+                    "xmlns" -> "http://www.w3.org/2000/xmlns/")
   }
 
 
