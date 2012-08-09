@@ -323,14 +323,13 @@
    6. [X] Add Header Steps
    7. [X] Update handler for new steps
    8. [X] Update filter / filter test app
-   9. [-] Tests[1/7]
+   9. [-] Tests[2/6]
       1. [X] Extend HTTP request mocks to handle headers
-      2. [ ] Add step tests
+      2. [X] Add step tests
       3. [ ] Handler tests
       4. [ ] WADL validator tests
       5. [ ] .* Test
       6. [ ] XSD Test
-      7. [ ] Default Header
 ** TODO Header Enhancements [0/3]
    1. [ ] Add default / fixed headers
    2. [ ] Hadle headers on request
