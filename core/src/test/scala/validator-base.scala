@@ -302,7 +302,7 @@ class BaseValidatorSuite extends FunSuite {
 
       override def answer(invocation : InvocationOnMock) : String = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
-        headers(key)
+        headers.getOrElse(key, null)
       }
     })
 
