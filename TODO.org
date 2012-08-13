@@ -313,7 +313,7 @@
       1. [X] Enable Optimization in multi-xpath checker tests
       2. [X] Checker tests with xpath 2
       3. [X] Ensure that validaTor Xpath tests work with validator
-** TODO Check Headers [8/9]
+** DONE Check Headers in Resource[9/9]
    1. [X] Added option to config
    2. [X] Extends XSD
    3. [X] Add support in XSL [1/1]
@@ -323,13 +323,13 @@
    6. [X] Add Header Steps
    7. [X] Update handler for new steps
    8. [X] Update filter / filter test app
-   9. [-] Tests[3/4]
+   9. [X] Tests[4/4]
       1. [X] Extend HTTP request mocks to handle headers
       2. [X] Add step tests
       3. [X] Handler tests
-      4. [ ] WADL validator tests [0/2]
-         1. [ ] .* Test
-         2. [ ] XSD Test
+      4. [X] WADL validator tests [2/2]
+         1. [X] .* Test
+         2. [X] XSD Test
 ** TODO Header Enhancements [0/3]
    1. [ ] Add default / fixed headers
    2. [ ] Hadle headers on request
