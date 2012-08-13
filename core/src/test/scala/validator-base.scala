@@ -108,7 +108,21 @@ object TestConfig {
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
              checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
              checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
-             enablePreProcessExtension : Boolean, xslEngine : String, 
+             enablePreProcessExtension : Boolean, xslEngine : String,
+             joinXPathChecks : Boolean, checkHeaders : Boolean) : Config = {
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
+                       xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension,
+                       xslEngine, joinXPathChecks)
+
+    config.checkHeaders = checkHeaders
+
+    config
+  }
+
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
+             enablePreProcessExtension : Boolean, xslEngine : String,
              joinXPathChecks : Boolean) : Config = {
     val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
                        xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension,
@@ -294,6 +308,24 @@ class BaseValidatorSuite extends FunSuite {
     return req
   }
 
+  def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean, headers : Map[String, String]) : HttpServletRequest = {
+    val req = request(method, url, contentType, content, parseContent)
+
+    when(req.getHeader(anyString())).thenAnswer(new Answer[String] {
+      val h = headers
+
+      override def answer(invocation : InvocationOnMock) : String = {
+        val key = invocation.getArguments()(0).asInstanceOf[String]
+        headers.getOrElse(key, null)
+      }
+    })
+
+    return req
+  }
+
+  def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean, headers : Map[String, String]) : HttpServletRequest = {
+    request (method, url, contentType, content.toString(), parseContent, headers)
+  }
 
   def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean) : HttpServletRequest = {
     request (method, url, contentType, content.toString(), parseContent)

@@ -49,6 +49,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
     (checker \\ "step").filter(n => (n \ "@type").text == nodeType)
   }
 
+  def stepsWithNameMatch(checker : NodeSeq, nodeMatch : String, nodeName : String) : NodeSeq = {
+    stepsWithMatch(checker, nodeMatch).filter (n => (n \ "@name").text == nodeName)
+  }
+
   def stepsWithMatch (checker : NodeSeq, nodeMatch  : String) : NodeSeq = {
     (checker \\ "step").filter(n => (n \ "@match").text == nodeMatch)
   }
@@ -77,6 +81,14 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithMatch (checker, reqTypeMatch).filter(n => (n \ "@type").text == "REQ_TYPE")
   }
 
+  def stepsWithHeaderMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
+    stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADER")
+  }
+
+  def stepsWithHeaderXSDMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
+    stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADERXSD")
+  }
+
   def Start : (NodeSeq) => NodeSeq = stepsWithType(_, "START")
   def Accept : (NodeSeq) => NodeSeq = stepsWithType(_, "ACCEPT")
   def URLFail : (NodeSeq) => NodeSeq = stepsWithType(_, "URL_FAIL")
@@ -93,6 +105,8 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def Method(method : String) : (NodeSeq) => NodeSeq = stepsWithMethodMatch(_, method)
   def XPath(expression : String) : (NodeSeq) => NodeSeq = stepsWithXPathMatch (_, expression)
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
+  def Header(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatch(_, name, headerMatch)
+  def HeaderXSD(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMatch (_, name, headerMatch)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {
 

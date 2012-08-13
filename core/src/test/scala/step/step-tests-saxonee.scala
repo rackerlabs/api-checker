@@ -416,4 +416,57 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[SAXParseException])
   }
+
+  test ("In an XSD header step, if the header is available then the uri level should stay the same.") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"28d42e00-e25a-11e1-9897-efbf2fa68353"))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"2fbf4592-e25a-11e1-bae1-93374682bd20"))
+
+    assert (header.checkStep (req1, response, chain, 0) == 0)
+    assert (header.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the uri level should be -1") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"28d42e00-e25a-11e1-9897-efbf2Za68353"))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"2fbf4592-e25a-11e1bae1-93374682bd20"))
+
+    assert (header.checkStep (req1, response, chain, 0) == -1)
+    assert (header.checkStep (req2, response, chain, 1) == -1)
+  }
+
+  test ("In an XSD header step, if the header is not available then the uri level should be -1") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->"28d42e00-e25a-11e1-9897-efbf2fa68353"))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->"2fbf4592-e25a-11e1-bae1-93374682bd20"))
+
+    assert (header.checkStep (req1, response, chain, 0) == -1)
+    assert (header.checkStep (req2, response, chain, 1) == -1)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"28d42e00-e25a-11e1-9897-efbf2Za68353"))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"2fbf4592-e25a-11e1bae1-93374682bd20"))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+  }
+
+  test ("In an XSD header step, if the header is not available then the request should contain an Exception") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->"28d42e00-e25a-11e1-9897-efbf2fa68353"))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->"2fbf4592-e25a-11e1-bae1-93374682bd20"))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+  }
 }
