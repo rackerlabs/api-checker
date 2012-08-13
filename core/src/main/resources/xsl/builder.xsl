@@ -354,14 +354,17 @@
     <xsl:template match="wadl:resource">
         <xsl:variable name="haveHeaders" as="xsd:boolean"
                       select="$useHeaderCheck and check:getHeaders(.)"/>
+        <xsl:variable name="nextSteps" as="xsd:string*">
+            <xsl:sequence select="check:getNextURLLinks(.)"/>
+            <xsl:sequence select="check:getNextMethodLinks(.)"/>
+        </xsl:variable>
         <xsl:variable name="links" as="xsd:string*">
             <xsl:choose>
                 <xsl:when test="$haveHeaders">
                     <xsl:sequence select="check:getNextHeaderLinks(.)"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:sequence select="check:getNextURLLinks(.)"/>
-                    <xsl:sequence select="check:getNextMethodLinks(.)"/>
+                    <xsl:sequence select="$nextSteps"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
@@ -397,7 +400,9 @@
         </step>
         <xsl:choose>
             <xsl:when test="$haveHeaders">
-                <xsl:call-template name="check:addHeaderSteps"/>
+                <xsl:call-template name="check:addHeaderSteps">
+                    <xsl:with-param name="next" select="$nextSteps"/>
+                </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:apply-templates/>
@@ -462,6 +467,7 @@
     </xsl:template>
 
     <xsl:template name="check:addHeaderSteps">
+        <xsl:param name="next" as="xsd:string*"/>
         <xsl:variable name="from" select="." as="node()"/>
         <xsl:variable name="headers" select="check:getHeaders($from)" as="node()*"/>
         <xsl:for-each select="$headers">
@@ -480,10 +486,7 @@
                 <xsl:attribute name="next">
                     <xsl:choose>
                         <xsl:when test="$pos = last()">
-                            <xsl:value-of separator=" ">
-                                <xsl:sequence select="check:getNextURLLinks($from)"/>
-                                <xsl:sequence select="check:getNextMethodLinks($from)"/>
-                            </xsl:value-of>
+                            <xsl:value-of separator=" " select="$next"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of separator=" "
