@@ -353,7 +353,7 @@
     
     <xsl:template match="wadl:resource">
         <xsl:variable name="haveHeaders" as="xsd:boolean"
-                      select="$useHeaderCheck and check:getHeaders(.)"/>
+                      select="check:haveHeaders(.)"/>
         <xsl:variable name="nextSteps" as="xsd:string*">
             <xsl:sequence select="check:getNextURLLinks(.)"/>
             <xsl:sequence select="check:getNextMethodLinks(.)"/>
@@ -843,6 +843,11 @@
                 <xsl:value-of select="()"/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="check:haveHeaders" as="xsd:boolean">
+        <xsl:param name="from" as="node()"/>
+        <xsl:value-of select="$useHeaderCheck and check:getHeaders($from)"/>
     </xsl:function>
 
     <xsl:function name="check:getHeaders" as="node()*">
