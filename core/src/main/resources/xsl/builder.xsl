@@ -398,17 +398,13 @@
                 </xsl:attribute>
             </xsl:if>
         </step>
-        <xsl:choose>
-            <xsl:when test="$haveHeaders">
-                <xsl:call-template name="check:addHeaderSteps">
-                    <xsl:with-param name="next" select="$nextSteps"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:apply-templates/>
-                <xsl:call-template name="check:addMethodSets"/>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:if test="$haveHeaders">
+            <xsl:call-template name="check:addHeaderSteps">
+                <xsl:with-param name="next" select="$nextSteps"/>
+            </xsl:call-template>
+        </xsl:if>
+        <xsl:apply-templates/>
+        <xsl:call-template name="check:addMethodSets"/>
     </xsl:template>
     <xsl:function name="check:isXSDURL" as="xsd:boolean">
         <xsl:param name="path" as="node()"/>
@@ -468,7 +464,7 @@
 
     <xsl:template name="check:addHeaderSteps">
         <xsl:param name="next" as="xsd:string*"/>
-        <xsl:variable name="from" select="." as="node()"/>
+        <xsl:param name="from" as="node()" select="."/>
         <xsl:variable name="headers" select="check:getHeaders($from)" as="node()*"/>
         <xsl:for-each select="$headers">
             <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
@@ -497,13 +493,23 @@
             </step>
             <step type="CONTENT_FAIL" id="{check:HeaderFailID(.)}"/>
         </xsl:for-each>
-        <xsl:apply-templates/>
-        <xsl:call-template name="check:addMethodSets"/>
     </xsl:template>
     
     <xsl:template match="wadl:method">
-        <xsl:variable name="links" as="xsd:string*">
+        <xsl:variable name="haveHeaders" as="xsd:boolean"
+                      select="wadl:request and check:haveHeaders(wadl:request)"/>
+        <xsl:variable name="nextSteps" as="xsd:string*">
             <xsl:sequence select="check:getNextReqTypeLinks(.)"/>
+        </xsl:variable>
+        <xsl:variable name="links" as="xsd:string*">
+            <xsl:choose>
+                <xsl:when test="$haveHeaders">
+                    <xsl:sequence select="check:getNextHeaderLinks(wadl:request)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:sequence select="$nextSteps"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
         <!--
             Only work with source methods, not copies if possible.  
@@ -527,8 +533,14 @@
                 </xsl:choose>
                 <xsl:call-template name="check:addLabel"/>
             </step>
-            <xsl:if test="count($links) &gt; 0">
+            <xsl:if test="count($nextSteps) &gt; 0">
                 <xsl:call-template name="check:addReqTypeFail"/>
+            </xsl:if>
+            <xsl:if test="$haveHeaders">
+                <xsl:call-template name="check:addHeaderSteps">
+                    <xsl:with-param name="next" select="$nextSteps"/>
+                    <xsl:with-param name="from" select="wadl:request"/>
+                </xsl:call-template>
             </xsl:if>
         </xsl:if>
         <xsl:apply-templates/>
