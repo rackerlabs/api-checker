@@ -274,81 +274,82 @@
     </xsl:template>
 
     <xsl:template match="check:step" mode="addErrorStates">
-        <xsl:choose>
-            <xsl:when test="@type=('URL','URLXSD','START','HEADER','HEADERXSD')">
-                <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-                <xsl:variable name="doConnect" as="xsd:boolean" 
-                    select="not((for $n in $nexts return 
+        <step>
+            <!-- Remove inRequest attributes -->
+            <xsl:copy-of select="@*[name() != 'inRequest'] | node()"/>
+        </step>
+    </xsl:template>
+
+    <!-- Only the following methods need error states added -->
+    <xsl:template match="check:step[@type=('URL','URLXSD','START','HEADER','HEADERXSD') and not(@inRequest)]" mode="addErrorStates">
+        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
+        <xsl:variable name="doConnect" as="xsd:boolean"
+                      select="not((for $n in $nexts return
                               if (..//check:step[@id = $n and @match=$matchAll])
                               then false() else true()) = false())"/>
-                <!-- Vars for processing method fail -->
-                <xsl:variable name="nextMethodMatch" as="xsd:string*"
-                              select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='METHOD']/@match)"/>
-                <xsl:variable name="haveMethodMatch" as="xsd:boolean" select="count($nextMethodMatch) &gt; 0"/>
-                <xsl:variable name="MethodMatchID" as="xsd:string" select="concat(generate-id(),'m')"/>
-                <!-- Vars for processing url fail -->
-                <xsl:variable name="nextURLMatch" as="xsd:string*"
-                              select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='URL']/@match)"/>
-                <xsl:variable name="nextURLXSDMatch" as="xsd:string*"
-                              select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='URLXSD']/@match)"/>
-                <xsl:variable name="haveURLMatch" as="xsd:boolean" select="(count($nextURLMatch) &gt; 0) or (count($nextURLXSDMatch) &gt; 0)"/>
-                <xsl:variable name="URLMatchID" as="xsd:string" select="concat(generate-id(),'u')"/>
-                <!-- Next variables -->
-                <xsl:variable name="newNexts" as="xsd:string*">
-                    <xsl:sequence select="$nexts"/>
-                    <xsl:choose>
-                        <xsl:when test="$haveMethodMatch">
-                            <xsl:sequence select="$MethodMatchID"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:sequence select="$METHOD_FAIL"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                    <xsl:if test="$doConnect">
-                        <xsl:choose>
-                            <xsl:when test="$haveURLMatch">
-                                <xsl:sequence select="$URLMatchID"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:sequence select="$URL_FAIL"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:if>
-                </xsl:variable>
-                <step>
-                    <xsl:copy-of select="@*[name() != 'next']"/>
-                    <xsl:attribute name="next">
-                        <xsl:value-of select="$newNexts" separator=" "/>
+        <!-- Vars for processing method fail -->
+        <xsl:variable name="nextMethodMatch" as="xsd:string*"
+                      select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='METHOD']/@match)"/>
+        <xsl:variable name="haveMethodMatch" as="xsd:boolean" select="count($nextMethodMatch) &gt; 0"/>
+        <xsl:variable name="MethodMatchID" as="xsd:string" select="concat(generate-id(),'m')"/>
+        <!-- Vars for processing url fail -->
+        <xsl:variable name="nextURLMatch" as="xsd:string*"
+                      select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='URL']/@match)"/>
+        <xsl:variable name="nextURLXSDMatch" as="xsd:string*"
+                      select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='URLXSD']/@match)"/>
+        <xsl:variable name="haveURLMatch" as="xsd:boolean" select="(count($nextURLMatch) &gt; 0) or (count($nextURLXSDMatch) &gt; 0)"/>
+        <xsl:variable name="URLMatchID" as="xsd:string" select="concat(generate-id(),'u')"/>
+        <!-- Next variables -->
+        <xsl:variable name="newNexts" as="xsd:string*">
+            <xsl:sequence select="$nexts"/>
+            <xsl:choose>
+                <xsl:when test="$haveMethodMatch">
+                    <xsl:sequence select="$MethodMatchID"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:sequence select="$METHOD_FAIL"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:if test="$doConnect">
+                <xsl:choose>
+                    <xsl:when test="$haveURLMatch">
+                        <xsl:sequence select="$URLMatchID"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:sequence select="$URL_FAIL"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:if>
+        </xsl:variable>
+        <step>
+            <xsl:copy-of select="@*[name() != 'next']"/>
+            <xsl:attribute name="next">
+                <xsl:value-of select="$newNexts" separator=" "/>
+            </xsl:attribute>
+        </step>
+        <xsl:if test="$haveMethodMatch">
+            <step type="METHOD_FAIL">
+                <xsl:attribute name="id" select="$MethodMatchID"/>
+                <xsl:attribute name="notMatch">
+                    <xsl:value-of select="$nextMethodMatch" separator="|"/>
+                </xsl:attribute>
+            </step>
+        </xsl:if>
+        <xsl:if test="$doConnect and $haveURLMatch">
+            <step type="URL_FAIL">
+                <xsl:attribute name="id" select="$URLMatchID"/>
+                <xsl:if test="count($nextURLMatch) &gt; 0">
+                    <xsl:attribute name="notMatch">
+                        <xsl:value-of select="$nextURLMatch" separator="|"/>
                     </xsl:attribute>
-                </step>
-                <xsl:if test="$haveMethodMatch">
-                    <step type="METHOD_FAIL">
-                        <xsl:attribute name="id" select="$MethodMatchID"/>
-                        <xsl:attribute name="notMatch">
-                            <xsl:value-of select="$nextMethodMatch" separator="|"/>
-                        </xsl:attribute>
-                    </step>
                 </xsl:if>
-                <xsl:if test="$doConnect and $haveURLMatch">
-                    <step type="URL_FAIL">
-                        <xsl:attribute name="id" select="$URLMatchID"/>
-                        <xsl:if test="count($nextURLMatch) &gt; 0">
-                            <xsl:attribute name="notMatch">
-                                <xsl:value-of select="$nextURLMatch" separator="|"/>
-                            </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test="count($nextURLXSDMatch) &gt; 0">
-                            <xsl:attribute name="notTypes">
-                                <xsl:value-of select="$nextURLXSDMatch" separator=" "/>
-                            </xsl:attribute>
-                        </xsl:if>
-                    </step>
+                <xsl:if test="count($nextURLXSDMatch) &gt; 0">
+                    <xsl:attribute name="notTypes">
+                        <xsl:value-of select="$nextURLXSDMatch" separator=" "/>
+                    </xsl:attribute>
                 </xsl:if>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy-of select="."/>
-            </xsl:otherwise>
-        </xsl:choose>
+            </step>
+        </xsl:if>
     </xsl:template>
     
     <xsl:template match="wadl:resource">
@@ -465,6 +466,7 @@
     <xsl:template name="check:addHeaderSteps">
         <xsl:param name="next" as="xsd:string*"/>
         <xsl:param name="from" as="node()" select="."/>
+        <xsl:param name="inRequest" as="xsd:boolean" select="false()"/>
         <xsl:variable name="headers" select="check:getHeaders($from)" as="node()*"/>
         <xsl:for-each select="$headers">
             <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
@@ -490,6 +492,9 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
+                <xsl:if test="$inRequest">
+                    <xsl:attribute name="inRequest">true</xsl:attribute>
+                </xsl:if>
             </step>
             <step type="CONTENT_FAIL" id="{check:HeaderFailID(.)}"/>
         </xsl:for-each>
@@ -540,6 +545,7 @@
                 <xsl:call-template name="check:addHeaderSteps">
                     <xsl:with-param name="next" select="$nextSteps"/>
                     <xsl:with-param name="from" select="wadl:request"/>
+                    <xsl:with-param name="inRequest" select="true()"/>
                 </xsl:call-template>
             </xsl:if>
         </xsl:if>
