@@ -330,9 +330,18 @@
       4. [X] WADL validator tests [2/2]
          1. [X] .* Test
          2. [X] XSD Test
-** TODO Header Enhancements [0/3]
+** DONE Headers on Request [2/2]
+   1. [X] Implement headers on request
+   2. [X] Tests [2/2]
+      1. [X] Handler Tests
+         1. [X] Request header only
+         2. [X] Request and Resource headers
+      2. [X] WADL validator tests [3/3]
+         1. [X] .* Test (Request)
+         2. [X] XSD Test (Request)
+         3. [X] Mixed Request / Resource
+** TODO Header Enhancements [0/2]
    1. [ ] Add default / fixed headers
-   2. [ ] Hadle headers on request
    3. [ ] Multiple header checks with the same name.
 ** TODO PreProc Enhancements [0/5]
    1. [ ] Preproc and XSL step should be able to change content type
