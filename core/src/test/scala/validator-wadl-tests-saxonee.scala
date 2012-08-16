@@ -859,6 +859,43 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
     </application>
     , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
 
+  //
+  // Like validator header int, but expects the header only in the put
+  //
+  val validator_HeaderIntPut = Validator(
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <representation mediaType="application/xml" element="tst:a"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:e"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
+
 
   test ("PUT on /a/b with application/xml should succeed on validator_HeaderUUID with valid XML1") {
     validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain)
@@ -992,4 +1029,70 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                                                             , false, Map("X-TEST-INT"->"90")),response,chain), 400)
   }
 
+
+  test ("PUT on /a/b with application/xml should succeed on validator_HeaderIntPut with valid XML1") {
+    validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90")),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPut with valid XML1") {
+    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"90")),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_HeaderIntPut with well formed JSON") {
+    validator_HeaderIntPut.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-INT"->"90")),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_HeaderIntPut with well formed JSON") {
+    validator_HeaderIntPut.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-INT"->"90")),response,chain)
+  }
+
+  test ("GOT on /c should succeed on validator_HeaderIntPut") {
+    validator_HeaderIntPut.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT header isn't set in validator_HeaderIntPut") {
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT header is mispelled in validator_HeaderIntPut") {
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INTs"->"90")),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT contains malformed data in validator_HeaderIntPut") {
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"foo")),response,chain), 400)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPut  if the X-TEST-INT header isn't set") {
+    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false),response, chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPut  if the X-TEST-INT header is mispelled") {
+    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INTs"->"90")),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPut  if the X-TEST-INT contains malformed data") {
+    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"foo")),response,chain)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT in the wrong location in validator_HeaderIntPut") {
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+  }
+
+  test ("POST on /a/b should failed with well formed XML POST in the wrong location in validator_HeaderIntPut") {
+    assertResultFailed(validator_HeaderIntPut.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_HeaderIntPut") {
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML, correct element, butdoes not validate against the schema in validator_HeaderIntPut") {
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b", "application/xml",
+                                                             <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                                                <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                                                                <stepType>URL_FAIL</stepType>
+                                                                <even>22</even>
+                                                              </a>
+                                                            , false, Map("X-TEST-INT"->"90")),response,chain), 400)
+  }
 }
