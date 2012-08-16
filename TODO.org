@@ -332,10 +332,10 @@
          2. [X] XSD Test
 ** TODO Headers on Request [1/2]
    1. [X] Implement headers on request
-   2. [ ] Tests [0/2]
-      1. [ ] Handler Tests
-         1. [ ] Request header only
-         2. [ ] Request and Resource headers
+   2. [-] Tests [1/2]
+      1. [X] Handler Tests
+         1. [X] Request header only
+         2. [X] Request and Resource headers
       2. [ ] WADL validator tests [0/3]
          1. [ ] .* Test (Request)
          2. [ ] XSD Test (Request)
