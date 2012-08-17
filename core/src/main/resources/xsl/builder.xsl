@@ -554,10 +554,26 @@
 
     <xsl:template match="wadl:request/wadl:representation[@mediaType]">
         <xsl:variable name="defaultNext" select="$ACCEPT"/>
+        <xsl:variable name="match" as="xsd:string">
+            <xsl:choose>
+                <!-- any media type */* -->
+                <xsl:when test="@mediaType = '*/*'">
+                    <xsl:value-of select="'.*'"/>
+                </xsl:when>
+                <!-- any subtype type/* -->
+                <xsl:when test="matches(@mediaType,'^[^/]+/\*$')">
+                    <xsl:value-of select="concat('(?i)',check:toRegExEscaped(replace(@mediaType,'^([^/]+/)(\*)$','$1')),'.*')"/>
+                </xsl:when>
+                <!-- others match directly type/subtype -->
+                <xsl:otherwise>
+                    <xsl:value-of select="concat('(?i)',check:toRegExEscaped(@mediaType))"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <step type="REQ_TYPE">
             <xsl:attribute name="id" select="generate-id()"/>
             <!-- Note that matches on the media type are always case insensitive -->
-            <xsl:attribute name="match" select="concat('(?i)',check:toRegExEscaped(@mediaType))"/>
+            <xsl:attribute name="match" select="$match"/>
             <xsl:choose>
                 <xsl:when test="$useWellFormCheck">
                     <xsl:choose>
