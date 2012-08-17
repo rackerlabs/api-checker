@@ -11,7 +11,7 @@ class ReqType(id : String, label : String, val rtype : Regex, next : Array[Step]
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
     var ret = -1
     req.getContentType() match {
-      case rtype() => ret = uriLevel
+      case rtype(_,_) => ret = uriLevel
       case _ => ret= -1
     }
     ret

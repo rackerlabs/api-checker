@@ -340,10 +340,10 @@
          1. [X] .* Test (Request)
          2. [X] XSD Test (Request)
          3. [X] Mixed Request / Resource
-** TODO MediaType fixes [2/4]
+** TODO MediaType fixes [3/4]
    1. [X] Support */*
    2. [X] Support type / *
-   3. [ ] Igrnore ; params
+   3. [X] Igrnore ; params
    4. [ ] Test [0/2]
       1. [ ] Builder
          1. [ ]  */*
