@@ -43,6 +43,9 @@ object Wadl2Checker {
   val help = parser.flag[Boolean] (List("h", "help"),
                                    "Display usage.")
 
+  val xpathVersion = parser.option[Int](List("t", "xpath-version"), "n",
+                                           "XPath version to use. Can be 1 or 2. Default: 1")
+
   val input = parser.parameter[String]("wadl",
                                        "WADL file/uri to read.  If not specified, "+
                                        " stdin will be used.", true)
@@ -94,6 +97,7 @@ object Wadl2Checker {
       c.enablePreProcessExtension = preProc.value.getOrElse(false)
       c.joinXPathChecks = joinXPaths.value.getOrElse(false)
       c.checkHeaders = header.value.getOrElse(false)
+      c.xpathVersion = xpathVersion.value.getOrElse(1)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)
     } catch {
