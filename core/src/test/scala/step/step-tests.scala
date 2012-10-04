@@ -383,12 +383,12 @@ class StepSuite extends BaseStepSuite {
   }
 
   test("ReqType mismatch message should be the same of the type regex") {
-    val rt = new ReqType ("XML", "XML", "application/xml|application/json".r, Array[Step]())
-    assert (rt.mismatchMessage == "application/xml|application/json".r.toString)
+    val rt = new ReqType ("XML", "XML", "(application/xml|application/json)()".r, Array[Step]())
+    assert (rt.mismatchMessage == "(application/xml|application/json)()".r.toString)
   }
 
   test("In a ReqType step, if the content type does not match, the returned URI level should be -1") {
-    val rt = new ReqType ("XML", "XML", "application/xml|application/json".r, Array[Step]())
+    val rt = new ReqType ("XML", "XML", "(application/xml|application/json)()".r, Array[Step]())
     assert (rt.checkStep (request("PUT", "/a/b","*.*"), response,chain, 0) == -1)
     assert (rt.checkStep (request("POST", "/a/b","application/junk"), response,chain, 1) == -1)
     val rt2 = new ReqType ("XML", "XML", "text/html".r, Array[Step]())
@@ -397,15 +397,15 @@ class StepSuite extends BaseStepSuite {
   }
 
   test("In a ReqType step, if the content type is null, the returned URI level should be -1") {
-    val rt = new ReqType ("XML", "XML", "application/xml|application/json".r, Array[Step]())
+    val rt = new ReqType ("XML", "XML", "(application/xml|application/json)()".r, Array[Step]())
     assert (rt.checkStep (request("PUT", "/a/b", null), response,chain, 0) == -1)
   }
 
   test("In a ReqType step, if the content matches, the URI level should stay the same") {
-    val rt = new ReqType ("XML", "XML", "application/xml|application/json".r, Array[Step]())
+    val rt = new ReqType ("XML", "XML", "(application/xml|application/json)()".r, Array[Step]())
     assert (rt.checkStep (request("PUT", "/a/b","application/xml"), response,chain, 0) == 0)
     assert (rt.checkStep (request("POST", "/a/b","application/json"), response,chain, 1) == 1)
-    val rt2 = new ReqType ("XML", "XML", "text/html".r, Array[Step]())
+    val rt2 = new ReqType ("XML", "XML", "(text/html)()".r, Array[Step]())
     assert (rt2.checkStep (request("GET", "/a/b/c","text/html"), response,chain, 2) == 2)
   }
 

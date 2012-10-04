@@ -344,15 +344,18 @@
    1. [X] Support */*
    2. [X] Support type / *
    3. [X] Igrnore ; params
-   4. [ ] Test [0/2]
-      1. [ ] Builder
+   4. [-] Test [1/3]
+      1. [X] Update existing mediaType tests
+      2. [ ] Builder
          1. [ ]  */*
          2. [ ] type / *
-         3. [ ] ; params
-      2. [ ] Validator
+         3. [ ] ; params, Ignored
+         4. [ ] ; params, Specified
+      3. [ ] Validator
          1. [ ] */*
          2. [ ] type / *
-         3. [ ] ; params
+         3. [ ] ; params, Ignored
+         4. [ ] ; params, Specified
 ** TODO Header Enhancements [0/2]
    1. [ ] Add default / fixed headers
    3. [ ] Multiple header checks with the same name.

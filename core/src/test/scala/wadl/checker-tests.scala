@@ -73,7 +73,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       and ("it should end in the GET and a DELETE method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
-      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), ReqType("application/xml"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
@@ -1909,10 +1909,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqTypeFail)
@@ -1957,11 +1957,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
   }
 
   scenario("The WADL contains PUT and POST operations accepting various media types, with dups optimization on") {
@@ -2000,11 +2000,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
   }
 
   //
@@ -2455,15 +2455,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
   scenario("The WADL contains PUT and POST operations accepting various media types where well formness is checked") {
@@ -2503,11 +2503,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 4")
@@ -2550,11 +2550,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
@@ -2566,10 +2566,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD") {
@@ -2614,11 +2614,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -2667,11 +2667,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -2721,11 +2721,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -2771,11 +2771,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 4")
@@ -2827,11 +2827,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
@@ -2844,12 +2844,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdElementAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, XPath("/tst:e"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
   }
 
   //
@@ -2857,12 +2857,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdElementAssertions2(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, XPath("/tst:e"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
   }
 
   //
@@ -2870,10 +2870,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def elementAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, XPath("/tst:e"), Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD with elements specified and checked") {
@@ -2919,11 +2919,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -2976,11 +2976,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -3033,11 +3033,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
@@ -3090,11 +3090,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 0")
@@ -3147,11 +3147,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 0")
@@ -3204,11 +3204,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -3250,14 +3250,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
   }
 
@@ -3294,14 +3294,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
   }
 
@@ -3340,14 +3340,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
   }
 
@@ -3388,17 +3388,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), ContentFail)
   }
 
@@ -3443,19 +3443,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), XPath("/tst:e/tst:stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), XPath("/tst:e/tst:stepType"), ContentFail)
   }
 
@@ -3499,24 +3499,24 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 6")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
   }
 
 
@@ -3559,24 +3559,24 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps, multiple params one with required == false)") {
@@ -3618,17 +3618,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 0")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
             XPath("/tst:e/tst:id"), ContentFail)
   }
 
@@ -3667,12 +3667,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
   }
 
@@ -3709,11 +3709,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML,
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML,
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a/@id"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a/@id"), ContentFail)
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified and multiple required plain params (no element check)") {
@@ -3749,11 +3749,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML,
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML,
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a/@id"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a/@id"),
             ContentFail)
   }
 
@@ -3790,11 +3790,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML,
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML,
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a/@id"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a/@id"),
             ContentFail)
   }
 
@@ -3838,14 +3838,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
   }
 
@@ -3901,14 +3901,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template")
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success")
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success/@didIt")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
   }
 
@@ -3958,14 +3958,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSL, ContentFail)
   }
 
@@ -4018,21 +4018,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
-   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"),
+   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
            XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XSL, ContentFail)
   }
 
@@ -4085,21 +4085,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
-   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"),
+   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
            XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XSL, ContentFail)
   }
 
@@ -4141,13 +4141,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='1']) = 3")
     assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='2']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 0")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), XSL, XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), XSL,
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), XSL,
            XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), XSL, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), XSL, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), XSL, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, ContentFail)
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps (dups on, join on, xpath2)") {
@@ -4188,13 +4188,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='1']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='2']) = 3")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 0")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), XSL, XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), XSL,
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), XSL,
            XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), XSL, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), XSL, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), XSL, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, ContentFail)
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps (dups on 2)") {
@@ -4244,21 +4244,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
-   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"),
+   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
            XSL, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/atom\\+xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XSL, ContentFail)
   }
 
@@ -4302,12 +4302,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
   }
 
@@ -4351,12 +4351,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
             XPath("/tst:a/@id"), ContentFail)
   }
 
@@ -4398,11 +4398,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML,
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML,
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XPath("/tst:a/@id"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a/@id"), ContentFail)
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified (but check disabled) and multiple required plain params (check disabled) , and a single XSL transform (no well form check)") {
@@ -4439,8 +4439,8 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 0")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSL, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSL, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
   }
 
 
@@ -4451,10 +4451,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndHeaderAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqTypeFail)
@@ -4470,15 +4470,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
   //
@@ -4487,10 +4487,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
 
@@ -4501,10 +4501,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"))
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
@@ -4520,15 +4520,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
   //
@@ -4537,10 +4537,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
 
@@ -4551,10 +4551,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
@@ -4571,15 +4571,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
   //
@@ -4589,10 +4589,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
   //
@@ -4602,11 +4602,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/json"))
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
@@ -4622,17 +4622,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
   }
 
   //
@@ -4642,12 +4642,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header must be checked") {
@@ -4696,11 +4696,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -4754,11 +4754,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -4811,11 +4811,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -4869,11 +4869,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -4927,11 +4927,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -4987,11 +4987,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -5047,11 +5047,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 3")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 0")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
@@ -5109,11 +5109,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 3")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 0")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
@@ -5169,11 +5169,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 0")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
@@ -5187,10 +5187,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqTypeFail)
@@ -5206,15 +5206,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
   //
@@ -5223,10 +5223,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
 
@@ -5237,10 +5237,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndReqXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
@@ -5256,15 +5256,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndReqXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
   //
@@ -5273,10 +5273,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndReqXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
 
@@ -5287,10 +5287,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
@@ -5307,15 +5307,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), Method("POST"), ReqType("application/json"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
   //
@@ -5325,10 +5325,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
   //
@@ -5338,11 +5338,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/json"))
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
@@ -5358,17 +5358,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
   }
 
   //
@@ -5378,12 +5378,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
   //
@@ -5393,11 +5393,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"))
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"))
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"))
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("application/json"))
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("application/xml"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
@@ -5413,17 +5413,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("application/json"), WellJSON)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("application/xml"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("application/json"), ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("application/xml"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), ContentFail)
   }
 
   //
@@ -5433,12 +5433,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("application/xml"), WellXML, ContentFail)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("application/xml"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("application/xml"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
 
@@ -5488,11 +5488,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -5546,11 +5546,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -5603,11 +5603,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -5661,11 +5661,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -5719,11 +5719,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -5778,11 +5778,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
@@ -5838,11 +5838,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 3")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 0")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
@@ -5900,11 +5900,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 3")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 0")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
@@ -5960,11 +5960,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 0")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
@@ -6021,11 +6021,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 3")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 0")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
@@ -6084,11 +6084,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/xml']) = 3")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)application/json']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/json']) = 0")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml']) = 1")
-    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)application/xml|(?i)application/json']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
