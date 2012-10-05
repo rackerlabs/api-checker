@@ -557,7 +557,7 @@
         <step type="REQ_TYPE">
             <xsl:attribute name="id" select="generate-id()"/>
             <!-- Note that matches on the media type are always case insensitive -->
-            <xsl:attribute name="match" select="concat('(?i)',check:toRegExEscaped(@mediaType))"/>
+            <xsl:attribute name="match" select="check:mediaTypeToRegEx(@mediaType)"/>
             <xsl:choose>
                 <xsl:when test="$useWellFormCheck">
                     <xsl:choose>
@@ -590,6 +590,44 @@
             </xsl:choose>
         </xsl:if>
     </xsl:template>
+
+    <xsl:function name="check:mediaTypeToRegEx" as="xsd:string">
+        <xsl:param name="mediaType" as="xsd:string"/>
+        <xsl:variable name="pre" as="xsd:string" select="'(?i)'"/>
+        <!--
+            Note, all of the regexes that we create need to use two
+            capture groups.  Has to do with the way in which scala
+            handles groups, which I think is silly.
+
+            -jw
+        -->
+        <xsl:choose>
+            <!-- any media type */* -->
+            <xsl:when test="$mediaType = '*/*'">
+                <xsl:value-of select="'(.*)()'"/>
+            </xsl:when>
+            <!-- any subtype type/* -->
+            <xsl:when test="matches($mediaType,'^[^/]+/\*$')">
+                <xsl:value-of select="concat($pre,'(',check:toRegExEscaped(replace($mediaType,'^([^/]+/)(\*)$','$1')),')(.*)')"/>
+            </xsl:when>
+            <!-- If we still see an '*' we have a bad media type -->
+            <xsl:when test="contains($mediaType, '*')">
+                <xsl:message terminate="yes">[ERROR] Bad mediatype '<xsl:value-of select="$mediaType"/>' valid media type ranges are of the form */* and type/*.  See RFC 2616, (14.1).</xsl:message>
+            </xsl:when>
+            <!-- mediatype (type/subtype) does not contain parameters, in this case we ignore params -->
+            <xsl:when test="not(contains($mediaType,';'))">
+                <xsl:value-of select="concat($pre,'(',check:toRegExEscaped($mediaType),')(;.*)?')"/>
+            </xsl:when>
+            <!--
+                If we do have parameters we try to match exactly,
+                this is a hack we should find a more accurate way
+                of dealing with mediaType parameters...extension?
+            -->
+            <xsl:otherwise>
+                <xsl:value-of select="concat($pre,'(',check:toRegExEscaped($mediaType),')()')"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
 
     <xsl:function name="check:isXML" as="xsd:boolean">
         <xsl:param name="in" as="xsd:string"/>
@@ -800,7 +838,7 @@
             <xsl:attribute name="id" select="check:ReqTypeFailID(.)"/>
             <xsl:attribute name="notMatch">
                 <xsl:value-of select="distinct-values(for $r in wadl:request/wadl:representation[@mediaType]
-                                      return concat('(?i)',check:toRegExEscaped($r/@mediaType)))" separator="|"/>
+                                      return check:mediaTypeToRegEx($r/@mediaType))" separator="|"/>
             </xsl:attribute>
         </step>
     </xsl:template>

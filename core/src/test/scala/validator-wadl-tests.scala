@@ -277,6 +277,12 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   // POST /c with json support
   // GET /c
   //
+  // POST /any, should allow *any* media type
+  //
+  // POST /text, should allow any text media type
+  //
+  // POST /v, should only allow text/plain;charset=UTF8 exactly, as is...
+  //
   // The validator is used in the following tests.
   //
   val validator_RT = Validator(
@@ -304,6 +310,27 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     , assertConfig)
@@ -316,8 +343,16 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     validator_RT.validate(request("PUT","/a/b","application/json"),response,chain)
   }
 
+  test ("PUT on /a/b with application/json;charset=UTF8 should succeed on validator_RT") {
+    validator_RT.validate(request("PUT","/a/b","application/json;charset=UTF8"),response,chain)
+  }
+
   test ("PUT on /a/b with aPPlicatioN/Xml should succeed on validator_RT") {
     validator_RT.validate(request("PUT","/a/b","aPPlication/Xml"),response,chain)
+  }
+
+  test ("PUT on /a/b with aPPlicatioN/Xml;   charset=UTF8 should succeed on validator_RT") {
+    validator_RT.validate(request("PUT","/a/b","aPPlication/Xml;   charset=UTF8"),response,chain)
   }
 
   test ("PUT on /a/b with application/jSON should succeed on validator_RT") {
@@ -332,8 +367,68 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     validator_RT.validate(request("POST","/c","application/json"),response,chain)
   }
 
+  test ("POST on /any with application/json should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/any","application/json"),response,chain)
+  }
+
+  test ("POST on /any with application/xml should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/any","application/xml"),response,chain)
+  }
+
+  test ("POST on /any with application/xml;charset=UTF8 should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/any","application/xml;charset=UTF8"),response,chain)
+  }
+
+  test ("POST on /any with application/xml; charset=UTF8 should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/any","application/xml; charset=UTF8"),response,chain)
+  }
+
+  test ("POST on /any with text/plain should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/any","text/plain"),response,chain)
+  }
+
+  test ("POST on /any with text/foo should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/any","text/foo"),response,chain)
+  }
+
+  test ("POST on /text with text/foo should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/text","text/foo"),response,chain)
+  }
+
+  test ("POST on /text with text/plain should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/text","text/plain"),response,chain)
+  }
+
+  test ("POST on /text with text/plain;charset=UTF8 should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/text","text/plain;charset=UTF8"),response,chain)
+  }
+
+  test ("POST on /text with text/plain;charset=UTF8,version=1 should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/text","text/plain;charset=UTF8,version=1"),response,chain)
+  }
+
+  test ("POST on /text with text/css should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/text","text/css"),response,chain)
+  }
+
+  test ("POST on /text with text/enriched should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/text","text/enriched"),response,chain)
+  }
+
+  test ("POST on /v with text/plain;charset=UTF8 should succeed on validator_RT") {
+    validator_RT.validate(request("POST","/v","text/plain;charset=UTF8"),response,chain)
+  }
+
   test ("GET on /c should succeed on validator_RT") {
     validator_RT.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("POST on /any should fail on validator_RT if mediatype is not specified") {
+    assertResultFailed(validator_RT.validate(request("POST","/any"),response,chain), 415)
+  }
+
+  test ("POST on /text should fail on validator_RT if mediatype is not specified") {
+    assertResultFailed(validator_RT.validate(request("POST","/text"),response,chain), 415)
   }
 
   test ("PUT on /a/b should fail on validator_RT if the media type is not specified") {
@@ -364,6 +459,33 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     assertResultFailed(validator_RT.validate(request("POST","/c","application/xml"),response,chain), 415)
   }
 
+  test ("POST on /text should fail on validator_RT if the media type is application/xml") {
+    assertResultFailed(validator_RT.validate(request("POST","/text","application/xml"),response,chain), 415)
+  }
+
+  test ("POST on /text should fail on validator_RT if the media type is application/json") {
+    assertResultFailed(validator_RT.validate(request("POST","/text","application/json"),response,chain), 415)
+  }
+
+  test ("POST on /text should fail on validator_RT if the media type is application/json;charset=UTF8") {
+    assertResultFailed(validator_RT.validate(request("POST","/text","application/json;charset=UTF8"),response,chain), 415)
+  }
+
+  test ("POST on /text should fail on validator_RT if the media type is video/3gpp") {
+    assertResultFailed(validator_RT.validate(request("POST","/text","video/3gpp"),response,chain), 415)
+  }
+
+  test ("POST on /v should fail on validator_RT if the media type is text/plain") {
+    assertResultFailed(validator_RT.validate(request("POST","/v","text/plain"),response,chain), 415)
+  }
+
+  test ("POST on /v should fail on validator_RT if the media type is text/plain;charset=WINDOZE") {
+    assertResultFailed(validator_RT.validate(request("POST","/v","text/plain;charsetWINDOZE"),response,chain), 415)
+  }
+
+  test ("POST on /v should fail on validator_RT if the media type is application/xml") {
+    assertResultFailed(validator_RT.validate(request("POST","/v","application/xml"),response,chain), 415)
+  }
 
   //
   // validator_WELL allows:
