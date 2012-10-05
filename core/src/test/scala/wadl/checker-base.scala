@@ -105,6 +105,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def Method(method : String) : (NodeSeq) => NodeSeq = stepsWithMethodMatch(_, method)
   def XPath(expression : String) : (NodeSeq) => NodeSeq = stepsWithXPathMatch (_, expression)
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
+  def AnyReqType : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(.*)()")
   def Header(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatch(_, name, headerMatch)
   def HeaderXSD(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMatch (_, name, headerMatch)
 

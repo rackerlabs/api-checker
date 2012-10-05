@@ -1912,6 +1912,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("any"), Method("POST"), AnyReqType)
+    assert (checker, Start, URL("text"), Method("POST"), ReqType("(text/)(.*)"))
+    assert (checker, Start, URL("v"), Method("POST"), ReqType("(text/plain;charset=UTF8)()"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
@@ -1948,19 +1951,46 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     when("the wadl is translated")
     val checker = builder.build (inWADL, stdConfig)
     reqTypeAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
   }
 
@@ -1991,19 +2021,46 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     when("the wadl is translated")
     val checker = builder.build (inWADL, dupConfig)
     reqTypeAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
   }
 
@@ -2493,6 +2550,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     when("the wadl is translated")
@@ -2500,13 +2578,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -2540,6 +2624,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     when("the wadl is translated")
@@ -2547,13 +2652,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
@@ -2601,6 +2712,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -2611,13 +2743,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     xsdAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -2654,6 +2792,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -2664,13 +2823,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     xsdAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -2708,6 +2873,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -2718,13 +2904,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     xsdAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -2761,6 +2953,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     when("the wadl is translated")
@@ -2768,13 +2981,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -2814,6 +3033,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -2824,13 +3064,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     xsdAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
@@ -2906,6 +3152,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -2916,13 +3183,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     xsdElementAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -2963,6 +3236,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -2973,13 +3267,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     xsdElementAssertions2(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -3020,6 +3320,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -3030,13 +3351,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     xsdElementAssertions2(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
@@ -3077,6 +3404,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -3087,13 +3435,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     elementAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -3134,6 +3488,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -3144,13 +3519,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     elementAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
@@ -3191,6 +3572,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                </method>
                <method name="GET"/>
            </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
         </resources>
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
@@ -3201,13 +3603,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAssertions(checker)
     xsdAssertions(checker)
     and("The following assertions should also hold:")
-    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
