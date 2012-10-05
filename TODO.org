@@ -340,21 +340,21 @@
          1. [X] .* Test (Request)
          2. [X] XSD Test (Request)
          3. [X] Mixed Request / Resource
-** TODO MediaType fixes [3/4]
+** DONE MediaType fixes [4/4]
    1. [X] Support */*
    2. [X] Support type / *
    3. [X] Igrnore ; params
-   4. [-] Test [2/3]
+   4. [X] Test [3/3]
       1. [X] Update existing mediaType tests
       2. [X] Builder [3/3]
          1. [X]  */*
          2. [X] type / *
          4. [X] ; params, Specified
-      3. [ ] Validator [0/4]
-         1. [ ] */*
-         2. [ ] type / *
-         3. [ ] ; params, Ignored
-         4. [ ] ; params, Specified
+      3. [X] Validator [4/4]
+         1. [X] */*
+         2. [X] type / *
+         3. [X] ; params, Ignored
+         4. [X] ; params, Specified
 ** TODO Header Enhancements [0/2]
    1. [ ] Add default / fixed headers
    3. [ ] Multiple header checks with the same name.
