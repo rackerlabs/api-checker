@@ -4,12 +4,12 @@
     <parent>
         <groupId>com.rackspace.papi.components.api-checker</groupId>
         <artifactId>cli</artifactId>
-        <version>1.0.1.1</version>
+        <version>1.0.1.2-SNAPSHOT</version>
     </parent>
 
     <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
     <artifactId>wadl2checker</artifactId>
-    <version>1.0.1.1</version>
+    <version>1.0.1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>API Checker CLI WADL2Checker</name>
