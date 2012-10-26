@@ -79,7 +79,6 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
     }
 
     try {
-      val transformer = wadl.newTransformer(TREE, XSD11, false, KEEP)
       val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
 
       buildHandler.getTransformer().setParameter (ENABLE_WELL_FORM, c.checkWellFormed)
@@ -122,9 +121,9 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       } else {
         buildHandler.setResult (output)
       }
-      transformer.transform (in, new SAXResult(buildHandler))
+      wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
     } catch {
-      case e => throw new WADLException ("WADL Processing Error", e)
+      case e => throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
     }
   }
 
