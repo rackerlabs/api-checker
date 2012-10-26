@@ -1,5 +1,6 @@
 package com.rackspace.com.papi.components.checker
 
+import java.io.File
 import java.util.Date
 import java.util.UUID
 import java.math.BigInteger
@@ -751,7 +752,8 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_XSDContent = Validator(
+  val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString
+  val validator_XSDContent = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
@@ -779,7 +781,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true))
 
   val goodXML_XSD1 = <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -943,7 +945,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_XSDContentT = Validator(
+  val validator_XSDContentT = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
@@ -971,7 +973,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, false, 1, false, true))
 
 
@@ -1171,7 +1173,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_XSDElementContent = Validator(
+  val validator_XSDElementContent = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -1200,13 +1202,13 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true))
 
   //
   //  Like validator_XSDElementContent, but using an XPath 2 engine.
   //
-  val validator_XSDElementContent2 = Validator(
+  val validator_XSDElementContent2 = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -1235,7 +1237,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 2))
 
   test ("PUT on /a/b with application/xml should succeed on validator_XSDElementContent with valid XML1") {
@@ -1339,7 +1341,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_XSDElementContentPlain = Validator(
+  val validator_XSDElementContentPlain = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -1372,13 +1374,13 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 1, true))
 
   //
   // Like XSDElementContentPlain but with joinopt
   //
-  val validator_XSDElementContentPlainOpt = Validator(
+  val validator_XSDElementContentPlainOpt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -1411,13 +1413,13 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 1, true, false , false, "XalanC", true))
 
   //
   //  Like validator_XSDElementContentPlain, but using an XPath 2 engine.
   //
-  val validator_XSDElementContentPlain2 = Validator(
+  val validator_XSDElementContentPlain2 = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -1452,14 +1454,14 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 2, true))
 
 
   //
   //  Like validator_XSDElementContentPlainOpt, but using an XPath 2 engine.
   //
-  val validator_XSDElementContentPlainOpt2 = Validator(
+  val validator_XSDElementContentPlainOpt2 = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -1494,7 +1496,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 2, true, false , false, "XalanC", true))
 
 
@@ -1824,7 +1826,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   // The validator is used in the following tests, it uses an external
   // grammar.
   //
-  val validator_UUID = Validator(
+  val validator_UUID = Validator((localWADLURI,
     <application xmlns="http://wadl.dev.java.net/2009/02"
                  xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
            <grammars>
@@ -1843,7 +1845,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
            <method id="getMethod" name="GET">
                <response status="200 203"/>
            </method>
-        </application>
+        </application>)
     , assertConfig)
 
   WADLSchemaAssertions(validator_UUID)
@@ -1996,7 +1998,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_XSDContentTT = Validator(
+  val validator_XSDContentTT = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api">
         <grammars>
@@ -2029,14 +2031,14 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, false, 1, false, true, true, "XalanC"))
 
   //
   //  Like validator_XSDContentTT except it uses embeded XSLs
   //
 
-  val validator_XSDContentTTE = Validator(
+  val validator_XSDContentTTE = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api">
         <grammars>
@@ -2141,13 +2143,13 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, false, 1, false, true, true, "XalanC"))
 
   //
   //  Like validator_XSDContentTT except uses Xalan instead of XalanC for XSL 1.0 engine.
   //
-  val validator_XSDContentTTX = Validator(
+  val validator_XSDContentTTX = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api">
         <grammars>
@@ -2180,13 +2182,13 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, false, 1, false, true, true, "Xalan"))
 
   //
   //  Like validator_XSDContentTT except uses Saxon instead of XalanC for XSL 1.0 engine
   //
-  val validator_XSDContentTTS = Validator(
+  val validator_XSDContentTTS = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api">
         <grammars>
@@ -2219,7 +2221,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, false, 1, false, true, true, "Saxon"))
 
 
@@ -2551,7 +2553,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_Header = Validator(
+  val validator_Header = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -2582,13 +2584,13 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
   //
   // Like validator header, but expects the header to be a UUID.
   //
-  val validator_HeaderUUID = Validator(
+  val validator_HeaderUUID = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -2619,13 +2621,13 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
   //
   // Like validator header, but expects the header to be an int.
   //
-  val validator_HeaderInt = Validator(
+  val validator_HeaderInt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -2656,14 +2658,14 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
 
   //
   // Like validator header int, but expects the header to only be required in the PUT request.
   //
-  val validator_HeaderIntPut = Validator(
+  val validator_HeaderIntPut = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -2694,14 +2696,14 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
 
   //
   // Like validator header int, but expects the header to only be required in the PUT request.
   //
-  val validator_HeaderIntPutMix = Validator(
+  val validator_HeaderIntPutMix = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -2733,7 +2735,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
   test ("PUT on /a/b with application/xml should succeed on validator_Header with valid XML1") {
