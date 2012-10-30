@@ -13,7 +13,8 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
 
   //
   //  These simple tests simply affirm that WADL Tools is doing it's
-  //  job, and that we are in fact throwing WADL Exceptions
+  //  job, and that we are in fact throwing WADL Exceptions, when a
+  //  referance is broken.
   //
 
   feature ("The WADLCheckerBuilder should reject a WADL that violates a WADL format") {
@@ -41,14 +42,10 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
       assert(thrown.getMessage().contains("missing"))
       assert(thrown.getMessage().contains("does not seem to exist"))
     }
-  }
 
-  //
-  //  Waiting for fix in WADL tools.
-  //
-  ignore ("The WADL contains an XSD which is missing an import") {
-    given("a WADL that contains an XSD which is missing an import")
-      val inWADL =
+    scenario ("The WADL contains an XSD which is missing an import") {
+      given("a WADL that contains an XSD which is missing an import")
+        val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
            <grammars>
@@ -79,10 +76,15 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-    when("the wadl is translated")
-    val thrown = intercept[WADLException] {
-      builder.build (inWADL, stdConfig)
+      when("the wadl is translated")
+      val thrown = intercept[WADLException] {
+        builder.build (inWADL, stdConfig)
+      }
+      then("Then a WADLException should be thrown with the words 'transform.xsd' and 'does not seem to exist'.")
+      assert(thrown.getMessage().contains("transform.xsd"))
+      assert(thrown.getMessage().contains("does not seem to exist"))
+      and("The exception should point to the file in error")
+      assert(thrown.getMessage().contains("test://app/xsd/simple.xsd"))
     }
-    then("A WADL Exception should be thrown")
   }
 }
