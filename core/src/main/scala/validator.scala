@@ -76,7 +76,7 @@ object Validator {
   }
 
   def apply (in : InputStream, config : Config) : Validator = {
-    apply (("", in), config)
+    apply (("test://path/to/mywadl.wadl", in), config)
   }
 }
 
