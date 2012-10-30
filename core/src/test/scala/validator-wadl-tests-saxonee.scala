@@ -1,5 +1,6 @@
 package com.rackspace.com.papi.components.checker
 
+import java.io.File
 import java.util.Date
 import java.util.UUID
 import java.math.BigInteger
@@ -64,7 +65,8 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   // The validator is used in the following tests, it uses an external
   // grammar.
   //
-  val validator_UUID = Validator(
+  val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString
+  val validator_UUID = Validator((localWADLURI,
     <application xmlns="http://wadl.dev.java.net/2009/02"
                  xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
            <grammars>
@@ -83,7 +85,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
            <method id="getMethod" name="GET">
                <response status="200 203"/>
            </method>
-        </application>
+        </application>)
     , assertConfigSaxonEE)
 
   WADLSchemaAssertions(validator_UUID)
@@ -236,7 +238,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_XSDContent = Validator(
+  val validator_XSDContent = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
@@ -264,7 +266,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, true, true, true))
 
   val goodXML = <some_xml att='1' xmlns='test.org'>
@@ -449,7 +451,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_XSDContentT = Validator(
+  val validator_XSDContentT = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
@@ -477,7 +479,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, true, true, true, false, 1, false, true))
 
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContentT with valid XML1") {
@@ -656,7 +658,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_XSDContentTT = Validator(
+  val validator_XSDContentTT = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api">
         <grammars>
@@ -689,7 +691,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, true, true, true, false, 1, false, true, true, "Saxon"))
 
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML1") {
@@ -788,7 +790,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   //
   // The validator is used in the following tests.
   //
-  val validator_HeaderUUID = Validator(
+  val validator_HeaderUUID = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -819,13 +821,13 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
 
   //
   // Like validator header, but expects the header to be an int.
   //
-  val validator_HeaderInt = Validator(
+  val validator_HeaderInt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -856,13 +858,13 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
 
   //
   // Like validator header int, but expects the header only in the put
   //
-  val validator_HeaderIntPut = Validator(
+  val validator_HeaderIntPut = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -893,13 +895,13 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
 
   //
   // Like validator header int put, but string header in PUT and POST.
   //
-  val validator_HeaderIntPutMix = Validator(
+  val validator_HeaderIntPutMix = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -931,7 +933,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                <method name="GET"/>
            </resource>
         </resources>
-    </application>
+    </application>)
     , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
 
   test ("PUT on /a/b with application/xml should succeed on validator_HeaderUUID with valid XML1") {
