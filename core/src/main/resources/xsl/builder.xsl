@@ -543,7 +543,16 @@
             </xsl:if>
             <xsl:if test="$haveHeaders">
                 <xsl:call-template name="check:addHeaderSteps">
-                    <xsl:with-param name="next" select="$nextSteps"/>
+                    <xsl:with-param name="next">
+                        <xsl:choose>
+                            <xsl:when test="count($nextSteps) &gt; 0">
+                                <xsl:value-of select="$nextSteps"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="($ACCEPT)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:with-param>
                     <xsl:with-param name="from" select="wadl:request"/>
                     <xsl:with-param name="inRequest" select="true()"/>
                 </xsl:call-template>
