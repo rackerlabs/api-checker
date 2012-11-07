@@ -1,6 +1,7 @@
 package com.rackspace.com.papi.components.checker.cli
 
 import com.rackspace.com.papi.components.checker.wadl.WADLDotBuilder
+import com.rackspace.com.papi.components.checker.util.URLResolver
 import org.clapper.argot.ArgotConverters._
 import org.clapper.argot.ArgotParser
 import org.clapper.argot.ArgotUsageException
@@ -60,7 +61,7 @@ object Wadl2Dot {
     if (input.value == None) {
       source = new StreamSource(System.in)
     } else {
-      source = new StreamSource(input.value.get)
+      source = new StreamSource(URLResolver.toAbsoluteSystemId(input.value.get))
     }
     source
   }
@@ -70,7 +71,7 @@ object Wadl2Dot {
     if (output.value == None) {
       result = new StreamResult(System.out)
     } else {
-      result = new StreamResult(output.value.get)
+      result = new StreamResult(URLResolver.toAbsoluteSystemId(output.value.get))
     }
     result
   }
