@@ -55,10 +55,7 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build(in : (String, InputStream), out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    val inputSource = new InputSource(in._2)
-    inputSource.setSystemId(in._1)
-    build(new SAXSource(xmlReader, inputSource), out, config, ignoreSinks, nfaMode)
+    build(new StreamSource(in._2,in._1), out, config, ignoreSinks, nfaMode)
   }
 
   def build(in : InputStream, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
@@ -66,13 +63,11 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build(in : Reader, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out, config, ignoreSinks, nfaMode)
+    build(new StreamSource(in), out, config, ignoreSinks, nfaMode)
   }
 
   def build(in : String, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out, config, ignoreSinks, nfaMode)
+    build(new StreamSource(in), out, config, ignoreSinks, nfaMode)
   }
 
   def build (in : (String, NodeSeq), config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : String = {

@@ -55,10 +55,7 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build (in : (String, InputStream), out : SAXResult, config : Config) : Step = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    val inputSource = new InputSource(in._2)
-    inputSource.setSystemId(in._1)
-    build (new SAXSource(xmlReader, inputSource), out, config)
+    build (new StreamSource(in._2,in._1), out, config)
   }
 
   def build(in : InputStream, config : Config) : Step = {
@@ -66,13 +63,11 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build (in : Reader, config : Config) : Step = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), config)
+    build(new StreamSource(in), config)
   }
 
   def build (in : String, config : Config) : Step = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), config)
+    build(new StreamSource(in), config)
   }
 
   def build (in : (String, NodeSeq), config : Config) : Step = {

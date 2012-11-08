@@ -128,10 +128,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build(in : (String, InputStream), out: Result, config : Config) : Unit = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    val inputSource = new InputSource(in._2)
-    inputSource.setSystemId(in._1)
-    build(new SAXSource(xmlReader, inputSource), out, config)
+    build(new StreamSource(in._2, in._1), out, config)
   }
 
   def build(in : InputStream, out: Result, config : Config) : Unit = {
@@ -139,13 +136,11 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
   }
 
   def build(in : Reader, out: Result, config : Config) : Unit = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out, config)
+    build(new StreamSource(in), out, config)
   }
 
   def build(in : String, out: Result, config : Config) : Unit = {
-    val xmlReader = wadl.newSAXParser.getXMLReader()
-    build(new SAXSource(xmlReader, new InputSource(in)), out, config)
+    build(new StreamSource(in), out, config)
   }
 
   def build (in : (String, NodeSeq), config : Config) : NodeSeq = {
