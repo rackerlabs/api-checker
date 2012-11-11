@@ -14,7 +14,12 @@ import net.sf.saxon.Controller
 import net.sf.saxon.serialize.MessageWarner
 
 object IdentityTransformPool {
-  private val tf = TransformerFactory.newInstance()
+  //
+  //  We purposly use Xalan-C for identity transform, it's fast and we
+  //  avoid licence check in SaxonEE, which for some reason is always
+  //  trigged by id transform.
+  //
+  private val tf = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
   private val pool = new SoftReferenceObjectPool[Transformer](new IdentityTransformerFactory(tf))
 
   def borrowTransformer : Transformer = pool.borrowObject()
