@@ -6,6 +6,7 @@ import javax.servlet.FilterChain
 
 import javax.xml.transform._
 import javax.xml.transform.sax._
+import javax.xml.transform.stream._
 import javax.xml.transform.dom._
 import javax.xml.validation._
 
@@ -62,17 +63,7 @@ object Validator {
   }
 
   def apply (in : (String, InputStream), config : Config) : Validator = {
-    val wadlParserFactory = SAXParserFactory.newInstance()
-    val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema")
-
-    wadlParserFactory.setNamespaceAware(true)
-    wadlParserFactory.setValidating(true)
-    wadlParserFactory.setSchema(schemaFactory.newSchema(getClass().getClassLoader().getResource("wadl.xsd")))
-
-    val xmlReader = wadlParserFactory.newSAXParser().getXMLReader()
-    val inputSource = new InputSource(in._2)
-    inputSource.setSystemId(in._1)
-    apply (new SAXSource(xmlReader, inputSource), config)
+    apply (new StreamSource(in._2, in._1), config)
   }
 
   def apply (in : InputStream, config : Config) : Validator = {
