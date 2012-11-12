@@ -18,6 +18,7 @@
     <xsl:param name="enableElementCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePlainParamCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePreProcessExtension" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enableIgnoreXSDExtension" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableHeaderCheck" as="xsd:boolean" select="false()"/>
 
     <!-- Do we have an XSD? -->
@@ -35,6 +36,8 @@
                   select="$enableXSDTransform and $useXSDContentCheck"/>
     <xsl:variable name="usePreProcessExtension" as="xsd:boolean"
                   select="$enablePreProcessExtension"/>
+    <xsl:variable name="useXSDIgnoreExtension" as="xsd:boolean"
+                  select="$enableIgnoreXSDExtension and $useXSDContentCheck"/>
     <xsl:variable name="useElementCheck" as="xsd:boolean"
                   select="$enableElementCheck"/>
     <xsl:variable name="usePlainParamCheck" as="xsd:boolean"
