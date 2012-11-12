@@ -36,7 +36,7 @@
                   select="$enableXSDTransform and $useXSDContentCheck"/>
     <xsl:variable name="usePreProcessExtension" as="xsd:boolean"
                   select="$enablePreProcessExtension"/>
-    <xsl:variable name="useXSDIgnoreExtension" as="xsd:boolean"
+    <xsl:variable name="useIgnoreXSDExtension" as="xsd:boolean"
                   select="$enableIgnoreXSDExtension and $useXSDContentCheck"/>
     <xsl:variable name="useElementCheck" as="xsd:boolean"
                   select="$enableElementCheck"/>
@@ -702,8 +702,10 @@
         <xsl:variable name="this" as="node()" select="."/>
         <xsl:variable name="defaultPlainParams" as="node()*"
                       select="wadl:param[xsd:boolean(@required) and @path and (@style='plain')]"/>
+        <xsl:variable name="ignoreXSDCheck" as="xsd:boolean"
+                      select="$useIgnoreXSDExtension and (xsd:boolean(@rax:ignoreXSD) or xsd:boolean(../@rax:ignoreXSD))"/>
         <xsl:variable name="doXSD" as="xsd:boolean"
-                      select="($type = 'WELL_XML') and $useXSDContentCheck"/>
+                      select="($type = 'WELL_XML') and $useXSDContentCheck and not($ignoreXSDCheck)"/>
         <xsl:variable name="doPreProcess" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $usePreProcessExtension and exists(rax:preprocess)"/>
         <xsl:variable name="doElement" as="xsd:boolean"

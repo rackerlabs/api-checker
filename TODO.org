@@ -355,10 +355,10 @@
          2. [X] type / *
          3. [X] ; params, Ignored
          4. [X] ; params, Specified
-** TODO Ignore XSD extension [2/5]
+** TODO Ignore XSD extension [3/5]
    1. [X] Add Config Option
    2. [X] Update CLI utils, filter test app
-   3. [ ] Handle in builder.xsl
+   3. [X] Handle in builder.xsl
    4. [ ] Handler Tests
    5. [ ] WADL validator tests
 ** TODO Header Enhancements [0/2]
