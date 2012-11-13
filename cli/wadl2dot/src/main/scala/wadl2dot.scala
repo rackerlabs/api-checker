@@ -39,6 +39,9 @@ object Wadl2Dot {
   val preProc  = parser.flag[Boolean] (List("P", "preproc"),
                                        "Enable preprocess extension : false")
 
+  val ignoreXSD  = parser.flag[Boolean] (List("i", "ignore-xsd-ext"),
+                                         "Enable Ignore XSD  extension : false")
+
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
                                           "Show error nodes. Default: false")
 
@@ -98,6 +101,7 @@ object Wadl2Dot {
       c.enablePreProcessExtension = preProc.value.getOrElse(false)
       c.joinXPathChecks = joinXPaths.value.getOrElse(false)
       c.checkHeaders = header.value.getOrElse(false)
+      c.enableIgnoreXSDExtension = ignoreXSD.value.getOrElse(false)
       c.validateChecker = true
 
       new WADLDotBuilder().build (getSource, getResult,
