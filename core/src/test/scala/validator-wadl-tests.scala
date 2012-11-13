@@ -930,6 +930,89 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                                                            ),response,chain), 400)
   }
 
+
+  //
+  //  Like validator_XSDContent, but uses ignoreXSD to disable XSD
+  //  validation on PUT to /a/b
+  //
+  val validator_XSDContentI = Validator((localWADLURI,
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml" rax:ignoreXSD="true"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"
+                                     />
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>)
+    ,TestConfig(false, false, true, true, false, 1,
+                false, false, false, "XalanC",
+                false, false, true))
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentI with valid XML1") {
+    validator_XSDContentI.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentI with valid XML2") {
+    validator_XSDContentI.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentI with valid XML1") {
+    validator_XSDContentI.validate(request("POST","/a/b","application/xml", goodXML_XSD1),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentI with valid XML2") {
+    validator_XSDContentI.validate(request("POST","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("PUT on /a/b with application/json should succeed on validator_XSDContentI with well formed JSON") {
+    validator_XSDContentI.validate(request("PUT","/a/b","application/json", goodJSON),response,chain)
+  }
+
+  test ("POST on /c with application/json should succeed on validator_XSDContentI with well formed JSON") {
+    validator_XSDContentI.validate(request("POST","/c","application/json", goodJSON),response,chain)
+  }
+
+  test ("GOT on /c should succeed on validator_XSDContentI") {
+    validator_XSDContentI.validate(request("GET","/c"),response,chain)
+  }
+
+  test ("PUT on /a/b with well formed XML that does not match schema on validator_XSDContentI should succeed because of ignoreXSD") {
+    validator_XSDContentI.validate(request("PUT","/a/b", "application/xml", goodXML),response,chain)
+  }
+
+  test ("PUT on /a/b with well formed XML that does not validate against the schema (junk-1) on validator_XSDContentI should succeed because of ignoreXSD") {
+    validator_XSDContentI.validate(request("PUT","/a/b", "application/xml",
+                                           <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                           <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
+                                           <stepType>URL_FAIL</stepType>
+                                           <even>22</even>
+                                           <junk/>
+                                           </e>
+                                         ),response,chain)
+  }
+
   //
   // validator_XSDContentT allows:
   //
