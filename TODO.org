@@ -362,8 +362,8 @@
    4. [X] Handler Tests
    5. [X] WADL validator tests
 ** TODO Header Enhancements [0/3]
-   1. [ ] Multiple header checks with the same name.
-          1. [ ] Allow checks in steps via enumeration
+   1. [-] Multiple header checks with the same name.
+          1. [X] Allow checks in steps via enumeration
           2. [ ] Support for single header with comma sererated list
           3. [ ] Add WADL validator tests.
    2. [ ] Handle fixed headers

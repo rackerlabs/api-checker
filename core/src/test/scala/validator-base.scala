@@ -5,6 +5,8 @@ import scala.xml._
 import java.io.ByteArrayInputStream
 import java.io.StringWriter
 
+import java.util.Enumeration
+
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.ServletInputStream
@@ -306,6 +308,15 @@ class BaseValidatorSuite extends FunSuite {
     var xmlParser : DocumentBuilder = null
     var jsonParser : JSONParser = null
 
+    when(req.getHeaders(anyString())).thenAnswer(new Answer[Enumeration[String]] {
+
+      class EnumResult() extends Enumeration[String] {
+        override def hasMoreElements = false
+        override def nextElement = null
+      }
+      override def answer(invocation : InvocationOnMock) : Enumeration[String] = new EnumResult()
+    })
+
     try {
       if (parseContent) {
         contentType match {
@@ -329,12 +340,25 @@ class BaseValidatorSuite extends FunSuite {
     val req = request(method, url, contentType, content, parseContent)
 
     when(req.getHeader(anyString())).thenAnswer(new Answer[String] {
-      val h = headers
-
       override def answer(invocation : InvocationOnMock) : String = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
         headers.getOrElse(key, null)
       }
+    })
+
+    when(req.getHeaders(anyString())).thenAnswer(new Answer[Enumeration[String]] {
+
+      class EnumResult(invocation : InvocationOnMock) extends Enumeration[String] {
+        val key = invocation.getArguments()(0).asInstanceOf[String]
+        var read : Boolean = !headers.contains(key)
+
+        override def hasMoreElements = !read
+        override def nextElement = {
+          read = true
+          headers.getOrElse(key, null)
+        }
+      }
+      override def answer(invocation : InvocationOnMock) : Enumeration[String] = new EnumResult(invocation)
     })
 
     return req
