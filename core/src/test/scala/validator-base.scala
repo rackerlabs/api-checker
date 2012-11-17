@@ -38,6 +38,8 @@ import org.mockito.Matchers._
 import org.mockito.stubbing.Answer
 import org.mockito.invocation.InvocationOnMock
 
+import scala.collection.JavaConversions._
+
 import org.w3c.dom.Document
 
 /**
@@ -336,35 +338,27 @@ class BaseValidatorSuite extends FunSuite {
     return req
   }
 
-  def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean, headers : Map[String, String]) : HttpServletRequest = {
+  def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean, headers : Map[String, List[String]]) : HttpServletRequest = {
     val req = request(method, url, contentType, content, parseContent)
 
     when(req.getHeader(anyString())).thenAnswer(new Answer[String] {
       override def answer(invocation : InvocationOnMock) : String = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
-        headers.getOrElse(key, null)
+        headers.getOrElse(key, null)(0)
       }
     })
 
     when(req.getHeaders(anyString())).thenAnswer(new Answer[Enumeration[String]] {
-
-      class EnumResult(invocation : InvocationOnMock) extends Enumeration[String] {
+      override def answer(invocation : InvocationOnMock) : Enumeration[String] = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
-        var read : Boolean = !headers.contains(key)
-
-        override def hasMoreElements = !read
-        override def nextElement = {
-          read = true
-          headers.getOrElse(key, null)
-        }
+        headers.getOrElse(key, List()).iterator
       }
-      override def answer(invocation : InvocationOnMock) : Enumeration[String] = new EnumResult(invocation)
     })
 
     return req
   }
 
-  def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean, headers : Map[String, String]) : HttpServletRequest = {
+  def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean, headers : Map[String, List[String]]) : HttpServletRequest = {
     request (method, url, contentType, content.toString(), parseContent, headers)
   }
 

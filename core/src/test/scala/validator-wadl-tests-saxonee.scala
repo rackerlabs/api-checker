@@ -937,19 +937,19 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
     , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
 
   test ("PUT on /a/b with application/xml should succeed on validator_HeaderUUID with valid XML1") {
-    validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain)
+    validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderUUID with valid XML1") {
-    validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain)
+    validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain)
   }
 
   test ("PUT on /a/b with application/json should succeed on validator_HeaderUUID with well formed JSON") {
-    validator_HeaderUUID.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain)
+    validator_HeaderUUID.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain)
   }
 
   test ("POST on /c with application/json should succeed on validator_HeaderUUID with well formed JSON") {
-    validator_HeaderUUID.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain)
+    validator_HeaderUUID.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain)
   }
 
   test ("GOT on /c should succeed on validator_HeaderUUID") {
@@ -961,11 +961,11 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-UUID header is mispelled") {
-    assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUIDs"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain), 400)
+    assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUIDs"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-UUID contains malformed data") {
-    assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->"b8870590e58411e191a37f4ba748be90")),response,chain), 400)
+    assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->List("b8870590e58411e191a37f4ba748be90"))),response,chain), 400)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderUUID  if the X-TEST-UUID header isn't set") {
@@ -973,23 +973,23 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderUUID  if the X-TEST-UUID header is mispelled") {
-    assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUIDs"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain), 400)
+    assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUIDs"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain), 400)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderUUID  if the X-TEST-UUID contains malformed data") {
-    assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->"b8870590e58411e191a37f4ba748be90")),response,chain), 400)
+    assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->List("b8870590e58411e191a37f4ba748be90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT in the wrong location in validator_HeaderUUID") {
-    assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain), 400)
+    assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain), 400)
   }
 
   test ("POST on /a/b should fail with well formed XML POST in the wrong location in validator_HeaderUUID") {
-    assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain), 400)
+    assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_HeaderUUID") {
-    assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain), 400)
+    assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML, correct element, butdoes not validate against the schema in validator_HeaderUUID") {
@@ -999,23 +999,23 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                                                                 <stepType>URL_FAIL</stepType>
                                                                 <even>22</even>
                                                               </a>
-                                                            , false, Map("X-TEST-UUID"->"b8870590-e584-11e1-91a3-7f4ba748be90")),response,chain), 400)
+                                                            , false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b with application/xml should succeed on validator_HeaderInt with valid XML1") {
-    validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90")),response,chain)
+    validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90"))),response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderInt with valid XML1") {
-    validator_HeaderInt.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"90")),response,chain)
+    validator_HeaderInt.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("90"))),response,chain)
   }
 
   test ("PUT on /a/b with application/json should succeed on validator_HeaderInt with well formed JSON") {
-    validator_HeaderInt.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-INT"->"90")),response,chain)
+    validator_HeaderInt.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-INT"->List("90"))),response,chain)
   }
 
   test ("POST on /c with application/json should succeed on validator_HeaderInt with well formed JSON") {
-    validator_HeaderInt.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-INT"->"90")),response,chain)
+    validator_HeaderInt.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-INT"->List("90"))),response,chain)
   }
 
   test ("GOT on /c should succeed on validator_HeaderInt") {
@@ -1027,11 +1027,11 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT header is mispelled") {
-    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INTs"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INTs"->List("90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT contains malformed data") {
-    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("foo"))),response,chain), 400)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderInt  if the X-TEST-INT header isn't set") {
@@ -1039,23 +1039,23 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderInt  if the X-TEST-INT header is mispelled") {
-    assertResultFailed(validator_HeaderInt.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INTs"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderInt.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INTs"->List("90"))),response,chain), 400)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderInt  if the X-TEST-INT contains malformed data") {
-    assertResultFailed(validator_HeaderInt.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderInt.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("foo"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT in the wrong location in validator_HeaderInt") {
-    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
   test ("POST on /a/b should fail with well formed XML POST in the wrong location in validator_HeaderInt") {
-    assertResultFailed(validator_HeaderInt.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderInt.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_HeaderInt") {
-    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML, correct element, butdoes not validate against the schema in validator_HeaderInt") {
@@ -1065,24 +1065,24 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                                                                 <stepType>URL_FAIL</stepType>
                                                                 <even>22</even>
                                                               </a>
-                                                            , false, Map("X-TEST-INT"->"90")),response,chain), 400)
+                                                            , false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
 
   test ("PUT on /a/b with application/xml should succeed on validator_HeaderIntPut with valid XML1") {
-    validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90")),response,chain)
+    validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90"))),response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPut with valid XML1") {
-    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"90")),response,chain)
+    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("90"))),response,chain)
   }
 
   test ("PUT on /a/b with application/json should succeed on validator_HeaderIntPut with well formed JSON") {
-    validator_HeaderIntPut.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-INT"->"90")),response,chain)
+    validator_HeaderIntPut.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-INT"->List("90"))),response,chain)
   }
 
   test ("POST on /c with application/json should succeed on validator_HeaderIntPut with well formed JSON") {
-    validator_HeaderIntPut.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-INT"->"90")),response,chain)
+    validator_HeaderIntPut.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-INT"->List("90"))),response,chain)
   }
 
   test ("GOT on /c should succeed on validator_HeaderIntPut") {
@@ -1094,11 +1094,11 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT header is mispelled in validator_HeaderIntPut") {
-    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INTs"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INTs"->List("90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT contains malformed data in validator_HeaderIntPut") {
-    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("foo"))),response,chain), 400)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPut  if the X-TEST-INT header isn't set") {
@@ -1106,23 +1106,23 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPut  if the X-TEST-INT header is mispelled") {
-    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INTs"->"90")),response,chain)
+    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INTs"->List("90"))),response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPut  if the X-TEST-INT contains malformed data") {
-    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"foo")),response,chain)
+    validator_HeaderIntPut.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("foo"))),response,chain)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT in the wrong location in validator_HeaderIntPut") {
-    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
   test ("POST on /a/b should failed with well formed XML POST in the wrong location in validator_HeaderIntPut") {
-    assertResultFailed(validator_HeaderIntPut.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPut.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_HeaderIntPut") {
-    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPut.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML, correct element, butdoes not validate against the schema in validator_HeaderIntPut") {
@@ -1132,23 +1132,23 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                                                                 <stepType>URL_FAIL</stepType>
                                                                 <even>22</even>
                                                               </a>
-                                                            , false, Map("X-TEST-INT"->"90")),response,chain), 400)
+                                                            , false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b with application/xml should succeed on validator_HeaderIntPutMix with valid XML1") {
-    validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90", "X-TEST"->"foo")),response,chain)
+    validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90"), "X-TEST"->List("foo"))),response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPutMix with valid XML1") {
-    validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST"->"foo")),response,chain)
+    validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST"->List("foo"))),response,chain)
   }
 
   test ("PUT on /a/b with application/json should succeed on validator_HeaderIntPutMix with well formed JSON") {
-    validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-INT"->"90", "X-TEST"->"foo")),response,chain)
+    validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/json", goodJSON, false, Map("X-TEST-INT"->List("90"), "X-TEST"->List("foo"))),response,chain)
   }
 
   test ("POST on /c with application/json should succeed on validator_HeaderIntPutMix with well formed JSON") {
-    validator_HeaderIntPutMix.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-foo"->"foo", "X-TEST"->"foo")),response,chain)
+    validator_HeaderIntPutMix.validate(request("POST","/c","application/json", goodJSON, false, Map("X-TEST-foo"->List("foo"), "X-TEST"->List("foo"))),response,chain)
   }
 
   test ("GOT on /c should succeed on validator_HeaderIntPutMix") {
@@ -1156,47 +1156,47 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   }
 
   test ("PUT on /a/b with application/xml should fail on validator_HeaderIntPutMix if X-TEST is not set") {
-    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT header isn't set in validator_HeaderIntPutMix") {
-    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST"->List("foo"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT header is mispelled in validator_HeaderIntPutMix") {
-    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INTs"->"90", "X-TEST"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INTs"->List("90"), "X-TEST"->List("foo"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT contains malformed data in validator_HeaderIntPutMix") {
-    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"foo", "X-TEST"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("foo"), "X-TEST"->List("foo"))),response,chain), 400)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPutMix  if the X-TEST-INT header isn't set") {
-    validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST"->"foo")),response, chain)
+    validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST"->List("foo"))),response, chain)
   }
 
   test ("POST on /a/b with application/xml should fail on validator_HeaderIntPutMix  if the X-TEST iheader isn't set") {
-    assertResultFailed(validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"50")),response, chain), 400)
+    assertResultFailed(validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("50"))),response, chain), 400)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPutMix  if the X-TEST-INT header is mispelled") {
-    validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INTs"->"90", "X-TEST"->"foo")),response,chain)
+    validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INTs"->List("90"), "X-TEST"->List("foo"))),response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderIntPutMix  if the X-TEST-INT contains malformed data") {
-    validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"foo", "X-TEST"->"foo")),response,chain)
+    validator_HeaderIntPutMix.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("foo"), "X-TEST"->List("foo"))),response,chain)
   }
 
   test ("PUT on /a/b should fail with well formed XML PUT in the wrong location in validator_HeaderIntPutMix") {
-    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->"90", "X-TEST"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-INT"->List("90"), "X-TEST"->List("foo"))),response,chain), 400)
   }
 
   test ("POST on /a/b should failed with well formed XML POST in the wrong location in validator_HeaderIntPutMix") {
-    assertResultFailed(validator_HeaderIntPutMix.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->"90", "X-TEST"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPutMix.validate(request("POST","/a/b", "application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90"), "X-TEST"->List("foo"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML that does not match schema on validator_HeaderIntPutMix") {
-    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-INT"->"90", "X-TEST"->"foo")),response,chain), 400)
+    assertResultFailed(validator_HeaderIntPutMix.validate(request("PUT","/a/b", "application/xml", goodXML, false, Map("X-TEST-INT"->List("90"), "X-TEST"->List("foo"))),response,chain), 400)
   }
 
   test ("PUT on /a/b should fail with well formed XML, correct element, butdoes not validate against the schema in validator_HeaderIntPutMix") {
@@ -1206,6 +1206,6 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
                                                                 <stepType>URL_FAIL</stepType>
                                                                 <even>22</even>
                                                               </a>
-                                                            , false, Map("X-TEST-INT"->"90", "X-TEST"->"foo")),response,chain), 400)
+                                                            , false, Map("X-TEST-INT"->List("90"), "X-TEST"->List("foo"))),response,chain), 400)
   }
 }
