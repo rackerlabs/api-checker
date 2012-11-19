@@ -940,6 +940,14 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
     validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain)
   }
 
+  test ("PUT on /a/b with application/xml should succeed on validator_HeaderUUID with valid XML1 (multiple headers)") {
+    validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90","3b14fd08-3294-11e2-bf4b-539af5d76c9f"))),response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_HeaderUUID with valid XML1 (multiple values in a single header)") {
+    validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90, 3b14fd08-3294-11e2-bf4b-539af5d76c9f"))),response,chain)
+  }
+
   test ("POST on /a/b with application/xml should succeed on validator_HeaderUUID with valid XML1") {
     validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain)
   }
@@ -980,6 +988,14 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
     assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->List("b8870590e58411e191a37f4ba748be90"))),response,chain), 400)
   }
 
+  test ("POST on /a/b with application/xml should succeed on validator_HeaderUUID  if the X-TEST-UUID contains malformed data (multiple headers)") {
+    assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->List("3b14fd08-3294-11e2-bf4b-539af5d76c9f", "b8870590e58411e191a37f4ba748be90"))),response,chain), 400)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_HeaderUUID  if the X-TEST-UUID contains malformed data (multiple values in a single header)") {
+    assertResultFailed(validator_HeaderUUID.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->List("3b14fd08-3294-11e2-bf4b-539af5d76c9f, b8870590e58411e191a37f4ba748be90"))),response,chain), 400)
+  }
+
   test ("PUT on /a/b should fail with well formed XML PUT in the wrong location in validator_HeaderUUID") {
     assertResultFailed(validator_HeaderUUID.validate(request("PUT","/a/b", "application/xml", goodXML_XSD1, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain), 400)
   }
@@ -1004,6 +1020,14 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
 
   test ("PUT on /a/b with application/xml should succeed on validator_HeaderInt with valid XML1") {
     validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90"))),response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_HeaderInt with valid XML1 (multiple headers)") {
+    validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90","100"))),response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_HeaderInt with valid XML1 (multiple values in a single header)") {
+    validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90, 100"))),response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderInt with valid XML1") {
@@ -1032,6 +1056,14 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
 
   test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT contains malformed data") {
     assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("foo"))),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT contains malformed data (multiple headers)") {
+    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90","foo"))),response,chain), 400)
+  }
+
+  test ("PUT on /a/b should fail with well formed XML PUT, if the X-TEST-INT contains malformed data (multiple values in a single header)") {
+    assertResultFailed(validator_HeaderInt.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-INT"->List("90, foo"))),response,chain), 400)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_HeaderInt  if the X-TEST-INT header isn't set") {
