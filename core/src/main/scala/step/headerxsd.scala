@@ -8,29 +8,30 @@ import javax.servlet.FilterChain
 
 import org.xml.sax.SAXParseException
 
+import scala.collection.JavaConversions._
+
 class HeaderXSD(id : String, label : String, val name : String, val value : QName, schema : Schema, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = name+" : "+value.toString
   val xsd = new XSDStringValidator(value, schema, id)
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    var ret = -1
-    var err : Option[SAXParseException] = None
-    val headerValue = req.getHeader(name)
-    if (headerValue != null) {
-      err = xsd.validate(headerValue)
-      if (err != None) {
-        req.contentError = err.get
-      } else {
-        ret = uriLevel
+    val headers : Iterator[String] = req.getHeaders(name)
+    var last_err : Option[SAXParseException] = None
+
+    //
+    //  If there exists at least one header matching the the name AND
+    //  all of the headers with the name match the value type in the
+    //  XSD, then return the uriLevel otherwise set an error and
+    //  return -1
+    //
+    if (!headers.isEmpty && headers.filterNot(v => { last_err = xsd.validate(v);  last_err match { case None => true ; case Some(_) => false } }).isEmpty) {
+      uriLevel
+    } else {
+     last_err match {
+        case Some(_) => req.contentError = new Exception("Expecting requeried HTTP header "+name+" to match "+value+" "+last_err.get.getMessage(), last_err.get)
+        case None => req.contentError = new Exception("Expecting required HTTP header "+name)
       }
+      -1
     }
-    if (ret == -1) {
-      if (err== None) {
-        req.contentError = new Exception("Expecting required HTTP header "+name)
-      }else {
-        req.contentError = new Exception("Expecting requeried HTTP header "+name+" to match "+value+" "+err.get.getMessage(), err.get)
-      }
-    }
-    ret
   }
 }
