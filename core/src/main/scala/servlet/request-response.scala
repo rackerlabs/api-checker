@@ -89,7 +89,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
     val value = super.getHeader(name)
     value match {
       case null => null
-      case _ =>  name.split(",")(0)
+      case _ =>  name.split(",")(0).trim
     }
   }
 
@@ -98,7 +98,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
     headers match {
       case null => null
       case _ => var list : List[String] = List()
-                headers.foreach(i => list = list ++ i.split(","))
+                headers.foreach(i => list = list ++ i.split(",").map(j => j.trim))
                 list.iterator
     }
   }
