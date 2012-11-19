@@ -5,6 +5,8 @@ import scala.xml._
 import java.io.ByteArrayInputStream
 import java.io.StringWriter
 
+import java.util.Enumeration
+
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.ServletInputStream
@@ -35,6 +37,8 @@ import org.mockito.Mockito._
 import org.mockito.Matchers._
 import org.mockito.stubbing.Answer
 import org.mockito.invocation.InvocationOnMock
+
+import scala.collection.JavaConversions._
 
 import org.w3c.dom.Document
 
@@ -306,6 +310,15 @@ class BaseValidatorSuite extends FunSuite {
     var xmlParser : DocumentBuilder = null
     var jsonParser : JSONParser = null
 
+    when(req.getHeaders(anyString())).thenAnswer(new Answer[Enumeration[String]] {
+
+      class EnumResult() extends Enumeration[String] {
+        override def hasMoreElements = false
+        override def nextElement = null
+      }
+      override def answer(invocation : InvocationOnMock) : Enumeration[String] = new EnumResult()
+    })
+
     try {
       if (parseContent) {
         contentType match {
@@ -325,22 +338,27 @@ class BaseValidatorSuite extends FunSuite {
     return req
   }
 
-  def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean, headers : Map[String, String]) : HttpServletRequest = {
+  def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean, headers : Map[String, List[String]]) : HttpServletRequest = {
     val req = request(method, url, contentType, content, parseContent)
 
     when(req.getHeader(anyString())).thenAnswer(new Answer[String] {
-      val h = headers
-
       override def answer(invocation : InvocationOnMock) : String = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
-        headers.getOrElse(key, null)
+        headers.getOrElse(key, null)(0)
+      }
+    })
+
+    when(req.getHeaders(anyString())).thenAnswer(new Answer[Enumeration[String]] {
+      override def answer(invocation : InvocationOnMock) : Enumeration[String] = {
+        val key = invocation.getArguments()(0).asInstanceOf[String]
+        headers.getOrElse(key, List()).iterator
       }
     })
 
     return req
   }
 
-  def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean, headers : Map[String, String]) : HttpServletRequest = {
+  def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean, headers : Map[String, List[String]]) : HttpServletRequest = {
     request (method, url, contentType, content.toString(), parseContent, headers)
   }
 

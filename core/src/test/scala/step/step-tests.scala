@@ -970,8 +970,26 @@ class StepSuite extends BaseStepSuite {
 
   test ("In a header step, if the header is available then the uri level should stay the same.") {
     val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->"Set"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->"Sat"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat")))
+
+    assert (header.checkStep (req1, response, chain, 0) == 0)
+    assert (header.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In a header step, if the header is available then the uri level should stay the same. (Multiple Headers)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Suite", "Station")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat", "Sweet", "Standing")))
+
+    assert (header.checkStep (req1, response, chain, 0) == 0)
+    assert (header.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In a header step, if the header is available then the uri level should stay the same. (Multiple Items in a single header)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Suite, Station")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat", "Sweet, Standing")))
 
     assert (header.checkStep (req1, response, chain, 0) == 0)
     assert (header.checkStep (req2, response, chain, 1) == 1)
@@ -979,8 +997,26 @@ class StepSuite extends BaseStepSuite {
 
   test ("In a header step, if a header exists, but the header does not match the the regex the urilevel should be set to -1.") {
     val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->"Ret"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->"Rat"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat")))
+
+    assert (header.checkStep (req1, response, chain, 0) == -1)
+    assert (header.checkStep (req2, response, chain, 1) == -1)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the urilevel should be set to -1. (Multiple Headers)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat", "Rat")))
+
+    assert (header.checkStep (req1, response, chain, 0) == -1)
+    assert (header.checkStep (req2, response, chain, 1) == -1)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the urilevel should be set to -1. (Multiple Items in a single header)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set, Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat, Rat")))
 
     assert (header.checkStep (req1, response, chain, 0) == -1)
     assert (header.checkStep (req2, response, chain, 1) == -1)
@@ -988,8 +1024,8 @@ class StepSuite extends BaseStepSuite {
 
   test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception") {
     val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->"Ret"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->"Rat"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat")))
 
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
@@ -999,10 +1035,36 @@ class StepSuite extends BaseStepSuite {
     assert (req2.contentError.isInstanceOf[Exception])
   }
 
-  test ("In a header step, if a header is not foound, the urilevel should be set to -1.") {
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Headers)") {
     val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->"Set"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->"Sat"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat", "Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Items in a single header)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set, Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat, Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+  }
+
+  test ("In a header step, if a header is not found, the urilevel should be set to -1.") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Sat")))
 
     assert (header.checkStep (req1, response, chain, 0) == -1)
     assert (header.checkStep (req2, response, chain, 1) == -1)
@@ -1010,8 +1072,8 @@ class StepSuite extends BaseStepSuite {
 
   test ("In a header step, if a header is not foound, the request should contain an Exception.") {
     val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->"Set"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->"Sat"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Sat")))
 
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
@@ -1023,8 +1085,26 @@ class StepSuite extends BaseStepSuite {
 
   test ("In an XSD header step, if the header is available then the uri level should stay the same.") {
     val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"28d42e00-e25a-11e1-9897-efbf2fa68353"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"2fbf4592-e25a-11e1-bae1-93374682bd20"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    assert (header.checkStep (req1, response, chain, 0) == 0)
+    assert (header.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In an XSD header step, if the header is available then the uri level should stay the same. (Multiple Headers)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353","ed2127f6-327b-11e2-abc3-ebcd8ddbb97b")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20","f5bc95d0-327b-11e2-9f31-e79a818b84c8")))
+
+    assert (header.checkStep (req1, response, chain, 0) == 0)
+    assert (header.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In an XSD header step, if the header is available then the uri level should stay the same. (Multiple Items in a single header)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353, ed2127f6-327b-11e2-abc3-ebcd8ddbb97b")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20, f5bc95d0-327b-11e2-9f31-e79a818b84c8")))
 
     assert (header.checkStep (req1, response, chain, 0) == 0)
     assert (header.checkStep (req2, response, chain, 1) == 1)
@@ -1032,17 +1112,36 @@ class StepSuite extends BaseStepSuite {
 
   test ("In an XSD header step, if the header is available, but the content is not correct, the uri level should be -1") {
     val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"28d42e00-e25a-11e1-9897-efbf2Za68353"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"2fbf4592-e25a-11e1bae1-93374682bd20"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
 
     assert (header.checkStep (req1, response, chain, 0) == -1)
     assert (header.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD header step, if the header is available, but the content is not correct, the uri level should be -1 (Multiple Headers)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353", "ed2127f6-327b-11e2-abc3ebcd8ddbb97")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20", "f5bc95d0327b11e29f31e79a818b84c8")))
+
+    assert (header.checkStep (req1, response, chain, 0) == -1)
+    assert (header.checkStep (req2, response, chain, 1) == -1)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the uri level should be -1 (Multiple Items in a single header)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353, ed2127f6-327b-11e2-abc3ebcd8ddbb97")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20, f5bc95d0327b11e29f31e79a818b84c8")))
+
+    assert (header.checkStep (req1, response, chain, 0) == -1)
+    assert (header.checkStep (req2, response, chain, 1) == -1)
+  }
+
+
   test ("In an XSD header step, if the header is not available then the uri level should be -1") {
     val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->"28d42e00-e25a-11e1-9897-efbf2fa68353"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->"2fbf4592-e25a-11e1-bae1-93374682bd20"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
 
     assert (header.checkStep (req1, response, chain, 0) == -1)
     assert (header.checkStep (req2, response, chain, 1) == -1)
@@ -1050,8 +1149,34 @@ class StepSuite extends BaseStepSuite {
 
   test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception") {
     val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"28d42e00-e25a-11e1-9897-efbf2Za68353"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->"2fbf4592-e25a-11e1bae1-93374682bd20"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Headers)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("503e5d36-327c-11e2-80d2-33e47888902d","28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("5cbcd858-327c-11e2-82e9-27eb85d59274","2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Items in a single header)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("503e5d36-327c-11e2-80d2-33e47888902d, 28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("5cbcd858-327c-11e2-82e9-27eb85d59274, 2fbf4592-e25a-11e1bae1-93374682bd20")))
 
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
@@ -1063,8 +1188,8 @@ class StepSuite extends BaseStepSuite {
 
   test ("In an XSD header step, if the header is not available then the request should contain an Exception") {
     val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
-    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->"28d42e00-e25a-11e1-9897-efbf2fa68353"))
-    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->"2fbf4592-e25a-11e1-bae1-93374682bd20"))
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
 
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)

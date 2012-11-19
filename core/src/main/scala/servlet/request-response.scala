@@ -19,7 +19,11 @@ import javax.xml.transform.stream.StreamResult
 import org.json.simple.JSONAware
 import org.w3c.dom.Document
 
+import java.util.Enumeration
+
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
+
+import scala.collection.JavaConversions._
 
 //
 //  Request Keys
@@ -78,6 +82,24 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       new BufferedReader(new InputStreamReader (getInputStream(), "UTF-8"))
     }else {
       super.getReader
+    }
+  }
+
+  override def getHeader (name : String) = {
+    val value = super.getHeader(name)
+    value match {
+      case null => null
+      case _ =>  name.split(",")(0).trim
+    }
+  }
+
+  override def getHeaders (name : String) : Enumeration[String] = {
+    val headers = super.getHeaders(name)
+    headers match {
+      case null => null
+      case _ => var list : List[String] = List()
+                headers.foreach(i => list = list ++ i.split(",").map(j => j.trim))
+                list.iterator
     }
   }
 }
