@@ -387,14 +387,14 @@
           4. [X] Add WADL validator tests [2/2]
                1. [X] Saxon
                2. [X] Xerces
-   2. [-] Handle fixed headers [2/7]
+   2. [-] Handle fixed headers [3/7]
           1. [X] Extend XSD to support Header Any[2/2]
              1. [X] Header Any regex
              2. [X] Header Any XSD
           2. [X] Add support in XSL
-          3. [ ] Write HeaderAny steps[0/2]
-             1. [ ] Header Any regex
-             2. [ ] Header Any XSD
+          3. [X] Write HeaderAny steps[2/2]
+             1. [X] Header Any regex
+             2. [X] Header Any XSD
           4. [ ] Update handler for new step
           5. [ ] Add Tests [0/3]
              1. [ ] Step Test
