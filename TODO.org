@@ -387,7 +387,7 @@
           4. [X] Add WADL validator tests [2/2]
                1. [X] Saxon
                2. [X] Xerces
-   2. [-] Handle fixed headers [4/7]
+   2. [-] Handle fixed headers [4/6]
           1. [X] Extend XSD to support Header Any[2/2]
              1. [X] Header Any regex
              2. [X] Header Any XSD
@@ -396,12 +396,11 @@
              1. [X] Header Any regex
              2. [X] Header Any XSD
           4. [X] Update handler for new step
-          5. [ ] Add Tests [0/3]
-             1. [ ] Step Test
+          5. [-] Add Tests [1/3]
+             1. [X] Step Test
              2. [ ] WADL Builder Tests
              3. [ ] WADL validator Tests
-          6. [ ] Cleanup builder XSL
-          7. [ ] Join fixed headers opt?
+          6. [ ] Join fixed headers opt?
    3. [ ] Handle default headers
 ** TODO PreProc Enhancements [0/5]
    1. [ ] Preproc and XSL step should be able to change content type
