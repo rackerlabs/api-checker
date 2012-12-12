@@ -57,6 +57,7 @@
         <pool.version>1.6</pool.version>
         <json-simple.version>1.1.1</json-simple.version>
         <xalan.version>2.7.1</xalan.version>
+        <metrics-scala.version>2.2.0</metrics-scala.version>
     </properties>
 
     <dependencies>
@@ -110,6 +111,11 @@
              <groupId>org.glassfish</groupId>
              <artifactId>javax.servlet</artifactId>
              <version>${servlet.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>com.yammer.metrics</groupId>
+             <artifactId>metrics-scala_2.9.1</artifactId>
+             <version>${metrics-scala.version}</version>
          </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>

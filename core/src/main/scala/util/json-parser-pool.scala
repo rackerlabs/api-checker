@@ -5,8 +5,12 @@ import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
 import org.json.simple.parser.JSONParser
 
-object JSONParserPool {
+import com.yammer.metrics.scala.Instrumented
+
+object JSONParserPool extends Instrumented {
   private val pool = new SoftReferenceObjectPool[JSONParser](new JSONParserFactory)
+  private val activeGauge = metrics.gauge("Active")(numActive)
+  private val idleGauge = metrics.gauge("Idle")(numIdle)
 
   def borrowParser : JSONParser = pool.borrowObject()
   def returnParser (parser : JSONParser) : Unit = pool.returnObject(parser)
