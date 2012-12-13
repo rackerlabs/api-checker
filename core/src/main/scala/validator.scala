@@ -31,6 +31,10 @@ import com.rackspace.com.papi.components.checker.servlet._
 import org.w3c.dom.Document
 
 import com.yammer.metrics.scala.Instrumented
+import com.yammer.metrics.scala.Meter
+import com.yammer.metrics.scala.Timer
+import com.yammer.metrics.scala.MetricsGroup
+import com.yammer.metrics.util.PercentGauge
 
 class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg, cause) {}
 
@@ -75,8 +79,17 @@ object Validator {
 
 class Validator private (val startStep : Step, val config : Config) extends Instrumented {
 
-  private val timer = metrics.timer(Integer.toHexString(hashCode()))
+  private class ValidatorFailGauge(private val timer : Timer,
+                                   private val failMeter : Meter) extends PercentGauge {
 
+    override def getNumerator = failMeter.oneMinuteRate
+    override def getDenominator = timer.oneMinuteRate
+  }
+
+  private val timer = metrics.timer("validation-timer", Integer.toHexString(hashCode()))
+  private val failMeter = metrics.meter("fail-meter", "fail", Integer.toHexString(hashCode()))
+  private val failGauge =  metricsRegistry.newGauge(getClass(), "fail-rate", Integer.toHexString(hashCode()),
+                                                   (new ValidatorFailGauge(timer, failMeter)))
   private val resultHandler = {
     if (config == null) {
       (new Config).resultHandler
@@ -92,6 +105,7 @@ class Validator private (val startStep : Step, val config : Config) extends Inst
       val cres = new CheckerServletResponse(res)
       val result = startStep.check (creq, cres, chain, 0).get
       resultHandler.handle(creq, cres, chain, result)
+      if (!result.valid) failMeter.mark()
       result
     } catch {
       case v : ValidatorException => throw v
