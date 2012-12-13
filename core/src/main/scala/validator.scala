@@ -39,12 +39,12 @@ import com.yammer.metrics.util.PercentGauge
 class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg, cause) {}
 
 object Validator {
-  def apply (startStep : Step, config : Config) : Validator = {
+  def apply (name : String, startStep : Step, config : Config) : Validator = {
     config.resultHandler.init(None)
-    new Validator(startStep, config)
+    new Validator(name, startStep, config)
   }
 
-  def apply (in : Source, config : Config = new Config) : Validator = {
+  def apply (name : String, in : Source, config : Config = new Config) : Validator = {
     val builder = new StepBuilder()
     val transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
 
@@ -58,26 +58,44 @@ object Validator {
     val step = builder.build(in, new SAXResult(transHandler), config)
 
     config.resultHandler.init(Some(domResult.getNode.asInstanceOf[Document]))
-    new Validator(step, config)
+    new Validator(name, step, config)
   }
 
-  def apply (in : Source, resultHandler : ResultHandler) : Validator = {
+  def apply (name : String, in : Source, resultHandler : ResultHandler) : Validator = {
     val config = new Config
     config.resultHandler = resultHandler
 
-    apply(in, config)
+    apply(name, in, config)
   }
 
-  def apply (in : (String, InputStream), config : Config) : Validator = {
-    apply (new StreamSource(in._2, in._1), config)
+  def apply (name : String, in : (String, InputStream), config : Config) : Validator = {
+    apply (name, new StreamSource(in._2, in._1), config)
   }
 
-  def apply (in : InputStream, config : Config) : Validator = {
-    apply (("test://path/to/mywadl.wadl", in), config)
+  def apply (name : String, in : InputStream, config : Config) : Validator = {
+    apply (name, ("test://path/to/mywadl.wadl", in), config)
   }
+
+  //
+  // The following are for backward compatability
+  //
+  def apply (startStep : Step, config : Config) : Validator = apply(null, startStep, config)
+  def apply (in : Source, config : Config) : Validator =  apply(null, in, config)
+  def apply (in : Source) : Validator =  apply(null, in, new Config)
+  def apply (in : Source, resultHandler : ResultHandler) : Validator = apply(null, in, resultHandler)
+  def apply (in : (String, InputStream), config : Config) : Validator = apply(null, in, config)
+  def apply (in : InputStream, config : Config) : Validator = apply (null, in, config)
 }
 
-class Validator private (val startStep : Step, val config : Config) extends Instrumented {
+class Validator private (private val _name : String, val startStep : Step, val config : Config) extends Instrumented {
+
+  val name = {
+    if (_name == null) {
+      Integer.toHexString(hashCode())
+    } else {
+      _name
+    }
+  }
 
   private class ValidatorFailGauge(private val timer : Timer,
                                    private val failMeter : Meter) extends PercentGauge {
@@ -86,10 +104,11 @@ class Validator private (val startStep : Step, val config : Config) extends Inst
     override def getDenominator = timer.oneMinuteRate
   }
 
-  private val timer = metrics.timer("validation-timer", Integer.toHexString(hashCode()))
-  private val failMeter = metrics.meter("fail-meter", "fail", Integer.toHexString(hashCode()))
-  private val failGauge =  metricsRegistry.newGauge(getClass(), "fail-rate", Integer.toHexString(hashCode()),
+  private val timer = metrics.timer("validation-timer", name)
+  private val failMeter = metrics.meter("fail-meter", "fail", name)
+  private val failGauge =  metricsRegistry.newGauge(getClass(), "fail-rate", name,
                                                    (new ValidatorFailGauge(timer, failMeter)))
+
   private val resultHandler = {
     if (config == null) {
       (new Config).resultHandler

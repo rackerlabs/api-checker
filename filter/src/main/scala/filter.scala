@@ -52,7 +52,7 @@ class ValidatorFilter extends Filter {
     conf.enableIgnoreXSDExtension = true
     conf.xslEngine = "XalanC"
 
-    validator = Validator(new SAXSource(new InputSource(wadlRef)), conf)
+    validator = Validator("Test Validator",new SAXSource(new InputSource(wadlRef)), conf)
   }
 
   override def doFilter (req : ServletRequest, resp : ServletResponse, chain : FilterChain) : Unit = {
