@@ -14,7 +14,7 @@ import javax.servlet.FilterChain
 import org.w3c.dom.Document
 
 class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandler {
-  def init (checker : Option[Document]) : Unit = {}
+  def init (validator : Validator, checker : Option[Document]) : Unit = {}
 
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
     Console.withOut(out) {

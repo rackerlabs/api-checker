@@ -40,8 +40,9 @@ class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg,
 
 object Validator {
   def apply (name : String, startStep : Step, config : Config) : Validator = {
-    config.resultHandler.init(None)
-    new Validator(name, startStep, config)
+    val validator = new Validator(name, startStep, config)
+    config.resultHandler.init(validator, None)
+    validator
   }
 
   def apply (name : String, in : Source, config : Config = new Config) : Validator = {
@@ -57,8 +58,9 @@ object Validator {
     transHandler.setResult(domResult)
     val step = builder.build(in, new SAXResult(transHandler), config)
 
-    config.resultHandler.init(Some(domResult.getNode.asInstanceOf[Document]))
-    new Validator(name, step, config)
+    val validator = new Validator(name, step, config)
+    config.resultHandler.init(validator, Some(domResult.getNode.asInstanceOf[Document]))
+    validator
   }
 
   def apply (name : String, in : Source, resultHandler : ResultHandler) : Validator = {
