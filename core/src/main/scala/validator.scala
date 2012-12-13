@@ -30,6 +30,8 @@ import com.rackspace.com.papi.components.checker.servlet._
 
 import org.w3c.dom.Document
 
+import com.yammer.metrics.scala.Instrumented
+
 class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg, cause) {}
 
 object Validator {
@@ -71,7 +73,9 @@ object Validator {
   }
 }
 
-class Validator private (val startStep : Step, val config : Config) {
+class Validator private (val startStep : Step, val config : Config) extends Instrumented {
+
+  private val timer = metrics.timer(Integer.toHexString(hashCode()))
 
   private val resultHandler = {
     if (config == null) {
@@ -82,6 +86,7 @@ class Validator private (val startStep : Step, val config : Config) {
   }
 
   def validate (req : HttpServletRequest, res : HttpServletResponse, chain : FilterChain) : Result = {
+    val context = timer.timerContext()
     try {
       val creq = new CheckerServletRequest (req)
       val cres = new CheckerServletResponse(res)
@@ -91,6 +96,8 @@ class Validator private (val startStep : Step, val config : Config) {
     } catch {
       case v : ValidatorException => throw v
       case e => throw new ValidatorException("Error while validating request", e)
+    } finally {
+      context.stop
     }
   }
 }
