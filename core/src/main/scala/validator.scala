@@ -4,6 +4,9 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.FilterChain
 
+import java.lang.management._
+import javax.management._
+
 import javax.xml.transform._
 import javax.xml.transform.sax._
 import javax.xml.transform.stream._
@@ -16,10 +19,12 @@ import javax.xml.parsers.SAXParserFactory
 import java.io.InputStream
 import java.io.ByteArrayOutputStream
 import java.io.Reader
+import java.io.StringWriter
 
 import scala.xml._
 
 import com.rackspace.com.papi.components.checker.wadl.StepBuilder
+import com.rackspace.com.papi.components.checker.wadl.WADLDotBuilder
 
 import com.rackspace.com.papi.components.checker.step.Step
 import com.rackspace.com.papi.components.checker.step.Result
@@ -28,7 +33,11 @@ import com.rackspace.com.papi.components.checker.handler.ResultHandler
 
 import com.rackspace.com.papi.components.checker.servlet._
 
+import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
+
 import org.w3c.dom.Document
+
+import org.apache.commons.codec.digest.DigestUtils.sha1Hex
 
 import com.yammer.metrics.scala.Instrumented
 import com.yammer.metrics.scala.Meter
@@ -59,7 +68,10 @@ object Validator {
     val step = builder.build(in, new SAXResult(transHandler), config)
 
     val validator = new Validator(name, step, config)
-    config.resultHandler.init(validator, Some(domResult.getNode.asInstanceOf[Document]))
+    val checker = domResult.getNode.asInstanceOf[Document]
+    val checkerMBean = new Checker(validator, checker)
+
+    config.resultHandler.init(validator, Some(checker))
     validator
   }
 
@@ -87,6 +99,53 @@ object Validator {
   def apply (in : Source, resultHandler : ResultHandler) : Validator = apply(null, in, resultHandler)
   def apply (in : (String, InputStream), config : Config) : Validator = apply(null, in, config)
   def apply (in : InputStream, config : Config) : Validator = apply (null, in, config)
+}
+
+
+trait CheckerMBean {
+  def checkerXML : String
+  def checkerDOT : String
+  def getXmlSHA1 : String
+  def getDotSHA1 : String
+}
+
+class Checker (private val validator : Validator, private val checker : Document) extends CheckerMBean {
+
+  private val mbs = ManagementFactory.getPlatformMBeanServer()
+  private val name = new ObjectName("\"com.rackspace.com.papi.components.checker\":type=\"Validator\",scope=\""+
+                            validator.name+"\",name=\"checker\"")
+  mbs.registerMBean(this, name)
+
+  private val xml = {
+    val transformer = IdentityTransformPool.borrowTransformer
+    try {
+      val writer = new StringWriter()
+      transformer.setOutputProperty (OutputKeys.INDENT, "yes")
+      transformer.transform (new DOMSource(checker), new StreamResult(writer))
+      writer.toString
+    } finally {
+      if (transformer != null) {
+        IdentityTransformPool.returnTransformer(transformer)
+      }
+    }
+  }
+
+  private val xmlSHA1 = sha1Hex(xml)
+
+  private val dot = {
+    val writer = new StringWriter()
+    val dotBuilder = new WADLDotBuilder()
+
+    dotBuilder.buildFromChecker (new DOMSource(checker), new StreamResult (writer), true, true)
+    writer.toString
+  }
+
+  private val dotSHA1 = sha1Hex(dot)
+
+  override def checkerXML = xml
+  override def checkerDOT = dot
+  override def getXmlSHA1 = xmlSHA1
+  override def getDotSHA1 = dotSHA1
 }
 
 class Validator private (private val _name : String, val startStep : Step, val config : Config) extends Instrumented {
