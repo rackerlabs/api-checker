@@ -25,8 +25,8 @@ object ValidatorPool extends Instrumented {
 
   private def addPool(schema : Schema) : SoftReferenceObjectPool[Validator] = {
     val pool = new SoftReferenceObjectPool[Validator](new ValidatorFactory(schema))
-    activeGauges :+ metrics.gauge(Integer.toHexString(schema.hashCode())+" Active")(pool.getNumActive)
-    idleGauges :+ metrics.gauge(Integer.toHexString(schema.hashCode())+" Idle")(pool.getNumIdle)
+    activeGauges :+ metrics.gauge("Active", Integer.toHexString(schema.hashCode()))(pool.getNumActive)
+    idleGauges :+ metrics.gauge("Idle", Integer.toHexString(schema.hashCode()))(pool.getNumIdle)
     pool
   }
 
@@ -80,8 +80,8 @@ object ValidatorHandlerPool extends Instrumented {
 
   private def addPool(schema : Schema) : SoftReferenceObjectPool[ValidatorHandler] = {
     val pool = new SoftReferenceObjectPool[ValidatorHandler](new ValidatorHandlerFactory(schema))
-    activeGauges :+ metrics.gauge(Integer.toHexString(schema.hashCode())+" Active")(pool.getNumActive)
-    idleGauges :+ metrics.gauge(Integer.toHexString(schema.hashCode())+" Idle")(pool.getNumIdle)
+    activeGauges :+ metrics.gauge("Active", Integer.toHexString(schema.hashCode()))(pool.getNumActive)
+    idleGauges :+ metrics.gauge("Idle", Integer.toHexString(schema.hashCode()))(pool.getNumIdle)
     pool
   }
 

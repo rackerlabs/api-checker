@@ -27,8 +27,8 @@ object XPathExpressionPool extends Instrumented {
     val pool = new SoftReferenceObjectPool[XPathExpression](version match { case 1 => new XPathExpressionFactory(expression, nc)
                                                                             case 2 => new XPath2ExpressionFactory(expression, nc)
                                                                          })
-    activeGauges :+ metrics.gauge(expression+" ("+version+") Active")(pool.getNumActive)
-    idleGauges :+ metrics.gauge(expression+" ("+version+") Idle")(pool.getNumIdle)
+    activeGauges :+ metrics.gauge("Active", expression+" ("+version+")")(pool.getNumActive)
+    idleGauges :+ metrics.gauge("Idle", expression+" ("+version+")")(pool.getNumIdle)
     pool
   }
 

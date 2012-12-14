@@ -42,8 +42,8 @@ object TransformPool extends Instrumented {
 
   private def addPool(templates : Templates) : SoftReferenceObjectPool[Transformer] = {
     val pool = new SoftReferenceObjectPool[Transformer](new XSLTransformerFactory(templates))
-    activeGauges :+ metrics.gauge(Integer.toHexString(templates.hashCode())+" Active")(pool.getNumActive)
-    idleGauges :+ metrics.gauge(Integer.toHexString(templates.hashCode())+" Idle")(pool.getNumIdle)
+    activeGauges :+ metrics.gauge("Active", Integer.toHexString(templates.hashCode()))(pool.getNumActive)
+    idleGauges :+ metrics.gauge("Idle", Integer.toHexString(templates.hashCode()))(pool.getNumIdle)
     pool
   }
 
