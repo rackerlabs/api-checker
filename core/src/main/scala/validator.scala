@@ -67,11 +67,10 @@ object Validator {
     transHandler.setResult(domResult)
     val step = builder.build(in, new SAXResult(transHandler), config)
 
-    val validator = new Validator(name, step, config)
-    val checker = domResult.getNode.asInstanceOf[Document]
-    val checkerMBean = new Checker(validator, checker)
+    val checker = Some(domResult.getNode.asInstanceOf[Document])
+    val validator = new Validator(name, step, config, checker)
+    config.resultHandler.init(validator, checker)
 
-    config.resultHandler.init(validator, Some(checker))
     validator
   }
 
@@ -102,60 +101,68 @@ object Validator {
 }
 
 
-trait CheckerMBean {
+trait ValidatorMBean {
   def checkerXML : String
   def checkerDOT : String
   def getXmlSHA1 : String
   def getDotSHA1 : String
 }
 
-class Checker (private val validator : Validator, private val checker : Document) extends CheckerMBean {
+class Validator private (private val _name : String, val startStep : Step, val config : Config, val checker : Option[Document] = None) extends Instrumented  with ValidatorMBean {
 
-  private val mbs = ManagementFactory.getPlatformMBeanServer()
-  private val name = new ObjectName("\"com.rackspace.com.papi.components.checker\":type=\"Validator\",scope=\""+
-                            validator.name+"\",name=\"checker\"")
-  mbs.registerMBean(this, name)
+  val name = _name match {
+    case null => Integer.toHexString(hashCode())
+    case _ => _name
+  }
+
+  //
+  //  Register with MBeanServer if the checker document is defined.
+  //
+  if (checker.isDefined) {
+    ManagementFactory.getPlatformMBeanServer().
+    registerMBean(this,
+                  new ObjectName("\"com.rackspace.com.papi.components.checker\":type=\"Validator\",scope=\""+
+                                 name+"\",name=\"checker\""))
+  }
 
   private val xml = {
-    val transformer = IdentityTransformPool.borrowTransformer
-    try {
-      val writer = new StringWriter()
-      transformer.setOutputProperty (OutputKeys.INDENT, "yes")
-      transformer.transform (new DOMSource(checker), new StreamResult(writer))
-      writer.toString
-    } finally {
-      if (transformer != null) {
-        IdentityTransformPool.returnTransformer(transformer)
-      }
+    checker match {
+      case None => null
+      case _ =>
+        val transformer = IdentityTransformPool.borrowTransformer
+        try {
+          val writer = new StringWriter()
+          transformer.setOutputProperty (OutputKeys.INDENT, "yes")
+          transformer.transform (new DOMSource(checker.get), new StreamResult(writer))
+          writer.toString
+        } finally {
+          if (transformer != null) {
+            IdentityTransformPool.returnTransformer(transformer)
+          }
+        }
     }
   }
 
-  private val xmlSHA1 = sha1Hex(xml)
+  private val xmlSHA1 = xml match {
+      case null => null
+      case _ => sha1Hex(xml)
+  }
 
   private val dot = {
-    val writer = new StringWriter()
-    val dotBuilder = new WADLDotBuilder()
+    checker match {
+      case None => null
+      case _ =>
+        val writer = new StringWriter()
+        val dotBuilder = new WADLDotBuilder()
 
-    dotBuilder.buildFromChecker (new DOMSource(checker), new StreamResult (writer), true, true)
-    writer.toString
+        dotBuilder.buildFromChecker (new DOMSource(checker.get), new StreamResult (writer), true, true)
+        writer.toString
+    }
   }
 
-  private val dotSHA1 = sha1Hex(dot)
-
-  override def checkerXML = xml
-  override def checkerDOT = dot
-  override def getXmlSHA1 = xmlSHA1
-  override def getDotSHA1 = dotSHA1
-}
-
-class Validator private (private val _name : String, val startStep : Step, val config : Config) extends Instrumented {
-
-  val name = {
-    if (_name == null) {
-      Integer.toHexString(hashCode())
-    } else {
-      _name
-    }
+  private val dotSHA1 = dot match {
+    case null => null
+    case _ => sha1Hex(dot)
   }
 
   private class ValidatorFailGauge(private val timer : Timer,
@@ -194,4 +201,12 @@ class Validator private (private val _name : String, val startStep : Step, val c
       context.stop
     }
   }
+
+  //
+  // MBean Impl
+  //
+  override def checkerXML = xml
+  override def checkerDOT = dot
+  override def getXmlSHA1 = xmlSHA1
+  override def getDotSHA1 = dotSHA1
 }
