@@ -364,7 +364,7 @@
 ** TODO Instrument Code[2/3]
    1. [X] Update TO Scala 2.9.1 (Needed for yammer mettrics)
    2. [X] Add support for yammer metrics
-   3. [-] Instrument [8/9]
+   3. [-] Instrument [9/10]
       1. [X] XML Pool
       2. [X] JSON Pool
       3. [X] Transform Pool
@@ -373,7 +373,8 @@
       6. [X] Validator
       7. [X] Error Rates
       8. [X] Allow validators to be named
-      9. [ ] Instrument Handler
+      9. [X] Instrument Handler
+      10. [ ] JMX Operation to get checker
 ** TODO Header Enhancements [1/3]
    1. [X] Multiple header checks with the same name [4/4]
           1. [X] Allow checks in steps via enumeration

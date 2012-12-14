@@ -35,7 +35,8 @@ class ValidatorFilter extends Filter {
     System.out.println ("Dot file is at: "+dot)
 
     val resultHandler = new DispatchResultHandler(List[ResultHandler](new SaveDotHandler(dot, true, true),
-                                                                      new ServletResultHandler()))
+                                                                      new ServletResultHandler(),
+                                                                      new InstrumentedHandler()))
 
     val conf = new Config
     conf.resultHandler = resultHandler
