@@ -35,7 +35,8 @@ class ValidatorFilter extends Filter {
     System.out.println ("Dot file is at: "+dot)
 
     val resultHandler = new DispatchResultHandler(List[ResultHandler](new SaveDotHandler(dot, true, true),
-                                                                      new ServletResultHandler()))
+                                                                      new ServletResultHandler(),
+                                                                      new InstrumentedHandler()))
 
     val conf = new Config
     conf.resultHandler = resultHandler
@@ -52,7 +53,7 @@ class ValidatorFilter extends Filter {
     conf.enableIgnoreXSDExtension = true
     conf.xslEngine = "XalanC"
 
-    validator = Validator(new SAXSource(new InputSource(wadlRef)), conf)
+    validator = Validator("Test Validator",new SAXSource(new InputSource(wadlRef)), conf)
   }
 
   override def doFilter (req : ServletRequest, resp : ServletResponse, chain : FilterChain) : Unit = {

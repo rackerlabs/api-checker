@@ -7,8 +7,12 @@ import javax.xml.parsers.DocumentBuilder
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-object XMLParserPool {
+import com.yammer.metrics.scala.Instrumented
+
+object XMLParserPool extends Instrumented {
   private val pool = new SoftReferenceObjectPool[DocumentBuilder](new XMLParserFactory)
+  private val activeGauge = metrics.gauge("Active")(numActive)
+  private val idleGauge = metrics.gauge("Idle")(numIdle)
 
   def borrowParser : DocumentBuilder = pool.borrowObject()
   def returnParser (builder : DocumentBuilder) : Unit = pool.returnObject(builder)

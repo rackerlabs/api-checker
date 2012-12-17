@@ -5,6 +5,7 @@ import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
+import scala.collection.mutable.LinkedList
 
 import javax.xml.namespace.NamespaceContext
 
@@ -12,16 +13,31 @@ import javax.xml.xpath.XPathExpression
 import javax.xml.xpath.XPathFactory
 import javax.xml.xpath.XPathFactory._
 
-object XPathExpressionPool {
+import com.yammer.metrics.core.Gauge
+import com.yammer.metrics.scala.Instrumented
+
+object XPathExpressionPool extends Instrumented {
   private val xpathExpressions : Map[String, SoftReferenceObjectPool[XPathExpression]] = new HashMap[String, SoftReferenceObjectPool[XPathExpression]]
   private val xpath2Expressions : Map[String, SoftReferenceObjectPool[XPathExpression]] = new HashMap[String, SoftReferenceObjectPool[XPathExpression]]
+
+  private val activeGauges = new LinkedList[Gauge[Int]]
+  private val idleGauges = new LinkedList[Gauge[Int]]
+
+  private def addXPathPool(expression : String, nc : NamespaceContext, version : Int) : SoftReferenceObjectPool[XPathExpression] = {
+    val pool = new SoftReferenceObjectPool[XPathExpression](version match { case 1 => new XPathExpressionFactory(expression, nc)
+                                                                            case 2 => new XPath2ExpressionFactory(expression, nc)
+                                                                         })
+    activeGauges :+ metrics.gauge("Active", expression+" ("+version+")")(pool.getNumActive)
+    idleGauges :+ metrics.gauge("Idle", expression+" ("+version+")")(pool.getNumIdle)
+    pool
+  }
 
   def borrowExpression(expression : String, nc : NamespaceContext, version : Int) : XPathExpression = {
     version match {
       case 1 =>
-        xpathExpressions.getOrElseUpdate(expression, new SoftReferenceObjectPool[XPathExpression](new XPathExpressionFactory(expression, nc))).borrowObject()
+        xpathExpressions.getOrElseUpdate(expression, addXPathPool(expression, nc, version)).borrowObject()
       case 2 =>
-        xpath2Expressions.getOrElseUpdate(expression, new SoftReferenceObjectPool[XPathExpression](new XPath2ExpressionFactory(expression, nc))).borrowObject()
+        xpath2Expressions.getOrElseUpdate(expression, addXPathPool(expression,nc,version)).borrowObject()
     }
   }
 

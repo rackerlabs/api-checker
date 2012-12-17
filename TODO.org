@@ -361,6 +361,22 @@
    3. [X] Handle in builder.xsl
    4. [X] Handler Tests
    5. [X] WADL validator tests
+** DONE Instrument Code[3/3]
+   1. [X] Update TO Scala 2.9.1 (Needed for yammer mettrics)
+   2. [X] Add support for yammer metrics
+   3. [X] Instrument [12/12]
+      1. [X] XML Pool
+      2. [X] JSON Pool
+      3. [X] Transform Pool
+      4. [X] Schema Pool
+      5. [X] xPath Pool
+      6. [X] Validator
+      7. [X] Error Rates
+      8. [X] Allow validators to be named
+      9. [X] Instrument Handler
+      10. [X] JMX Operation to get checker
+      11. [X] Cleanup
+      12. [X] Keep track of last X errors.
 ** TODO Header Enhancements [1/3]
    1. [X] Multiple header checks with the same name [4/4]
           1. [X] Allow checks in steps via enumeration

@@ -2,6 +2,7 @@ package com.rackspace.com.papi.components.checker.util
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
+import scala.collection.mutable.LinkedList
 
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
@@ -13,7 +14,10 @@ import javax.xml.transform.Transformer
 import net.sf.saxon.Controller
 import net.sf.saxon.serialize.MessageWarner
 
-object IdentityTransformPool {
+import com.yammer.metrics.core.Gauge
+import com.yammer.metrics.scala.Instrumented
+
+object IdentityTransformPool extends Instrumented  {
   //
   //  We purposly use Xalan-C for identity transform, it's fast and we
   //  avoid licence check in SaxonEE, which for some reason is always
@@ -21,6 +25,8 @@ object IdentityTransformPool {
   //
   private val tf = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
   private val pool = new SoftReferenceObjectPool[Transformer](new IdentityTransformerFactory(tf))
+  private val activeGauge = metrics.gauge("Active")(numActive)
+  private val idleGauge = metrics.gauge("Idle")(numIdle)
 
   def borrowTransformer : Transformer = pool.borrowObject()
   def returnTransformer (transformer : Transformer) : Unit = pool.returnObject(transformer)
@@ -28,10 +34,18 @@ object IdentityTransformPool {
   def numIdle : Int = pool.getNumIdle()
 }
 
-object TransformPool {
+object TransformPool extends Instrumented {
   private val transformPools : Map[Templates, SoftReferenceObjectPool[Transformer]] = new HashMap[Templates, SoftReferenceObjectPool[Transformer]]
-  private def pool (templates : Templates) : SoftReferenceObjectPool[Transformer] =
-    transformPools.getOrElseUpdate (templates, new SoftReferenceObjectPool[Transformer](new XSLTransformerFactory(templates)))
+  private val activeGauges = new LinkedList[Gauge[Int]]
+  private val idleGauges = new LinkedList[Gauge[Int]]
+  private def pool (templates : Templates) : SoftReferenceObjectPool[Transformer] = transformPools.getOrElseUpdate (templates, addPool(templates))
+
+  private def addPool(templates : Templates) : SoftReferenceObjectPool[Transformer] = {
+    val pool = new SoftReferenceObjectPool[Transformer](new XSLTransformerFactory(templates))
+    activeGauges :+ metrics.gauge("Active", Integer.toHexString(templates.hashCode()))(pool.getNumActive)
+    idleGauges :+ metrics.gauge("Idle", Integer.toHexString(templates.hashCode()))(pool.getNumIdle)
+    pool
+  }
 
   def borrowTransformer (templates : Templates) = pool(templates).borrowObject
   def returnTransformer (templates : Templates, transformer : Transformer) = pool(templates).returnObject(transformer)

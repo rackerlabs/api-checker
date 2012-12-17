@@ -18,7 +18,7 @@ class SaveDotHandler(val out : File, val ignoreSinks : Boolean, nfaMode : Boolea
 
   val dotBuilder = new WADLDotBuilder()
 
-  def init (checker : Option[Document]) : Unit = {
+  def init (validator : Validator, checker : Option[Document]) : Unit = {
     if (checker != None) {
       dotBuilder.buildFromChecker (new DOMSource(checker.get), new StreamResult (out), ignoreSinks, nfaMode)
     }

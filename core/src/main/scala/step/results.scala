@@ -20,10 +20,23 @@ abstract class Result(val message : String,   // A message describing the result
     stepIDs = stepId +: stepIDs
   }
 
-  override def toString : String = message
+  protected val startPath = "["
+  protected val endPath = "]"
+
+  def path : String = startPath+stepIDs.reduceLeft(_+" "+_)+endPath
+  def cmpString : String = message+" "+path+" "+terminal+" "+uriLevel
+  override def toString : String = path
+  override def hashCode : Int = cmpString.hashCode
+  override def equals (any : Any) : Boolean = {
+    any match {
+      case r : Result => this.hashCode() == r.hashCode()
+      case _ => false
+    }
+  }
 }
 abstract class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String) extends Result(message, false, true, uriLevel, stepId) {
-  override def toString : String = code+" : "+message
+  override def toString : String = path+" "+code+" : "+message
+  override def cmpString : String = super.cmpString+" "+code
 }
 
 class AcceptResult(message: String, uriLevel : Int, stepId : String)  extends Result(message, true, true, uriLevel, stepId)
@@ -31,11 +44,32 @@ class BadContentResult(message : String, uriLevel : Int, stepId : String) extend
 class URLFailResult(message : String, uriLevel : Int, stepId : String) extends ErrorResult(message, 404, uriLevel, stepId)
 class MethodFailResult(message: String, uriLevel : Int, stepId : String) extends ErrorResult(message, 405, uriLevel, stepId)
 class BadMediaTypeResult(message: String, uriLevel : Int, stepId : String) extends ErrorResult(message, 415, uriLevel, stepId)
-class MismatchResult(message: String, uriLevel : Int, stepId : String) extends Result(message, false, false, uriLevel, stepId)
+class MismatchResult(message: String, uriLevel : Int, stepId : String) extends Result(message, false, false, uriLevel, stepId) {
+  override protected val startPath = "("
+  override protected val endPath = ")"
+}
 
 class MultiFailResult(val fails : Array[Result], uriLevel : Int, stepId : String)
       extends Result ("Multiple possible errors", false, false, uriLevel, stepId)
 {
+  override protected val startPath = "{"
+  override protected val endPath = "}"
+
+  override def path : String = startPath+(for {f <- fails} yield f.path).reduceLeft(_+" "+_)+endPath
+
+  override def toString : String = {
+    reduce match {
+      case Some(e : ErrorResult) => path+" "+e.code+" : "+e.message
+      case Some(r : Result) => path
+      case None => path
+    }
+  }
+
+  override def cmpString : String = {
+    val cmpStrings : Array[String]= for {f <- fails} yield f.cmpString
+    cmpStrings.reduceLeft(_+" "+_)+" "+uriLevel+" "+stepId
+  }
+
   //
   //  Pick a single fail result out of the possible set of failers.
   //
@@ -52,5 +86,4 @@ class MultiFailResult(val fails : Array[Result], uriLevel : Int, stepId : String
       })
     None
   }
-
 }
