@@ -47,7 +47,7 @@ import org.w3c.dom.Document
  * the request in invalid.
  */
 class AssertResultHandler extends ResultHandler {
-  def init(checker : Option[Document]) : Unit = {}
+  def init(validator : Validator, checker : Option[Document]) : Unit = {}
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
     if (!result.valid) {
       throw new ResultFailedException("Validation failed",req,resp,chain,result)

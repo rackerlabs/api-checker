@@ -45,7 +45,7 @@
     </distributionManagement>
 
     <properties>
-        <scala.version>2.9.0</scala.version>
+        <scala.version>2.9.1</scala.version>
         <saxon-ee.version>9.4.0.4</saxon-ee.version>
         <scala.test.version>1.6.1</scala.test.version>
         <junit.version>4.10</junit.version>
@@ -55,8 +55,10 @@
         <servlet.version>3.1</servlet.version>
         <mockito.version>1.9.0</mockito.version>
         <pool.version>1.6</pool.version>
+        <codec.version>1.7</codec.version>
         <json-simple.version>1.1.1</json-simple.version>
         <xalan.version>2.7.1</xalan.version>
+        <metrics-scala.version>2.2.0</metrics-scala.version>
     </properties>
 
     <dependencies>
@@ -106,10 +108,20 @@
             <artifactId>commons-pool</artifactId>
             <version>${pool.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${codec.version}</version>
+        </dependency>
          <dependency>
              <groupId>org.glassfish</groupId>
              <artifactId>javax.servlet</artifactId>
              <version>${servlet.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>com.yammer.metrics</groupId>
+             <artifactId>metrics-scala_2.9.1</artifactId>
+             <version>${metrics-scala.version}</version>
          </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
