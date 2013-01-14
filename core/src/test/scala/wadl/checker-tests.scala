@@ -52,6 +52,211 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, Start, MethodFail)
     }
 
+    scenario("The WADL contains an explicit root element, with no methods on the root") {
+      given("a WADL with an explicit root element, no methods on root")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="/">
+                <resource path="element">
+                    <method name="GET">
+                        <response status="200"/>
+                    </method>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      val checker = builder.build (inWADL, stdConfig)
+      then("The checker should contain an URL node only for the element")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 1")
+      and ("The checker should contain a single GET method")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      and ("The checker should NOT contian URL steps with a match == '/'")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
+      and ("The URL path should simply be from Start to the element")
+      assert (checker, Start, URL("element"), Method("GET"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("element"), URLFail)
+      assert (checker, URL("element"), MethodFail)
+    }
+
+    scenario("The WADL contains an explicit root element, with methods on the root") {
+      given("a WADL with an explicit root element, methods on root")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="/">
+                <method name="GET">
+                    <response status="200"/>
+                </method>
+                <resource path="element">
+                    <method name="GET">
+                        <response status="200"/>
+                    </method>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      val checker = builder.build (inWADL, stdConfig)
+      then("The checker should contain an URL node only for the element")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 1")
+      and ("The checker should contain two GET methods")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
+      and ("The checker should NOT contian URL steps with a match == '/'")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
+      and ("The URL path should exist from Start to the element")
+      assert (checker, Start, URL("element"), Method("GET"))
+      and ("The URL path should exist from START directly to GET method")
+      assert (checker, Start, Method("GET"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("element"), URLFail)
+      assert (checker, URL("element"), MethodFail)
+    }
+
+    scenario("The WADL contains a / path deeper in the URI structure") {
+      given("a WADL that contains a / path deefer in the URI structure")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="/">
+                <method name="GET">
+                    <response status="200"/>
+                </method>
+                <resource path="element">
+                    <resource path="/">
+                       <method name="GET">
+                          <response status="200"/>
+                       </method>
+                    </resource>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      val checker = builder.build (inWADL, stdConfig)
+      then("The checker should contain an URL node only for the element")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 1")
+      and ("The checker should contain two GET methods")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
+      and ("The checker should NOT contian URL steps with a match == '/'")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
+      and ("The URL path should exist from Start to the element")
+      assert (checker, Start, URL("element"), Method("GET"))
+      and ("The URL path should exist from START directly to GET method")
+      assert (checker, Start, Method("GET"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("element"), URLFail)
+      assert (checker, URL("element"), MethodFail)
+    }
+
+    scenario("The WADL contains a / path deeper in the URI structure (with sub elements)") {
+      given("a WADL that contains a / path deeper in the URI structure")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="/">
+                <method name="GET">
+                    <response status="200"/>
+                </method>
+                <resource path="element">
+                    <resource path="/">
+                       <method name="GET">
+                          <response status="200"/>
+                       </method>
+                       <resource path="element2">
+                          <method name="POST">
+                            <response status="200"/>
+                          </method>
+                       </resource>
+                    </resource>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      val checker = builder.build (inWADL, stdConfig)
+      then("The checker should contain an URL node and element2")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 2")
+      and ("The checker should contain two GET methods")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
+      and ("The checker should contain a POST methods")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 1")
+      and ("The checker should NOT contian URL steps with a match == '/'")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
+      and ("The URL path should exist from Start to the element")
+      assert (checker, Start, URL("element"), Method("GET"))
+      and ("The URL path should exist from Start to the element2")
+      assert (checker, Start, URL("element"), URL("element2"), Method("POST"))
+      and ("The URL path should exist from START directly to GET method")
+      assert (checker, Start, Method("GET"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("element"), URLFail)
+      assert (checker, URL("element"), MethodFail)
+      assert (checker, URL("element2"), URLFail)
+      assert (checker, URL("element2"), MethodFail)
+    }
+
+
+    scenario("The WADL contains a / path deeper in the URI structure (with sub elements and multiple nested '/')") {
+      given("a WADL that contains a / path deeper in the URI structure")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="/">
+                <method name="GET">
+                    <response status="200"/>
+                </method>
+                <resource path="element">
+                    <resource path="/">
+                      <resource path="/">
+                        <method name="GET">
+                           <response status="200"/>
+                        </method>
+                        <resource path="element2">
+                          <method name="POST">
+                            <response status="200"/>
+                          </method>
+                        </resource>
+                     </resource>
+                    </resource>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      val checker = builder.build (inWADL, stdConfig)
+      then("The checker should contain an URL node and element2")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 2")
+      and ("The checker should contain two GET methods")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
+      and ("The checker should contain a POST methods")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 1")
+      and ("The checker should NOT contian URL steps with a match == '/'")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
+      and ("The URL path should exist from Start to the element")
+      assert (checker, Start, URL("element"), Method("GET"))
+      and ("The URL path should exist from Start to the element2")
+      assert (checker, Start, URL("element"), URL("element2"), Method("POST"))
+      and ("The URL path should exist from START directly to GET method")
+      assert (checker, Start, Method("GET"))
+      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("element"), URLFail)
+      assert (checker, URL("element"), MethodFail)
+      assert (checker, URL("element2"), URLFail)
+      assert (checker, URL("element2"), MethodFail)
+    }
 
     //
     //  The following scenarios test a single resource located at
