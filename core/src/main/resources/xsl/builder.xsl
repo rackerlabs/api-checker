@@ -896,8 +896,10 @@
         
     <xsl:function name="check:getNextURLLinks" as="xsd:string*">
         <xsl:param name="from" as="node()"/>
-        <xsl:sequence select="for $r in $from/wadl:resource return 
-            if (xsd:boolean($r/@rax:invisible)) then
+        <xsl:sequence select="for $r in $from/wadl:resource return
+            if ($r/@path = '/') then
+            (check:getNextURLLinks($r))
+            else if (xsd:boolean($r/@rax:invisible)) then
             (generate-id($r), check:getNextURLLinks($r))
             else generate-id($r)"/>
     </xsl:function>
@@ -942,8 +944,8 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:for-each-group>
-        <xsl:if test="$from/wadl:resource[@rax:invisible]">
-            <xsl:for-each select="$from/wadl:resource[@rax:invisible]">
+        <xsl:if test="$from/wadl:resource[@rax:invisible] or $from/wadl:resource[@path='/']">
+            <xsl:for-each select="$from/wadl:resource[@rax:invisible] | $from/wadl:resource[@path='/']">
                 <xsl:sequence select="check:getNextMethodLinks(.)"/>
             </xsl:for-each>
         </xsl:if>
