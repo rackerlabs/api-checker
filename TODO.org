@@ -396,9 +396,9 @@
              1. [X] Header Any regex
              2. [X] Header Any XSD
           4. [X] Update handler for new step
-          5. [-] Add Tests [1/3]
+          5. [-] Add Tests [2/3]
              1. [X] Step Test
-             2. [ ] WADL Builder Tests
+             2. [X] WADL Builder Tests
              3. [ ] WADL validator Tests
           6. [ ] Join fixed headers opt?
    3. [ ] Handle default headers
