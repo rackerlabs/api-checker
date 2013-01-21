@@ -19,6 +19,7 @@
     <xsl:param name="enablePlainParamCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePreProcessExtension" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableIgnoreXSDExtension" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enableMessageExtension" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableHeaderCheck" as="xsd:boolean" select="false()"/>
 
     <!-- Do we have an XSD? -->
@@ -47,6 +48,8 @@
                           $enablePlainParamCheck or $enablePreProcessExtension"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
                   select="$enableHeaderCheck"/>
+    <xsl:variable name="useMessageExtension" as="xsd:boolean"
+                  select="$enableMessageExtension"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -805,13 +808,15 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:attribute name="match" select="concat('/',check:normType(resolve-QName(@element,.)))"/>
-                <xsl:attribute name="message" select="concat('Expecting the root elemest to be: ',check:normType(resolve-QName(@element,.)))"/>
+                <xsl:if test="$useMessageExtension">
+                    <xsl:attribute name="message" select="concat('Expecting the root elemest to be: ',check:normType(resolve-QName(@element,.)))"/>
+                </xsl:if>
             </step>
         </xsl:if>
         <xsl:if test="$doReqPlainParam">
             <xsl:for-each select="$defaultPlainParams">
                 <step type="XPATH" id="{check:XPathID($this,position())}" match="{@path}">
-                    <xsl:if test="@rax:message">
+                    <xsl:if test="@rax:message and $useMessageExtension">
                         <xsl:attribute name="message" select="@rax:message"/>
                     </xsl:if>
                     <xsl:choose>
