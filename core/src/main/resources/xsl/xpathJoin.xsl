@@ -141,8 +141,9 @@
                         <xsl:apply-templates select="$steps" mode="join"/>
                         <xslout:otherwise>
                             <xslout:message terminate="yes">
-                                <xsl:text>Expecting: </xsl:text>
-                                <xsl:value-of select="$steps[@type='XPATH']/@match" separator=" or "/>
+                                <xsl:value-of select="for $s in $steps[@type='XPATH'] return
+                                                        if ($s/@message) then $s/@message
+                                                        else concat('Expecting ',$s/@match)" separator=" or "/>
                             </xslout:message>
                         </xslout:otherwise>
                     </xslout:choose>
