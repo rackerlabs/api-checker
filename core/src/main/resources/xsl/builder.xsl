@@ -805,11 +805,15 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:attribute name="match" select="concat('/',check:normType(resolve-QName(@element,.)))"/>
+                <xsl:attribute name="message" select="concat('Expecting the root elemest to be: ',check:normType(resolve-QName(@element,.)))"/>
             </step>
         </xsl:if>
         <xsl:if test="$doReqPlainParam">
             <xsl:for-each select="$defaultPlainParams">
                 <step type="XPATH" id="{check:XPathID($this,position())}" match="{@path}">
+                    <xsl:if test="@rax:message">
+                        <xsl:attribute name="message" select="@rax:message"/>
+                    </xsl:if>
                     <xsl:choose>
                         <xsl:when test="position() = last()">
                             <xsl:choose>
