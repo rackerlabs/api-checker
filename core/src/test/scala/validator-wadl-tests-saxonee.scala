@@ -65,7 +65,6 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
   // The validator is used in the following tests, it uses an external
   // grammar.
   //
-  val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString
   val validator_UUID = Validator((localWADLURI,
     <application xmlns="http://wadl.dev.java.net/2009/02"
                  xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
@@ -268,37 +267,6 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
         </resources>
     </application>)
     , TestConfig(false, true, true, true))
-
-  val goodXML = <some_xml att='1' xmlns='test.org'>
-                  <an_element>
-                    <another_element />
-                  </an_element>
-                </some_xml>
-
-  val goodJSON = """
-       {
-           "stuff" : {
-             "thing" : true,
-             "string" : "A String",
-             "array" : [ 1, 2, 3, 4],
-             "obj" : {
-               "a" : "A",
-               "b" : "B"
-             },
-            "null" : null
-           }
-       }
-  """
-
-  val goodXML_XSD1 = <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
-                        <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
-                        <stepType>URL_FAIL</stepType>
-                        <even>22</even>
-                     </e>
-  val goodXML_XSD2 = <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
-                        id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"
-                        stepType="ACCEPT"
-                        even="22"/>
 
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContent with valid XML1") {
     validator_XSDContent.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
