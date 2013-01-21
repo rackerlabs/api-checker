@@ -41,6 +41,8 @@ object Wadl2Dot {
 
   val ignoreXSD  = parser.flag[Boolean] (List("i", "ignore-xsd-ext"),
                                          "Enable Ignore XSD  extension : false")
+  val message  = parser.flag[Boolean] (List("m", "message-ext"),
+                                         "Enable Message extension : false")
 
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
                                           "Show error nodes. Default: false")
@@ -102,6 +104,7 @@ object Wadl2Dot {
       c.joinXPathChecks = joinXPaths.value.getOrElse(false)
       c.checkHeaders = header.value.getOrElse(false)
       c.enableIgnoreXSDExtension = ignoreXSD.value.getOrElse(false)
+      c.enableMessageExtension = message.value.getOrElse(false)
       c.validateChecker = true
 
       new WADLDotBuilder().build (getSource, getResult,

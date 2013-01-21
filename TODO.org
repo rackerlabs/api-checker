@@ -377,13 +377,13 @@
       10. [X] JMX Operation to get checker
       11. [X] Cleanup
       12. [X] Keep track of last X errors.
-** TODO rax:message XPath extension [5/7]
+** TODO rax:message XPath extension [6/7]
    1. [X] Extend XSD to allow message in XPath
    2. [X] Extend builder XSL to add message in XPath state
    3. [X] Extend state to accept message in XPath
    4. [X] Extend handler to pass message over
    5. [X] Add rax:message flag
-   6. [ ] Add extension to cli
+   6. [X] Add extension to cli
    7. [ ] TESTS [0/3]
       1. [ ] State
       2. [ ] Builder
