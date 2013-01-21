@@ -809,7 +809,7 @@
                 </xsl:choose>
                 <xsl:attribute name="match" select="concat('/',check:normType(resolve-QName(@element,.)))"/>
                 <xsl:if test="$useMessageExtension">
-                    <xsl:attribute name="message" select="concat('Expecting the root elemest to be: ',check:normType(resolve-QName(@element,.)))"/>
+                    <xsl:attribute name="message" select="concat('Expecting the root element to be: ',check:normType(resolve-QName(@element,.)))"/>
                 </xsl:if>
             </step>
         </xsl:if>
