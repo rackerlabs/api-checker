@@ -11,9 +11,16 @@ import com.rackspace.com.papi.components.checker.util.XPathExpressionPool._
 
 import org.xml.sax.SAXParseException
 
-class XPath(id : String, label : String, val expression : String, val nc : NamespaceContext, val version : Int, next : Array[Step]) extends ConnectedStep(id, label, next) {
+class XPath(id : String, label : String, val expression : String, val message : Option[String],
+            val nc : NamespaceContext, val version : Int, next : Array[Step]) extends ConnectedStep(id, label, next) {
 
-  override val mismatchMessage : String = "The expression "+expression+" does not evaluate to true"
+  override val mismatchMessage : String = {
+    if (message == None) {
+      "Expecting "+expression
+    } else {
+      message.get
+    }
+  }
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
     var ret = -1
@@ -22,7 +29,7 @@ class XPath(id : String, label : String, val expression : String, val nc : Names
     try {
       xpath = borrowExpression (expression, nc, version)
       if (!xpath.evaluate (req.parsedXML, BOOLEAN).asInstanceOf[Boolean]) {
-        req.contentError = new SAXParseException ("Expecting "+expression, null)
+        req.contentError = new SAXParseException (mismatchMessage, null)
       } else {
         ret = uriLevel
       }

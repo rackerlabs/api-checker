@@ -837,7 +837,7 @@ class StepSuite extends BaseStepSuite {
 
   test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", context, 1, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, context, 1, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -853,7 +853,7 @@ class StepSuite extends BaseStepSuite {
 
   test("In an XPath test, if the XPath resolves to false the uriLevel should be -1") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", context, 1, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, context, 1, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -869,7 +869,7 @@ class StepSuite extends BaseStepSuite {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", context, 1, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, context, 1, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -890,7 +890,7 @@ class StepSuite extends BaseStepSuite {
 
   test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", context, 2, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, context, 2, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -906,7 +906,7 @@ class StepSuite extends BaseStepSuite {
 
   test("In an XPath test, if the XPath resolves to false the uriLevel should be -1 (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", context, 2, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, context, 2, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -922,7 +922,7 @@ class StepSuite extends BaseStepSuite {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", context, 2, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, context, 2, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
