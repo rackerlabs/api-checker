@@ -49,6 +49,8 @@
                 <alternative test="@type eq 'XSL'" type="chk:XSLStep"/>
                 <alternative test="@type eq 'HEADER'" type="chk:HeaderStep"/>
                 <alternative test="@type eq 'HEADERXSD'" type="chk:HeaderXSDStep"/>
+                <alternative test="@type eq 'HEADER_ANY'" type="chk:HeaderAnyStep"/>
+                <alternative test="@type eq 'HEADERXSD_ANY'" type="chk:HeaderXSDAnyStep"/>
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
@@ -242,6 +244,21 @@
         </complexContent>
     </complexType>
 
+    <complexType name="HeaderAnyStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Exactly like HeaderStep, except that given
+                    multiple headers, this step accepts if *any* of
+                    the header values pass.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:HeaderStep"/>
+        </complexContent>
+    </complexType>
+
     <complexType name="HeaderXSDStep">
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
@@ -257,6 +274,21 @@
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:QName" use="required"/>
             </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="HeaderXSDAnyStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Exactly like HeaderXSDStep, except that given
+                    multiple headers, this step accepts if *any* of
+                    the header values pass.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:HeaderXSDStep"/>
         </complexContent>
     </complexType>
 
@@ -475,6 +507,8 @@
             <enumeration value="XSL"/>
             <enumeration value="HEADER"/>
             <enumeration value="HEADERXSD"/>
+            <enumeration value="HEADER_ANY"/>
+            <enumeration value="HEADERXSD_ANY"/>
         </restriction>
     </simpleType>
 

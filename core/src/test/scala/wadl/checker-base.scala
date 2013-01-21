@@ -89,6 +89,14 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADERXSD")
   }
 
+  def stepsWithHeaderAnyMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
+    stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADER_ANY")
+  }
+
+  def stepsWithHeaderXSDAnyMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
+    stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADERXSD_ANY")
+  }
+
   def Start : (NodeSeq) => NodeSeq = stepsWithType(_, "START")
   def Accept : (NodeSeq) => NodeSeq = stepsWithType(_, "ACCEPT")
   def URLFail : (NodeSeq) => NodeSeq = stepsWithType(_, "URL_FAIL")
@@ -108,6 +116,8 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def AnyReqType : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(.*)()")
   def Header(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatch(_, name, headerMatch)
   def HeaderXSD(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMatch (_, name, headerMatch)
+  def HeaderAny(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyMatch(_, name, headerMatch)
+  def HeaderXSDAny(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMatch (_, name, headerMatch)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {
 

@@ -694,18 +694,6 @@ class ValidatorSuite extends BaseValidatorSuite {
     start
   }, TestConfig(false, true))
 
-  val goodJSON = """
-       {
-         "flavor" : {
-            "id" : "52415800-8b69-11e0-9b19-734f1195ff37",
-            "name" : "256 MB Server",
-            "ram" : 256,
-            "disk" : 10,
-            "vcpus" : 1
-         }
-       }
-  """
-
   test ("GET on /a/b should succeed on validator_JSON") {
     validator_JSON.validate(request("GET","/a/b"),response,chain)
   }

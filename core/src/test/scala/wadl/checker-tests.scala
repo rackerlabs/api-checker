@@ -5568,15 +5568,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndHeaderAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/json)(;.*)?"))
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqTypeFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqTypeFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqTypeFail)
     assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
   }
 
@@ -5587,14 +5591,20 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
@@ -5604,10 +5614,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
 
@@ -5767,8 +5781,8 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
-  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header must be checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header must be checked")
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked") {
+    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -5778,6 +5792,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
                <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -5821,7 +5838,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 5")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header must be checked, non-req should be ignored") {
@@ -5836,6 +5853,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            <resource path="/a/b">
                <param name="X-TEST" style="header" type="xsd:string" required="true"/>
                <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="false" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
+               <param name="X-TEST3" style="header" type="xsd:string" required="false"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -5879,7 +5901,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 5")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD header must be checked") {
@@ -6304,14 +6326,18 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def reqTypeAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
     then("The machine should contain paths to all ReqTypes")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"))
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
     and("ReqTypeFail states should be after PUT and POST states")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqTypeFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
     assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
   }
@@ -6323,13 +6349,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def wellFormedAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should contain paths to WellXML and WELLJSON types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"), WellXML)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     and("There should be content failed states")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
@@ -6340,9 +6370,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
@@ -6572,6 +6604,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <method name="PUT">
                   <request>
                       <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -6613,7 +6648,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 5")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked, non-req should be ignored") {
@@ -6630,6 +6665,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                   <request>
                       <param name="X-TEST" style="header" type="xsd:string" required="true"/>
                       <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="false" fixed="bar"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
+                      <param name="X-TEST3" style="header" type="xsd:string" required="false"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -6671,7 +6711,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
-    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 5")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header must be checked") {
