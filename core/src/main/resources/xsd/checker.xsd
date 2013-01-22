@@ -183,6 +183,7 @@
             <extension base="chk:ConnectedStep">
                 <attribute name="match" type="xsd:string" use="required"/>
                 <attribute name="version" type="chk:XPathVersion" use="optional"/>
+                <attribute name="message" type="xsd:string" use="optional"/>
             </extension>
         </complexContent>
     </complexType>

@@ -30,6 +30,7 @@ object BuilderXSLParams {
   val ENABLE_PLAIN_PARAM = "enablePlainParamCheck"
   val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
   val ENABLE_XSD_IGNORE_EXT  = "enableIgnoreXSDExtension"
+  val ENABLE_MESSAGE_EXT    = "enableMessageExtension"
   val ENABLE_HEADER         = "enableHeaderCheck"
 }
 
@@ -89,6 +90,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_PLAIN_PARAM, c.checkPlainParams)
       buildHandler.getTransformer().setParameter (ENABLE_PRE_PROCESS_EXT, c.enablePreProcessExtension)
       buildHandler.getTransformer().setParameter (ENABLE_XSD_IGNORE_EXT, c.enableIgnoreXSDExtension)
+      buildHandler.getTransformer().setParameter (ENABLE_MESSAGE_EXT, c.enableMessageExtension)
       buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
 
       var output = out;

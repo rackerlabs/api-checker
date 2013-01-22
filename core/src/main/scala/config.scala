@@ -92,6 +92,11 @@ class Config {
   @BeanProperty var enableIgnoreXSDExtension : Boolean = false
 
   //
+  //  Enable message extension
+  //
+  @BeanProperty var enableMessageExtension : Boolean = false
+
+  //
   //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,
   //  and Saxon. Note that Saxon is an XSL 2.0 engine, but most 1.0
   //  XSLs should work fine.
