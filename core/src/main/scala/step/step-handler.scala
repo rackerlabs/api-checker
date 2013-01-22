@@ -544,6 +544,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
+    val message : Option[String] = {
+      if (atts.getValue("message") == null) {
+        None
+      } else {
+        Some(atts.getValue("message"))
+      }
+    }
     val context : NamespaceContext = ImmutableNamespaceContext(prefixes)
     val version : Int = {
       val sversion = atts.getValue("version")
@@ -570,7 +577,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
 
     next += (id -> nexts)
-    steps += (id -> new XPath(id, label, _match, context, version, new Array[Step](nexts.length)))
+    steps += (id -> new XPath(id, label, _match, message, context, version, new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {

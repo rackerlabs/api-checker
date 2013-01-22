@@ -41,6 +41,9 @@ object Wadl2Checker {
   val ignoreXSD  = parser.flag[Boolean] (List("i", "ignore-xsd-ext"),
                                          "Enable Ignore XSD  extension : false")
 
+  val message  = parser.flag[Boolean] (List("m", "message-ext"),
+                                         "Enable Message extension : false")
+
   val validate = parser.flag[Boolean] (List("v", "validate"),
                                        "Validate produced checker Default: false")
 
@@ -102,6 +105,7 @@ object Wadl2Checker {
       c.joinXPathChecks = joinXPaths.value.getOrElse(false)
       c.checkHeaders = header.value.getOrElse(false)
       c.enableIgnoreXSDExtension = ignoreXSD.value.getOrElse(false)
+      c.enableMessageExtension = message.value.getOrElse(false)
       c.xpathVersion = xpathVersion.value.getOrElse(1)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)

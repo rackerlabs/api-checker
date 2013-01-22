@@ -109,7 +109,21 @@ object TestConfig {
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
 
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
+             enablePreProcessExtension : Boolean, xslEngine : String,
+             joinXPathChecks : Boolean, checkHeaders : Boolean,
+             enableIgnoreXSDExtension : Boolean, enableMessageExtension : Boolean) : Config = {
 
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
+                       xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension,
+                       xslEngine, joinXPathChecks, checkHeaders, enableIgnoreXSDExtension)
+
+    config.enableMessageExtension = enableMessageExtension
+
+    config
+  }
 
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
              checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
@@ -445,6 +459,22 @@ class BaseValidatorSuite extends FunSuite {
     }
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
+    }
+  }
+
+  def assertResultFailed(f : => Any, code : Int, message : String) : Unit = {
+    var result : ErrorResult = null
+    assertResultFailed(f).get.result match {
+      case mfr : MultiFailResult =>
+        result = mfr.reduce.get.asInstanceOf[ErrorResult]
+      case other : ErrorResult =>
+        result = other
+    }
+    if (result.code != code) {
+      throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
+    }
+    if (result.message != message) {
+      throw new TestFailedException(Some("Expected error message '"+message+"' but got '"+result.message+"'"), None, 4)
     }
   }
 }
