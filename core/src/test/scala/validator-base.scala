@@ -109,7 +109,21 @@ object TestConfig {
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
 
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
+             enablePreProcessExtension : Boolean, xslEngine : String,
+             joinXPathChecks : Boolean, checkHeaders : Boolean,
+             enableIgnoreXSDExtension : Boolean, enableMessageExtension : Boolean) : Config = {
 
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
+                       xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension,
+                       xslEngine, joinXPathChecks, checkHeaders, enableIgnoreXSDExtension)
+
+    config.enableMessageExtension = enableMessageExtension
+
+    config
+  }
 
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
              checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
