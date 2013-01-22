@@ -461,4 +461,20 @@ class BaseValidatorSuite extends FunSuite {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
   }
+
+  def assertResultFailed(f : => Any, code : Int, message : String) : Unit = {
+    var result : ErrorResult = null
+    assertResultFailed(f).get.result match {
+      case mfr : MultiFailResult =>
+        result = mfr.reduce.get.asInstanceOf[ErrorResult]
+      case other : ErrorResult =>
+        result = other
+    }
+    if (result.code != code) {
+      throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
+    }
+    if (result.message != message) {
+      throw new TestFailedException(Some("Expected error message '"+message+"' but got '"+result.message+"'"), None, 4)
+    }
+  }
 }
