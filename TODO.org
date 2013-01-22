@@ -385,8 +385,8 @@
    5. [X] Add rax:message flag
    6. [X] Add extension to cli
    7. [X] Make join optimization aware of the extesion.
-   8. [ ] TESTS [0/3]
-      1. [ ] State
+   8. [-] TESTS [1/3]
+      1. [X] State
       2. [ ] Builder
       3. [ ] Validator
 ** TODO Header Enhancements [1/3]
