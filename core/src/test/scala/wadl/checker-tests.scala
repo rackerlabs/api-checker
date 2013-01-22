@@ -3799,12 +3799,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdElementAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
   }
 
   //
@@ -3812,12 +3812,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def xsdElementAssertions2(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), ContentFail)
   }
 
   //
@@ -3825,8 +3825,8 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
   def elementAssertions(checker : NodeSeq) : Unit = {
     and("The machine should cantain paths to XSD types")
-    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e", "Expecting the root element to be: tst:e"), Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a", "Expecting the root element to be: tst:a"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
@@ -4367,14 +4367,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
   }
 
@@ -4411,14 +4411,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
   }
 
@@ -4457,14 +4457,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
   }
 
@@ -4505,17 +4505,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), ContentFail)
   }
 
@@ -4560,19 +4560,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), XPath("/tst:e/tst:stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), XPath("/tst:e/tst:stepType"), ContentFail)
   }
 
@@ -4622,18 +4622,18 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), ContentFail)
   }
 
 
@@ -4682,18 +4682,18 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:stepType"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), ContentFail)
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps, multiple params one with required == false)") {
@@ -4735,17 +4735,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:e/tst:stepType']) = 0")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), XSD, Accept)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"),
             XPath("/tst:e/tst:id"), ContentFail)
   }
 
@@ -4784,12 +4784,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
   }
 
@@ -4955,14 +4955,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
   }
 
@@ -5018,14 +5018,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template")
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success")
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success/@didIt")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
   }
 
@@ -5075,14 +5075,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSL, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSL, ContentFail)
   }
 
@@ -5135,21 +5135,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
-   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
+   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
            XSL, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XSL, ContentFail)
   }
 
@@ -5202,21 +5202,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
-   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
+   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
            XSL, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XSL, ContentFail)
   }
 
@@ -5361,21 +5361,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 2")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
-   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
+   assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
            XSL, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XSL, ContentFail)
   }
 
@@ -5419,12 +5419,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
   }
 
@@ -5468,12 +5468,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"), ContentFail)
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a"),
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), ContentFail)
   }
 
