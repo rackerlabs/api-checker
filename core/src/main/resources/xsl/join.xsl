@@ -133,16 +133,23 @@
                 <xsl:variable name="join" select="$joins[1]" as="node()"/>
                 <xsl:variable name="steps" select="tokenize($join/@steps,' ')"/>
                 <xsl:variable name="next_out" as="xsd:string*">
-                    <xsl:for-each-group select="$nexts" group-by=". = $steps">
-                        <xsl:choose>
-                            <xsl:when test=". = $steps">
-                                <xsl:value-of select="generate-id($join)"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:sequence select="current-group()"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:for-each-group>
+                    <xsl:choose>
+                        <xsl:when test="every $s in $steps satisfies $s=$nexts">
+                            <xsl:for-each-group select="$nexts" group-by=". = $steps">
+                                <xsl:choose>
+                                    <xsl:when test=". = $steps">
+                                        <xsl:value-of select="generate-id($join)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:sequence select="current-group()"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:for-each-group>
+                        </xsl:when>
+                        <xsl:otherwise>
+                           <xsl:sequence select="$nexts"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:variable>
                 <xsl:sequence select="check:getNexts($joins[position() != 1],$next_out)"/>
             </xsl:otherwise>
