@@ -25,6 +25,14 @@
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
                 <version>2.15.2</version>
+                <configuration>
+                    <args>
+                        <arg>-unchecked</arg>
+                        <arg>-deprecation</arg>
+                        <arg>-explaintypes</arg>
+                    </args>
+                    <recompileMode>modified-only</recompileMode>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
