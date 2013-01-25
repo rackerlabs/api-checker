@@ -38,6 +38,7 @@
                         <arg>-deprecation</arg>
                         <arg>-explaintypes</arg>
                     </args>
+                    <recompileMode>modified-only</recompileMode>
                 </configuration>
                 <executions>
                     <execution>
