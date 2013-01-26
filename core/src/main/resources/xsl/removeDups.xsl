@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   removeDups.xsl
+
+   This stylesheet takes a document in checker format and removes
+   duplicate states. The stylesheet considers a state a duplicate if
+   it matches on the same kind of input AND it attaches to the same
+   states on output. It then replaces those states with a single
+   state.
+
+   For example:
+
+              +===+
+             /+ B +=
+   +===+ /=== +===+ \    +===+
+   | A +=            +===+ C |
+   +===+ \=== +===+ /    +===+
+             \+ B +=
+              +===+
+
+    Becomes:
+
+    +===+    +===+     +===+
+    | A +====+ B +=====+ C |
+    +===+    +===+     +===+
+
+   The process operates in a recursive manner until all duplicates are
+   replaced.
+-->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"

@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   builder.xsl
+
+   This stylesheet is responsible for converting a WADL into the
+   checker format that is used naively by the api-checker to validate
+   requests.
+
+   The input is a WADL that has been normalized into "tree" format by
+   WADL-Tools (https://github.com/rackspace/wadl-tools)
+
+   The parameters below enable features. If no features are specified
+   then only URI, Methods, and Media-Types are checked.
+
+   The config flags below the parameters are what are used to actually
+   drive the transformation. The reason for this is that enabling
+   one feature via a parameter (enableXSDTransform) may depend on
+   other features being turned on (enableXSDContentCheck).
+-->
 <xsl:stylesheet 
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
