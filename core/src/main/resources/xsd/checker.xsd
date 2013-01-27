@@ -1,3 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  checker.xsd
+
+  This XSD describes the checker format used by the validator to
+  internally represent its state machine. The validator will ensure
+  that all checker documents conform to this schema before they are
+  processed.
+-->
 <schema
     elementFormDefault="qualified"
     attributeFormDefault="unqualified"

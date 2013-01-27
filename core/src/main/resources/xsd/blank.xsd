@@ -1,3 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    blank.xsd
+
+    This silly schema is used when the validator processes a checker
+    document that does not have an explicit W3C schema associated with
+    it.  It allows standards W3C schema types to be used.
+-->
 <schema
     elementFormDefault="qualified"
     attributeFormDefault="unqualified"

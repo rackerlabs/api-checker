@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   xpathJoin.xsl
+
+   This stylesheet takes a document in checker format and replaces
+   adjacent XPath states with a single XSLT that executes a
+   combination of the XPath steps and prints an appropriate error.
+   The stylesheet also combines the XML WellForm check with the XSL if
+   there is an adjacent XPath state.
+-->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
