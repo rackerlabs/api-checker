@@ -13,8 +13,8 @@ import org.scalatest.FunSuite
 @RunWith(classOf[JUnitRunner])
 class TransformPoolSuite extends FunSuite {
   val factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
-  val templates1 = factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
-  val templates2 = factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/removeDups.xsl")))
+  val templates1 = factory.newTemplates (new StreamSource(getClass().getResource("/xsl/builder.xsl").toString))
+  val templates2 = factory.newTemplates (new StreamSource(getClass().getResource("/xsl/opt/removeDups.xsl").toString))
 
   test("The ID transform pool should successfully create a transformer") {
     var transformer : Transformer = null

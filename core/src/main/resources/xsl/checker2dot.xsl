@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  checker.xsl
+
+  This stylesheet is responsible for converting a checker document
+  to a graph in dot format.  The purpose of this is to enable the
+  visualization of the validator machine.
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     xmlns:check="http://www.rackspace.com/repose/wadl/checker"

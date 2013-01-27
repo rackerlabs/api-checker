@@ -63,15 +63,15 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   val checkerSchemaSource  = new Array[Source](2);
 
-  checkerSchemaSource(0) = new StreamSource(getClass().getResourceAsStream("/xsd/transform.xsd"))
-  checkerSchemaSource(1) = new StreamSource(getClass().getResourceAsStream("/xsd/checker.xsd"))
+  checkerSchemaSource(0) = new StreamSource(getClass().getResource("/xsd/transform.xsd").toString)
+  checkerSchemaSource(1) = new StreamSource(getClass().getResource("/xsd/checker.xsd").toString)
 
   val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
 
-  val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/builder.xsl")))
-  val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/removeDups.xsl")))
-  val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/join.xsl")))
-  val joinXPathTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/xpathJoin.xsl")))
+  val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/builder.xsl").toString))
+  val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/removeDups.xsl").toString))
+  val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/join.xsl").toString))
+  val joinXPathTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/xpathJoin.xsl").toString))
 
   def build (in : Source, out: Result, config : Config) : Unit = {
     var c = config

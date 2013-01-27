@@ -1,4 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   join.xsl
+
+   This stylesheet take a document in checker format and safely joins
+   states in different branches of execution. The operation works like
+   removeDups.xsl except that output of a state need not be the same
+   in each of the replaced states.
+
+   For Example:
+
+              +===+    +===+
+            /=| B +====+ X |
+   +===+ /==  +===+    +===+
+   | A +=
+   +===+ \==  +===+    +===+
+            \=| B +====+ Y |
+              +===+    +===+
+
+   Becomes:
+                     +===+
+                    /+ X |
+   +===+    +===+ /= +===+
+   | A +====+ B +=
+   +===+    +===+ \= +===+
+                    \+ Y |
+                     +===+
+
+   The process is executed recursively.  It is assumed that the input
+   file has already gone through the removeDups.xsl
+-->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"

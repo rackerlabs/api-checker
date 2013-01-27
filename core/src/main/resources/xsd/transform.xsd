@@ -1,3 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    transform.xsd
+
+    An extreamly loose schema for XSL in checker format.
+
+    TODO: Replace with actual XSL 1.0/XSL 2.0 schema.
+-->
 <schema
     elementFormDefault="qualified"
     attributeFormDefault="unqualified"
@@ -8,11 +16,6 @@
 
     <element name="stylesheet" type="xsl:Transform" />
     <element name="transform" type="xsl:Transform" />
-
-    <!--
-        An extreamly loose schema for XSL in checker format.  TODO:
-        replace with actual XSL 1.0/XSL 2.0 schema.
-    -->
 
     <!-- Transform Def -->
     <complexType name="Transform" mixed="true">

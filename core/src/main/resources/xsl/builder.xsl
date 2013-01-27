@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   builder.xsl
+
+   This stylesheet is responsible for converting a WADL into the
+   checker format that is used natively by the api-checker to validate
+   requests.
+
+   The input is a WADL that has been normalized into "tree" format by
+   WADL-Tools (https://github.com/rackspace/wadl-tools)
+
+   The parameters below enable features. If no features are specified
+   then only URI, Methods, and Media-Types are checked.
+
+   The config flags below the parameters are what are used to actually
+   drive the transformation. The reason for this is that enabling
+   one feature via a parameter (enableXSDTransform) may depend on
+   other features being turned on (enableXSDContentCheck).
+-->
 <xsl:stylesheet 
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -6,8 +24,12 @@
     xmlns:check="http://www.rackspace.com/repose/wadl/checker"
     xmlns:rax="http://docs.rackspace.com/api"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
+    xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
     exclude-result-prefixes="xsd wadl rax check"
     version="2.0">
+
+    <!-- Add prune steps template -->
+    <xsl:import href="util/pruneSteps.xsl"/>
 
     <xsl:output indent="yes" method="xml"/>
 
@@ -104,9 +126,12 @@
         <checker>
             <xsl:call-template name="check:addNamespaceNodes"/>
             <xsl:apply-templates mode="grammar"/>
-            <xsl:call-template name="check:pruneStates">
-                <xsl:with-param name="checker" select="$pass2"/>
-            </xsl:call-template>
+            <xsl:variable name="pruned">
+                <xsl:call-template name="util:pruneSteps">
+                    <xsl:with-param name="checker" select="$pass2"/>
+                </xsl:call-template>
+            </xsl:variable>
+            <xsl:copy-of select="$pruned//check:step"/>
         </checker>
     </xsl:template>
 
@@ -139,31 +164,6 @@
             </xsl:if>
             <xsl:copy-of select="."/>
         </grammar>
-    </xsl:template>
-
-    <xsl:template name="check:pruneStates">
-        <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(string-join($checker//check:step/@next,' '),' ')"/>
-        <xsl:variable name="connected" as="xsd:integer" select="count($checker//check:step[$nexts = @id])"/>
-        <xsl:variable name="all" as="xsd:integer" select="count($checker//check:step[@type != 'START'])"/>
-        <xsl:choose>
-            <xsl:when test="$connected = $all">
-                <xsl:for-each select="$checker//check:step">
-                    <xsl:copy-of select="."/>
-                </xsl:for-each>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:call-template name="check:pruneStates">
-                    <xsl:with-param name="checker">
-                        <checker>
-                            <xsl:apply-templates select="$checker" mode="pruneStates">
-                                <xsl:with-param name="nexts" select="$nexts"/>
-                            </xsl:apply-templates>
-                        </checker>
-                    </xsl:with-param>
-                </xsl:call-template>
-            </xsl:otherwise>
-        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="check:getNamespaces">
@@ -262,21 +262,6 @@
                 <xsl:value-of select="$uri"/>
             </xsl:attribute>
         </ns>
-    </xsl:template>
-
-    <xsl:template match="check:step" mode="pruneStates">
-        <xsl:param name="nexts" as="xsd:string*"/>
-        <xsl:choose>
-            <xsl:when test="@type='START'">
-                <xsl:copy-of select="."/>
-            </xsl:when>
-            <xsl:when test="@id = $nexts">
-                <xsl:copy-of select="."/>
-            </xsl:when>
-            <xsl:otherwise>
-                <!-- pruned -->
-            </xsl:otherwise>
-        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="check:step" mode="addErrorStates">
