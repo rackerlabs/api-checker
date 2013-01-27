@@ -72,6 +72,16 @@
                 </documentation>
             </annotation>
         </assert>
+        <assert test="count(chk:step[@id = tokenize(string-join(..//chk:step/@next,' '),' ')]) = count(chk:step[@type != 'START'])"
+                saxon:message="Every step must be connected">
+            <annotation>
+                <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                    <html:p>
+                        Every step must be connected.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </assert>
     </complexType>
 
     <!-- Connected Steps -->

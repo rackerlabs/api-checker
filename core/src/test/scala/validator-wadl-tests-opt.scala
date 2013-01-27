@@ -190,4 +190,141 @@ xmlns:atom="http://www.w3.org/2005/Atom">
                                                          bad_usage), response, chain), 400)
   }
 
+    val sharedXPathWADL2 =
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:foo="http://www.rackspace.com/foo/bar"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             xmlns:atom="http://www.w3.org/2005/Atom">
+    <resources base="http://localhost/">
+        <resource path="y" type="#FOO"/>
+        <resource path="x" type="#FOO #BAR"/>
+    </resources>
+    <resource_type id="FOO">
+        <method name="POST">
+            <request>
+                <representation mediaType="application/xml" element="foo:bar">
+                    <param name="stuff"
+                           style="plain"
+                           required="true"
+                           path="/foo:bar/@junk"/>
+                </representation>
+            </request>
+        </method>
+    </resource_type>
+    <resource_type id="BAR">
+        <method name="POST">
+            <request>
+                <representation mediaType="application/xml" element="foo:foo">
+                    <param name="stuff"
+                           style="plain"
+                           required="true"
+                           path="/foo:foo/@junk"/>
+                </representation>
+            </request>
+        </method>
+    </resource_type>
+</application>
+
+  val shardXPath2NoRemoveDups = Validator(sharedXPathWADL2, TestConfig(false, false, true, true, true, 1, true))
+  val shardXPath2NoDups = Validator(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true))
+
+  val good_bar = <bar xmlns="http://www.rackspace.com/foo/bar" junk="true"/>
+  val good_foo = <foo xmlns="http://www.rackspace.com/foo/bar" junk="true"/>
+  val bad_bar  = <bar xmlns="http://www.rackspace.com/foo/bar" />
+  val bad_foo  = <foo xmlns="http://www.rackspace.com/foo/bar" />
+  val bad_foo_bar = <just bad="ture"/>
+
+  test("POST of good_bar should work on y on shardXPath2NoRemoveDups") {
+    shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml", good_bar), response, chain)
+  }
+
+  test("POST of good_bar should work on y on shardXPath2NoDups") {
+    shardXPath2NoDups.validate(request("POST", "y", "application/xml", good_bar), response, chain)
+  }
+
+  test("POST of good_bar should work on x on shardXPath2NoRemoveDups") {
+    shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml", good_bar), response, chain)
+  }
+
+  test("POST of good_bar should work on x on shardXPath2NoDups") {
+    shardXPath2NoDups.validate(request("POST", "x", "application/xml", good_bar), response, chain)
+  }
+
+  test("POST of good_foo should work on x on shardXPath2NoRemoveDups") {
+    shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml", good_foo), response, chain)
+  }
+
+  test("POST of good_foo should work on x on shardXPath2NoDups") {
+    shardXPath2NoDups.validate(request("POST", "x", "application/xml", good_foo), response, chain)
+  }
+
+  test("POST of good_foo on y should fail on shardXPath2NoRemoveDups") {
+    assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml",
+                                                                good_foo), response, chain), 400)
+  }
+
+  test("POST of good_foo on y should fail on shardXPath2NoDups") {
+    assertResultFailed(shardXPath2NoDups.validate(request("POST", "y", "application/xml",
+                                                          good_foo), response, chain), 400)
+  }
+
+  test("POST of bad_bar on y should fail on shardXPath2NoRemoveDups") {
+    assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml",
+                                                                bad_bar), response, chain), 400)
+  }
+
+  test("POST of bad_bar on y should fail on shardXPath2NoDups") {
+    assertResultFailed(shardXPath2NoDups.validate(request("POST", "y", "application/xml",
+                                                          bad_bar), response, chain), 400)
+  }
+
+  test("POST of bad_foo on y should fail on shardXPath2NoRemoveDups") {
+    assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml",
+                                                                bad_foo), response, chain), 400)
+  }
+
+  test("POST of bad_foo on y should fail on shardXPath2NoDups") {
+    assertResultFailed(shardXPath2NoDups.validate(request("POST", "y", "application/xml",
+                                                          bad_foo), response, chain), 400)
+  }
+
+  test("POST of bad_foo_bar on y should fail on shardXPath2NoRemoveDups") {
+    assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml",
+                                                                bad_foo_bar), response, chain), 400)
+  }
+
+  test("POST of bad_foo_bar on y should fail on shardXPath2NoDups") {
+    assertResultFailed(shardXPath2NoDups.validate(request("POST", "y", "application/xml",
+                                                          bad_foo_bar), response, chain), 400)
+  }
+
+  test("POST of bad_bar on x should fail on shardXPath2NoRemoveDups") {
+    assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml",
+                                                                bad_bar), response, chain), 400)
+  }
+
+  test("POST of bad_bar on x should fail on shardXPath2NoDups") {
+    assertResultFailed(shardXPath2NoDups.validate(request("POST", "x", "application/xml",
+                                                          bad_bar), response, chain), 400)
+  }
+
+  test("POST of bad_foo on x should fail on shardXPath2NoRemoveDups") {
+    assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml",
+                                                                bad_foo), response, chain), 400)
+  }
+
+  test("POST of bad_foo on x should fail on shardXPath2NoDups") {
+    assertResultFailed(shardXPath2NoDups.validate(request("POST", "x", "application/xml",
+                                                          bad_foo), response, chain), 400)
+  }
+
+  test("POST of bad_foo_bar on x should fail on shardXPath2NoRemoveDups") {
+    assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml",
+                                                                bad_foo_bar), response, chain), 400)
+  }
+
+  test("POST of bad_foo_bar on x should fail on shardXPath2NoDups") {
+    assertResultFailed(shardXPath2NoDups.validate(request("POST", "x", "application/xml",
+                                                          bad_foo_bar), response, chain), 400)
+  }
 }

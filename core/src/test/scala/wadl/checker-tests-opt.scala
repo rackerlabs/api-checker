@@ -27,6 +27,7 @@ class WADLCheckerOptSpec extends BaseCheckerSpec {
   register ("w_ns17", "http://docs.rackspace.com/event/nova/host")
   register ("w_ns18", "http://docs.rackspace.com/event/RHEL")
   register ("atom", "http://www.w3.org/2005/Atom")
+  register ("foo", "http://www.rackspace.com/foo/bar")
 
   feature ("The WADLCheckerBuilder can correctly transforma a WADL into checker format") {
 
@@ -207,6 +208,97 @@ xmlns:atom="http://www.w3.org/2005/Atom">
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns18:usage']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/@only_usage']) = 1")
+    }
+
+    val sharedXPathWADL2 =
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:foo="http://www.rackspace.com/foo/bar"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             xmlns:atom="http://www.w3.org/2005/Atom">
+    <resources base="http://localhost/">
+        <resource path="y" type="#FOO"/>
+        <resource path="x" type="#FOO #BAR"/>
+    </resources>
+    <resource_type id="FOO">
+        <method name="POST">
+            <request>
+                <representation mediaType="application/xml" element="foo:bar">
+                    <param name="stuff"
+                           style="plain"
+                           required="true"
+                           path="/foo:bar/@junk"/>
+                </representation>
+            </request>
+        </method>
+    </resource_type>
+    <resource_type id="BAR">
+        <method name="POST">
+            <request>
+                <representation mediaType="application/xml" element="foo:foo">
+                    <param name="stuff"
+                           style="plain"
+                           required="true"
+                           path="/foo:foo/@junk"/>
+                </representation>
+            </request>
+        </method>
+    </resource_type>
+</application>
+
+    scenario ("The sharedXPathWADL2 is processed checking wellformness, elemnts, and plain parameters, but without optimizations") {
+      given("the sharedXPathWADL2")
+      when("The WADL is transalted")
+      val checker = builder.build(sharedXPathWADL2, TestConfig(false, false, true, true, true, 1, true))
+      then ("The following paths should hold")
+
+      assert(checker,Start, URL("y"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML)
+
+      assert(checker,Start, URL("x"),  Method("POST"), Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
+             XPath("/foo:bar/@junk"), Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"), Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
+             XPath("/foo:foo/@junk"), Accept)
+
+      and ("The Following counts should hold")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 4")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH']) = 6")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar/@junk']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo/@junk']) = 1")
+    }
+
+    scenario ("The sharedXPathWADL2 is processed checking wellformness, elemnts, and plain parameters, with remove dups optimization") {
+      given("the sharedXPathWADL2")
+      when("The WADL is transalted")
+      val checker = builder.build(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true))
+      then ("The following paths should hold")
+
+      assert(checker,Start, URL("y"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
+             XPath("/foo:bar/@junk"), Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
+             XPath("/foo:foo/@junk"), Accept)
+
+      and ("The Following counts should hold")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH']) = 4")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar/@junk']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo/@junk']) = 1")
     }
   }
 }
