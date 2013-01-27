@@ -33,9 +33,12 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:check="http://www.rackspace.com/repose/wadl/checker"
+    xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     exclude-result-prefixes="xsd check"
     version="2.0">
+
+    <xsl:import href="../util/pruneSteps.xsl"/>
 
     <xsl:output indent="yes" method="xml"/>
 
@@ -51,7 +54,12 @@
                 <checker>
                     <xsl:copy-of select="/check:checker/namespace::*"/>
                     <xsl:copy-of select="/check:checker/check:grammar"/>
-                    <xsl:copy-of select="$checker//check:step"/>
+                    <xsl:variable name="pruned">
+                        <xsl:call-template name="util:pruneSteps">
+                            <xsl:with-param name="checker" select="$checker"/>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:copy-of select="$pruned//check:step"/>
                 </checker>
             </xsl:when>
             <xsl:otherwise>
@@ -70,14 +78,10 @@
     <xsl:template name="doJoin">
         <xsl:param name="checker" as="node()"/>
         <xsl:param name="joins" as="node()*"/>
-        <xsl:variable name="excludes" as="xsd:string*">
-            <xsl:sequence select="tokenize(string-join($joins//@steps, ' '), ' ')"/>
-        </xsl:variable>
 
         <checker>
             <xsl:apply-templates select="$checker" mode="copy">
                 <xsl:with-param name="joins" select="$joins"/>
-                <xsl:with-param name="excludes" select="$excludes"/>
             </xsl:apply-templates>
             <xsl:apply-templates select="$joins" mode="join">
                 <xsl:with-param name="checker" select="$checker"/>
@@ -128,18 +132,12 @@
 
     <xsl:template match="check:step" mode="copy">
         <xsl:param name="joins" as="node()*"/>
-        <xsl:param name="excludes" as="xsd:string*"/>
-        <xsl:choose>
-            <xsl:when test="$excludes = @id"/>
-            <xsl:otherwise>
-                <step>
-                    <xsl:apply-templates select="@*[name() != 'next']" mode="copy"/>
-                    <xsl:apply-templates select="@next" mode="copy">
-                        <xsl:with-param name="joins" select="$joins"/>
-                    </xsl:apply-templates>
-                </step>
-            </xsl:otherwise>
-        </xsl:choose>
+        <step>
+            <xsl:apply-templates select="@*[name() != 'next']" mode="copy"/>
+            <xsl:apply-templates select="@next" mode="copy">
+                <xsl:with-param name="joins" select="$joins"/>
+            </xsl:apply-templates>
+        </step>
     </xsl:template>
 
     <xsl:template match="@*" mode="copy">
