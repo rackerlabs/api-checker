@@ -117,8 +117,6 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   // Our schema...
   //
   private[this] var _schema : Schema = null
-  private[this] val _blankSchema : Schema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/blank.xsd")))
-
   private[this] def schema(qn : QName) : Schema = {
     if ((_schema == null) && (qn.getNamespaceURI() != "http://www.w3.org/2001/XMLSchema")) {
       throw new SAXParseException("No schema available.", locator)
