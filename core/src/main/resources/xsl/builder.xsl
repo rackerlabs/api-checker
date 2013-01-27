@@ -3,7 +3,7 @@
    builder.xsl
 
    This stylesheet is responsible for converting a WADL into the
-   checker format that is used naively by the api-checker to validate
+   checker format that is used natively by the api-checker to validate
    requests.
 
    The input is a WADL that has been normalized into "tree" format by
