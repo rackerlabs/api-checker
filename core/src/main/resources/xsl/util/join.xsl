@@ -139,6 +139,7 @@
             <xsl:apply-templates select="@next" mode="copy">
                 <xsl:with-param name="joins" select="$joins"/>
             </xsl:apply-templates>
+            <xsl:copy-of select="element()"/>
         </step>
     </xsl:template>
 
