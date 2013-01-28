@@ -88,8 +88,9 @@ xmlns:atom="http://www.w3.org/2005/Atom">
   </resource_type>
 </application>
 
-  val shardXPathNoRemoveDups = Validator(sharedXPathWADL, TestConfig(false, false, true, true, true, 1, true))
-  val shardXPathNoDups = Validator(sharedXPathWADL, TestConfig(true, false, true, true, true, 1, true))
+  val shardXPathNoRemoveDups = Validator(sharedXPathWADL, TestConfig(false, false, true, true, true, 1, true, true, false, "Xalan", false))
+  val shardXPathNoDups = Validator(sharedXPathWADL, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", false))
+  val shardXPathNoDupsJoinXPath = Validator(sharedXPathWADL, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", true))
 
   val good_usage16 =
 <atom:entry xmlns:atom="http://www.w3.org/2005/Atom" xmlns="http://docs.rackspace.com/usage/nova/ips" only_usage_up_down="true">
@@ -124,12 +125,20 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     shardXPathNoDups.validate(request("POST", "nova/entries", "application/atom+xml", good_rhel), response, chain)
   }
 
+  test("POST of RHEL should work on nova/entries on shardXPathNoDupsJoinXPath") {
+    shardXPathNoDupsJoinXPath.validate(request("POST", "nova/entries", "application/atom+xml", good_rhel), response, chain)
+  }
+
   test("POST of RHEL should work on servers/entries on shardXPathNoRemoveDups") {
     shardXPathNoRemoveDups.validate(request("POST", "servers/entries", "application/atom+xml", good_rhel), response, chain)
   }
 
   test("POST of RHEL should work on servers/entries on shardXPathNoDups") {
     shardXPathNoDups.validate(request("POST", "servers/entries", "application/atom+xml", good_rhel), response, chain)
+  }
+
+  test("POST of RHEL should work on servers/entries on shardXPathNoDupsJoinXPath") {
+    shardXPathNoDupsJoinXPath.validate(request("POST", "servers/entries", "application/atom+xml", good_rhel), response, chain)
   }
 
   test("POST of good_usage17 should work on servers/entries on shardXPathNoRemoveDups") {
@@ -140,12 +149,20 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     shardXPathNoDups.validate(request("POST", "servers/entries", "application/atom+xml", good_usage17), response, chain)
   }
 
+  test("POST of good_usage17 should work on servers/entries on shardXPathNoDupsJoinXPath") {
+    shardXPathNoDupsJoinXPath.validate(request("POST", "servers/entries", "application/atom+xml", good_usage17), response, chain)
+  }
+
   test("POST of good_usage16 should work on nova/entries on shardXPathNoRemoveDups") {
     shardXPathNoRemoveDups.validate(request("POST", "nova/entries", "application/atom+xml", good_usage16), response, chain)
   }
 
   test("POST of good_usage16 should work on nova/entries on shardXPathNoDups") {
     shardXPathNoDups.validate(request("POST", "nova/entries", "application/atom+xml", good_usage16), response, chain)
+  }
+
+  test("POST of good_usage16 should work on nova/entries on shardXPathNoDupsJoinXPath") {
+    shardXPathNoDupsJoinXPath.validate(request("POST", "nova/entries", "application/atom+xml", good_usage16), response, chain)
   }
 
 
@@ -159,6 +176,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
                                                          good_usage16), response, chain), 400)
   }
 
+  test("POST of good_usage16 onservers/entries  should fail on shardXPathNoDupsJoinXPath") {
+    assertResultFailed(shardXPathNoDupsJoinXPath.validate(request("POST", "servers/entries", "application/atom+xml",
+                                                         good_usage16), response, chain), 400)
+  }
+
   test("POST of good_usage17 on nova/entries should fail on shardXPathNoRemoveDups") {
     assertResultFailed(shardXPathNoRemoveDups.validate(request("POST", "nova/entries", "application/atom+xml",
                                                                good_usage17), response, chain), 400)
@@ -166,6 +188,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 
   test("POST of good_usage17 on servers/entries  should fail on shardXPathNoDups") {
     assertResultFailed(shardXPathNoDups.validate(request("POST", "nova/entries", "application/atom+xml",
+                                                         good_usage17), response, chain), 400)
+  }
+
+  test("POST of good_usage17 on servers/entries  should fail on shardXPathNoDupsJoinXPath") {
+    assertResultFailed(shardXPathNoDupsJoinXPath.validate(request("POST", "nova/entries", "application/atom+xml",
                                                          good_usage17), response, chain), 400)
   }
 
@@ -180,6 +207,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
                                                          bad_usage), response, chain), 400)
   }
 
+  test("POST of bad_usage on nova/entries  should fail on shardXPathNoDupsJoinXPath") {
+    assertResultFailed(shardXPathNoDupsJoinXPath.validate(request("POST", "nova/entries", "application/atom+xml",
+                                                         bad_usage), response, chain), 400)
+  }
+
   test("POST of bad_usage on servers/entries should fail on shardXPathNoRemoveDups") {
     assertResultFailed(shardXPathNoRemoveDups.validate(request("POST", "servers/entries", "application/atom+xml",
                                                                bad_usage), response, chain), 400)
@@ -187,6 +219,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 
   test("POST of bad_usage on servers/entries  should fail on shardXPathNoDups") {
     assertResultFailed(shardXPathNoDups.validate(request("POST", "servers/entries", "application/atom+xml",
+                                                         bad_usage), response, chain), 400)
+  }
+
+  test("POST of bad_usage on servers/entries  should fail on shardXPathNoDupsJoinXPath") {
+    assertResultFailed(shardXPathNoDupsJoinXPath.validate(request("POST", "servers/entries", "application/atom+xml",
                                                          bad_usage), response, chain), 400)
   }
 
@@ -225,8 +262,9 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     </resource_type>
 </application>
 
-  val shardXPath2NoRemoveDups = Validator(sharedXPathWADL2, TestConfig(false, false, true, true, true, 1, true))
-  val shardXPath2NoDups = Validator(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true))
+  val shardXPath2NoRemoveDups = Validator(sharedXPathWADL2, TestConfig(false, false, true, true, true, 1, true, true, false, "Xalan", false))
+  val shardXPath2NoDups = Validator(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", false))
+  val shardXPath2NoDupsJoinXPath = Validator(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", true))
 
   val good_bar = <bar xmlns="http://www.rackspace.com/foo/bar" junk="true"/>
   val good_foo = <foo xmlns="http://www.rackspace.com/foo/bar" junk="true"/>
@@ -242,12 +280,20 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     shardXPath2NoDups.validate(request("POST", "y", "application/xml", good_bar), response, chain)
   }
 
+  test("POST of good_bar should work on y on shardXPath2NoDupsJoinXPath") {
+    shardXPath2NoDupsJoinXPath.validate(request("POST", "y", "application/xml", good_bar), response, chain)
+  }
+
   test("POST of good_bar should work on x on shardXPath2NoRemoveDups") {
     shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml", good_bar), response, chain)
   }
 
   test("POST of good_bar should work on x on shardXPath2NoDups") {
     shardXPath2NoDups.validate(request("POST", "x", "application/xml", good_bar), response, chain)
+  }
+
+  test("POST of good_bar should work on x on shardXPath2NoDupsJoinXPath") {
+    shardXPath2NoDupsJoinXPath.validate(request("POST", "x", "application/xml", good_bar), response, chain)
   }
 
   test("POST of good_foo should work on x on shardXPath2NoRemoveDups") {
@@ -258,6 +304,10 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     shardXPath2NoDups.validate(request("POST", "x", "application/xml", good_foo), response, chain)
   }
 
+  test("POST of good_foo should work on x on shardXPath2NoDupsJoinXPath") {
+    shardXPath2NoDupsJoinXPath.validate(request("POST", "x", "application/xml", good_foo), response, chain)
+  }
+
   test("POST of good_foo on y should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml",
                                                                 good_foo), response, chain), 400)
@@ -265,6 +315,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 
   test("POST of good_foo on y should fail on shardXPath2NoDups") {
     assertResultFailed(shardXPath2NoDups.validate(request("POST", "y", "application/xml",
+                                                          good_foo), response, chain), 400)
+  }
+
+  test("POST of good_foo on y should fail on shardXPath2NoDupsJoinXPath") {
+    assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "y", "application/xml",
                                                           good_foo), response, chain), 400)
   }
 
@@ -278,6 +333,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
                                                           bad_bar), response, chain), 400)
   }
 
+  test("POST of bad_bar on y should fail on shardXPath2NoDupsJoinXPath") {
+    assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "y", "application/xml",
+                                                          bad_bar), response, chain), 400)
+  }
+
   test("POST of bad_foo on y should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml",
                                                                 bad_foo), response, chain), 400)
@@ -285,6 +345,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 
   test("POST of bad_foo on y should fail on shardXPath2NoDups") {
     assertResultFailed(shardXPath2NoDups.validate(request("POST", "y", "application/xml",
+                                                          bad_foo), response, chain), 400)
+  }
+
+  test("POST of bad_foo on y should fail on shardXPath2NoDupsJoinXPath") {
+    assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "y", "application/xml",
                                                           bad_foo), response, chain), 400)
   }
 
@@ -298,6 +363,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
                                                           bad_foo_bar), response, chain), 400)
   }
 
+  test("POST of bad_foo_bar on y should fail on shardXPath2NoDupsJoinXPath") {
+    assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "y", "application/xml",
+                                                          bad_foo_bar), response, chain), 400)
+  }
+
   test("POST of bad_bar on x should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml",
                                                                 bad_bar), response, chain), 400)
@@ -305,6 +375,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 
   test("POST of bad_bar on x should fail on shardXPath2NoDups") {
     assertResultFailed(shardXPath2NoDups.validate(request("POST", "x", "application/xml",
+                                                          bad_bar), response, chain), 400)
+  }
+
+  test("POST of bad_bar on x should fail on shardXPath2NoDupsJoinXPath") {
+    assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "x", "application/xml",
                                                           bad_bar), response, chain), 400)
   }
 
@@ -318,6 +393,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
                                                           bad_foo), response, chain), 400)
   }
 
+  test("POST of bad_foo on x should fail on shardXPath2NoDupsJoinXPath") {
+    assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "x", "application/xml",
+                                                          bad_foo), response, chain), 400)
+  }
+
   test("POST of bad_foo_bar on x should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml",
                                                                 bad_foo_bar), response, chain), 400)
@@ -325,6 +405,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 
   test("POST of bad_foo_bar on x should fail on shardXPath2NoDups") {
     assertResultFailed(shardXPath2NoDups.validate(request("POST", "x", "application/xml",
+                                                          bad_foo_bar), response, chain), 400)
+  }
+
+  test("POST of bad_foo_bar on x should fail on shardXPath2NoDupsJoinXPath") {
+    assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "x", "application/xml",
                                                           bad_foo_bar), response, chain), 400)
   }
 }
