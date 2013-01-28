@@ -41,10 +41,9 @@
     <!--
         Most of the work of joining is done by the following util. The
         purpose of this template is to identify the joins and to
-        decide what attributes the new join nodes should have.
+        create new join steps.
     -->
     <xsl:import href="../util/join.xsl"/>
-
 
     <!--
         Select join candidates.
@@ -157,19 +156,25 @@
     </xsl:template>
 
     <!--
-        Describe attributes in new join steps
+        Convert joins into a checker step.
     -->
-    <xsl:template name="stepAttributes">
+    <xsl:template match="check:join" mode="join">
         <xsl:param name="checker" as="node()"/>
         <xsl:param name="joins" as="node()*"/>
-        <xsl:param name="currentJoin" as="node()"/>
-        <xsl:param name="joinSteps" as="node()*"/>
+        <xsl:variable name="steps" select="@steps"/>
+        <xsl:variable name="joinSteps" as="node()*" select="$checker//check:step[@id = tokenize($steps,' ')]"/>
 
-        <!--
-            Since the steps are exactly alike, we need to simply copy
-            over the attributes from the first join step.
-        -->
-        <xsl:apply-templates select="$joinSteps[1]/@*[not(name() = ('next','label','id'))]"
-                             mode="copy"/>
+        <step id="{generate-id(.)}">
+            <!--
+                Since the steps are exactly alike, we need to simply copy
+                over the attributes from the first join step.
+            -->
+            <xsl:apply-templates select="$joinSteps[1]/@*[not(name() = ('next','label','id'))]"
+                                 mode="copy"/>
+            <xsl:call-template name="joinNext">
+                <xsl:with-param name="checker" select="$checker"/>
+                <xsl:with-param name="joins" select="$joins"/>
+            </xsl:call-template>
+        </step>
     </xsl:template>
 </xsl:stylesheet>

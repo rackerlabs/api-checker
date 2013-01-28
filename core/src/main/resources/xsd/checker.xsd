@@ -15,6 +15,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
     xmlns:saxon="http://saxon.sf.net/"
+    xmlns:xerces="http://xerces.apache.org"
     targetNamespace="http://www.rackspace.com/repose/wadl/checker">
 
     <import namespace="http://www.w3.org/1999/XSL/Transform"
@@ -185,6 +186,9 @@
                 <attribute name="version" type="chk:XSLVersion" use="required"/>
                 <assert test="if (@href and (xsl:stylesheet or xsl:transform)) then false() else true() "
                         saxon:message="Can't define an inline transform and also include a href"/>
+                <assert test="if (not(@href)) then (xsl:stylesheet or xsl:transform) else true()"
+                        saxon:message="An XSL step must contain an href or an inline transformation"
+                        xerces:message="An XSL step must contain an href or an inline transformation"/>
             </extension>
         </complexContent>
     </complexType>
