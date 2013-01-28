@@ -49,6 +49,7 @@ class ValidatorFilter extends Filter {
     conf.checkPlainParams = true
     conf.doXSDGrammarTransform = true
     conf.enablePreProcessExtension = true
+    conf.enableMessageExtension = true
     conf.joinXPathChecks = true
     conf.enableIgnoreXSDExtension = true
     conf.xslEngine = "XalanC"
