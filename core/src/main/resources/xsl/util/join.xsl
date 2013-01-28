@@ -27,24 +27,21 @@
    A new state E is used to replace states C and D. The process is
    executed recursively.
 
-   How the process identifies candidates for the join (C, D), and what
-   attributes the newly created states have (E) is left for a
-   customization layer to implement.  This stylesheet does all of the
-   common work around the process of joining.
+   How the process identifies candidates for the join (C, D), and
+   produces the new state (E) is left for a customization layer to
+   implement.  This stylesheet does all of the common work around the
+   process of joining.
 
-   There are two templates that a customization layer should fill
-   in.
+   The customization layer should fill in:
 
    1.  A template which matches a check:step and produces joins, in
        the example above it would idetitfy steps C and D.
-   2.  A template which takes a join and producess the attribues
-       needed for the replacement step. So in the example above it
-       would state what attributes are needed by step E.
+
+   2.  Templates in 'join' mode, wich match on joins and create the
+       replacement checker steps. So in the example above it would
+       match on the join produced in step 1 and generate step E.
 
    See the bottom of this file for details.
-
-   The @id of state E, and the @next attributes are filled in by this
-   stylesheet.
 -->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -107,31 +104,12 @@
         </checker>
     </xsl:template>
 
-    <xsl:template match="check:join" mode="join">
-        <xsl:param name="checker" as="node()"/>
-        <xsl:param name="joins" as="node()*"/>
-        <xsl:variable name="joinSteps" as="xsd:string*" select="tokenize(@steps,' ')"/>
-        <xsl:variable name="steps" as="node()*" select="$checker//check:step[@id = $joinSteps]"/>
-
-        <step id="{generate-id(.)}">
-            <xsl:call-template name="stepAttributes">
-                <xsl:with-param name="checker" select="$checker"/>
-                <xsl:with-param name="joins" select="$joins"/>
-                <xsl:with-param name="currentJoin" select="."/>
-                <xsl:with-param name="joinSteps" select="$steps"/>
-            </xsl:call-template>
-            <xsl:call-template name="joinNext">
-                <xsl:with-param name="joins" select="$joins"/>
-                <xsl:with-param name="steps" select="$steps"/>
-                <xsl:with-param name="nexts" select="()"/>
-             </xsl:call-template>
-        </step>
-    </xsl:template>
-
     <xsl:template name="joinNext">
+        <xsl:param name="checker" as="node()*"/>
         <xsl:param name="joins" as="node()*"/>
-        <xsl:param name="steps" as="node()*"/>
-        <xsl:param name="nexts" as="xsd:string*"/>
+        <xsl:param name="join" as="node()" select="."/>
+        <xsl:param name="steps" as="node()*" select="$checker//check:step[@id = tokenize($join/@steps,' ')]"/>
+        <xsl:param name="nexts" as="xsd:string*" select="()"/>
         <xsl:choose>
             <xsl:when test="empty($steps)">
                 <xsl:attribute name="next">
@@ -143,6 +121,8 @@
             <xsl:otherwise>
                 <xsl:variable name="snexts" as="xsd:string*" select="check:getNexts($joins,tokenize($steps[1]/@next,' '))"/>
                 <xsl:call-template name="joinNext">
+                    <xsl:with-param name="checker" select="$checker"/>
+                    <xsl:with-param name="joins" select="$joins"/>
                     <xsl:with-param name="steps" select="$steps[position() != 1]"/>
                     <xsl:with-param name="nexts"
                                     select="(for $s in $snexts
@@ -227,24 +207,26 @@
     </xsl:template>
 
     <!--
-        A new step is created for every join. The step already
-        contains an id and next attributes.  The purpose of this
-        template is to generate all other attributes for the new step.
+        A new step is created for every join. You must match a join
+        and generate a step.  The id of the step should be the
+        generate-id of the join for things to work.  You should
+        generate the next attribute.  There is a default template for
+        doing this called joinNext.
 
-        The following parameters are passed in:
+        The following parameters are passed to apply templates:
 
         checker     :  The entire checker document
         joins       :  The entire list of joins
-        currentJoin :  The join that is associated with this step
-        joinSteps   :  The list of steps associated with the currentJoin
     -->
-    <xsl:template name="stepAttributes">
+    <xsl:template match="check:join" mode="join">
         <xsl:param name="checker" as="node()"/>
         <xsl:param name="joins" as="node()*"/>
-        <xsl:param name="currentJoin" as="node()"/>
-        <xsl:param name="joinSteps" as="node()*"/>
-        <!--
-           This should be implemented by a customization layer.
-        -->
+
+        <step id="{generate-id(.)}">
+            <xsl:call-template name="joinNext">
+                <xsl:with-param name="checker" select="$checker"/>
+                <xsl:with-param name="joins" select="$joins"/>
+             </xsl:call-template>
+        </step>
     </xsl:template>
 </xsl:stylesheet>
