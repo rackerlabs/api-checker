@@ -64,7 +64,8 @@
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
-                saxon:message="There should be 1 and only 1 step of type START.">
+                saxon:message="There should be 1 and only 1 step of type START."
+                xerces:message="There should be 1 and only 1 step of type START.">
             <annotation>
                 <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                     <html:p>
@@ -74,7 +75,8 @@
             </annotation>
         </assert>
         <assert test="count(chk:step[@id = tokenize(string-join(..//chk:step/@next,' '),' ')]) = count(chk:step[@type != 'START'])"
-                saxon:message="Every step must be connected">
+                saxon:message="Every step must be connected"
+                xerces:message="Every step must be connected">
             <annotation>
                 <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                     <html:p>
@@ -185,7 +187,8 @@
                 <attribute name="href" type="xsd:anyURI" use="optional"/>
                 <attribute name="version" type="chk:XSLVersion" use="required"/>
                 <assert test="if (@href and (xsl:stylesheet or xsl:transform)) then false() else true() "
-                        saxon:message="Can't define an inline transform and also include a href"/>
+                        saxon:message="Can't define an inline transform and also include a href"
+                        xerces:message="Can't define an inline transform and also include a href"/>
                 <assert test="if (not(@href)) then (xsl:stylesheet or xsl:transform) else true()"
                         saxon:message="An XSL step must contain an href or an inline transformation"
                         xerces:message="An XSL step must contain an href or an inline transformation"/>
@@ -506,9 +509,11 @@
         <attribute name="ns" type="xsd:string" use="optional"/>
         <attribute name="href" type="xsd:anyURI" use="optional"/>
         <assert test="if (xsd:*) then xsd:schema else true()"
-                saxon:message="Only xsd:schema element is allowed!"/>
+                saxon:message="Only xsd:schema element is allowed!"
+                xerces:message="Only xsd:schema element is allowed!"/>
         <assert test="if (xsd:schema and @href) then false() else true()"
-                saxon:message="Grammar can't have both an href and a schema"/>
+                saxon:message="Grammar can't have both an href and a schema"
+                xerces:message="Grammar can't have both an href and a schema"/>
     </complexType>
 
     <!-- Simple Types -->
