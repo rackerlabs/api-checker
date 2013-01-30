@@ -6957,7 +6957,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
-    println (checker)
     reqTypeAndReqHeaderDupsOnAssertions(checker)
     wellFormedAndReqHeaderDupsOnAssertions(checker)
     xsdAndReqHeaderDupsOnAssertions(checker)
