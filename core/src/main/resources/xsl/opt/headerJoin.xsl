@@ -1,5 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   headerJoin.xsl
 
+   This stylesheet takes a document in checker format and safely joins
+   header states in different branches of execution. The operation
+   works like removeDups.xsl, but this takes into account the fact
+   that the same HTTP header may have multiple values, which are
+   checked by different states, and it creates a state that check
+   those values simultaneously.
+
+   For Example:
+
+              +===+
+            /=| C +=
+   +===+ /==  +===+ \== +===+
+   | A +=               + Y |
+   +===+ \==  +===+ /== +===+
+            \=| D +=
+              +===+
+
+   Becomes:
+
+
+   +===+    +===+    +===+
+   | A +====+ B +====+ Y |
+   +===+    +===+    +===+
+
+
+   Here, C and D are states that check that the content of a header
+   contians a value. The new state B, checks that the content of the
+   header contain be any one of those values.
+
+   The process is executed recursively.  It is assumed that the input
+   file has already gone through removeDups.xsl and commonDups.xsl
+-->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
