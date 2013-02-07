@@ -118,6 +118,7 @@
                         <xsl:with-param name="excludes" select="$excludes"/>
                         <xsl:with-param name="id" select="@id"/>
                     </xsl:apply-templates>
+                    <xsl:copy-of select="element()"/>
                 </step>
             </xsl:otherwise>
         </xsl:choose>
