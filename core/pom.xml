@@ -30,6 +30,10 @@
                         <arg>-explaintypes</arg>
                     </args>
                     <recompileMode>modified-only</recompileMode>
+                    <jvmArgs>
+                        <jvmArg>-Xms64m</jvmArg>
+                        <jvmArg>-Xmx1024m</jvmArg>
+                    </jvmArgs>
                 </configuration>
                 <executions>
                     <execution>
