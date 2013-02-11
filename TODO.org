@@ -389,6 +389,16 @@
       1. [X] State
       2. [X] Builder
       3. [X] Validator
+** TODO rax:code for XPath message [0/6]
+   1. [ ] Allow passing code to content error state (Defualt 400)
+   2. [ ] Extend XSD to allow code in XPath
+   3. [ ] Extend builder XSL to add code in XPath state
+   4. [ ] Extend handler to pass code over
+   5. [ ] Make join optimization aware of the extension
+   6. [ ] TESTS [0/3]
+      1. [ ] State
+      2. [ ] Builder
+      3. [ ] Validator
 ** TODO Header Enhancements [1/3]
    1. [X] Multiple header checks with the same name [4/4]
       1. [X] Allow checks in steps via enumeration
