@@ -67,7 +67,7 @@
                   select="$enablePlainParamCheck"/>
     <xsl:variable name="useWellFormCheck" as="xsd:boolean"
                   select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or
-                          $enablePlainParamCheck or $enablePreProcessExtension"/>
+                          $enablePlainParamCheck"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
                   select="$enableHeaderCheck"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
@@ -593,12 +593,14 @@
 
     <xsl:template match="wadl:request/wadl:representation[@mediaType]">
         <xsl:variable name="defaultNext" select="$ACCEPT"/>
+        <xsl:variable name="doUseWellFormCheck" as="xsd:boolean"
+                      select="$useWellFormCheck or ($usePreProcessExtension and exists(rax:preprocess))"/>
         <step type="REQ_TYPE">
             <xsl:attribute name="id" select="generate-id()"/>
             <!-- Note that matches on the media type are always case insensitive -->
             <xsl:attribute name="match" select="check:mediaTypeToRegEx(@mediaType)"/>
             <xsl:choose>
-                <xsl:when test="$useWellFormCheck">
+                <xsl:when test="$doUseWellFormCheck">
                     <xsl:choose>
                         <xsl:when test="check:isXML(@mediaType) or check:isJSON(@mediaType)">
                             <xsl:call-template name="check:addWellFormNext"/>
@@ -614,7 +616,7 @@
             </xsl:choose>
             <xsl:call-template name="check:addLabel"/>
         </step>
-        <xsl:if test="$useWellFormCheck">
+        <xsl:if test="$doUseWellFormCheck">
             <xsl:choose>
                 <xsl:when test="check:isXML(@mediaType)">
                     <xsl:call-template name="check:addWellForm">
