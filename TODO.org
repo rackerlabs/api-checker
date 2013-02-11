@@ -389,8 +389,8 @@
       1. [X] State
       2. [X] Builder
       3. [X] Validator
-** TODO rax:code for XPath message [0/6]
-   1. [ ] Allow passing code to content error state (Defualt 400)
+** TODO rax:code for XPath message [1/6]
+   1. [X] Allow passing code to content error state (Defualt 400)
    2. [ ] Extend XSD to allow code in XPath
    3. [ ] Extend builder XSL to add code in XPath state
    4. [ ] Extend handler to pass code over

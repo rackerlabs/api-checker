@@ -32,6 +32,7 @@ object RequestAttributes {
   val PARSED_XML    = "com.rackspace.com.papi.components.checker.servlet.ParsedXML"
   val PARSED_JSON   = "com.rackspace.com.papi.components.checker.servlet.ParsedJSON"
   val CONTENT_ERROR = "com.rackspace.com.papi.components.checker.servlet.ContentError"
+  val CONTENT_ERROR_CODE = "com.rackspace.com.papi.components.checker.servlet.ContentErrorCode"
 }
 
 import RequestAttributes._
@@ -52,7 +53,15 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   def parsedJSON_= (obj : Object):Unit = request.setAttribute (PARSED_JSON, obj)
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
-  def contentError_= (e : Exception):Unit = request.setAttribute(CONTENT_ERROR, e)
+  def contentError_= (e : Exception):Unit = {
+    request.setAttribute(CONTENT_ERROR, e)
+    request.setAttribute(CONTENT_ERROR_CODE, 400)
+  }
+  def contentError(e : Exception, c : Int) : Unit = {
+    request.setAttribute(CONTENT_ERROR, e)
+    request.setAttribute(CONTENT_ERROR_CODE, c)
+  }
+  def contentErrorCode : Int = request.getAttribute(CONTENT_ERROR_CODE).asInstanceOf[Int]
 
   override def getInputStream : ServletInputStream = {
     if (parsedXML != null) {
