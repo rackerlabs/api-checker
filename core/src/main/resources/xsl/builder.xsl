@@ -804,6 +804,9 @@
                     <xsl:if test="@rax:message and $useMessageExtension">
                         <xsl:attribute name="message" select="@rax:message"/>
                     </xsl:if>
+                    <xsl:if test="@rax:code and $useMessageExtension">
+                        <xsl:attribute name="code" select="@rax:code"/>
+                    </xsl:if>
                     <xsl:choose>
                         <xsl:when test="position() = last()">
                             <xsl:choose>
