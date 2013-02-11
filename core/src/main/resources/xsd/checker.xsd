@@ -210,6 +210,7 @@
                 <attribute name="match" type="xsd:string" use="required"/>
                 <attribute name="version" type="chk:XPathVersion" use="optional"/>
                 <attribute name="message" type="xsd:string" use="optional"/>
+                <attribute name="code" type="xsd:int" use="optional"/>
             </extension>
         </complexContent>
     </complexType>
