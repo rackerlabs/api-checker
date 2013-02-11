@@ -84,17 +84,17 @@ class Config {
   //
   //  Enable preprocess extension
   //
-  @BeanProperty var enablePreProcessExtension : Boolean = false
+  @BeanProperty var enablePreProcessExtension : Boolean = true
 
   //
   //  Enable ignore XSD extension
   //
-  @BeanProperty var enableIgnoreXSDExtension : Boolean = false
+  @BeanProperty var enableIgnoreXSDExtension : Boolean = true
 
   //
   //  Enable message extension
   //
-  @BeanProperty var enableMessageExtension : Boolean = false
+  @BeanProperty var enableMessageExtension : Boolean = true
 
   //
   //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,

@@ -35,14 +35,14 @@ object Wadl2Checker {
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
 
-  val preProc  = parser.flag[Boolean] (List("P", "preproc"),
-                                       "Enable preprocess extension : false")
+  val preProc  = parser.flag[Boolean] (List("P", "disable-preproc-ext"),
+                                       "Disable preprocess extension : false")
 
-  val ignoreXSD  = parser.flag[Boolean] (List("i", "ignore-xsd-ext"),
-                                         "Enable Ignore XSD  extension : false")
+  val ignoreXSD  = parser.flag[Boolean] (List("i", "disable-ignore-xsd-ext"),
+                                         "Disable Ignore XSD  extension : false")
 
-  val message  = parser.flag[Boolean] (List("m", "message-ext"),
-                                         "Enable Message extension : false")
+  val message  = parser.flag[Boolean] (List("m", "disable-message-ext"),
+                                         "Disable Message extension : false")
 
   val validate = parser.flag[Boolean] (List("v", "validate"),
                                        "Validate produced checker Default: false")
@@ -101,11 +101,11 @@ object Wadl2Checker {
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
       c.checkElements = element.value.getOrElse(false)
       c.checkPlainParams = plainParam.value.getOrElse(false)
-      c.enablePreProcessExtension = preProc.value.getOrElse(false)
+      c.enablePreProcessExtension = !(preProc.value.getOrElse(false))
       c.joinXPathChecks = joinXPaths.value.getOrElse(false)
       c.checkHeaders = header.value.getOrElse(false)
-      c.enableIgnoreXSDExtension = ignoreXSD.value.getOrElse(false)
-      c.enableMessageExtension = message.value.getOrElse(false)
+      c.enableIgnoreXSDExtension = !(ignoreXSD.value.getOrElse(false))
+      c.enableMessageExtension = !(message.value.getOrElse(false))
       c.xpathVersion = xpathVersion.value.getOrElse(1)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)
