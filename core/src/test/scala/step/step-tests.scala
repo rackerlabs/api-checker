@@ -904,11 +904,38 @@ class StepSuite extends BaseStepSuite {
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[SAXParseException])
     assert (req1.contentError.getMessage.contains("Expecting /tst:root"))
+    assert (req1.contentErrorCode == 400)
 
     xpath.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[SAXParseException])
     assert (req2.contentError.getMessage.contains("Expecting /tst:root"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with setErrorCode") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, Some(401), context, 1, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <foot xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </foot>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:foot xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:foot>, true)
+    xpath.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting /tst:root"))
+    assert (req1.contentErrorCode == 401)
+
+    xpath.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting /tst:root"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message") {
@@ -927,11 +954,38 @@ class StepSuite extends BaseStepSuite {
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[SAXParseException])
     assert (req1.contentError.getMessage.contains("/tst:root was expected"))
+    assert (req1.contentErrorCode == 400)
 
     xpath.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[SAXParseException])
     assert (req2.contentError.getMessage.contains("/tst:root was expected"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message and set code") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root", Some("/tst:root was expected"), Some(401), context, 1, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <foot xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </foot>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:foot xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:foot>, true)
+    xpath.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("/tst:root was expected"))
+    assert (req1.contentErrorCode == 401)
+
+    xpath.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("/tst:root was expected"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same (XPath 2)") {
@@ -981,10 +1035,12 @@ class StepSuite extends BaseStepSuite {
     xpath.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentErrorCode == 400)
 
     xpath.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentErrorCode == 400)
   }
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with a message of 'Expecting '+XPATH (XPath 2)") {
@@ -1003,11 +1059,38 @@ class StepSuite extends BaseStepSuite {
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[SAXParseException])
     assert (req1.contentError.getMessage.contains("Expecting if (/tst:root) then true() else false()"))
+    assert (req1.contentErrorCode == 400)
 
     xpath.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[SAXParseException])
     assert (req2.contentError.getMessage.contains("Expecting if (/tst:root) then true() else false()"))
+    assert (req1.contentErrorCode == 400)
+  }
+
+  test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with a message of 'Expecting '+XPATH (XPath 2) with set code") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, Some(401), context, 2, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <foot xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </foot>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:foot xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:foot>, true)
+    xpath.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting if (/tst:root) then true() else false()"))
+    assert (req1.contentErrorCode == 401)
+
+    xpath.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting if (/tst:root) then true() else false()"))
+    assert (req1.contentErrorCode == 401)
   }
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message(XPath 2)") {
@@ -1026,11 +1109,38 @@ class StepSuite extends BaseStepSuite {
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[SAXParseException])
     assert (req1.contentError.getMessage.contains("/tst:root was expected"))
+    assert (req1.contentErrorCode == 400)
 
     xpath.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[SAXParseException])
     assert (req2.contentError.getMessage.contains("/tst:root was expected"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message(XPath 2) and setCode") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", Some("/tst:root was expected"), Some(401), context, 2, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <foot xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </foot>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:foot xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:foot>, true)
+    xpath.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("/tst:root was expected"))
+    assert (req1.contentErrorCode == 401)
+
+    xpath.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("/tst:root was expected"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("An XSL should correctly transfrom request XML (XSL 1.0)") {
