@@ -34,18 +34,13 @@ object XPathExpressionPool extends Instrumented {
 
   def borrowExpression(expression : String, nc : NamespaceContext, version : Int) : XPathExpression = {
     version match {
-      case 1 =>
-        xpathExpressions.getOrElseUpdate(expression, addXPathPool(expression, nc, version)).borrowObject()
-      case 2 =>
-        xpath2Expressions.getOrElseUpdate(expression, addXPathPool(expression,nc,version)).borrowObject()
+      case 1 => new XPathExpressionFactory(expression, nc).makeObject
+      case 2 => new XPath2ExpressionFactory(expression, nc).makeObject
     }
   }
 
   def returnExpression(expression : String, version : Int, xpathExpression : XPathExpression) : Unit = {
-    version match {
-      case 1 => xpathExpressions(expression).returnObject(xpathExpression)
-      case 2 => xpath2Expressions(expression).returnObject(xpathExpression)
-    }
+
   }
 
   def numActive (expression : String, version : Int) : Int = {
