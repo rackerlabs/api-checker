@@ -102,7 +102,7 @@
                                      the first error code need apply.
                                  -->
                                  <xsl:if test="$steps[@type='XPATH' and exists(@code)]">
-                                     <xsl:value-of select="concat('&amp;lt;&amp;lt;C:',$steps[@type='XPATH']/@code[1],'&amp;gt;&amp;gt;')"/>
+                                     <xsl:value-of select="concat('C:',$steps[@type='XPATH']/@code[1],':C')"/>
                                  </xsl:if>
                              </xslout:message>
                          </xslout:otherwise>

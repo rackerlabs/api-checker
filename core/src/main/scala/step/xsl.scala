@@ -89,7 +89,7 @@ object TransformErrorCapture {
   //  TODO: Find a better way of interfacing with XSL. This technique
   //  is brittle. XPathExtension(?)
   //
-  val errorCode = "<<C:(/d+)>>".r
+  val errorCode = "C:(\\d+):C".r
 
   //
   //  If no error code is found in the output the following will be
