@@ -96,6 +96,14 @@
                                  <xsl:value-of select="for $s in $steps[@type='XPATH'] return
                                                        if ($s/@message) then $s/@message
                                                        else concat('Expecting ',$s/@match)" separator=" or "/>
+                                 <!--
+                                     Since XPath or operations are not
+                                     joined at the moment, then only
+                                     the first error code need apply.
+                                 -->
+                                 <xsl:if test="$steps[@type='XPATH' and exists(@code)]">
+                                     <xsl:value-of select="concat('C:',$steps[@type='XPATH']/@code[1],':C')"/>
+                                 </xsl:if>
                              </xslout:message>
                          </xslout:otherwise>
                      </xslout:choose>
