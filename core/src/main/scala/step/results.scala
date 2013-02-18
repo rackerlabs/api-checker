@@ -34,7 +34,8 @@ abstract class Result(val message : String,   // A message describing the result
     }
   }
 }
-abstract class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String) extends Result(message, false, true, uriLevel, stepId) {
+
+class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String) extends Result(message, false, true, uriLevel, stepId) {
   override def toString : String = path+" "+code+" : "+message
   override def cmpString : String = super.cmpString+" "+code
 }

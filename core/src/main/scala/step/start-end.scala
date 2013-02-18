@@ -190,7 +190,7 @@ class ContentFail(id : String, label : String) extends Step(id, label) {
     //  If there is a contentError in the request, return it,
     //  otherwise return NONE.
     //
-    var result : Option[BadContentResult] = None
+    var result : Option[Result] = None
 
     if (req.contentError != null) {
       val msg = {
@@ -201,7 +201,12 @@ class ContentFail(id : String, label : String) extends Step(id, label) {
         m
       }
 
-      val bcr = new BadContentResult("Bad Content: "+msg, uriLevel, id)
+      val bcr = {
+        req.contentErrorCode match {
+          case 400 => new BadContentResult("Bad Content: "+msg, uriLevel, id)
+          case c : Int => new ErrorResult (msg, c, uriLevel, id)
+        }
+      }
       result = Some(bcr)
     }
 

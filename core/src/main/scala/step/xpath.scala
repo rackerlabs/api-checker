@@ -12,13 +12,21 @@ import com.rackspace.com.papi.components.checker.util.XPathExpressionPool._
 import org.xml.sax.SAXParseException
 
 class XPath(id : String, label : String, val expression : String, val message : Option[String],
-            val nc : NamespaceContext, val version : Int, next : Array[Step]) extends ConnectedStep(id, label, next) {
+            val code : Option[Int], val nc : NamespaceContext, val version : Int, next : Array[Step]) extends ConnectedStep(id, label, next) {
 
   override val mismatchMessage : String = {
     if (message == None) {
       "Expecting "+expression
     } else {
       message.get
+    }
+  }
+
+  val mismatchCode : Int = {
+    if (code == None) {
+      400
+    } else {
+      code.get
     }
   }
 
@@ -29,7 +37,7 @@ class XPath(id : String, label : String, val expression : String, val message : 
     try {
       xpath = borrowExpression (expression, nc, version)
       if (!xpath.evaluate (req.parsedXML, BOOLEAN).asInstanceOf[Boolean]) {
-        req.contentError = new SAXParseException (mismatchMessage, null)
+        req.contentError(new SAXParseException (mismatchMessage, null), mismatchCode)
       } else {
         ret = uriLevel
       }
