@@ -396,9 +396,9 @@
    4. [X] Modify XPath State to accept code
    5. [X] Extend handler to pass code over
    6. [X] Make join optimization aware of the extension
-   7. [-] TESTS [1/4]
+   7. [-] TESTS [2/4]
       1. [X] State
-      2. [ ] Builder
+      2. [X] Builder
       3. [ ] Validator
       4. [ ] Test XPath Join on [0/3]
          1. [ ] XSL 2.0

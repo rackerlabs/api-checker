@@ -77,6 +77,14 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithXPathMatch(checker, xpathMatch).filter (n => (n \ "@message").text == message)
   }
 
+  def stepsWithXPathCodeMatch (checker : NodeSeq, xpathMatch : String, code : Int) : NodeSeq = {
+    stepsWithXPathMatch(checker, xpathMatch).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithXPathMessageCodeMatch (checker : NodeSeq, xpathMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithXPathMessageMatch(checker, xpathMatch, message).filter (n => (n \ "@code").text == code.toString)
+  }
+
   def stepsWithMethodMatch (checker : NodeSeq, methodMatch  : String) : NodeSeq = {
     stepsWithMatch (checker, methodMatch).filter(n => (n \ "@type").text == "METHOD")
   }
@@ -117,6 +125,8 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def Method(method : String) : (NodeSeq) => NodeSeq = stepsWithMethodMatch(_, method)
   def XPath(expression : String) : (NodeSeq) => NodeSeq = stepsWithXPathMatch (_, expression)
   def XPath(expression: String, message : String) : (NodeSeq) => NodeSeq = stepsWithXPathMessageMatch(_, expression, message)
+  def XPath(expression: String, code : Int) : (NodeSeq) => NodeSeq = stepsWithXPathCodeMatch(_, expression, code)
+  def XPath(expression: String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithXPathMessageCodeMatch(_, expression, message, code)
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
   def AnyReqType : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(.*)()")
   def Header(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatch(_, name, headerMatch)
