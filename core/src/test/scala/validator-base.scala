@@ -477,4 +477,22 @@ class BaseValidatorSuite extends FunSuite {
       throw new TestFailedException(Some("Expected error message '"+message+"' but got '"+result.message+"'"), None, 4)
     }
   }
+
+  def assertResultFailed(f : => Any, code : Int, message : List[String]) : Unit = {
+    var result : ErrorResult = null
+    assertResultFailed(f).get.result match {
+      case mfr : MultiFailResult =>
+        result = mfr.reduce.get.asInstanceOf[ErrorResult]
+      case other : ErrorResult =>
+        result = other
+    }
+    if (result.code != code) {
+      throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
+    }
+    message.foreach(m => {
+      if (!result.message.contains(m)) {
+        throw new TestFailedException(Some("Expected error string '"+m+"' in the result message, but it didn't have one. Actual result message: '"+result.message+"'"), None, 4)
+      }
+    })
+  }
 }
