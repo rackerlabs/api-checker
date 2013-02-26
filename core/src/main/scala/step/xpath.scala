@@ -44,7 +44,7 @@ class XPath(id : String, label : String, val expression : String, val message : 
     } catch {
       case e : Exception => req.contentError = e
     } finally {
-      if (xpath != null) returnExpression (expression, version, xpath)
+      if (xpath != null) returnExpression (expression, nc, version, xpath)
     }
 
     ret
