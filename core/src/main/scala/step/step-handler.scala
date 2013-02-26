@@ -578,7 +578,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       case spe : SAXParseException => throw spe
       case e : Exception => throw new SAXParseException ("Error while compiling XPath expression", locator, e)
     } finally {
-      if (expression != null) XPathExpressionPool.returnExpression(_match, version, expression)
+      if (expression != null) XPathExpressionPool.returnExpression(_match, context, version, expression)
     }
 
     next += (id -> nexts)

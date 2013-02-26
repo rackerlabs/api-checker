@@ -17,8 +17,10 @@ import com.yammer.metrics.core.Gauge
 import com.yammer.metrics.scala.Instrumented
 
 object XPathExpressionPool extends Instrumented {
-  private val xpathExpressions : Map[String, SoftReferenceObjectPool[XPathExpression]] = new HashMap[String, SoftReferenceObjectPool[XPathExpression]]
-  private val xpath2Expressions : Map[String, SoftReferenceObjectPool[XPathExpression]] = new HashMap[String, SoftReferenceObjectPool[XPathExpression]]
+  private val xpathExpressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext), 
+                                                                                                                         SoftReferenceObjectPool[XPathExpression]]
+  private val xpath2Expressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext),
+                                                                                                                          SoftReferenceObjectPool[XPathExpression]]
 
   private val activeGauges = new LinkedList[Gauge[Int]]
   private val idleGauges = new LinkedList[Gauge[Int]]
@@ -35,30 +37,30 @@ object XPathExpressionPool extends Instrumented {
   def borrowExpression(expression : String, nc : NamespaceContext, version : Int) : XPathExpression = {
     version match {
       case 1 =>
-        xpathExpressions.getOrElseUpdate(expression, addXPathPool(expression, nc, version)).borrowObject()
+        xpathExpressions.getOrElseUpdate((expression, nc), addXPathPool(expression, nc, version)).borrowObject()
       case 2 =>
-        xpath2Expressions.getOrElseUpdate(expression, addXPathPool(expression,nc,version)).borrowObject()
+        xpath2Expressions.getOrElseUpdate((expression, nc), addXPathPool(expression,nc,version)).borrowObject()
     }
   }
 
-  def returnExpression(expression : String, version : Int, xpathExpression : XPathExpression) : Unit = {
+  def returnExpression(expression : String, nc : NamespaceContext, version : Int, xpathExpression : XPathExpression) : Unit = {
     version match {
-      case 1 => xpathExpressions(expression).returnObject(xpathExpression)
-      case 2 => xpath2Expressions(expression).returnObject(xpathExpression)
+      case 1 => xpathExpressions((expression, nc)).returnObject(xpathExpression)
+      case 2 => xpath2Expressions((expression, nc)).returnObject(xpathExpression)
     }
   }
 
-  def numActive (expression : String, version : Int) : Int = {
+  def numActive (expression : String, nc : NamespaceContext, version : Int) : Int = {
     version match {
-      case 1 => xpathExpressions(expression).getNumActive()
-      case 2 => xpath2Expressions(expression).getNumActive()
+      case 1 => xpathExpressions((expression, nc)).getNumActive()
+      case 2 => xpath2Expressions((expression,nc)).getNumActive()
     }
   }
 
-  def numIdle (expression : String, version : Int) : Int = {
+  def numIdle (expression : String, nc : NamespaceContext, version : Int) : Int = {
     version match {
-      case 1 => xpathExpressions(expression).getNumIdle()
-      case 2 => xpath2Expressions(expression).getNumIdle()
+      case 1 => xpathExpressions((expression, nc)).getNumIdle()
+      case 2 => xpath2Expressions((expression, nc)).getNumIdle()
     }
   }
 }

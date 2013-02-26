@@ -76,4 +76,14 @@ class ImmutableNamespaceContext private (private val inputNS : scala.collection.
       Set[String]().toIterator //an empty string iterator
     }
   }
+
+  //
+  //  Borrow toString, hashCode, and equals from our immutable
+  //  namespace map.
+  //
+  override def toString = prefixToURI.toString
+  override def hashCode = prefixToURI.hashCode
+  override def equals(o : Any) = {
+    o.asInstanceOf[ImmutableNamespaceContext].prefixToURI.equals(prefixToURI)
+  }
 }
