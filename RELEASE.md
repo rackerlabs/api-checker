@@ -4,7 +4,7 @@
 
 1. Updated Saxon 9.4.0.4 -> 9.4.0.6
 1. All RAX extensions are now enabled by default
-1. Test framework is not exported as a jar, so you can use api-checker
+1. Test framework is now exported as a jar, so you can use api-checker
    in JUnit tests
 1. Resolved Bug here XPath pool was not taking namespace context into account
 1. Resolved Bug where HREFs in a WADL artifacts (XSDs, XSLs) were not
@@ -42,7 +42,7 @@
 ## Release 1.0.2 (2012-11-13) ##
 
 1. Integrate with WADL Tools 1.0.9
-1. Media Type ranges (for example text/* and */*)  are now supported
+1. Media Type ranges (for example text/* and \*/\*)  are now supported
 1. Media Type parameters (application/xml;version=2) are now ignored when validating
 1. Media Type charset parameter is now supported (application/xml; charset=UTF-16)
 1. Wadl2Checker CLI Util now supports xpath-version argument
