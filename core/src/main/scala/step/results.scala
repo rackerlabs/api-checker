@@ -56,7 +56,7 @@ class MultiFailResult(val fails : Array[Result], uriLevel : Int, stepId : String
   override protected val startPath = "{"
   override protected val endPath = "}"
 
-  override def path : String = startPath+(for {f <- fails} yield f.path).reduceLeft(_+" "+_)+endPath
+  override def path : String = startPath+stepIDs.reduceLeft(_+" "+_)+" "+(for {f <- fails} yield f.path).reduceLeft(_+" "+_)+endPath
 
   override def toString : String = {
     reduce match {
