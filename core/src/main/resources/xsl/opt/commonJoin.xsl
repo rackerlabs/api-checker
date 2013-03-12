@@ -141,8 +141,8 @@
                 </xsl:for-each-group>
             </xsl:for-each-group>
         </xsl:for-each-group>
-        <!-- Steps with no @match and no @transform-->
-        <xsl:for-each-group select="$nextStep[not(@match) and not(@transform)]" group-by="@type">
+        <!-- Steps with no @match, no @notMatch,  and no @transform-->
+        <xsl:for-each-group select="$nextStep[not(@match) and not(@transform) and not(@notMatch)]" group-by="@type">
             <xsl:if test="count(current-group()) &gt; 1">
                 <join>
                     <xsl:attribute name="steps">
