@@ -37,7 +37,7 @@ abstract class Result(val message : String,   // A message describing the result
 }
 
 class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String,
-                  headers : Map[String,String] = new HashMap()) extends Result(message, false, true, uriLevel, stepId) {
+                  val headers : Map[String,String] = new HashMap()) extends Result(message, false, true, uriLevel, stepId) {
   override def toString : String = path+" "+code+" : "+message
   override def cmpString : String = super.cmpString+" "+code
 }

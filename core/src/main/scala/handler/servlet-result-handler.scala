@@ -6,6 +6,8 @@ import com.rackspace.com.papi.components.checker.step.Result
 import com.rackspace.com.papi.components.checker.step.ErrorResult
 import com.rackspace.com.papi.components.checker.step.MultiFailResult
 
+import scala.collection.JavaConversions._
+
 import javax.servlet.FilterChain
 
 import org.w3c.dom.Document
@@ -18,9 +20,15 @@ class ServletResultHandler extends ResultHandler {
       result match {
         case mrf : MultiFailResult =>
           val re = mrf.reduce.get.asInstanceOf[ErrorResult]
-          resp.sendError(re.code, re.message)
-        case errorResult : ErrorResult => resp.sendError(errorResult.code, errorResult.message)
+          sendError(re, resp)
+        case errorResult : ErrorResult =>
+          sendError(errorResult, resp)
       }
     }
+  }
+
+  private def sendError (er : ErrorResult, resp : CheckerServletResponse) : Unit = {
+    er.headers.keySet.iterator.foreach(h => resp.addHeader(h, er.headers.get(h)))
+    resp.sendError(er.code, er.message)
   }
 }
