@@ -31,11 +31,11 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
         </application>, assertConfig)
 
   test ("GET on / should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405)
+    assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("an empty GET should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET",""),response,chain), 405)
+    assertResultFailed(validator_EMPTY.validate(request("GET",""),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a should fail on validator_EMPTY") {
@@ -47,7 +47,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("a completely empty request should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("",""),response,chain), 405)
+    assertResultFailed(validator_EMPTY.validate(request("",""),response,chain), 405, Map("Allow"->""))
   }
 
   //
@@ -80,15 +80,15 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("GET on / should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/"),response,chain), 405)
+    assertResultFailed(validator_AB.validate(request("GET","/"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("an empty GET should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET",""),response,chain), 405)
+    assertResultFailed(validator_AB.validate(request("GET",""),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/a"),response,chain), 405)
+    assertResultFailed(validator_AB.validate(request("GET","/a"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a/b/c/d should fail on validator_AB") {
@@ -96,7 +96,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("POST","/a/b"),response,chain), 405)
+    assertResultFailed(validator_AB.validate(request("POST","/a/b"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   test ("GET on /index.html should fail on validator_AB") {
@@ -159,7 +159,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b should fail on validator_ABAC") {
-    assertResultFailed(validator_ABAC.validate(request("POST","/a/b"),response,chain), 405)
+    assertResultFailed(validator_ABAC.validate(request("POST","/a/b"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   test ("GET on /index.html should fail on validator_ABAC") {
@@ -171,7 +171,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/c should fail on validator_ABAC") {
-    assertResultFailed(validator_ABAC.validate(request("POST","/a/c"),response,chain), 405)
+    assertResultFailed(validator_ABAC.validate(request("POST","/a/c"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   //
@@ -256,11 +256,11 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a//c should fail validator_REG") {
-    assertResultFailed(validator_REG.validate(request("GET","/a//c"),response,chain), 405)
+    assertResultFailed(validator_REG.validate(request("GET","/a//c"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a should fail validator_REG") {
-    assertResultFailed(validator_REG.validate(request("GET","/a"),response,chain), 405)
+    assertResultFailed(validator_REG.validate(request("GET","/a"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a/b/d should fail validator_REG") {
@@ -444,11 +444,11 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("PUT on /c should fail on validator_RT with a 405") {
-    assertResultFailed(validator_RT.validate(request("PUT","/c","application/json"),response,chain), 405)
+    assertResultFailed(validator_RT.validate(request("PUT","/c","application/json"),response,chain), 405, Map("Allow"->"GET, POST"))
   }
 
   test ("GET on /a/b should fail on validator_RT with a 405") {
-    assertResultFailed(validator_RT.validate(request("GET","/a/b"),response,chain), 405)
+    assertResultFailed(validator_RT.validate(request("GET","/a/b"),response,chain), 405, Map("Allow"->"POST, PUT"))
   }
 
   test ("POST on /a/b should fail on validator_RT if the media type is application/json") {
@@ -571,11 +571,11 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("PUT on /c should fail on validator_WELL with a 405") {
-    assertResultFailed(validator_WELL.validate(request("PUT","/c","application/json"),response,chain), 405)
+    assertResultFailed(validator_WELL.validate(request("PUT","/c","application/json"),response,chain), 405, Map("Allow"->"GET, POST"))
   }
 
   test ("GET on /a/b should fail on validator_WELL with a 405") {
-    assertResultFailed(validator_WELL.validate(request("GET","/a/b"),response,chain), 405)
+    assertResultFailed(validator_WELL.validate(request("GET","/a/b"),response,chain), 405, Map("Allow"->"POST, PUT"))
   }
 
   test ("POST on /a/b should fail on validator_WELL if the media type is application/json") {
@@ -1424,11 +1424,11 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("POST","/a/b"),response,chain), 405)
+    assertResultFailed(validator_AM.validate(request("POST","/a/b"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   test ("DELETE on /z/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("DELETE","/z/b"),response,chain), 405)
+    assertResultFailed(validator_AM.validate(request("DELETE","/z/b"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   test ("GET on /a/c should fail on validator_AM") {
@@ -1457,7 +1457,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     }
 
     test ("DELETE on /path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498f should fail on "+validator) {
-      assertResultFailed(validator.validate(request("DELETE","/path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498f"),response,chain), 405)
+      assertResultFailed(validator.validate(request("DELETE","/path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498f"),response,chain), 405, Map("Allow"->"GET"))
     }
 
     test ("GET on /path/to/my/resource/bbe10c88-6477-11e1-84cf-979e24b1498z should fail on "+validator) {
