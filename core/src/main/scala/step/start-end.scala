@@ -175,7 +175,7 @@ class MethodFail(id : String, label : String) extends Step(id, label) {
 //
 class MethodFailMatch(id : String, label : String, val method : Regex) extends MethodFail(id, label) {
   private val allowHeaders = new HashMap[String, String](1)
-  allowHeaders.put("Allow", method.toString.replaceAll("\\|",","))
+  allowHeaders.put("Allow", method.toString.replaceAll("\\|",", "))
 
   override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
     var result : Option[Result] = super.check(req, resp, chain, uriLevel)
