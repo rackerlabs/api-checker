@@ -1,5 +1,6 @@
 package com.rackspace.com.papi.components.checker.step
-
+import java.util.Map
+import java.util.HashMap
 import scala.collection.immutable.List
 
 //
@@ -35,7 +36,8 @@ abstract class Result(val message : String,   // A message describing the result
   }
 }
 
-class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String) extends Result(message, false, true, uriLevel, stepId) {
+class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String,
+                  val headers : Map[String,String] = new HashMap()) extends Result(message, false, true, uriLevel, stepId) {
   override def toString : String = path+" "+code+" : "+message
   override def cmpString : String = super.cmpString+" "+code
 }
@@ -43,7 +45,8 @@ class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : Str
 class AcceptResult(message: String, uriLevel : Int, stepId : String)  extends Result(message, true, true, uriLevel, stepId)
 class BadContentResult(message : String, uriLevel : Int, stepId : String) extends ErrorResult(message, 400, uriLevel, stepId)
 class URLFailResult(message : String, uriLevel : Int, stepId : String) extends ErrorResult(message, 404, uriLevel, stepId)
-class MethodFailResult(message: String, uriLevel : Int, stepId : String) extends ErrorResult(message, 405, uriLevel, stepId)
+class MethodFailResult(message: String, uriLevel : Int, stepId : String, headers : Map[String,String])
+      extends ErrorResult(message, 405, uriLevel, stepId, headers)
 class BadMediaTypeResult(message: String, uriLevel : Int, stepId : String) extends ErrorResult(message, 415, uriLevel, stepId)
 class MismatchResult(message: String, uriLevel : Int, stepId : String) extends Result(message, false, false, uriLevel, stepId) {
   override protected val startPath = "("

@@ -495,4 +495,26 @@ class BaseValidatorSuite extends FunSuite {
       }
     })
   }
+
+  def assertResultFailed(f : => Any, code : Int, headers : Map[String, String]) : Unit = {
+    var result : ErrorResult = null
+    assertResultFailed(f).get.result match {
+      case mfr : MultiFailResult =>
+        result = mfr.reduce.get.asInstanceOf[ErrorResult]
+      case other : ErrorResult =>
+        result = other
+    }
+    if (result.code != code) {
+      throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
+    }
+    headers.keys.foreach(k => {
+      val v = headers(k)
+      if (!result.headers.containsKey(k)) {
+        throw new TestFailedException(Some("Expected result header "+k), None, 4)
+      }
+      if (!result.headers.get(k).equals(v)) {
+        throw new TestFailedException(Some("Expected result header "+k+" to match value '"+v+"' but instead got '"+result.headers.get(k)+"'"), None, 4)
+      }
+    })
+  }
 }

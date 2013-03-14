@@ -1,5 +1,7 @@
 package com.rackspace.com.papi.components.checker.step
 
+import java.util.HashMap
+
 import scala.util.control.Breaks._
 
 import javax.xml.namespace.QName
@@ -148,6 +150,9 @@ class URLFailXSD(id : String, label : String, types : Array[QName], schema : Sch
 // Method fail state
 //
 class MethodFail(id : String, label : String) extends Step(id, label) {
+  private val allowHeaders = new HashMap[String,String](1)
+  allowHeaders.put("Allow","")
+
   override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
     //
     //  If there is URL stuff return NONE.  Otherwise generate an
@@ -156,7 +161,7 @@ class MethodFail(id : String, label : String) extends Step(id, label) {
     var result : Option[MethodFailResult] = None
 
     if (uriLevel >= req.URISegment.size) {
-      val mfr = new MethodFailResult("Bad method: "+req.getMethod(), uriLevel, id)
+      val mfr = new MethodFailResult("Bad method: "+req.getMethod(), uriLevel, id, allowHeaders.clone().asInstanceOf[java.util.Map[String,String]])
       result = Some(mfr)
     }
 
@@ -169,12 +174,16 @@ class MethodFail(id : String, label : String) extends Step(id, label) {
 //  matched against the uri regex
 //
 class MethodFailMatch(id : String, label : String, val method : Regex) extends MethodFail(id, label) {
+  private val allowHeaders = new HashMap[String, String](1)
+  allowHeaders.put("Allow", method.toString.replaceAll("\\|",", "))
+
   override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
     var result : Option[Result] = super.check(req, resp, chain, uriLevel)
     if (result != None) {
       req.getMethod() match {
         case method() => result = None
-        case _ => result = Some(new MethodFailResult (result.get.message+". The Method does not match the pattern: '"+method+"'", uriLevel, id)) // Augment our parents result with match info
+        case _ => result = Some(new MethodFailResult (result.get.message+". The Method does not match the pattern: '"+method+"'", uriLevel, id, 
+                                                      allowHeaders.clone.asInstanceOf[java.util.Map[String,String]])) // Augment our parents result with match info
       }
     }
     result
