@@ -1,5 +1,13 @@
 # Releases #
 
+## Release 1.0.6 (2013-03-14) ##
+
+1. Allow header is now set on 405 error as required by HTTP RFC
+1. Resolved bug where error states were not always handled correctly
+   by removed dups optimization
+1. Resolved bug where results were not converted correctly to strings
+
+
 ## Release 1.0.5 (2013-02-27) ##
 
 1. Updated Saxon 9.4.0.4 -> 9.4.0.6
