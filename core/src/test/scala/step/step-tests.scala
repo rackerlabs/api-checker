@@ -53,6 +53,20 @@ class StepSuite extends BaseStepSuite {
     assert (res2.get.isInstanceOf[MethodFailResult])
   }
 
+  test("MethodFail should return method fail result with empty allow header  if the URI level has been exceeded") {
+    val mf  = new MethodFail("mf", "mf")
+    val res = mf.check (request("GET", "/a/b"), response,chain, 2)
+    assert (res.isDefined)
+    val headers = res.get.asInstanceOf[MethodFailResult].headers
+    assert (headers.containsKey("Allow"))
+    assert (headers.get("Allow").equals(""))
+    val res2 = mf.check (request("GET", "/a/b"), response,chain, 3)
+    assert (res2.isDefined)
+    val headers2 = res.get.asInstanceOf[MethodFailResult].headers
+    assert (headers2.containsKey("Allow"))
+    assert (headers2.get("Allow").equals(""))
+  }
+
   test("MethodFail should return None when URI level is not exceeded") {
     val mf  = new MethodFail("mf", "mf")
     val res = mf.check (request("GET", "/a/b"), response,chain, 0)
@@ -69,6 +83,34 @@ class StepSuite extends BaseStepSuite {
     val res2 = mf.check (request("GET", "/a/b"), response,chain, 3)
     assert (res2.isDefined)
     assert (res2.get.isInstanceOf[MethodFailResult])
+  }
+
+  test("MethodFailMatch should return method fail result with appropriate Allow header if the URI level has been exceeded and the method regex does not match") {
+    val mf  = new MethodFailMatch("mf", "mf", "POST".r)
+    val res = mf.check (request("GET", "/a/b"), response,chain, 2)
+    assert (res.isDefined)
+    val headers = res.get.asInstanceOf[MethodFailResult].headers
+    assert (headers.containsKey("Allow"))
+    assert (headers.get("Allow").equals("POST"))
+    val res2 = mf.check (request("GET", "/a/b"), response,chain, 3)
+    assert (res2.isDefined)
+    val headers2 = res.get.asInstanceOf[MethodFailResult].headers
+    assert (headers2.containsKey("Allow"))
+    assert (headers2.get("Allow").equals("POST"))
+  }
+
+  test("MethodFailMatch should return method fail result with appropriate Allow header if the URI level has been exceeded and the method regex does not match (multiple method match)") {
+    val mf  = new MethodFailMatch("mf", "mf", "POST|PUT".r)
+    val res = mf.check (request("GET", "/a/b"), response,chain, 2)
+    assert (res.isDefined)
+    val headers = res.get.asInstanceOf[MethodFailResult].headers
+    assert (headers.containsKey("Allow"))
+    assert (headers.get("Allow").equals("POST, PUT"))
+    val res2 = mf.check (request("GET", "/a/b"), response,chain, 3)
+    assert (res2.isDefined)
+    val headers2 = res.get.asInstanceOf[MethodFailResult].headers
+    assert (headers2.containsKey("Allow"))
+    assert (headers2.get("Allow").equals("POST, PUT"))
   }
 
   test("MethodFailMatch should return None if the URI level has been exceeded and the method regex matches") {
