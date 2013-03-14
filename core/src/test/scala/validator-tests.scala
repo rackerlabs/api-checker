@@ -24,11 +24,11 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertConfig)
 
   test ("GET on / should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405)
+    assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("an empty GET should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET",""),response,chain), 405)
+    assertResultFailed(validator_EMPTY.validate(request("GET",""),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a should fail on validator_EMPTY") {
@@ -40,7 +40,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("a completely empty request should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("",""),response,chain), 405)
+    assertResultFailed(validator_EMPTY.validate(request("",""),response,chain), 405, Map("Allow"->""))
   }
 
   //
@@ -74,15 +74,15 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("GET on / should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/"),response,chain), 405)
+    assertResultFailed(validator_AB.validate(request("GET","/"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("an empty GET should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET",""),response,chain), 405)
+    assertResultFailed(validator_AB.validate(request("GET",""),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/a"),response,chain), 405)
+    assertResultFailed(validator_AB.validate(request("GET","/a"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a/b/c/d should fail on validator_AB") {
@@ -90,7 +90,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("POST","/a/b"),response,chain), 405)
+    assertResultFailed(validator_AB.validate(request("POST","/a/b"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   test ("GET on /index.html should fail on validator_AB") {
@@ -150,7 +150,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a should fail validator_REG1") {
-    assertResultFailed(validator_REG1.validate(request("GET","/a"),response,chain), 405)
+    assertResultFailed(validator_REG1.validate(request("GET","/a"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a/+7/c should fail validator_REG1") {
@@ -239,11 +239,11 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a//c should fail validator_REG2") {
-    assertResultFailed(validator_REG2.validate(request("GET","/a//c"),response,chain), 405)
+    assertResultFailed(validator_REG2.validate(request("GET","/a//c"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a should fail validator_REG2") {
-    assertResultFailed(validator_REG2.validate(request("GET","/a"),response,chain), 405)
+    assertResultFailed(validator_REG2.validate(request("GET","/a"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a/b/d should fail validator_REG2") {
@@ -278,19 +278,19 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("PUT on /a/b should fail validator_REG3") {
-    assertResultFailed(validator_REG3.validate(request("PUT","/a/b"),response,chain), 405)
+    assertResultFailed(validator_REG3.validate(request("PUT","/a/b"),response,chain), 405, Map("Allow"->"X?GET"))
   }
 
   test ("POST on /a/b should fail validator_REG3") {
-    assertResultFailed(validator_REG3.validate(request("POST","/a/b"),response,chain), 405)
+    assertResultFailed(validator_REG3.validate(request("POST","/a/b"),response,chain), 405, Map("Allow"->"X?GET"))
   }
 
   test ("X on /a/b should fail validator_REG3") {
-    assertResultFailed(validator_REG3.validate(request("X-","/a/b"),response,chain), 405)
+    assertResultFailed(validator_REG3.validate(request("X-","/a/b"),response,chain), 405, Map("Allow"->"X?GET"))
   }
 
   test ("XPUT on /a/b should fail validator_REG3") {
-    assertResultFailed(validator_REG3.validate(request("XPUT","/a/b"),response,chain), 405)
+    assertResultFailed(validator_REG3.validate(request("XPUT","/a/b"),response,chain), 405, Map("Allow"->"X?GET"))
   }
 
   //
@@ -374,11 +374,11 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("PUT on /a/b/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/b/c"),response,chain), 405)
+    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/b/c"),response,chain), 405, Map("Allow"->"GET, POST"))
   }
 
   test ("PUT on /a/d/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/d/c"),response,chain), 405)
+    assertResultFailed(validator_CPLX1.validate(request("PUT","/a/d/c"),response,chain), 405, Map("Allow"->"GET, POST"))
   }
 
   test ("PUT on /a/atest/c should fail validator_CPLX1") {
@@ -386,23 +386,23 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a/d should fail on validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/d"),response,chain), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/d"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a/z should fail on validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z"),response,chain), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a/<katakana> should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84"),response,chain), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84"),response,chain), 405, Map("Allow"->""))
   }
 
   test ("GET on /a/z/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z/c"),response,chain), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/z/c"),response,chain), 405, Map("Allow"->"PUT"))
   }
 
   test ("GET on /a/<katakana>/c should fail validator_CPLX1") {
-    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84/c"),response,chain), 405)
+    assertResultFailed(validator_CPLX1.validate(request("GET","/a/%E3%83%84/c"),response,chain), 405, Map("Allow"->"PUT"))
   }
 
   //
@@ -523,15 +523,15 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("POST","/a/b","application/xml"),response,chain), 405)
+    assertResultFailed(validator_AM.validate(request("POST","/a/b","application/xml"),response,chain), 405, Map("Allow"->"PUT"))
   }
 
   test ("PUT on /c/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("PUT","/c/b","application/xml"),response,chain), 405)
+    assertResultFailed(validator_AM.validate(request("PUT","/c/b","application/xml"),response,chain), 405, Map("Allow"->"POST"))
   }
 
   test ("DELETE on /z/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("DELETE","/z/b"),response,chain), 405)
+    assertResultFailed(validator_AM.validate(request("DELETE","/z/b"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   test ("GET on /a/c should fail on validator_AM") {
@@ -593,7 +593,7 @@ class ValidatorSuite extends BaseValidatorSuite {
                                                          <another_element />
                                                         </an_element>
                                                       </some_xml>
-                                                    ),response,chain), 405)
+                                                    ),response,chain), 405, Map("Allow"->"GET, PUT"))
   }
 
   test ("PUT on /a/b with valid JSON should fail with 415") {
@@ -707,7 +707,7 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b should fail on validator_JSON") {
-    assertResultFailed(validator_JSON.validate(request("POST","/a/b"),response,chain), 405)
+    assertResultFailed(validator_JSON.validate(request("POST","/a/b"),response,chain), 405, Map("Allow"->"GET, PUT"))
   }
 
   test ("PUT on /a/b with valid XML should fail on validator_JSON with 415") {

@@ -62,15 +62,15 @@ class ValidatorWADLSuite2 extends BaseValidatorSuite {
   }
 
   test ("POST on / should fail on validator_SLASH") {
-    assertResultFailed(validator_SLASH.validate(request("POST","/"),response,chain), 405)
+    assertResultFailed(validator_SLASH.validate(request("POST","/"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   test ("POST on /element should fail on validator_SLASH") {
-    assertResultFailed(validator_SLASH.validate(request("POST","/element"),response,chain), 405)
+    assertResultFailed(validator_SLASH.validate(request("POST","/element"),response,chain), 405, Map("Allow"->"GET"))
   }
 
   test ("GET on /element/element2 should fail on validator_SLASH") {
-    assertResultFailed(validator_SLASH.validate(request("GET","/element/element2"),response,chain), 405)
+    assertResultFailed(validator_SLASH.validate(request("GET","/element/element2"),response,chain), 405, Map("Allow"->"POST"))
   }
 
   test ("GET on /foo should fail on validator_SLASH") {
