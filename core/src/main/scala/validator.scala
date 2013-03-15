@@ -115,14 +115,21 @@ class Validator private (private val _name : String, val startStep : Step, val c
     case _ => _name
   }
 
+
+  private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
+  private val objectName = new ObjectName("\"com.rackspace.com.papi.components.checker\":type=\"Validator\",scope=\""+
+                                 name+"\",name=\"checker\"")
+
+  private val TIMER_NAME       = "validation-timer"
+  private val FAIL_METER_NAME  = "fail-meter"
+  private val FAIL_METER_EVENT = "fail"
+  private val FAIL_RATE_NAME   = "fail-rate"
+
   //
   //  Register with MBeanServer if the checker document is defined.
   //
   if (checker.isDefined) {
-    ManagementFactory.getPlatformMBeanServer().
-    registerMBean(this,
-                  new ObjectName("\"com.rackspace.com.papi.components.checker\":type=\"Validator\",scope=\""+
-                                 name+"\",name=\"checker\""))
+    platformMBeanServer.registerMBean(this, objectName)
   }
 
   private val xml = {
@@ -172,9 +179,9 @@ class Validator private (private val _name : String, val startStep : Step, val c
     override def getDenominator = timer.oneMinuteRate
   }
 
-  private val timer = metrics.timer("validation-timer", name)
-  private val failMeter = metrics.meter("fail-meter", "fail", name)
-  private val failGauge =  metricsRegistry.newGauge(getClass(), "fail-rate", name,
+  private val timer = metrics.timer(TIMER_NAME, name)
+  private val failMeter = metrics.meter(FAIL_METER_NAME, FAIL_METER_EVENT, name)
+  private val failGauge =  metricsRegistry.newGauge(getClass, FAIL_RATE_NAME, name,
                                                    (new ValidatorFailGauge(timer, failMeter)))
 
   private val resultHandler = {
@@ -200,6 +207,18 @@ class Validator private (private val _name : String, val startStep : Step, val c
     } finally {
       context.stop
     }
+  }
+
+  def destroy : Unit = {
+    resultHandler.destroy
+
+    if (checker.isDefined) {
+      platformMBeanServer.unregisterMBean(objectName)
+    }
+
+    metricsRegistry.removeMetric(getClass, TIMER_NAME, name)
+    metricsRegistry.removeMetric(getClass, FAIL_METER_NAME, name)
+    metricsRegistry.removeMetric(getClass, FAIL_RATE_NAME, name)
   }
 
   //

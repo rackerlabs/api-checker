@@ -12,6 +12,7 @@ import org.w3c.dom.Document
 abstract class ResultHandler {
   def init(validator : Validator, checker : Option[Document]) : Unit
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result) : Unit
+  def destroy : Unit = {}
 }
 
 class NullHandler extends ResultHandler {
