@@ -30,6 +30,11 @@ trait InstrumentedHandlerMBean {
 
 class InstrumentedHandler extends ResultHandler with Instrumented with InstrumentedHandlerMBean {
 
+  private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
+  private var latestFailMBeanName : Option[ObjectName] = None
+
+  private var validator : Option[Validator] = None
+
   private case class FailData(val reqValue : String, val result : Result, val count : AtomicLong) {}
 
   private class FailMap[K,V](private val _capacity : Int)  extends LinkedHashMap[K,V](_capacity+1, 1.1.asInstanceOf[Float], true) {
@@ -41,6 +46,9 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
   private val lastFailed = Collections.synchronizedMap(new FailMap[Result,FailData](lastFailedCapacity))
 
   override def init (validator : Validator, checker : Option[Document]) : Unit = {
+
+    this.validator = Some(validator)
+
     if (checker != None) {
       val elms = checker.get.getElementsByTagNameNS("http://www.rackspace.com/repose/wadl/checker",
                                                     "step")
@@ -52,15 +60,14 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
 
         stepMeters = stepMeters + (id -> metrics.meter(id, etype, validator.name))
       }
-
-      //
-      // Register the MBean
-      //
-      ManagementFactory.getPlatformMBeanServer().
-      registerMBean(this,
-                    new ObjectName("\"com.rackspace.com.papi.components.checker.handler\":type=\"InstrumentedHandler\",scope=\""+
-                                   validator.name+"\",name=\"latestFails\""))
     }
+
+    //
+    // Register the MBean
+    //
+    latestFailMBeanName = Some(new ObjectName("\"com.rackspace.com.papi.components.checker.handler\":type=\"InstrumentedHandler\",scope=\""+
+                                   validator.name+"\",name=\"latestFails\""))
+    platformMBeanServer.registerMBean(this,latestFailMBeanName.get)
   }
 
   private def markResult (result : Result) : Unit = {
@@ -95,4 +102,16 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
     for { d <- data } yield d.toString
   }
 
+  override def destroy : Unit = {
+    if (latestFailMBeanName != None) {
+      platformMBeanServer.unregisterMBean(latestFailMBeanName.get)
+      latestFailMBeanName = None
+    }
+
+    if (validator != None) {
+      stepMeters.keys.foreach ( k => metricsRegistry.removeMetric(getClass, k, validator.get.name))
+      validator = None
+      stepMeters = Map.empty
+    }
+  }
 }

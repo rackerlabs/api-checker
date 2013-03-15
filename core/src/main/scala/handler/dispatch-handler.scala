@@ -23,5 +23,7 @@ class DispatchResultHandler(private[this] var handlers : List[ResultHandler] = L
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
     handlers.foreach(h => h.handle(req,resp,chain,result))
   }
-
+  override def destroy : Unit = {
+    handlers.foreach(h => h.destroy)
+  }
 }
