@@ -428,9 +428,9 @@
          2. [X] WADL Builder Tests
          3. [X] WADL validator Tests
       6. [X] Join fixed headers opt?
-   3. [-] Add support for rax:code and rax:message in Header checks [1/6]
+   3. [-] Add support for rax:code and rax:message in Header checks [2/6]
       1. [X] Extend XSD to allow passing code, message to Header States
-      2. [ ] Extend builder XSL to add code, message
+      2. [X] Extend builder XSL to add code, message
       3. [ ] Make sure join optimizations are aware of the extension
       4. [ ] Modify Header states to accept code, message
       5. [ ] Modify handler to plug in state correctly
