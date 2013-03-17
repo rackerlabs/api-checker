@@ -227,7 +227,7 @@
                 </xsl:for-each-group>
             </xsl:for-each-group>
             <!-- For steps that have a name, take that into account -->
-            <xsl:for-each-group select="$checker//check:step[@name and @match]" group-by="@type">
+            <xsl:for-each-group select="$checker//check:step[@name and @match and not(@code) and not(@message)]" group-by="@type">
                 <xsl:for-each-group select="current-group()" group-by="@next">
                     <xsl:for-each-group select="current-group()" group-by="@match">
                         <xsl:for-each-group select="current-group()" group-by="@name">
@@ -243,6 +243,74 @@
                                     </xsl:attribute>
                                 </group>
                             </xsl:if>
+                        </xsl:for-each-group>
+                    </xsl:for-each-group>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
+            <xsl:for-each-group select="$checker//check:step[@name and @match and @code and not(@message)]" group-by="@type">
+                <xsl:for-each-group select="current-group()" group-by="@next">
+                    <xsl:for-each-group select="current-group()" group-by="@match">
+                        <xsl:for-each-group select="current-group()" group-by="@name">
+                            <xsl:for-each-group select="current-group()" group-by="@code">
+                                <xsl:if test="count(current-group()) > 1">
+                                    <group>
+                                        <xsl:attribute name="include">
+                                            <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                                        </xsl:attribute>
+                                        <xsl:attribute name="exclude">
+                                            <xsl:value-of separator=" ">
+                                                <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                                            </xsl:value-of>
+                                        </xsl:attribute>
+                                    </group>
+                                </xsl:if>
+                            </xsl:for-each-group>
+                        </xsl:for-each-group>
+                    </xsl:for-each-group>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
+            <xsl:for-each-group select="$checker//check:step[@name and @match and not(@code) and @message]" group-by="@type">
+                <xsl:for-each-group select="current-group()" group-by="@next">
+                    <xsl:for-each-group select="current-group()" group-by="@match">
+                        <xsl:for-each-group select="current-group()" group-by="@name">
+                            <xsl:for-each-group select="current-group()" group-by="@message">
+                                <xsl:if test="count(current-group()) > 1">
+                                    <group>
+                                        <xsl:attribute name="include">
+                                            <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                                        </xsl:attribute>
+                                        <xsl:attribute name="exclude">
+                                            <xsl:value-of separator=" ">
+                                                <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                                            </xsl:value-of>
+                                        </xsl:attribute>
+                                    </group>
+                                </xsl:if>
+                            </xsl:for-each-group>
+                        </xsl:for-each-group>
+                    </xsl:for-each-group>
+                </xsl:for-each-group>
+            </xsl:for-each-group>
+            <xsl:for-each-group select="$checker//check:step[@name and @match and @code and @message]" group-by="@type">
+                <xsl:for-each-group select="current-group()" group-by="@next">
+                    <xsl:for-each-group select="current-group()" group-by="@match">
+                        <xsl:for-each-group select="current-group()" group-by="@name">
+                            <xsl:for-each-group select="current-group()" group-by="@code">
+                                <xsl:for-each-group select="current-group()" group-by="@message">
+                                    <xsl:if test="count(current-group()) > 1">
+                                        <group>
+                                            <xsl:attribute name="include">
+                                                <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                                            </xsl:attribute>
+                                            <xsl:attribute name="exclude">
+                                                <xsl:value-of separator=" ">
+                                                    <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                                                </xsl:value-of>
+                                            </xsl:attribute>
+                                        </group>
+                                    </xsl:if>
+                                </xsl:for-each-group>
+                            </xsl:for-each-group>
                         </xsl:for-each-group>
                     </xsl:for-each-group>
                 </xsl:for-each-group>
