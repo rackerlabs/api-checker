@@ -7,8 +7,28 @@ import javax.servlet.FilterChain
 
 import scala.collection.JavaConversions._
 
-class Header(id : String, label : String, val name : String, val value : Regex, next : Array[Step]) extends ConnectedStep(id, label, next) {
-  override val mismatchMessage : String = name+" : "+value.toString;
+class Header(id : String, label : String, val name : String, val value : Regex,
+             val message : Option[String], val code : Option[Int],
+             next : Array[Step]) extends ConnectedStep(id, label, next) {
+
+  def this(id : String, label : String, name : String, value : Regex,
+           next : Array[Step]) = this(id, label, name, value, None, None, next)
+
+  override val mismatchMessage : String = {
+    if (message == None) {
+      "Expecting an HTTP header "+name+" to have a value matching "+value.toString()
+    } else {
+      message.get
+    }
+  }
+
+  val mismatchCode : Int = {
+    if (code == None) {
+      400
+    } else {
+      code.get
+    }
+  }
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
     val headers : Iterator[String] = req.getHeaders(name)
@@ -21,7 +41,7 @@ class Header(id : String, label : String, val name : String, val value : Regex, 
     if (!headers.isEmpty && headers.filterNot(v => v match { case value() => true ; case _ => false } ).isEmpty) {
       uriLevel
     } else {
-      req.contentError = new Exception("Expecting an HTTP header "+name+" to have a value matching "+value.toString())
+      req.contentError(new Exception(mismatchMessage), mismatchCode)
       -1
     }
   }

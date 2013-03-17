@@ -10,8 +10,29 @@ import org.xml.sax.SAXParseException
 
 import scala.collection.JavaConversions._
 
-class HeaderXSD(id : String, label : String, val name : String, val value : QName, schema : Schema, next : Array[Step]) extends ConnectedStep(id, label, next) {
-  override val mismatchMessage : String = name+" : "+value.toString
+class HeaderXSD(id : String, label : String, val name : String, val value : QName, schema : Schema,
+                val message : Option[String], val code : Option[Int],
+                next : Array[Step]) extends ConnectedStep(id, label, next) {
+
+  def this(id : String, label : String, name : String, value : QName, schema : Schema,
+           next : Array[Step]) = this(id, label, name, value, schema, None, None, next)
+
+  override val mismatchMessage : String = {
+    if (message == None) {
+      "Expecting an HTTP header "+name+" to match "+value
+    } else {
+      message.get
+    }
+  }
+
+  val mismatchCode : Int = {
+    if (code == None) {
+      400
+    } else {
+      code.get
+    }
+  }
+
   val xsd = new XSDStringValidator(value, schema, id)
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
@@ -28,8 +49,8 @@ class HeaderXSD(id : String, label : String, val name : String, val value : QNam
       uriLevel
     } else {
      last_err match {
-        case Some(_) => req.contentError = new Exception("Expecting requeried HTTP header "+name+" to match "+value+" "+last_err.get.getMessage(), last_err.get)
-        case None => req.contentError = new Exception("Expecting required HTTP header "+name)
+        case Some(_) => req.contentError(new Exception(mismatchMessage+" "+last_err.get.getMessage(), last_err.get), mismatchCode)
+        case None => req.contentError(new Exception(mismatchMessage), mismatchCode)
       }
       -1
     }

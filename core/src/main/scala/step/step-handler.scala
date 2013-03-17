@@ -537,11 +537,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
   }
 
-  private[this] def addXPath(atts : Attributes) : Unit = {
-    val nexts : Array[String] = atts.getValue("next").split(" ")
-    val id : String = atts.getValue("id")
-    val label : String = atts.getValue("label")
-    val _match : String = atts.getValue("match")
+  private[this] def getMessageCode(atts : Attributes) = {
     val message : Option[String] = {
       if (atts.getValue("message") == null) {
         None
@@ -556,6 +552,17 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         Some(atts.getValue("code").toInt)
       }
     }
+    (message, code)
+  }
+
+  private[this] def addXPath(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
     val context : NamespaceContext = ImmutableNamespaceContext(prefixes)
     val version : Int = {
       val sversion = atts.getValue("version")
@@ -601,9 +608,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
     val name : String = atts.getValue("name")
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
 
     next += (id -> nexts)
-    steps += (id -> new Header(id, label, name, _match.r, new Array[Step](nexts.length)))
+    steps += (id -> new Header(id, label, name, _match.r,
+                               message, code, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderAny(atts : Attributes) : Unit = {
@@ -612,9 +623,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
     val name : String = atts.getValue("name")
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
 
     next += (id -> nexts)
-    steps += (id -> new HeaderAny(id, label, name, _match.r, new Array[Step](nexts.length)))
+    steps += (id -> new HeaderAny(id, label, name, _match.r,
+                                  message, code, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderXSD(atts : Attributes) : Unit = {
@@ -624,9 +639,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val _match : String = atts.getValue("match")
     val name : String = atts.getValue("name")
     val qn : QName = qname(_match)
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
 
     next += (id -> nexts)
-    steps += (id -> new HeaderXSD(id, label, name, qn, schema(qn), new Array[Step](nexts.length)))
+    steps += (id -> new HeaderXSD(id, label, name, qn, schema(qn),
+                                  message, code, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderXSDAny(atts : Attributes) : Unit = {
@@ -636,9 +655,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val _match : String = atts.getValue("match")
     val name : String = atts.getValue("name")
     val qn : QName = qname(_match)
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
 
     next += (id -> nexts)
-    steps += (id -> new HeaderXSDAny(id, label, name, qn, schema(qn), new Array[Step](nexts.length)))
+    steps += (id -> new HeaderXSDAny(id, label, name, qn, schema(qn),
+                                     message, code, new Array[Step](nexts.length)))
   }
 
   private[this] def addMethod(atts : Attributes) : Unit = {
