@@ -142,7 +142,7 @@
                 <xsl:attribute name="code" select="$joinSteps[1]/@code"/>
             </xsl:if>
             <xsl:if test="$joinSteps[1]/@message">
-                <xsl:attribute name="code" select="$joinSteps[1]/@message"/>
+                <xsl:attribute name="message" select="$joinSteps[1]/@message"/>
             </xsl:if>
         </step>
     </xsl:template>
