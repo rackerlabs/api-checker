@@ -97,16 +97,64 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADER")
   }
 
+  def stepsWithHeaderCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
+    stepsWithHeaderMatch(checker, name, headerMatch).filter(n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderMessageMatch (checker : NodeSeq, name : String, headerMatch : String, message : String) : NodeSeq = {
+    stepsWithHeaderMatch(checker, name, headerMatch).filter(n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderMessageCodeMatch (checker : NodeSeq, name : String, headerMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderMessageMatch(checker, name, headerMatch, message).filter(n => (n \ "@code").text == code.toString)
+  }
+
   def stepsWithHeaderXSDMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADERXSD")
+  }
+
+  def stepsWithHeaderXSDCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
+    stepsWithHeaderXSDMatch (checker, name, headerMatch).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderXSDMessageMatch (checker : NodeSeq, name : String, headerMatch : String, message : String) : NodeSeq = {
+    stepsWithHeaderXSDMatch (checker, name, headerMatch).filter (n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderXSDMessageCodeMatch (checker : NodeSeq, name : String, headerMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderXSDMessageMatch (checker, name, headerMatch, message).filter (n => (n \ "@code").text == code.toString)
   }
 
   def stepsWithHeaderAnyMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADER_ANY")
   }
 
+  def stepsWithHeaderAnyCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
+    stepsWithHeaderAnyMatch (checker, name, headerMatch).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderAnyMessageMatch (checker : NodeSeq, name : String, headerMatch : String, message : String) : NodeSeq = {
+    stepsWithHeaderAnyMatch (checker, name, headerMatch).filter (n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderAnyMessageCodeMatch (checker : NodeSeq, name : String, headerMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderAnyMessageMatch (checker, name, headerMatch, message).filter (n => (n \ "@code").text == code.toString)
+  }
+
   def stepsWithHeaderXSDAnyMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADERXSD_ANY")
+  }
+
+  def stepsWithHeaderXSDAnyCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
+    stepsWithHeaderXSDAnyMatch (checker, name, headerMatch).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderXSDAnyMessageMatch (checker : NodeSeq, name : String, headerMatch : String, message : String) : NodeSeq = {
+    stepsWithHeaderXSDAnyMatch (checker, name, headerMatch).filter (n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderXSDAnyMessageCodeMatch (checker : NodeSeq, name : String, headerMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderXSDAnyMessageMatch (checker, name, headerMatch, message).filter (n => (n \ "@code").text == code.toString)
   }
 
   def Start : (NodeSeq) => NodeSeq = stepsWithType(_, "START")
@@ -130,9 +178,21 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
   def AnyReqType : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(.*)()")
   def Header(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatch(_, name, headerMatch)
+  def Header(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMessageMatch(_, name, headerMatch, message)
+  def Header(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderCodeMatch(_, name, headerMatch, code)
+  def Header(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderMessageCodeMatch(_, name, headerMatch, message, code)
   def HeaderXSD(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMatch (_, name, headerMatch)
+  def HeaderXSD(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMessageMatch (_, name, headerMatch, message)
+  def HeaderXSD(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDCodeMatch (_, name, headerMatch, code)
+  def HeaderXSD(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMessageCodeMatch (_, name, headerMatch, message, code)
   def HeaderAny(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyMatch(_, name, headerMatch)
+  def HeaderAny(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyMessageMatch(_, name, headerMatch, message)
+  def HeaderAny(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyCodeMatch(_, name, headerMatch, code)
+  def HeaderAny(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyMessageCodeMatch(_, name, headerMatch, message, code)
   def HeaderXSDAny(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMatch (_, name, headerMatch)
+  def HeaderXSDAny(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMessageMatch (_, name, headerMatch, message)
+  def HeaderXSDAny(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyCodeMatch (_, name, headerMatch, code)
+  def HeaderXSDAny(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMessageCodeMatch (_, name, headerMatch, message, code)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {
 
