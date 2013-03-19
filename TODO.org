@@ -404,7 +404,7 @@
          1. [X] XSL 2.0
          2. [X] Xalan 1.0
          3. [X] XalanC 1.0
-** TODO Header Enhancements [2/4]
+** TODO Header Enhancements [3/4]
    1. [X] Multiple header checks with the same name [4/4]
       1. [X] Allow checks in steps via enumeration
       2. [X] Support for single header with comma sererated list
@@ -428,16 +428,16 @@
          2. [X] WADL Builder Tests
          3. [X] WADL validator Tests
       6. [X] Join fixed headers opt?
-   3. [-] Add support for rax:code and rax:message in Header checks [5/6]
+   3. [X] Add support for rax:code and rax:message in Header checks [6/6]
       1. [X] Extend XSD to allow passing code, message to Header States
       2. [X] Extend builder XSL to add code, message
       3. [X] Make sure join optimizations are aware of the extension
       4. [X] Modify Header states to accept code, message
       5. [X] Modify handler to plug in state correctly
-      6. [-] TESTS [2/3]
+      6. [X] TESTS [3/3]
          1. [X] State
          2. [X] Builder
-         3. [ ] Validator
+         3. [X] Validator
    4. [ ] Handle default headers
 ** TODO PreProc Enhancements [0/5]
    1. [ ] Preproc and XSL step should be able to change content type
