@@ -476,6 +476,7 @@
             <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
             <xsl:variable name="pos" select="position()"/>
             <step id="{check:HeaderID(.)}" name="{@name}">
+                <xsl:call-template name="check:addMessageExtension"/>
                 <xsl:attribute name="type">
                     <xsl:choose>
                         <xsl:when test="$isXSD">HEADERXSD</xsl:when>
@@ -509,6 +510,7 @@
             <xsl:for-each select="$fixed_headers[@name=$current]">
                 <step id="{check:HeaderID(.)}" name="{@name}"
                       type="HEADER_ANY" match="{check:toRegExEscaped(@fixed)}">
+                    <xsl:call-template name="check:addMessageExtension"/>
                     <xsl:attribute name="next">
                         <xsl:choose>
                             <xsl:when test="$pos = $last">
@@ -801,12 +803,7 @@
         <xsl:if test="$doReqPlainParam">
             <xsl:for-each select="$defaultPlainParams">
                 <step type="XPATH" id="{check:XPathID($this,position())}" match="{@path}">
-                    <xsl:if test="@rax:message and $useMessageExtension">
-                        <xsl:attribute name="message" select="@rax:message"/>
-                    </xsl:if>
-                    <xsl:if test="@rax:code and $useMessageExtension">
-                        <xsl:attribute name="code" select="@rax:code"/>
-                    </xsl:if>
+                    <xsl:call-template name="check:addMessageExtension"/>
                     <xsl:choose>
                         <xsl:when test="position() = last()">
                             <xsl:choose>
@@ -910,6 +907,25 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
+        </xsl:if>
+    </xsl:template>
+
+
+    <xsl:template name="check:addMessageExtension">
+        <!--
+            This should be called from a state that supports message
+            and code attributes.
+
+            The context should be the appropriate wadl:paramater.
+
+            The attributes are added if the useMessageExtension is
+            enabled AND the extension is used for this step.
+        -->
+        <xsl:if test="@rax:message and $useMessageExtension">
+            <xsl:attribute name="message" select="@rax:message"/>
+        </xsl:if>
+        <xsl:if test="@rax:code and $useMessageExtension">
+            <xsl:attribute name="code" select="@rax:code"/>
         </xsl:if>
     </xsl:template>
 

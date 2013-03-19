@@ -268,6 +268,8 @@
             <extension base="chk:ConnectedStep">
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:string" use="required"/>
+                <attribute name="message" type="xsd:string" use="optional"/>
+                <attribute name="code" type="xsd:int" use="optional"/>
             </extension>
         </complexContent>
     </complexType>
@@ -301,6 +303,8 @@
             <extension base="chk:ConnectedStep">
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:QName" use="required"/>
+                <attribute name="message" type="xsd:string" use="optional"/>
+                <attribute name="code" type="xsd:int" use="optional"/>
             </extension>
         </complexContent>
     </complexType>
