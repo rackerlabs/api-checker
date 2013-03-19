@@ -1274,9 +1274,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception (Custom Code)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception (Custom Message)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("Very Bad Header"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Very Bad Header"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Very Bad Header"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception (Custom Code, Custom Message)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("Very Bad Header"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Very Bad Header"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Very Bad Header"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Headers)") {
@@ -1287,9 +1338,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Headers, Custom Code)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat", "Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Headers, Custom Message)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("Bad?@!"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat", "Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Bad?@!"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Bad?@!"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Headers, Custom Message, Custom Code)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("Bad?@!"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat", "Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Bad?@!"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Bad?@!"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Items in a single header)") {
@@ -1300,9 +1402,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Items in a single header, Custom Code)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set, Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat, Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Items in a single header, Custom Message)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("What?"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set, Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat, Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentError.getMessage.contains("What?"))
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentError.getMessage.contains("What?"))
+  }
+
+  test ("In a header step, if a header exists, but the header does not match the the regex the requst should conatin an Exception. (Multiple Items in a single header, Custom Message, Custom Code)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("What?"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set, Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat, Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    assert (req1.contentError.getMessage.contains("What?"))
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+    assert (req2.contentError.getMessage.contains("What?"))
   }
 
   test ("In a header step, if a header is not found, the urilevel should be set to -1.") {
@@ -1322,10 +1475,62 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
   }
+
+  test ("In a header step, if a header is not foound, the request should contain an Exception. (Custom Code)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Sat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In a header step, if a header is not foound, the request should contain an Exception. (Custom Message)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("What Header?"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Sat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("What Header?"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("What Header?"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header step, if a header is not foound, the request should contain an Exception. (Custom Code, Custom Message)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("What Header?"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Sat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("What Header?"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("What Header?"))
+    assert (req2.contentErrorCode == 401)
+  }
+
 
   test ("In an XSD header step, if the header is available then the uri level should stay the same.") {
     val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Array[Step]())
@@ -1399,9 +1604,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Custom Code)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Custom Message)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Bad XSD Header"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Bad XSD Header"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Bad XSD Header"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Custom Message, Custom Code)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Bad XSD Header"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Bad XSD Header"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Bad XSD Header"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Headers)") {
@@ -1412,9 +1668,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Headers, Custom Code)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("503e5d36-327c-11e2-80d2-33e47888902d","28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("5cbcd858-327c-11e2-82e9-27eb85d59274","2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Headers, Custom Message)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Bste?"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("503e5d36-327c-11e2-80d2-33e47888902d","28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("5cbcd858-327c-11e2-82e9-27eb85d59274","2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentError.getMessage.contains("Bste?"))
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentError.getMessage.contains("Bste?"))
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Headers, Custom Code, Custom Message)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Bste?"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("503e5d36-327c-11e2-80d2-33e47888902d","28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("5cbcd858-327c-11e2-82e9-27eb85d59274","2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    assert (req1.contentError.getMessage.contains("Bste?"))
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+    assert (req2.contentError.getMessage.contains("Bste?"))
   }
 
   test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Items in a single header)") {
@@ -1425,9 +1732,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Items in a single header, Custom Code)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("503e5d36-327c-11e2-80d2-33e47888902d, 28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("5cbcd858-327c-11e2-82e9-27eb85d59274, 2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Items in a single header, Custom Message)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Abc"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("503e5d36-327c-11e2-80d2-33e47888902d, 28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("5cbcd858-327c-11e2-82e9-27eb85d59274, 2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Abc"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Abc"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Items in a single header, Custom Code, Custom Message)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Abc"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("503e5d36-327c-11e2-80d2-33e47888902d, 28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("5cbcd858-327c-11e2-82e9-27eb85d59274, 2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Abc"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Abc"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In an XSD header step, if the header is not available then the request should contain an Exception") {
@@ -1438,9 +1796,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD header step, if the header is not available then the request should contain an Exception (Custom Code)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an XSD header step, if the header is not available then the request should contain an Exception (Custom Message)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Xyz"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Xyz"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Xyz"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD header step, if the header is not available then the request should contain an Exception (Custom Message, Custom Code)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Xyz"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Xyz"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Xyz"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In a header any step, if the header is available then the uri level should stay the same.") {
@@ -1523,9 +1932,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header any step, if a header exists, but the header does not match the the regex the requst should conatin an Exception (Custom Code)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In a header any step, if a header exists, but the header does not match the the regex the requst should conatin an Exception (Custom Message)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("..E.."), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("..E.."))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("..E.."))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header any step, if a header exists, but the header does not match the the regex the requst should conatin an Exception (Custom Code, Custom Message)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("..E.."), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("..E.."))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("..E.."))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In a header any step, if a header exists, but none of the headers match the the regex the requst should conatin an Exception") {
@@ -1536,9 +1996,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header any step, if a header exists, but none of the headers match the the regex the requst should conatin an Exception (Custom Code)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret","RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat","LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In a header any step, if a header exists, but none of the headers match the the regex the requst should conatin an Exception (Custom Message)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("Custom Msg"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret","RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat","LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentError.getMessage.contains("Custom Msg"))
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentError.getMessage.contains("Custom Msg"))
+  }
+
+  test ("In a header any step, if a header exists, but none of the headers match the the regex the requst should conatin an Exception (Custom Code, Custom Message)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("Custom Msg"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret","RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat","LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    assert (req1.contentError.getMessage.contains("Custom Msg"))
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+    assert (req2.contentError.getMessage.contains("Custom Msg"))
   }
 
   test ("In a header any step, if the header is not found the request should conatin an Exception") {
@@ -1549,9 +2060,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header any step, if the header is not found the request should conatin an Exception (Custom Code)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-HEADER"->List("Ret","RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-HEADER"->List("Rat","LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In a header any step, if the header is not found the request should conatin an Exception (Custom Message)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("CMsg"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-HEADER"->List("Ret","RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-HEADER"->List("Rat","LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("CMsg"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("CMsg"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header any step, if the header is not found the request should conatin an Exception (Custom Code, Custom Message)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("CMsg"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-HEADER"->List("Ret","RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-HEADER"->List("Rat","LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("CMsg"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("CMsg"))
+    assert (req2.contentErrorCode == 401)
   }
 
 
@@ -1563,9 +2125,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header any step, if a header exists, but none of the headers match the the regex the requst should conatin an Exception (Multiple items in a single header, Custom Code)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret, RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat, LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In a header any step, if a header exists, but none of the headers match the the regex the requst should conatin an Exception (Multiple items in a single header, Custom Message)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("CMessage"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret, RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat, LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("CMessage"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("CMessage"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In a header any step, if a header exists, but none of the headers match the the regex the requst should conatin an Exception (Multiple items in a single header, Custom Code, Custom Message)") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, Some("CMessage"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Ret, RET", "ZOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Rat, LET", "XOO!")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("CMessage"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("CMessage"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In an XSD any header step, if the header is available then the uri level should stay the same.") {
@@ -1648,9 +2261,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (Custom Code)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (Custom Message)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Custom Message"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Custom Message"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Custom Message"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (Custom Code, Custom Message)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Custom Message"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Custom Message"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Custom Message"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple headers all incorrect)") {
@@ -1661,9 +2325,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple headers all incorrect, Custom Code)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353", "foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20", "bar")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple headers all incorrect, Custom Message)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Custom Message"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353", "foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20", "bar")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Custom Message"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Custom Message"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple headers all incorrect, Custom Code, Custom Message)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Custom Message"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353", "foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20", "bar")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Custom Message"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Custom Message"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple items, all incorrect)") {
@@ -1674,9 +2389,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple items, all incorrect, Custom Code)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353, foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20, bar")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple items, all incorrect, Custom Message)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Custom Message"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353, foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20, bar")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Custom Message"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Custom Message"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple items, all incorrect, Custom Code, Custom Message)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Custom Message"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353, foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20, bar")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Custom Message"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Custom Message"))
+    assert (req2.contentErrorCode == 401)
   }
 
   test ("In an XSD any header step, if the header not available, the request should conatin an Exception") {
@@ -1687,9 +2453,60 @@ class StepSuite extends BaseStepSuite {
     header.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 400)
     header.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD any header step, if the header not available, the request should conatin an Exception (Custom Code)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an XSD any header step, if the header not available, the request should conatin an Exception (Custom Message)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Custom Message"), None, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Custom Message"))
+    assert (req1.contentErrorCode == 400)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Custom Message"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an XSD any header step, if the header not available, the request should conatin an Exception (Custom Code, Custom Message)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, Some("Custom Message"), Some(401), Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Custom Message"))
+    assert (req1.contentErrorCode == 401)
+    header.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Custom Message"))
+    assert (req2.contentErrorCode == 401)
   }
 
 }
