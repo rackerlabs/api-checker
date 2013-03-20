@@ -1424,7 +1424,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("POST on /a/b should fail on validator_AM") {
-    assertResultFailed(validator_AM.validate(request("POST","/a/b"),response,chain), 405, Map("Allow"->"GET"))
+    assertResultFailed(validator_AM.validate(request("POST","/a/b"),response,chain), 405, Map("Allow"->"PUT"))
   }
 
   test ("DELETE on /z/b should fail on validator_AM") {
