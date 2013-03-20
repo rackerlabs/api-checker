@@ -1,5 +1,12 @@
 # Releases #
 
+## Release 1.0.7 (2013-03-20) ##
+
+1. Updated WADL Tools to 1.0.12 to fix issue where some resource types
+   were dropped during WADL normalization
+1. Added destroy method in validator to do general cleanup
+1. rax:message and rax:code extensions can now apply to Headers
+
 ## Release 1.0.6 (2013-03-14) ##
 
 1. Allow header is now set on 405 error as required by HTTP RFC
