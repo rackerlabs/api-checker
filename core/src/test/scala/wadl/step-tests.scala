@@ -2,7 +2,7 @@ package com.rackspace.com.papi.components.checker.wadl
 
 import scala.xml._
 import org.junit.runner.RunWith
-import org.scalatest.TestFailedException
+import org.scalatest.exceptions.TestFailedException
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers._
 
@@ -20,7 +20,7 @@ class WADLStepSpec extends BaseStepSpec {
     info ("so that an API validator can process the machine to validate the API")
 
     scenario("The WADL does not contain any resources") {
-      given("a WADL with no resources")
+      Given("a WADL with no resources")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -28,16 +28,16 @@ class WADLStepSpec extends BaseStepSpec {
               <resource/>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL).asInstanceOf[Start]
-      then("the start step should only be connected with an URLFail and MethodFail steps")
+      Then("the start step should only be connected with an URLFail And MethodFail steps")
       assert (step.next.length == 2)
       assert (step.next.filter(a => a.isInstanceOf[URLFail]).length == 1)
       assert (step.next.filter(a => a.isInstanceOf[MethodFail]).length == 1)
     }
 
     scenario("The WADL contains a single multi-path resource") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -57,7 +57,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -69,8 +69,8 @@ class WADLStepSpec extends BaseStepSpec {
       assert(step, Start, URI("path"), MethodFail)
     }
 
-    scenario("The WADL contains a single multi-path resource, XML well formness, and XSD checks are on") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+    scenario("The WADL contains a single multi-path resource, XML well formness, And XSD checks are on") {
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars>
@@ -121,7 +121,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL, TestConfig(false, false, true, true)).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -136,8 +136,8 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
 
-    scenario("The WADL contains a single multi-path resource, XML well formness, element, and XSD checks are on") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+    scenario("The WADL contains a single multi-path resource, XML well formness, element, And XSD checks are on") {
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                   xmlns:tst="http://www.rackspace.com/xerces/test">
@@ -188,7 +188,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL, TestConfig(false, false, true, true, true)).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -203,8 +203,8 @@ class WADLStepSpec extends BaseStepSpec {
       assert(step, Start, URI("path"), MethodFail)
     }
 
-    scenario("The WADL contains a single multi-path resource, element, and XSD checks are on, well formness is off") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+    scenario("The WADL contains a single multi-path resource, element, And XSD checks are on, well formness is off") {
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                   xmlns:tst="http://www.rackspace.com/xerces/test">
@@ -255,7 +255,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL, TestConfig(false, false, false, true, true)).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -270,8 +270,8 @@ class WADLStepSpec extends BaseStepSpec {
       assert(step, Start, URI("path"), MethodFail)
     }
 
-    scenario("The WADL contains a single multi-path resource, with element checks on but XSD and well formness checks are off") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+    scenario("The WADL contains a single multi-path resource, with element checks on but XSD And well formness checks are off") {
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                   xmlns:tst="http://www.rackspace.com/xerces/test">
@@ -322,7 +322,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL, TestConfig(false, false, false, false, true)).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -337,7 +337,7 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     scenario("The WADL contains a single multi-path resource, with element checks but bad QName for element") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars>
@@ -358,14 +358,14 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       intercept[WADLException] {
         val step = builder.build (inWADL, TestConfig(false, false, false, false, true)).asInstanceOf[Start]
       }
     }
 
     scenario("The WADL contains a single multi-path resource, XSD checks are on, but well formness is not specified") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars>
@@ -416,7 +416,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL, TestConfig(false, false, false, true)).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -431,7 +431,7 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     scenario("The WADL contains a single multi-path resource, XML well formness check is on") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -451,7 +451,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL, TestConfig(false, true)).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -465,7 +465,7 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     scenario("The WADL contains a single multi-path resource, JSON well formness check is on") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -485,7 +485,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL, TestConfig(false, true)).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -498,8 +498,8 @@ class WADLStepSpec extends BaseStepSpec {
       assert(step, Start, URI("path"), MethodFail)
     }
 
-    scenario("The WADL contains a single multi-path resource, JSON and XML well formness check is on") {
-      given("a WADL that contains a single multi-path resource with a GET and DELETE method")
+    scenario("The WADL contains a single multi-path resource, JSON And XML well formness check is on") {
+      Given("a WADL that contains a single multi-path resource with a GET And DELETE method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -520,7 +520,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL, TestConfig(false, true)).asInstanceOf[Start]
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -536,7 +536,7 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     scenario("The WADL contains multiple, related paths") {
-      given ("a WADL with multiple related paths")
+      Given ("a WADL with multiple related paths")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -559,7 +559,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
           </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -575,7 +575,7 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     scenario("The WADL contains multiple, unrelated paths") {
-      given ("a WADL with multiple unrelated paths")
+      Given ("a WADL with multiple unrelated paths")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -598,7 +598,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
           </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -615,7 +615,7 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     scenario("The WADL contains method ids") {
-      given ("a WADL with method IDs")
+      Given ("a WADL with method IDs")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -630,7 +630,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
           </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -643,7 +643,7 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     scenario("The WADL contains an initial invisible node") {
-      given ("a WADL with an initial invisble node")
+      Given ("a WADL with an initial invisble node")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:rax="http://docs.rackspace.com/api">
@@ -668,7 +668,7 @@ class WADLStepSpec extends BaseStepSpec {
               </resource>
            </resources>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val step = builder.build (inWADL)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
@@ -685,7 +685,7 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     scenario("The WADL contains a template parameter of type string at the end of a path") {
-      given("a WADL with a single template string at the end of the path")
+      Given("a WADL with a single template string at the end of the path")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -700,20 +700,20 @@ class WADLStepSpec extends BaseStepSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val step = builder.build (inWADL)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI(".*"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI(".*"), MethodFailMatch("GET"))
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI(".*"), URLFail)
       assert(step, Start, URI("path"), URLFailMatch("to"))
-      and("There should not be an URLFail node right before a catch any URI...")
+      And("There should not be an URLFail node right before a catch any URI...")
       intercept[TestFailedException] {
         assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
       }
     }
 
     scenario("The WADL contains a template parameter of type string in the middle of the path") {
-      given("a WADL with a single template string in the middle of the path")
+      Given("a WADL with a single template string in the middle of the path")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -728,7 +728,7 @@ class WADLStepSpec extends BaseStepSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val step = builder.build (inWADL)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI(".*"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI(".*"), URI("resource"), MethodFailMatch("GET"))
@@ -740,10 +740,10 @@ class WADLStepSpec extends BaseStepSpec {
     }
 
     //
-    // Pending getting url handlers working in this test suite.
+    // Pending getting url Handlers working in this test suite.
     //
     ignore("The WADL contains a template parameter of a custom type at the end of the path") {
-      given("A WADL with a template parameter of a custom type at the end of the path")
+      Given("A WADL with a template parameter of a custom type at the end of the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -773,7 +773,7 @@ class WADLStepSpec extends BaseStepSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val step = builder.build (inWADL)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URIXSD(new QName("test://schema/a","yesno","tst")),Method("GET"), Accept)
       //

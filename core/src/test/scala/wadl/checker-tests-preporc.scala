@@ -126,26 +126,26 @@ class WADLCheckerPreProcSpec extends BaseCheckerSpec {
       </application>
 
       scenario("The testWADL is processed with preporc extension disabled") {
-        given("The testWADL with preproc extension disabled")
-        when("The WADL is transalted")
+        Given("The testWADL with preproc extension disabled")
+        When("The WADL is transalted")
         val checker = builder.build(testWADL, TestConfig(false, false, false, false, false, 1, false, false, false))
-        then("There should not be any well-form checks")
+        Then("There should not be any well-form checks")
         assert(checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 0");
       }
 
       scenario("The testWADL is processed with preporc extension enabled") {
-        given("The testWADL with preproc extension disabled")
-        when("The WADL is transalted")
+        Given("The testWADL with preproc extension disabled")
+        When("The WADL is transalted")
         val checker = builder.build(testWADL, TestConfig(false, false, false, false, false, 1, false, false, true))
-        then("There should not be any well-form checks")
+        Then("There should not be any well-form checks")
         assert(checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 0");
       }
 
       scenario("The testPreProcWADL is processed with preporc extension enabled") {
-        given("The testPreProcWADL with preproc extension disabled")
-        when("The WADL is transalted")
+        Given("The testPreProcWADL with preproc extension disabled")
+        When("The WADL is transalted")
         val checker = builder.build(testPreProcWADL, TestConfig(false, false, false, false, false, 1, false, false, true))
-        then("There should be a single WELL_XML step on the POST operation")
+        Then("There should be a single WELL_XML step on the POST operation")
         assert(checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
         assert(checker, "count(/chk:checker/chk:step[@type='XSL']) = 1")
         assert(checker, Start, URL("a"), URL("b"), Method("POST"),
