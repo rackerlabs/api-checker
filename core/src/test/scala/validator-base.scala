@@ -32,7 +32,7 @@ import com.rackspace.com.papi.components.checker.util.JSONParserPool
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
 
 import org.scalatest.FunSuite
-import org.scalatest.TestFailedException
+import org.scalatest.exceptions.TestFailedException
 
 import org.mockito.Mockito._
 import org.mockito.Matchers._

@@ -107,10 +107,10 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 </application>
 
     scenario ("The sharedXPathWADL is processed checking wellformness, XSD, elemnts, and plain parameters, but without optimizations") {
-      given("the sharedXPathWADL")
-      when("The WADL is transalted")
+      Given("the sharedXPathWADL")
+      When("The WADL is transalted")
       val checker = builder.build(sharedXPathWADL, TestConfig(false, false, true, true, true, 1, true))
-      then ("The following paths should hold")
+      Then ("The following paths should hold")
 
       assert(checker,Start, URL("servers"), URL("entries"), Method("POST"),
              Method("POST"),
@@ -141,7 +141,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              XPath("/atom:entry/w_ns18:usage"),
              XPath("/atom:entry/@only_usage"), Accept)
 
-      and ("The Following counts should hold")
+      And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 6")
       assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 4")
       assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 4")
@@ -159,10 +159,10 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     }
 
     scenario ("The sharedXPathWADL is processed checking wellformness, XSD, elemnts, and plain parameters, with remove dups optimization") {
-      given("the sharedXPathWADL")
-      when("The WADL is transalted")
+      Given("the sharedXPathWADL")
+      When("The WADL is transalted")
       val checker = builder.build(sharedXPathWADL, TestConfig(true, false, true, true, true, 1, true))
-      then ("The following paths should hold")
+      Then ("The following paths should hold")
 
       assert(checker,Start, URL("servers"), URL("entries"),
              Method("POST"),
@@ -193,7 +193,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              XPath("/atom:entry/w_ns18:usage"),
              XPath("/atom:entry/@only_usage"), Accept)
 
-      and ("The Following counts should hold")
+      And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
       assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
       assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 2")
@@ -211,10 +211,10 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     }
 
     scenario ("The sharedXPathWADL is processed checking wellformness, XSD, elemnts, and plain parameters, with remove dups and joinpath optimizations") {
-      given("the sharedXPathWADL")
-      when("The WADL is transalted")
+      Given("the sharedXPathWADL")
+      When("The WADL is transalted")
       val checker = builder.build(sharedXPathWADL, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", true))
-      then ("The following paths should hold")
+      Then ("The following paths should hold")
 
       assert(checker,Start, URL("servers"), URL("entries"),
              Method("POST"),
@@ -245,7 +245,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              XPath("/atom:entry/w_ns18:usage"),
              XPath("/atom:entry/@only_usage"), Accept)
 
-      and ("The Following counts should hold")
+      And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
       assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 0")
       assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 2")
@@ -300,10 +300,10 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 </application>
 
     scenario ("The sharedXPathWADL2 is processed checking wellformness, elemnts, and plain parameters, but without optimizations") {
-      given("the sharedXPathWADL2")
-      when("The WADL is transalted")
+      Given("the sharedXPathWADL2")
+      When("The WADL is transalted")
       val checker = builder.build(sharedXPathWADL2, TestConfig(false, false, true, true, true, 1, true))
-      then ("The following paths should hold")
+      Then ("The following paths should hold")
 
       assert(checker,Start, URL("y"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
@@ -317,7 +317,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
              XPath("/foo:foo/@junk"), Accept)
 
-      and ("The Following counts should hold")
+      And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 4")
       assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
       assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 3")
@@ -329,10 +329,10 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     }
 
     scenario ("The sharedXPathWADL2 is processed checking wellformness, elemnts, and plain parameters, with remove dups optimization") {
-      given("the sharedXPathWADL2")
-      when("The WADL is transalted")
+      Given("the sharedXPathWADL2")
+      When("The WADL is transalted")
       val checker = builder.build(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true))
-      then ("The following paths should hold")
+      Then ("The following paths should hold")
 
       assert(checker,Start, URL("y"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
@@ -346,7 +346,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
              XPath("/foo:foo/@junk"), Accept)
 
-      and ("The Following counts should hold")
+      And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
       assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
       assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 2")
@@ -358,10 +358,10 @@ xmlns:atom="http://www.w3.org/2005/Atom">
     }
 
     scenario ("The sharedXPathWADL2 is processed checking wellformness, elemnts, and plain parameters, with remove dups and joinpath optimizations") {
-      given("the sharedXPathWADL2")
-      when("The WADL is transalted")
+      Given("the sharedXPathWADL2")
+      When("The WADL is transalted")
       val checker = builder.build(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", true))
-      then ("The following paths should hold")
+      Then ("The following paths should hold")
 
       assert(checker,Start, URL("y"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), XSL)
@@ -374,7 +374,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
              XPath("/foo:foo/@junk"), Accept)
 
-      and ("The Following counts should hold")
+      And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
       assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 2")

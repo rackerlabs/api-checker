@@ -8,7 +8,7 @@ import javax.xml.transform._
 import javax.xml.transform.sax._
 import javax.xml.transform.stream._
 
-import org.scalatest.TestFailedException
+import org.scalatest.exceptions.TestFailedException
 
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.test.BaseWADLSpec

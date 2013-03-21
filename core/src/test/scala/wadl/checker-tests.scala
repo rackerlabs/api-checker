@@ -29,7 +29,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     info ("so that an API validator can process the checker format to validate the API")
 
     scenario("The WADL does not contain any resources") {
-      given("a WADL with no resources")
+      Given("a WADL with no resources")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -37,23 +37,23 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               <resource/>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
-      then("The checker should contain a single start node")
+      Then("The checker should contain a single start node")
       assert (checker, "count(//chk:step[@type='START']) = 1")
-      and("The only steps accessible from start should be the fail states")
+      And("The only steps accessible from start should be the fail states")
       val path = allStepsFromStart(checker)
       assert (path, "count(//chk:step) = 3")
       assert (path, "/chk:checker/chk:step[@type='START']")
       assert (path, "/chk:checker/chk:step[@type='METHOD_FAIL']")
       assert (path, "/chk:checker/chk:step[@type='URL_FAIL']")
-      and("There should exist a direct path from start to each failed state")
+      And("There should exist a direct path from start to each failed state")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
     }
 
     scenario("The WADL contains an explicit root element, with no methods on the root") {
-      given("a WADL with an explicit root element, no methods on root")
+      Given("a WADL with an explicit root element, no methods on root")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -68,15 +68,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       val checker = builder.build (inWADL, stdConfig)
-      then("The checker should contain an URL node only for the element")
+      Then("The checker should contain an URL node only for the element")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 1")
-      and ("The checker should contain a single GET method")
+      And ("The checker should contain a single GET method")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
-      and ("The checker should NOT contian URL steps with a match == '/'")
+      And ("The checker should NOT contian URL steps with a match == '/'")
       assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
-      and ("The URL path should simply be from Start to the element")
+      And ("The URL path should simply be from Start to the element")
       assert (checker, Start, URL("element"), Method("GET"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("element"), URLFail)
@@ -84,7 +84,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     }
 
     scenario("The WADL contains an explicit root element, with methods on the root") {
-      given("a WADL with an explicit root element, methods on root")
+      Given("a WADL with an explicit root element, methods on root")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -102,17 +102,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       val checker = builder.build (inWADL, stdConfig)
-      then("The checker should contain an URL node only for the element")
+      Then("The checker should contain an URL node only for the element")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 1")
-      and ("The checker should contain two GET methods")
+      And ("The checker should contain two GET methods")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
-      and ("The checker should NOT contian URL steps with a match == '/'")
+      And ("The checker should NOT contian URL steps with a match == '/'")
       assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
-      and ("The URL path should exist from Start to the element")
+      And ("The URL path should exist from Start to the element")
       assert (checker, Start, URL("element"), Method("GET"))
-      and ("The URL path should exist from START directly to GET method")
+      And ("The URL path should exist from START directly to GET method")
       assert (checker, Start, Method("GET"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("element"), URLFail)
@@ -120,7 +120,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     }
 
     scenario("The WADL contains a / path deeper in the URI structure") {
-      given("a WADL that contains a / path deefer in the URI structure")
+      Given("a WADL that contains a / path deefer in the URI structure")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -140,17 +140,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       val checker = builder.build (inWADL, stdConfig)
-      then("The checker should contain an URL node only for the element")
+      Then("The checker should contain an URL node only for the element")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 1")
-      and ("The checker should contain two GET methods")
+      And ("The checker should contain two GET methods")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
-      and ("The checker should NOT contian URL steps with a match == '/'")
+      And ("The checker should NOT contian URL steps with a match == '/'")
       assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
-      and ("The URL path should exist from Start to the element")
+      And ("The URL path should exist from Start to the element")
       assert (checker, Start, URL("element"), Method("GET"))
-      and ("The URL path should exist from START directly to GET method")
+      And ("The URL path should exist from START directly to GET method")
       assert (checker, Start, Method("GET"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("element"), URLFail)
@@ -158,7 +158,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     }
 
     scenario("The WADL contains a / path deeper in the URI structure (with sub elements)") {
-      given("a WADL that contains a / path deeper in the URI structure")
+      Given("a WADL that contains a / path deeper in the URI structure")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -183,21 +183,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       val checker = builder.build (inWADL, stdConfig)
-      then("The checker should contain an URL node and element2")
+      Then("The checker should contain an URL node and element2")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 2")
-      and ("The checker should contain two GET methods")
+      And ("The checker should contain two GET methods")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
-      and ("The checker should contain a POST methods")
+      And ("The checker should contain a POST methods")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 1")
-      and ("The checker should NOT contian URL steps with a match == '/'")
+      And ("The checker should NOT contian URL steps with a match == '/'")
       assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
-      and ("The URL path should exist from Start to the element")
+      And ("The URL path should exist from Start to the element")
       assert (checker, Start, URL("element"), Method("GET"))
-      and ("The URL path should exist from Start to the element2")
+      And ("The URL path should exist from Start to the element2")
       assert (checker, Start, URL("element"), URL("element2"), Method("POST"))
-      and ("The URL path should exist from START directly to GET method")
+      And ("The URL path should exist from START directly to GET method")
       assert (checker, Start, Method("GET"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("element"), URLFail)
@@ -208,7 +208,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
     scenario("The WADL contains a / path deeper in the URI structure (with sub elements and multiple nested '/')") {
-      given("a WADL that contains a / path deeper in the URI structure")
+      Given("a WADL that contains a / path deeper in the URI structure")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -235,21 +235,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resources>
         </application>
       val checker = builder.build (inWADL, stdConfig)
-      then("The checker should contain an URL node and element2")
+      Then("The checker should contain an URL node and element2")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 2")
-      and ("The checker should contain two GET methods")
+      And ("The checker should contain two GET methods")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
-      and ("The checker should contain a POST methods")
+      And ("The checker should contain a POST methods")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 1")
-      and ("The checker should NOT contian URL steps with a match == '/'")
+      And ("The checker should NOT contian URL steps with a match == '/'")
       assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
-      and ("The URL path should exist from Start to the element")
+      And ("The URL path should exist from Start to the element")
       assert (checker, Start, URL("element"), Method("GET"))
-      and ("The URL path should exist from Start to the element2")
+      And ("The URL path should exist from Start to the element2")
       assert (checker, Start, URL("element"), URL("element2"), Method("POST"))
-      and ("The URL path should exist from START directly to GET method")
+      And ("The URL path should exist from START directly to GET method")
       assert (checker, Start, Method("GET"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("element"), URLFail)
@@ -268,18 +268,18 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def singlePathAssertions (checker : NodeSeq) : Unit = {
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
-      and ("The checker should contain a GET, DELETE, and POST method")
+      And ("The checker should contain a GET, DELETE, and POST method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE']")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='POST']")
-      and ("The path from the start should contain all URL nodes in order")
-      and ("it should end in the GET and a DELETE method node")
+      And ("The path from the start should contain all URL nodes in order")
+      And ("it should end in the GET and a DELETE method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), ReqType("(application/xml)(;.*)?"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("path"), URLFail)
@@ -290,12 +290,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("my"), MethodFail)
       assert (checker, URL("resource"), URLFail)
       assert (checker, URL("resource"), MethodFail)
-      and ("The POST method should contain an ReqTypeFail")
+      And ("The POST method should contain an ReqTypeFail")
       assert (checker, Method("POST"), ReqTypeFail)
     }
 
     scenario("The WADL contains a single multi-path resource") {
-      given("a WADL that contains a single multi-path resource with a GET, DELETE, and POST method")
+      Given("a WADL that contains a single multi-path resource with a GET, DELETE, and POST method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -316,13 +316,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
     ignore("The WADL contains a single multi-path resource ending in /") {
-      given("a WADL that contains a single multi-path resource with a GET, DELETE, and POST method and ending in /")
+      Given("a WADL that contains a single multi-path resource with a GET, DELETE, and POST method and ending in /")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -343,13 +343,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource in tree form") {
-      given("a WADL that contains a single multi-path resource in tree form with a GET, DELETE, and POST method")
+      Given("a WADL that contains a single multi-path resource in tree form with a GET, DELETE, and POST method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -376,13 +376,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource in mixed form") {
-      given("a WADL that contains a single multi-path resource in mixed form with a GET, DELETE, and POST method")
+      Given("a WADL that contains a single multi-path resource in mixed form with a GET, DELETE, and POST method")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -405,13 +405,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource with a method referece") {
-      given("a WADL that contains a single multi-path resource with a method reference")
+      Given("a WADL that contains a single multi-path resource with a method reference")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -433,13 +433,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource with a resource type") {
-      given("a WADL that contains a single multi-path resource with a resource type")
+      Given("a WADL that contains a single multi-path resource with a resource type")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -461,13 +461,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
              </method>
            </resource_type>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
 
     scenario("The WADL contains a single multi-path resource with a resource type with method references") {
-      given("a WADL that contains a single multi-path resource with a resource type with method references")
+      Given("a WADL that contains a single multi-path resource with a resource type with method references")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -490,7 +490,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       singlePathAssertions(checker)
     }
@@ -504,19 +504,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def multiplePathAssertions (checker : NodeSeq) : Unit = {
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
-      and ("The checker should contain a GET, POST, and DELETE method")
+      And ("The checker should contain a GET, POST, and DELETE method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE']")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='POST']")
-      and ("The path from the start should contain all URL nodes in order")
-      and ("it should end in the right method")
+      And ("The path from the start should contain all URL nodes in order")
+      And ("it should end in the right method")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("other_resource"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("other_resource"), Method("POST"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("path"), URLFail)
@@ -532,7 +532,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     }
 
     scenario("The WADL contains multiple, related paths") {
-      given ("a WADL with multiple related paths")
+      Given ("a WADL with multiple related paths")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -555,13 +555,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
           </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       multiplePathAssertions(checker)
     }
 
     scenario("The WADL in tree format contains multiple, related paths") {
-      given ("a WADL in tree format with multiple related paths")
+      Given ("a WADL in tree format with multiple related paths")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -590,13 +590,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       multiplePathAssertions(checker)
     }
 
     scenario("The WADL in mix format contains multiple, related paths") {
-      given ("a WADL in mix format with multiple related paths")
+      Given ("a WADL in mix format with multiple related paths")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -621,7 +621,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       multiplePathAssertions(checker)
     }
@@ -635,19 +635,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def multipleUnrelatedPathAssertions (checker : NodeSeq) : Unit = {
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 8")
-      and ("The checker should contain a GET, POST, and DELETE method")
+      And ("The checker should contain a GET, POST, and DELETE method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE']")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='POST']")
-      and ("The path from the start should contain all URL nodes in order")
-      and ("it should end in the right method")
+      And ("The path from the start should contain all URL nodes in order")
+      And ("it should end in the right method")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
       assert (checker, Start, URL("this"), URL("is"), URL("my"), URL("other_resource"), Method("GET"))
       assert (checker, Start, URL("this"), URL("is"), URL("my"), URL("other_resource"), Method("POST"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("this"), URLFail)
@@ -667,7 +667,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     }
 
     scenario("The WADL contains multiple, unrelated paths") {
-      given ("a WADL with multiple unrelated paths")
+      Given ("a WADL with multiple unrelated paths")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -690,13 +690,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
           </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       multipleUnrelatedPathAssertions(checker)
     }
 
     scenario("The WADL in tree format contains multiple, unrelated paths") {
-      given ("a WADL in tree format with multiple unrelated paths")
+      Given ("a WADL in tree format with multiple unrelated paths")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -731,13 +731,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       multipleUnrelatedPathAssertions(checker)
     }
 
     scenario("The WADL in mix format contains multiple, unrelated paths") {
-      given ("a WADL in mix format with multiple unrelated paths")
+      Given ("a WADL in mix format with multiple unrelated paths")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -764,13 +764,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       multipleUnrelatedPathAssertions(checker)
     }
 
     scenario("The WADL contains method ids") {
-      given ("a WADL with method IDs")
+      Given ("a WADL with method IDs")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -785,16 +785,16 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
           </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
-      then("The method nodes should contain a resource label with the id")
+      Then("The method nodes should contain a resource label with the id")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD']) = 2")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET' and @label='getResource']")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE' and @label='deleteResource']")
     }
 
     scenario("The WADL contains an initial invisible node") {
-      given ("a WADL with an initial invisble node")
+      Given ("a WADL with an initial invisble node")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:rax="http://docs.rackspace.com/api">
@@ -819,13 +819,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
-      then("All paths should be available as defined in the WADL...")
+      Then("All paths should be available as defined in the WADL...")
       assert (checker, Start, URL("path"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("DELETE"))
-      and("Paths should also be accessible directly from start")
+      And("Paths should also be accessible directly from start")
       assert (checker, Start, Method("GET"))
       assert (checker, Start, URL("to"), URL("my"), URL("resource"), Method("GET"))
       assert (checker, Start, URL("to"), URL("my"), URL("resource"), Method("DELETE"))
@@ -839,14 +839,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def stringTemplateAtEndAssertions (checker : NodeSeq) : Unit = {
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
-      and ("The checker should contain a GET method")
+      And ("The checker should contain a GET method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
-      and ("The path from the start should contain all URL nodes including a .*")
-      and ("it should end in the GET method node")
+      And ("The path from the start should contain all URL nodes including a .*")
+      And ("it should end in the GET method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), URL(".*"), Method("GET"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("path"), URLFail)
@@ -858,14 +858,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), MethodFail)
       assert (checker, URL(".*"), URLFail)
       assert (checker, URL(".*"), MethodFail)
-      and ("the URL('resource') will not have an URL fail because all URLs are accepted")
+      And ("the URL('resource') will not have an URL fail because all URLs are accepted")
       val stepsFromResource = allStepsFromStep (checker, URL("resource"), 2)
       assert (stepsFromResource, "not(//chk:step[@type='URL_FAIL'])")
     }
 
 
     scenario("The WADL contains a template parameter of type string at the end of a path") {
-      given("a WADL with a single template string at the end of the path")
+      Given("a WADL with a single template string at the end of the path")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -880,13 +880,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       stringTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL in tree format contains a template parameter of type string at the end of a path") {
-      given("a WADL in tree format with a single template string at the end of the path")
+      Given("a WADL in tree format with a single template string at the end of the path")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -909,13 +909,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       stringTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL in mix format contains a template parameter of type string at the end of a path") {
-      given("a WADL in mix format with a single template string at the end of the path")
+      Given("a WADL in mix format with a single template string at the end of the path")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -934,13 +934,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       stringTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL contains a template parameter of type string at the end of a path, the prefix used is not xsd, but the qname is valid") {
-      given("a WADL with a single template string at the end of the path, the prefix used is not xsd, but the qname is valid")
+      Given("a WADL with a single template string at the end of the path, the prefix used is not xsd, but the qname is valid")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:x="http://www.w3.org/2001/XMLSchema">
@@ -955,13 +955,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       stringTemplateAtEndAssertions(checker)
     }
 
     scenario("Error Condition: The WADL contains a template parameter of type string, but the param element has a name mismatch") {
-      given("a WADL with a template parameter, with a mismatch in the param name")
+      Given("a WADL with a template parameter, with a mismatch in the param name")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -976,15 +976,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
-      then ("A WADLException should be thrown")
+      When ("the wadl is translated")
+      Then ("A WADLException should be thrown")
       intercept[WADLException] {
         val checker = builder.build (inWADL, stdConfig)
       }
     }
 
     scenario("Error Condition: The WADL contains a template parameter of type string, but is missing a  param element") {
-      given("a WADL with a template parameter but no param element")
+      Given("a WADL with a template parameter but no param element")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -998,15 +998,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
-      then ("A WADLException should be thrown")
+      When ("the wadl is translated")
+      Then ("A WADLException should be thrown")
       intercept[WADLException] {
         val checker = builder.build (inWADL, stdConfig)
       }
     }
 
     scenario("Error Condition: The WADL contains a template parameter of type string, but the param element has a type mismatch") {
-      given("a WADL with a template parameter, with a mismatch in the param type")
+      Given("a WADL with a template parameter, with a mismatch in the param type")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -1021,15 +1021,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
-      then ("A WADLException should be thrown")
+      When ("the wadl is translated")
+      Then ("A WADLException should be thrown")
       intercept[WADLException] {
         val checker = builder.build (inWADL, stdConfig)
       }
     }
 
     scenario("Error Condition: The WADL contains a template parameter of a type with a bad qname") {
-      given("a WADL with a template parameter of a type with a bad qname")
+      Given("a WADL with a template parameter of a type with a bad qname")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -1043,8 +1043,8 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
-      then ("A WADLException should be thrown")
+      When ("the wadl is translated")
+      Then ("A WADLException should be thrown")
       intercept[WADLException] {
         val checker = builder.build (inWADL, stdConfig)
       }
@@ -1058,14 +1058,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def stringTemplateInMiddleAssertions (checker : NodeSeq) : Unit = {
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
-      and ("The checker should contain a GET method")
+      And ("The checker should contain a GET method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
-      and ("The path from the start should contain all URL nodes including a .*")
-      and ("it should end in the GET method node")
+      And ("The path from the start should contain all URL nodes including a .*")
+      And ("it should end in the GET method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL(".*"), URL("resource"), Method("GET"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("path"), URLFail)
@@ -1077,13 +1077,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), URLFail)
       assert (checker, URL(".*"), URLFail)
       assert (checker, URL(".*"), MethodFail)
-      and ("the URL('my') will not have an URL fail because all URLs are accepted")
+      And ("the URL('my') will not have an URL fail because all URLs are accepted")
       val stepsFromResource = allStepsFromStep (checker, URL("my"), 2)
       assert (stepsFromResource, "not(//chk:step[@type='URL_FAIL'])")
     }
 
     scenario("The WADL contains a template parameter of type string in the middle of the path") {
-      given("a WADL with a single template string in the middle of the path")
+      Given("a WADL with a single template string in the middle of the path")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -1098,13 +1098,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       stringTemplateInMiddleAssertions(checker)
     }
 
     scenario("The WADL in tree format contains a template parameter of type string in the middle of the path") {
-      given("a WADL in tree format with a single template string in the middle of the path")
+      Given("a WADL in tree format with a single template string in the middle of the path")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -1127,13 +1127,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       stringTemplateInMiddleAssertions(checker)
     }
 
     scenario("The WADL in mix format contains a template parameter of type string in the middle of the path") {
-      given("a WADL in mix format with a single template string in the middle of the path")
+      Given("a WADL in mix format with a single template string in the middle of the path")
       val inWADL=
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -1152,7 +1152,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when ("the wadl is translated")
+      When ("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       stringTemplateInMiddleAssertions(checker)
     }
@@ -1165,22 +1165,22 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def customTemplateAtEndAssertions (checker : NodeSeq) : Unit = {
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
-      and("A single URLXSD node")
+      And("A single URLXSD node")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD' and @label='yn']) = 1")
-      and ("The checker should contain a GET method")
+      And ("The checker should contain a GET method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
-      and ("The path from the start should contain all URL and URLXSD nodes")
-      and ("it should end in the GET method node")
+      And ("The path from the start should contain all URL and URLXSD nodes")
+      And ("it should end in the GET method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Label("yn"), Method("GET"))
-      and ("The URLXSD should match a valid QName")
+      And ("The URLXSD should match a valid QName")
       assert (checker, "namespace-uri-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'test://schema/a'")
       assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'yesno'")
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("path"), URLFail)
@@ -1193,14 +1193,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), MethodFail)
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
-      and("The grammar nodes are added to the checker")
+      And("The grammar nodes are added to the checker")
       assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and  @type='W3C_XML']")
       assert (checker, "if (/chk:checker/chk:grammar/@href) then not(/chk:checker/chk:grammar/xsd:schema) else /chk:checker/chk:grammar/xsd:schema")
       assert (checker, "if (/chk:checker/chk:grammar/@href) then /chk:checker/chk:grammar/@href='test://app/xsd/simple.xsd' else true()")
     }
 
     scenario("The WADL contains a template parameter of a custom type at the end of the path") {
-      given("A WADL with a template parameter of a custom type at the end of the path")
+      Given("A WADL with a template parameter of a custom type at the end of the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1230,13 +1230,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL contains a template parameter of a custom type at the end of the path, the XSD is embedded") {
-      given("A WADL with a template parameter of a custom type at the end of the path, the XSD is embedded")
+      Given("A WADL with a template parameter of a custom type at the end of the path, the XSD is embedded")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1264,13 +1264,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL contains a template parameter of a custom type at the end of the path, the schema is in a relative path") {
-      given("A WADL with a template parameter of a custom type at the end of the path, the schema is in a relative path")
+      Given("A WADL with a template parameter of a custom type at the end of the path, the schema is in a relative path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1300,13 +1300,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL in tree format contains a template parameter of a custom type at the end of the path") {
-      given("A WADL in tree format with a template parameter of a custom type at the end of the path")
+      Given("A WADL in tree format with a template parameter of a custom type at the end of the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1344,13 +1344,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL in mix format contains a template parameter of a custom type at the end of the path") {
-      given("A WADL in mix format with a template parameter of a custom type at the end of the path")
+      Given("A WADL in mix format with a template parameter of a custom type at the end of the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1384,13 +1384,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
-      given("A WADL with a template parameter of a custom type at the end of the path, with the type in a default namespace")
+      Given("A WADL with a template parameter of a custom type at the end of the path, with the type in a default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
                           xmlns="test://schema/a">
@@ -1420,13 +1420,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL in tree format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
-      given("A WADL in tree format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
+      Given("A WADL in tree format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
                           xmlns="test://schema/a">
@@ -1464,13 +1464,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL in mix format contains a template parameter of a custom type at the end of the path, the type is in the default namespace") {
-      given("A WADL in mix format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
+      Given("A WADL in mix format with a template parameter of a custom type at the end of the path, the type is in the default namespace")
       val inWADL =
         <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02"
                          xmlns="test://schema/a">
@@ -1504,13 +1504,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateAtEndAssertions(checker)
     }
 
     scenario("The WADL contains a template parameter of a custom type at the end of the path, with remove dup on") {
-      given("A WADL with a template parameter of a custom type at the end of the path")
+      Given("A WADL with a template parameter of a custom type at the end of the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1546,29 +1546,29 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, dupConfig)
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 7")
-      and("A single URLXSD node")
+      And("A single URLXSD node")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD' and @label='yn']) = 1")
-      and ("The checker should contain a GET method")
+      And ("The checker should contain a GET method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
-      and ("The path from the start should contain all URL and URLXSD nodes")
-      and ("it should end in the GET method node")
+      And ("The path from the start should contain all URL and URLXSD nodes")
+      And ("it should end in the GET method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Label("yn"), Method("GET"))
-      and ("The URLXSD should match a valid QName")
+      And ("The URLXSD should match a valid QName")
       assert (checker, "namespace-uri-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'test://schema/a'")
       assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'yesno'")
-      and ("There should not be a duplicate dup node")
+      And ("There should not be a duplicate dup node")
       assert (checker, "count(//chk:step[@type='URL' and @match='dup']) = 1")
-      and ("The dup paths should be valid")
+      And ("The dup paths should be valid")
       assert (checker, Start, URL("1"), URL("dup"), Method("GET"))
       assert (checker, Start, URL("2"), URL("dup"), Method("GET"))
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("1"), URLFail)
@@ -1587,12 +1587,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), MethodFail)
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
-      and("The grammar nodes are added to the checker")
+      And("The grammar nodes are added to the checker")
       assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://app/xsd/simple.xsd' and @type='W3C_XML']")
     }
 
     scenario("The WADL contains a template parameter of a custom type, but the grammar is missing") {
-      given("A WADL with a template parameter of a custom type, but the grammar is missing")
+      Given("A WADL with a template parameter of a custom type, but the grammar is missing")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1609,15 +1609,15 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when("the wadl is translated")
-      then ("A WADLException should be thrown")
+      When("the wadl is translated")
+      Then ("A WADLException should be thrown")
       intercept[WADLException] {
         val checker = builder.build (inWADL, dupConfig)
       }
     }
 
     scenario("The WADL contains a template parameter of a custom type, but the grammar is not XSD") {
-      given("A WADL with a template parameter of a custom type, but the grammar is not XSD")
+      Given("A WADL with a template parameter of a custom type, but the grammar is not XSD")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1634,7 +1634,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       register("test://app/xsd/simple.rng",
                <grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
                xmlns="http://relaxng.org/ns/structure/1.0" >
@@ -1643,7 +1643,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                  </define>
                </grammar>
              )
-      then ("The grammar should be ignored")
+      Then ("The grammar should be ignored")
       val checker = builder.build (inWADL, dupConfig)
       assert (checker, "not(/chk:checker/chk:grammar)")
     }
@@ -1653,7 +1653,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //  testing.
     //
     ignore("The WADL contains a template parameter of a custom type, but the grammar is not XML") {
-      given("A WADL with a template parameter of a custom type, but the grammar is not XML")
+      Given("A WADL with a template parameter of a custom type, but the grammar is not XML")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1670,7 +1670,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                <response status="200 203"/>
            </method>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       // register_unparsed("test://app/xsd/simple.json",
       //          """
       //            {
@@ -1678,7 +1678,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       //            }
       //          """
       //        )
-      then ("The grammar should be ignored")
+      Then ("The grammar should be ignored")
       val checker = builder.build (inWADL, stdConfig)
       assert (checker, "not(/chk:checker/chk:grammar)")
     }
@@ -1692,22 +1692,22 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def customTemplateInMiddleAssertions (checker : NodeSeq) : Unit = {
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 4")
-      and("A single URLXSD node")
+      And("A single URLXSD node")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD' and @label='yn']) = 1")
-      and ("The checker should contain a GET method")
+      And ("The checker should contain a GET method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
-      and ("The path from the start should contain all URL and URLXSD nodes")
-      and ("it should end in the GET method node")
+      And ("The path from the start should contain all URL and URLXSD nodes")
+      And ("it should end in the GET method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), Label("yn"), URL("resource"), Method("GET"))
-      and ("The URLXSD should match a valid QName")
+      And ("The URLXSD should match a valid QName")
       assert (checker, "namespace-uri-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'test://schema/a'")
       assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'yesno'")
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("path"), URLFail)
@@ -1720,12 +1720,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, URL("resource"), URLFail)
       assert (checker, Label("yn"), URLFail)
       assert (checker, Label("yn"), MethodFail)
-      and("The grammar nodes are added to the checker")
+      And("The grammar nodes are added to the checker")
       assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://simple.xsd' and @type='W3C_XML']")
     }
 
     scenario("The WADL contains a template parameter of a custom type in the middle of the path") {
-      given("A WADL with a template parameter of a custom type in the middle of  the path")
+      Given("A WADL with a template parameter of a custom type in the middle of  the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1755,13 +1755,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateInMiddleAssertions(checker)
     }
 
     scenario("The WADL in tree format contains a template parameter of a custom type in the middle of the path") {
-      given("A WADL in tree format with a template parameter of a custom type in the middle of  the path")
+      Given("A WADL in tree format with a template parameter of a custom type in the middle of  the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1799,13 +1799,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateInMiddleAssertions(checker)
     }
 
     scenario("The WADL in mix format contains a template parameter of a custom type in the middle of the path") {
-      given("A WADL in mix format with a template parameter of a custom type in the middle of  the path")
+      Given("A WADL in mix format with a template parameter of a custom type in the middle of  the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -1839,7 +1839,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplateInMiddleAssertions(checker)
     }
@@ -1853,19 +1853,19 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     //
 
     def customTemplatesInMiddleAssertions (checker : NodeSeq) : Unit = {
-      then("The checker should contain an URL node for each path step")
+      Then("The checker should contain an URL node for each path step")
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 5")
-      and("A single URLXSD node")
+      And("A single URLXSD node")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD']) = 2")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD' and @label='yn']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD' and @label='tf']) = 1")
-      and ("The checker should contain two GET methods")
+      And ("The checker should contain two GET methods")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
-      and ("The path from the start should contain all URL and URLXSD nodes")
-      and ("it should end in the GET method node")
+      And ("The path from the start should contain all URL and URLXSD nodes")
+      And ("it should end in the GET method node")
       assert (checker, Start, URL("path"), URL("to"), URL("my"), Label("yn"), URL("resource"), Method("GET"))
       assert (checker, Start, URL("path"), URL("to"), URL("my"), Label("tf"), URL("resource"), Method("GET"))
-      and ("The URLXSD should match a valid QName")
+      And ("The URLXSD should match a valid QName")
       assert (checker, "namespace-uri-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'test://schema/a'")
       assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
@@ -1874,7 +1874,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                                            "= 'test://schema/b'")
       assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@label='tf'][1]/@match, //chk:step[@label='tf'][1])) "+
                                            "= 'truefalse'")
-      and ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
       assert (checker, Start, URLFail)
       assert (checker, Start, MethodFail)
       assert (checker, URL("path"), URLFail)
@@ -1889,13 +1889,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       assert (checker, Label("yn"), MethodFail)
       assert (checker, Label("tf"), URLFail)
       assert (checker, Label("tf"), MethodFail)
-      and("The grammar nodes are added to the checker")
+      And("The grammar nodes are added to the checker")
       assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://simple.xsd' and @type='W3C_XML']")
       assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/b' and @href='test://simple-too.xsd' and @type='W3C_XML']")
     }
 
     scenario("The WADL contains multiple template parameters of a custom type in the middle of the path") {
-      given("A WADL with multiple template parameters of a custom type in the middle of  the path")
+      Given("A WADL with multiple template parameters of a custom type in the middle of  the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a"
@@ -1948,13 +1948,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplatesInMiddleAssertions(checker)
     }
 
     scenario("The WADL in tree format contains multiple template parameter of a custom type in the middle of the path") {
-      given("A WADL in tree format with multiple template parameter of a custom type in the middle of  the path")
+      Given("A WADL in tree format with multiple template parameter of a custom type in the middle of  the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a"
@@ -2017,13 +2017,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplatesInMiddleAssertions(checker)
     }
 
     scenario("The WADL in mix format contains multiple template parameters of a custom type in the middle of the path") {
-      given("A WADL in mix format with multiple template parameters of a custom type in the middle of  the path")
+      Given("A WADL in mix format with multiple template parameters of a custom type in the middle of  the path")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a"
@@ -2082,13 +2082,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       customTemplatesInMiddleAssertions(checker)
     }
 
     scenario("The WADL contains a URL with special regex symbols") {
-      given("a WADL that contains an URL winh special regex symbols")
+      Given("a WADL that contains an URL winh special regex symbols")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2101,7 +2101,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       assert (checker, Start, URL("\\\\\\^\\-\\.\\$\\{\\}\\*\\+\\|\\#\\(\\)\\[\\]"), Method("\\.\\-"))
       assert (checker, Start, URL("\\^ABC\\[D\\]EFG\\#"), Method("\\-GET\\.\\.IT\\-"))
@@ -2113,7 +2113,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  ReqTypeFail nodes, they are used in the next couple of tests.
   //
   def reqTypeAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
@@ -2122,7 +2122,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("v"), Method("POST"), ReqType("(text/plain;charset=UTF8)()"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
@@ -2130,7 +2130,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting various media types") {
-    given ("a WADL that contains multiple PUT and POST operation with various media types")
+    Given ("a WADL that contains multiple PUT and POST operation with various media types")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars/>
@@ -2179,10 +2179,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resource>
         </resources>
     </application>
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, stdConfig)
     reqTypeAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -2200,7 +2200,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting various media types, with dups optimization on") {
-    given ("a WADL that contains multiple PUT and POST operation with various media types")
+    Given ("a WADL that contains multiple PUT and POST operation with various media types")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars/>
@@ -2249,10 +2249,10 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resource>
         </resources>
     </application>
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, dupConfig)
     reqTypeAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -2277,7 +2277,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
 
   def noDupAsserts(checker : NodeSeq) : Unit = {
-    then("The paths in both resources should match")
+    Then("The paths in both resources should match")
     assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
     assert (checker, "count(//chk:step[@type='URL' and @match='path']) = 1")
     assert (checker, "count(//chk:step[@type='URL' and @match='to']) = 1")
@@ -2287,7 +2287,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL does not contain any duplicate resources, but remove dup optimization is on") {
-    given("a WADL that contains no duplicate nodes")
+    Given("a WADL that contains no duplicate nodes")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2299,9 +2299,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     noDupAsserts(checker_dupon)
@@ -2309,7 +2309,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL, in tree format, does not contain any duplicate nodes, but remove dup optimization is on") {
-    given("a WADL in tree format that contains no duplicate nodes")
+    Given("a WADL in tree format that contains no duplicate nodes")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2327,9 +2327,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     noDupAsserts(checker_dupon)
@@ -2337,7 +2337,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL, in mix format, does not contain any duplicate nodes, but remove dup optimization is on") {
-    given("a WADL in mix format that contains no duplicate nodes")
+    Given("a WADL in mix format that contains no duplicate nodes")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2351,9 +2351,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     noDupAsserts(checker_dupon)
@@ -2368,13 +2368,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
 
   def singleDupAsserts(checker_dupon : NodeSeq, checker_dupoff : NodeSeq) : Unit = {
-    then("Paths should exist in both checkers")
+    Then("Paths should exist in both checkers")
     assert (checker_dupon, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
     assert (checker_dupon, Start, URL("path"), URL("to"), URL("another"), URL("resource"), Method("GET"))
     assert (checker_dupoff, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
     assert (checker_dupoff, Start, URL("path"), URL("to"), URL("another"), URL("resource"), Method("GET"))
 
-    and("there should be a duplicate resource node when dup is off")
+    And("there should be a duplicate resource node when dup is off")
     assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='path']) = 1")
     assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='to']) = 1")
     assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='my']) = 1")
@@ -2382,7 +2382,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='another']) = 1")
     assert (checker_dupoff, "count(//chk:step[@type='METHOD' and @match='GET']) = 1")
 
-    and("there should *not* be a duplicate resource node when dup is on")
+    And("there should *not* be a duplicate resource node when dup is on")
     assert (checker_dupon, "count(//chk:step[@type='URL' and @match='path']) = 1")
     assert (checker_dupon, "count(//chk:step[@type='URL' and @match='to']) = 1")
     assert (checker_dupon, "count(//chk:step[@type='URL' and @match='my']) = 1")
@@ -2392,7 +2392,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contain a single duplicate and remove dup optimization is on") {
-    given("a WADL that contains a single duplicate")
+    Given("a WADL that contains a single duplicate")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2408,16 +2408,16 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                  <response status="200 203"/>
            </method>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     singleDupAsserts(checker_dupon, checker_dupoff)
   }
 
   scenario("The WADL, in tree format, contains a single duplicate node and remove dup optimization is on") {
-    given("a WADL in tree format contains a single duplicate")
+    Given("a WADL in tree format contains a single duplicate")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2441,16 +2441,16 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                  <response status="200 203"/>
            </method>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     singleDupAsserts(checker_dupon, checker_dupoff)
   }
 
   scenario("The WADL, in mix format,  contain a single duplicate and remove dup optimization is on") {
-    given("a WADL, in mix format,  that contains a single duplicate")
+    Given("a WADL, in mix format,  that contains a single duplicate")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2470,9 +2470,9 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                  <response status="200 203"/>
            </method>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     singleDupAsserts(checker_dupon, checker_dupoff)
@@ -2487,7 +2487,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //
 
   def multipleDupAsserts(checker_dupon : NodeSeq, checker_dupoff : NodeSeq) : Unit = {
-    then("Paths should exist in both checkers")
+    Then("Paths should exist in both checkers")
     assert (checker_dupon, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("GET"))
     assert (checker_dupon, Start, URL("path"), URL("to"), URL("another"), URL("resource"), Method("GET"))
     assert (checker_dupon, Start, URL("what"), URL("about"), URL("this"), URL("resource"), Method("GET"))
@@ -2504,21 +2504,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker_dupoff, Start, URL("resource2"), Method("GET"))
 
 
-    and("there should be a number of duplicate resource node when dup is off")
+    And("there should be a number of duplicate resource node when dup is off")
     assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='resource']) = 4")
     assert (checker_dupoff, "count(//chk:step[@type='URL' and @match='resource2']) = 3")
 
-    and("there should *not* be many duplicate resources dup is on, resource will be duplicate 'cus it's used in 2 different ways")
+    And("there should *not* be many duplicate resources dup is on, resource will be duplicate 'cus it's used in 2 different ways")
     assert (checker_dupon, "count(//chk:step[@type='URL' and @match='resource']) = 2")
     assert (checker_dupon, "count(//chk:step[@type='URL' and @match='resource2']) = 1")
 
-    and("there should be the same number of methods in each")
+    And("there should be the same number of methods in each")
     assert (checker_dupon, "count(//chk:step[@type='METHOD' and @match='GET']) = 1")
     assert (checker_dupoff, "count(//chk:step[@type='METHOD' and @match='GET']) = 2")
   }
 
   scenario("The WADL contain multiple duplicates and remove dup optimization is on") {
-    given("a WADL that contains multiple duplicates")
+    Given("a WADL that contains multiple duplicates")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2552,16 +2552,16 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                  <response status="200 203"/>
            </method>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     multipleDupAsserts(checker_dupon, checker_dupoff)
   }
 
   scenario("The WADL, in tree format, contains multiple duplicates and remove dup optimization is on") {
-    given("a WADL in tree format contains multiple duplicates")
+    Given("a WADL in tree format contains multiple duplicates")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2618,16 +2618,16 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                  <response status="200 203"/>
            </method>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     multipleDupAsserts(checker_dupon, checker_dupoff)
   }
 
   scenario("The WADL, in mixed format, contains multiple duplicates and remove dup optimization is on") {
-    given("a WADL, in mixed format, that contains multiple duplicates")
+    Given("a WADL, in mixed format, that contains multiple duplicates")
     val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2663,16 +2663,16 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                  <response status="200 203"/>
            </method>
         </application>
-    when("the WADL is translated, with dup remove on")
+    When("the WADL is translated, with dup remove on")
     val checker_dupon = builder.build(inWADL, dupConfig)
-    and ("the WADL is translated, with dup remove off")
+    And ("the WADL is translated, with dup remove off")
     val checker_dupoff = builder.build(inWADL, stdConfig)
 
     multipleDupAsserts(checker_dupon, checker_dupoff)
   }
 
   scenario("The WADL contains a single resource with multiple methods of the same type") {
-      given("a WADL that contains a single resource with multiple methods of the same type")
+      Given("a WADL that contains a single resource with multiple methods of the same type")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -2693,17 +2693,17 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
-      then("There should be a total of 5 POST method steps...4 specified plus 1 collecting them")
+      Then("There should be a total of 5 POST method steps...4 specified plus 1 collecting them")
       assert(checker, "count(//chk:step[@type='METHOD']) = 5")
-      and ("All paths should go through POST step.")
+      And ("All paths should go through POST step.")
       assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Method("POST"))
       assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action1"))
       assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action2"))
       assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action3"))
       assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action4"))
-      and ("One of the post steps is labeled ε, the rest are labeled according to thier ID")
+      And ("One of the post steps is labeled ε, the rest are labeled according to thier ID")
       assert(checker, "//chk:step[@type='METHOD' and @label='action1']")
       assert(checker, "//chk:step[@type='METHOD' and @label='action2']")
       assert(checker, "//chk:step[@type='METHOD' and @label='action3']")
@@ -2716,12 +2716,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  ContentError nodes.  They are used in the next couple of tests.
   //
   def wellFormedAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -2729,7 +2729,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting various media types where well formness is checked") {
-    given ("a WADL that contains multiple PUT and POST operation with various media types")
+    Given ("a WADL that contains multiple PUT and POST operation with various media types")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars/>
@@ -2778,11 +2778,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resource>
         </resources>
     </application>
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -2803,7 +2803,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting various media types where well formness is checked, with dupson") {
-    given ("a WADL that contains multiple PUT and POST operation with various media types")
+    Given ("a WADL that contains multiple PUT and POST operation with various media types")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars/>
@@ -2852,11 +2852,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resource>
         </resources>
     </application>
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -2881,7 +2881,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // nodes. They are used in the next couple of tests.
   //
   def xsdAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -2889,7 +2889,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
@@ -2942,12 +2942,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -2969,7 +2969,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD (well formed not specified)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD (well formed not specified)")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD (well formed not specified)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
@@ -3022,12 +3022,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3050,7 +3050,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD (only grammar transform option is specified)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD (only grammar transform option is specified)")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD (only grammar transform option is specified)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
@@ -3103,12 +3103,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, false, false, false, 1, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3131,7 +3131,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, but no grammar is actually specified") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
@@ -3181,11 +3181,11 @@ class WADLCheckerSpec extends BaseCheckerSpec {
            </resource>
         </resources>
     </application>
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3203,13 +3203,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 4")
-    and("There should be no XSD steps, since no grammar was specified")
+    And("There should be no XSD steps, since no grammar was specified")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 0")
   }
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, but ignore XSD extension is used (set to false)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -3264,14 +3264,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, false, 1,
                                                   false, false, false, "XalanC",
                                                     false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3294,7 +3294,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, but ignore XSD extension is used (set to 0)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -3349,14 +3349,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, false, 1,
                                                   false, false, false, "XalanC",
                                                     false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3378,7 +3378,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, but ignore XSD extension is used (set to true)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -3433,13 +3433,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, false, 1,
                                                   false, false, false, "XalanC",
                                                     false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3461,7 +3461,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, but ignore XSD extension is used (set to 1)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -3516,13 +3516,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, false, 1,
                                                   false, false, false, "XalanC",
                                                     false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3544,7 +3544,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, but ignore XSD extension is used (set to true, in representation)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -3599,13 +3599,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, false, 1,
                                                   false, false, false, "XalanC",
                                                     false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3627,7 +3627,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, but ignore XSD extension is used (set to true, in representation, mixed)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -3683,13 +3683,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, false, 1,
                                                   false, false, false, "XalanC",
                                                     false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
@@ -3714,7 +3714,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, with dupson") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, with dupson")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, with dupson")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02">
         <grammars>
@@ -3767,12 +3767,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3798,7 +3798,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // nodes. They are used in the next couple of tests.
   //
   def xsdElementAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -3811,7 +3811,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  Like the assertions above but only one XPath type is specified
   //
   def xsdElementAssertions2(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e","Expecting the root element to be: tst:e"), XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -3824,7 +3824,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  Here, were not doing XSD validation
   //
   def elementAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:e", "Expecting the root element to be: tst:e"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a", "Expecting the root element to be: tst:a"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -3832,7 +3832,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD with elements specified and checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD with elemenst specified")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD with elemenst specified")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -3886,12 +3886,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdElementAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3916,7 +3916,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD with elements specified and checked. The same element is used for POST and PUT") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD with elemenst specified")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD with elemenst specified")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -3970,12 +3970,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdElementAssertions2(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -4000,7 +4000,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD with elements specified and checked. The same element is used for POST and PUT, dups on") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD with elemenst specified")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD with elemenst specified")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4054,12 +4054,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdElementAssertions2(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -4084,7 +4084,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml no XSD validation with elements specified and checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML elements specified")
+    Given ("a WADL that contains multiple PUT and POST operation with XML elements specified")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4138,12 +4138,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     elementAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -4168,7 +4168,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml no XSD validation, no WELL Formed  with elements specified and checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML elements specified")
+    Given ("a WADL that contains multiple PUT and POST operation with XML elements specified")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4222,12 +4222,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, false, false, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     elementAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -4252,7 +4252,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD with elements checked, but none specified") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4306,12 +4306,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true))
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
     xsdAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -4334,7 +4334,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4379,7 +4379,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (rax:code extension)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -4426,7 +4426,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (with rax:message extension)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -4473,7 +4473,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (with rax:message, rax:code extension)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -4520,7 +4520,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different namespaces)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02">
         <wadl:grammars>
@@ -4565,7 +4565,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (wellform checks to false)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4610,7 +4610,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4661,7 +4661,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps, multiple params)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4719,7 +4719,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps, multiple params, same element in multiple reps)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4779,7 +4779,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps, multiple params, same element in multiple reps, rax message extension)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -4841,7 +4841,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps, multiple params, same element in multiple reps, rax:message, rax:code extensions)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -4903,7 +4903,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps, multiple params, same element in multiple reps, dups on)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -4962,7 +4962,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (different reps, multiple params one with required == false)") {
-    given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -5015,7 +5015,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified and multiple required plain params") {
-    given ("a WADL that contains a POST operation with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -5059,7 +5059,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified and multiple required plain params (no XSD, element, or well-form checks)") {
-    given ("a WADL that contains a POST operation with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -5099,7 +5099,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified and multiple required plain params (no element check)") {
-    given ("a WADL that contains a POST operation with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -5140,7 +5140,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml with no elements specified and multiple required plain params") {
-    given ("a WADL that contains a POST operation with elemenst specified and multiple plain params")
+    Given ("a WADL that contains a POST operation with elemenst specified and multiple plain params")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -5181,7 +5181,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a single XSL transform") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5232,7 +5232,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a single embeded XSL transform") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5295,7 +5295,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a single embeded XSL transform (dups on)") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5358,7 +5358,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a single embeded XSL transform (dups on, joins on)") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5417,7 +5417,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transform") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5473,7 +5473,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5540,7 +5540,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps (dups on)") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on)")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5607,7 +5607,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps (dups on, join on)") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on, join on)")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on, join on)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5654,7 +5654,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps (dups on, join on, xpath2)") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on, join on, xpath2)")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on, join on, xpath2)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5701,7 +5701,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a multiple XSL transforms in different reps (dups on 2)") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on 2)")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and multiple XSL transform in diffrent reps (dups on 2)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5766,7 +5766,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified and multiple required plain params, and a single XSL transform") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5815,7 +5815,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified  and multiple required plain params, and a single XSL transform (no well form check)") {
-    given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform (no well form check)")
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform (no well form check)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5864,7 +5864,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified (but check disabled) and multiple required plain params, and a single XSL transform (no well form check)") {
-    given ("a WADL that contains a POST operation with elemets specified (but check disabled) and multiple plain params and a single XSL transform (no well form check)")
+    Given ("a WADL that contains a POST operation with elemets specified (but check disabled) and multiple plain params and a single XSL transform (no well form check)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5909,7 +5909,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains a POST  operation accepting xml with elements specified (but check disabled) and multiple required plain params (check disabled) , and a single XSL transform (no well form check)") {
-    given ("a WADL that contains a POST operation with elemets specified (but check disabled) and multiple plain params (check disabled) and a single XSL transform (no well form check)")
+    Given ("a WADL that contains a POST operation with elemets specified (but check disabled) and multiple plain params (check disabled) and a single XSL transform (no well form check)")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -5953,7 +5953,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  couple of tests.
   //
   def reqTypeAndHeaderAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"))
@@ -5962,7 +5962,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqTypeFail)
@@ -5976,13 +5976,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  have been removed
   //
   def reqTypeAndHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqTypeFail)
     assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
@@ -5993,7 +5993,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  ContentError, and header nodes.  They are used in the next couple of tests.
   //
   def wellFormedAndHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
@@ -6001,7 +6001,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
@@ -6016,12 +6016,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  optimization is on, and duplicates have been removed
   //
   def wellFormedAndHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -6033,7 +6033,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // header nodes. They are used in the next couple of tests.
   //
   def xsdAndHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -6048,7 +6048,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // Like xsdAndHeaderAssertions, but it's assumed that remove dups opt is on
   //
   def xsdAndHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
             Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
@@ -6060,7 +6060,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   def raxCodeHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The header states should have the appropriate header codes")
+    And("The header states should have the appropriate header codes")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
             HeaderAny("X-FOO","foo", 402), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
@@ -6080,7 +6080,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   def raxMessageHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The header states should have the appropriate header codes")
+    And("The header states should have the appropriate header codes")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*", "X-TEST, bad"),
             Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","foo", "X-FOO,foo,bad"),
             Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -6149,13 +6149,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  next couple of tests.
   //
   def reqTypeAndXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
@@ -6168,12 +6168,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  couple of tests.
   //
   def wellFormedAndXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -6185,7 +6185,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // XSD header nodes. They are used in the next couple of tests.
   //
   def xsdAndXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -6199,13 +6199,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  in the next couple of tests.
   //
   def reqTypeAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
@@ -6219,12 +6219,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  the next couple of tests.
   //
   def wellFormedAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -6237,7 +6237,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // tests.
   //
   def xsdAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -6250,14 +6250,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  in the next couple of tests.
   //
   def reqTypeAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
@@ -6270,13 +6270,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  the next couple of tests.
   //
   def wellFormedAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -6290,7 +6290,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // tests.
   //
   def xsdAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -6300,7 +6300,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -6337,14 +6337,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
     xsdAndHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6360,7 +6360,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (rax:code)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6398,7 +6398,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6406,7 +6406,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndHeaderAssertions(checker)
     xsdAndHeaderAssertions(checker)
     raxCodeHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6422,7 +6422,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (rax:message)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6460,7 +6460,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6468,7 +6468,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndHeaderAssertions(checker)
     xsdAndHeaderAssertions(checker)
     raxMessageHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6484,7 +6484,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (rax:code, rax:message)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6522,7 +6522,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6531,7 +6531,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndHeaderAssertions(checker)
     raxMessageHeaderAssertions(checker)
     raxCodeHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6547,7 +6547,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -6584,14 +6584,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderDupsOnAssertions(checker)
     wellFormedAndHeaderDupsOnAssertions(checker)
     xsdAndHeaderDupsOnAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6607,7 +6607,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code (same))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6645,7 +6645,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6653,7 +6653,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndHeaderDupsOnAssertions(checker)
     xsdAndHeaderDupsOnAssertions(checker)
     raxSameCodeHeaderDupsAssertion(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6669,7 +6669,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:message (same))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6707,7 +6707,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6715,7 +6715,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndHeaderDupsOnAssertions(checker)
     xsdAndHeaderDupsOnAssertions(checker)
     raxSameMessageHeaderDupsAssertion(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6731,7 +6731,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code, rax:message (same))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6769,7 +6769,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6778,7 +6778,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndHeaderDupsOnAssertions(checker)
     raxSameMessageHeaderDupsAssertion(checker)
     raxSameCodeHeaderDupsAssertion(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6795,7 +6795,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code (different))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6833,7 +6833,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6841,7 +6841,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndHeaderAssertions(checker)
     xsdAndHeaderAssertions(checker)
     raxCodeHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6857,7 +6857,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:message (different))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6895,7 +6895,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6903,7 +6903,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndHeaderAssertions(checker)
     xsdAndHeaderAssertions(checker)
     raxMessageHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6919,7 +6919,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code, rax:message (different))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -6957,7 +6957,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -6966,7 +6966,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndHeaderAssertions(checker)
     raxMessageHeaderAssertions(checker)
     raxCodeHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -6983,7 +6983,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header must be checked, non-req should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header must be checked, non-req should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header must be checked, non-req should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7023,14 +7023,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
     xsdAndHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7046,7 +7046,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD header must be checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7080,14 +7080,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndXSDHeaderAssertions(checker)
     wellFormedAndXSDHeaderAssertions(checker)
     xsdAndXSDHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7103,7 +7103,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD header must be checked, non-req should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header must be checked, non-req should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header must be checked, non-req should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7138,14 +7138,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndXSDHeaderAssertions(checker)
     wellFormedAndXSDHeaderAssertions(checker)
     xsdAndXSDHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7161,7 +7161,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD header and header must be checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7196,14 +7196,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeaderAssertions(checker)
     wellFormedAndHeaderXSDHeaderAssertions(checker)
     xsdAndHeaderXSDHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7220,7 +7220,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD header and header must be checked, non-req should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked, non-req should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked, non-req should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7256,14 +7256,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeaderAssertions(checker)
     wellFormedAndHeaderXSDHeaderAssertions(checker)
     xsdAndHeaderXSDHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7279,7 +7279,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7316,14 +7316,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
     xsdAndHeaderXSDHeader2Assertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7339,7 +7339,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers, non req headers should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers, nonrequired headers should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers, nonrequired headers should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7378,14 +7378,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
     xsdAndHeaderXSDHeader2Assertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7401,7 +7401,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers, opt on") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers, opt on")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD header and header must be checked, multiple similar Headers, opt on")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7438,14 +7438,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     true, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
     xsdAndHeaderXSDHeader2Assertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7466,7 +7466,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  in the next couple of tests.
   //
   def reqTypeAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"))
@@ -7474,7 +7474,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqTypeFail)
@@ -7488,13 +7488,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  Like reqTypeAndReqHeaderAssertions, but we assume remove dups optimization
   //
   def reqTypeAndReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
@@ -7507,14 +7507,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  ContentError, and header nodes.  They are used in the next couple of tests.
   //
   def wellFormedAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"), ContentFail)
@@ -7527,12 +7527,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  Like wellFormedAndReqHeaderAssertions, but we assume remove dups on optimization
   //
   def wellFormedAndReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -7544,7 +7544,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // header nodes. They are used in the next couple of tests.
   //
   def xsdAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -7557,7 +7557,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // Like xsdAndReqHeaderAssertions, but we assume remove dups optimization
   //
   def xsdAndReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
             ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -7567,7 +7567,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   def raxCodeReqHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain header assertions with correct error code")
+    And("The machine should contain header assertions with correct error code")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
             HeaderAny("X-FOO","foo", 402), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
@@ -7585,7 +7585,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   def raxCodeReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain header assertions with the correct error code")
+    And("The machine should cantain header assertions with the correct error code")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*", 401),
             Header("X-TEST2", ".*", 401), HeaderAny("X-FOO","foo|bar", 401),
             ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -7597,7 +7597,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   def raxMessageReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain header assertions with the correct error code")
+    And("The machine should cantain header assertions with the correct error code")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*", "No!"),
             Header("X-TEST2", ".*", "No!"), HeaderAny("X-FOO","foo|bar", "No!"),
             ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -7609,7 +7609,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   def raxMessageReqHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain header assertions with correct error code")
+    And("The machine should contain header assertions with correct error code")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*", "No1"), Header("X-TEST2", ".*", "No4"),
             HeaderAny("X-FOO","foo", "No2"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
@@ -7632,13 +7632,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  next couple of tests.
   //
   def reqTypeAndReqXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
@@ -7651,12 +7651,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  couple of tests.
   //
   def wellFormedAndReqXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -7668,7 +7668,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // XSD header nodes. They are used in the next couple of tests.
   //
   def xsdAndReqXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -7682,13 +7682,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  in the next couple of tests.
   //
   def reqTypeAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
@@ -7702,12 +7702,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  the next couple of tests.
   //
   def wellFormedAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -7720,7 +7720,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // tests.
   //
   def xsdAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -7733,14 +7733,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  in the next couple of tests.
   //
   def reqTypeAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
@@ -7753,13 +7753,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  the next couple of tests.
   //
   def wellFormedAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -7773,7 +7773,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // tests.
   //
   def xsdAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -7788,14 +7788,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  in the next couple of tests.
   //
   def reqTypeAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
@@ -7808,13 +7808,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  the next couple of tests.
   //
   def wellFormedAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), WellJSON)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -7828,7 +7828,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // tests.
   //
   def xsdAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -7838,7 +7838,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -7875,14 +7875,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
     xsdAndReqHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7899,7 +7899,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (rax:code)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -7937,7 +7937,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -7945,7 +7945,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndReqHeaderAssertions(checker)
     xsdAndReqHeaderAssertions(checker)
     raxCodeReqHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -7962,7 +7962,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (rax:message)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -8000,7 +8000,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -8008,7 +8008,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndReqHeaderAssertions(checker)
     xsdAndReqHeaderAssertions(checker)
     raxMessageReqHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8024,7 +8024,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (rax:code, rax:message)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -8062,7 +8062,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -8071,7 +8071,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndReqHeaderAssertions(checker)
     raxCodeReqHeaderAssertions(checker)
     raxMessageReqHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8088,7 +8088,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on)") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8125,14 +8125,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderDupsOnAssertions(checker)
     wellFormedAndReqHeaderDupsOnAssertions(checker)
     xsdAndReqHeaderDupsOnAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8149,7 +8149,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:code(same))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -8187,7 +8187,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -8195,7 +8195,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndReqHeaderDupsOnAssertions(checker)
     xsdAndReqHeaderDupsOnAssertions(checker)
     raxCodeReqHeaderDupsOnAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8211,7 +8211,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:message(same))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -8249,7 +8249,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -8257,7 +8257,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndReqHeaderDupsOnAssertions(checker)
     xsdAndReqHeaderDupsOnAssertions(checker)
     raxMessageReqHeaderDupsOnAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8273,7 +8273,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:code, rax:message(same))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -8311,7 +8311,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -8320,7 +8320,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndReqHeaderDupsOnAssertions(checker)
     raxCodeReqHeaderDupsOnAssertions(checker)
     raxMessageReqHeaderDupsOnAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8336,7 +8336,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:code(diff))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -8374,7 +8374,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -8382,7 +8382,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndReqHeaderAssertions(checker)
     xsdAndReqHeaderAssertions(checker)
     raxCodeReqHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8398,7 +8398,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:message(diff))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -8436,7 +8436,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -8444,7 +8444,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     wellFormedAndReqHeaderAssertions(checker)
     xsdAndReqHeaderAssertions(checker)
     raxMessageReqHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8460,7 +8460,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:code, rax:message(diff))") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -8498,7 +8498,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
@@ -8507,7 +8507,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndReqHeaderAssertions(checker)
     raxCodeReqHeaderAssertions(checker)
     raxMessageReqHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8524,7 +8524,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked, non-req should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT must be checked, non-req should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT must be checked, non-req should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8564,14 +8564,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
     xsdAndReqHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8587,7 +8587,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header must be checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8621,14 +8621,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqXSDHeaderAssertions(checker)
     wellFormedAndReqXSDHeaderAssertions(checker)
     xsdAndReqXSDHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8644,7 +8644,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header must be checked, non-req should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header must be checked, non-req should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header must be checked, non-req should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8679,14 +8679,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqXSDHeaderAssertions(checker)
     wellFormedAndReqXSDHeaderAssertions(checker)
     xsdAndReqXSDHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8702,7 +8702,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and header must be checked") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and header must be checked")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and header must be checked")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8737,14 +8737,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeaderAssertions(checker)
     wellFormedAndReqHeaderXSDHeaderAssertions(checker)
     xsdAndReqHeaderXSDHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8760,7 +8760,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required XSD request header and request header must be checked, non-req should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD request header and request header must be checked, non-req should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required XSD request header and request header must be checked, non-req should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8796,14 +8796,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeaderAssertions(checker)
     wellFormedAndReqHeaderXSDHeaderAssertions(checker)
     xsdAndReqHeaderXSDHeaderAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8819,7 +8819,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8856,14 +8856,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
     xsdAndReqHeaderXSDHeader2Assertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8879,7 +8879,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, non req headers should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, nonrequired headers should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, nonrequired headers should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8918,14 +8918,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
     xsdAndReqHeaderXSDHeader2Assertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -8941,7 +8941,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, opt on") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, opt on")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, opt on")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -8978,14 +8978,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     true, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
     xsdAndReqHeaderXSDHeader2Assertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -9001,7 +9001,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, mixed, multiple similar Headers") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -9039,14 +9039,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertions(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertions(checker)
     xsdAndReqHeaderXSDHeader2MixAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -9062,7 +9062,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, mixed, non req headers should be ignored") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, nonrequired headers should be ignored")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, nonrequired headers should be ignored")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -9102,14 +9102,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertions(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertions(checker)
     xsdAndReqHeaderXSDHeader2MixAssertions(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -9130,14 +9130,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  in the next couple of tests. Some Header nodes do not have a ReqType.
   //
   def reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker : NodeSeq) : Unit = {
-    then("The machine should contain paths to all ReqTypes")
+    Then("The machine should contain paths to all ReqTypes")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), Accept)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), Accept)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("GET"))
-    and("ReqTypeFail states should be after PUT and POST states")
+    And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), Accept)
   }
@@ -9148,13 +9148,13 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   //  the next couple of tests. Some Header nodes do not have a ReqType.
   //
   def wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker : NodeSeq) : Unit = {
-    and("The machine should contain paths to WellXML and WELLJSON types")
+    And("The machine should contain paths to WellXML and WELLJSON types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), Accept)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), Accept)
-    and("There should be content failed states")
+    And("There should be content failed states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -9166,14 +9166,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   // tests. Some Header nodes do not have a ReqType.
   //
   def xsdAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker : NodeSeq) : Unit = {
-    and("The machine should cantain paths to XSD types")
+    And("The machine should cantain paths to XSD types")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, mixed, non req headers should be ignored, checks should occur even if no represetation type is specified.") {
-    given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, nonrequired headers should be ignored. No representation types are sepecified.")
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, nonrequired headers should be ignored. No representation types are sepecified.")
     val inWADL =
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -9209,14 +9209,14 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     </application>
     register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
-    when("the wadl is translated")
+    When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
                                                     true, true, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker)
     xsdAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker)
-    and("The following assertions should also hold:")
+    And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
