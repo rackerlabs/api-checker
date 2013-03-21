@@ -158,7 +158,7 @@
                 <repository>
                     <id>scala-tools.org</id>
                     <name>Scala-tools Maven2 Repository</name>
-                    <url>http://scala-tools.org/repo-releases</url>
+                    <url>https://oss.sonatype.org/content/groups/scala-tools/</url>
                 </repository>
             </repositories>
             <pluginRepositories>
@@ -170,7 +170,7 @@
                 <pluginRepository>
                     <id>scala-tools.org</id>
                     <name>Scala-tools Maven2 Repository</name>
-                    <url>http://scala-tools.org/repo-releases</url>
+                    <url>https://oss.sonatype.org/content/groups/scala-tools/</url>
                 </pluginRepository>
                 <pluginRepository>
                     <id>onejar-maven-plugin.googlecode.com</id>
