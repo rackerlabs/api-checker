@@ -44,7 +44,7 @@ class WADLDotSpec extends BaseDotSpec {
       info ("so that I can visualize the machine.")
 
       scenario("The WADL rendered in nfa mode with sinks") {
-        given("a WADL")
+        Given("a WADL")
         val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -59,14 +59,14 @@ class WADLDotSpec extends BaseDotSpec {
               </resource>
            </resources>
         </application>
-        when("the wadl is translated with nfa mode and sinks")
+        When("the wadl is translated with nfa mode and sinks")
         val dot = builder.build (inWADL, config, false, true)
         println(dot)
-        then ("It shouldn't blow up")
+        Then ("It shouldn't blow up")
       }
 
     scenario("The WADL rendered in nfa mode with no sinks") {
-        given("a WADL")
+        Given("a WADL")
         val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -81,14 +81,14 @@ class WADLDotSpec extends BaseDotSpec {
               </resource>
            </resources>
         </application>
-        when("the wadl is translated with nfa mode and sinks")
+        When("the wadl is translated with nfa mode and sinks")
         val dot = builder.build (inWADL, config, true, true)
         println(dot)
-        then ("It shouldn't blow up")
+        Then ("It shouldn't blow up")
       }
 
     scenario("The WADL rendered in simple mode with sinks") {
-        given("a WADL")
+        Given("a WADL")
         val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -103,14 +103,14 @@ class WADLDotSpec extends BaseDotSpec {
               </resource>
            </resources>
         </application>
-        when("the wadl is translated with nfa mode and sinks")
+        When("the wadl is translated with nfa mode and sinks")
         val dot = builder.build (inWADL, config, false, false)
         println(dot)
-        then ("It shouldn't blow up")
+        Then ("It shouldn't blow up")
       }
 
     scenario("The WADL rendered in simple mode with no sinks") {
-        given("a WADL")
+        Given("a WADL")
         val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -125,10 +125,10 @@ class WADLDotSpec extends BaseDotSpec {
               </resource>
            </resources>
         </application>
-        when("the wadl is translated with nfa mode and sinks")
+        When("the wadl is translated with nfa mode and sinks")
         val dot = builder.build (inWADL, config, true, false)
         println(dot)
-        then ("It shouldn't blow up")
+        Then ("It shouldn't blow up")
     }
   }
 }

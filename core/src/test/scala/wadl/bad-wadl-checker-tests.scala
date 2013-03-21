@@ -24,7 +24,7 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
     info ("so that problems with WADLs are caught early")
 
     scenario("The WADL contains a missing local reference") {
-      given("a WADL with no resources")
+      Given("a WADL with no resources")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
@@ -34,17 +34,17 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>
-      when("the wadl is translated")
+      When("the wadl is translated")
       val thrown = intercept[WADLException] {
         builder.build (inWADL, stdConfig)
       }
-      then("A WADL Exception should be thrown with the words 'missing' and 'does not seem to exist'.")
+      Then("A WADL Exception should be thrown with the words 'missing' and 'does not seem to exist'.")
       assert(thrown.getMessage().contains("missing"))
       assert(thrown.getMessage().contains("does not seem to exist"))
     }
 
     scenario ("The WADL contains an XSD which is missing an import") {
-      given("a WADL that contains an XSD which is missing an import")
+      Given("a WADL that contains an XSD which is missing an import")
         val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02"
                      xmlns:tst="test://schema/a">
@@ -76,14 +76,14 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
                        </restriction>
                    </simpleType>
                 </schema>)
-      when("the wadl is translated")
+      When("the wadl is translated")
       val thrown = intercept[WADLException] {
         builder.build (inWADL, stdConfig)
       }
-      then("Then a WADLException should be thrown with the words 'transform.xsd' and 'does not seem to exist'.")
+      Then("Then a WADLException should be thrown with the words 'transform.xsd' and 'does not seem to exist'.")
       assert(thrown.getMessage().contains("transform.xsd"))
       assert(thrown.getMessage().contains("does not seem to exist"))
-      and("The exception should point to the file in error")
+      And("The exception should point to the file in error")
       assert(thrown.getMessage().contains("test://app/xsd/simple.xsd"))
     }
   }

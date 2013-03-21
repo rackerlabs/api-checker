@@ -2,7 +2,7 @@ package com.rackspace.com.papi.components.checker.wadl
 
 import scala.collection.mutable.LinkedList
 
-import org.scalatest.TestFailedException
+import org.scalatest.exceptions.TestFailedException
 
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
