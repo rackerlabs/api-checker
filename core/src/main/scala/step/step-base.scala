@@ -4,6 +4,7 @@ import scala.collection.mutable.ListBuffer
 
 import com.rackspace.com.papi.components.checker.servlet._
 import javax.servlet.FilterChain
+import collection.mutable.PriorityQueue
 
 //
 //  Base class for all other steps
@@ -13,10 +14,13 @@ abstract class Step(val id : String, val label : String) {
   //
   //  Checks the step at the given URI level.
   //
-  def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result]
+  // stepCount : default value is 1 is convenience for first step
+  def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int, stepCount : Int = 1 ) : Option[Result]
 
   //
   //  Checks the step at the beginnig of the PATH
+  //
+  // TODO:  is this actually called?  Wouldn't this recursive call never end?
   //
   def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain) : Option[Result] = {
     return check(req,resp,chain)
@@ -42,10 +46,10 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //
   //  Go to the next step.
   //
-  def nextStep (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Array[Result] = {
+  def nextStep (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int, stepCount : Int ) : Array[Result] = {
     val resultBuffer = new ListBuffer[Result]
     for (i <- 0 to next.length-1) {
-      val oresult = next(i).check(req, resp, chain, uriLevel)
+      val oresult = next(i).check(req, resp, chain, uriLevel, stepCount + 1 )
       if (oresult.isDefined) {
         val result = oresult.get
         if (result.valid) {
@@ -61,21 +65,33 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //
   //  Check this step, if successful, check next relevant steps.
   //
-  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
+  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int, stepCount : Int ) : Option[Result] = {
     var result : Option[Result] = None
-    val nextURILevel = checkStep(req, resp, chain, uriLevel)
+    val nextURILevel = checkStep(req, resp, chain, uriLevel )
 
     if (nextURILevel != -1) {
-      val results : Array[Result] = nextStep (req, resp, chain, nextURILevel)
-      if (results.size == 1) {
-        results(0).addStepId(id)
-        result = Some(results(0))
-      } else {
-        result = Some(new MultiFailResult (results, uriLevel, id))
+
+      var results = nextStep (req, resp, chain, nextURILevel, stepCount )
+
+      results.size match {
+        case 0 =>
+          result = None
+
+        case 1 =>
+          results(0).addStepId(id)
+          result = Some(results(0))
+
+        case _ =>
+
+          // get the highest priority result
+          val pQueue = new PriorityQueue[Result]
+          pQueue.enqueue( results: _* )
+
+          result = Some( pQueue.dequeue )
       }
 
     } else {
-      result = Some(new MismatchResult(mismatchMessage, uriLevel, id))
+      result = Some(new MismatchResult(mismatchMessage, uriLevel, id, stepCount))
     }
 
     return result

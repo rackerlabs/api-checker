@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             xmlns:db="http://docbook.org/ns/docbook"
+             xmlns:rax="http://docs.rackspace.com/api"
+             xmlns:atom="http://www.w3.org/2005/Atom">
+
+    <!-- Resource Types -->
+    <resource_type id="AtomFeed">
+        <method href="#getFeed"/>
+        <resource path="entries/{id}">
+            <param name="id" type="xs:anyURI" style="template"/>
+            <method href="#getEntry"/>
+        </resource>
+    </resource_type>
+
+    <resource_type id="Unvalidated">
+        <doc title="Unvalidated">
+            <db:para>
+                Leaving these descriptions fairly loose as these
+                feeds are currently not validated against.
+            </db:para>
+        </doc>
+        <method href="#addPlainUnvalidatedEntry"/>
+    </resource_type>
+
+    <resource_type id="Validated">
+        <doc title="Validated">
+            <db:para>
+                Check against XSDs but don't check against cross
+                posts.
+            </db:para>
+        </doc>
+        <method href="#addPlainEntry"/>
+    </resource_type>
+
+    <!-- METHODS -->
+    <method id="getFeed" name="GET">
+        <request>
+            <param name="marker" style="query" type="xs:anyURI" required="false"/>
+            <param name="limit"  style="query" type="xs:int" required="false"/>
+            <param name="direction" style="query" type="xs:string" required="false"/>
+        </request>
+        <response status="200">
+            <representation mediaType="application/atom+xml"/>
+        </response>
+        <!-- On Error -->
+        <response status="400 401 409 500 503">
+            <representation mediaType="application/xml"/>
+        </response>
+    </method>
+
+    <method id="getEntry" name="GET">
+        <response status="200">
+            <representation mediaType="application/atom+xml"/>
+        </response>
+        <!-- On Error -->
+        <response status="400 401 409 500 503">
+            <representation mediaType="application/xml"/>
+        </response>
+    </method>
+
+    <method id="addPlainUnvalidatedEntry" name="POST">
+        <request rax:ignoreXSD="true">
+            <representation mediaType="application/xml"/>
+            <representation mediaType="application/atom+xml"/>
+        </request>
+        <!-- Okay -->
+        <response status="201">
+            <representation mediaType="application/atom+xml"/>
+        </response>
+        <!-- On Error -->
+        <response status="400 401 409 500 503">
+            <representation mediaType="application/xml"/>
+        </response>
+    </method>
+
+    <method id="addPlainEntry" name="POST">
+        <request>
+            <representation mediaType="application/atom+xml" element="atom:entry">
+               <rax:preprocess href="atom_hopper_pre.xsl"/>
+            </representation>
+        </request>
+        <!-- Okay -->
+        <response status="201">
+            <representation mediaType="application/atom+xml"/>
+        </response>
+        <!-- On Error -->
+        <response status="400 401 409 500 503">
+            <representation mediaType="application/xml"/>
+        </response>
+    </method>
+</application>

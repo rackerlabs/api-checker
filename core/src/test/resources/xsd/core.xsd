@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:event="http://docs.rackspace.com/core/event"
+    xmlns:xerces="http://xerces.apache.org"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+    targetNamespace="http://docs.rackspace.com/core/event">
+
+    <complexType name="EventBase" abstract="true">
+        <annotation>
+            <documentation>
+                <html:p>
+                    This is the base type for all event records.  The
+                    only thing that is required is a version
+                    attribute.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="version" type="event:NonEmptyString" use="required">
+            <annotation>
+                <documentation>
+                    <html:p>
+                        Event record version.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="EventV1">
+        <annotation>
+            <documentation>
+                <html:p>
+                    Event information version 1.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="event:EventBase">
+                <sequence>
+                    <any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
+                </sequence>
+                <attribute name="tenantId" type="event:NonEmptyString" use="optional">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                Identifies the tenant ID.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="resourceId" type="event:NonEmptyString" use="optional">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                Identifies an instance of the product.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="id" type="event:UUID" use="required">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                A GUID identifying the event record.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="referenceId" type="event:UUID" use="optional">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                A GUID identifying the event record,
+                                that this record is updating. This is
+                                optional, and this should be used if
+                                this event is correcting another
+                                event.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="rootAction" type="event:NonEmptyString" use="optional">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                Identifies the action that caused the
+                                event.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="type" type="event:EventType" use="required">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                Identifies the type of event.  If one
+                                of the existing event types don't feed
+                                set this type to EXTENDED and add an
+                                eventType attribute to your product
+                                schema.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="environment" type="event:ENVIRONMENT"
+                           use="optional" default="PROD">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                The environment where the message
+                                originated from.  The optional is
+                                optional, if it is not specified PROD
+                                will be assumed.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="dataCenter" type="event:DC" use="optional" default="GLOBAL">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                Identifies the datacenter of the
+                                event, for example, DFW3.  The
+                                attribute is optional, if it is not
+                                specified GLOBAL will be assumed.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="region" type="event:Region" use="optional" default="GLOBAL">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                Identifies the region, for example,
+                                DFW.  The attribute is optional, if it
+                                is not specified GLOBAL will be
+                                assumed.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="startTime" type="event:UTCDateTime" use="optional">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                UTC, ISO Format start time. startTime is 
+                                inclusive (i.e. the event occurred starting 
+                                at the startTime, not after).
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="endTime" type="event:UTCDateTime" use="optional">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                UTC, ISO Format end time.  For an EXISTs
+                                event, the startTime and endTime reflect the
+                                event duriation for the resource instance. 
+                                endTime is exclusive (i.e. the event occurred
+                                up to, but not during the endTime).
+                                endTime must come after startTime.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="eventTime" type="event:UTCDateTime" use="optional">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                UTC, ISO Format event time. The time
+                                when an event occured. Use instead of
+                                startTime and endTime in cases where
+                                the event does not have a range.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="resourceName" type="event:NonEmptyString" use="optional">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                Customer defined name for the resource.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <assert vc:minVersion="1.1" test="if (*:product/@resourceType) then @resourceId else true()"
+                        xerces:message="If a resource type is specified then so should a resourceId"
+                        saxon:message="If a resource type is specified then so should a resourceId"
+                        >
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If a resource type is specified then
+                                so should a resourceId.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@type =  ('USAGE', 'USAGE_SNAPSHOT')) then @tenantId else true()"
+                        xerces:message="Usage messages must contain a tenantId"
+                        saxon:message="Usage messages must contain a tenantId"
+                        >
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                A usage message must always contain a tenant id.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="*:product/@serviceCode"
+                        xerces:message="The product element is missing the serviceCode attribute."
+                        saxon:message="The product element is missing the serviceCode attribute.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                Each product schema must define a
+                                service code attribute that uniquely
+                                identifies the product.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@type eq 'EXTENDED') then *:product/@eventType else true()"
+                        xerces:message="The event type is set to EXTENDED, but couldn't find eventType attribute in the product data."
+                        saxon:message="The event type is set to EXTENDED, but couldn't find eventType attribute in the product date.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If the type is equal to 'EXTENDED'
+                                then the product attributes should
+                                contain an eventType element, which
+                                will contain the actual EventType.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@type eq 'USAGE') then @startTime else true()"
+                        xerces:message="Usage events must have a startTime."
+                        saxon:message="Usage events must have a startTime.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If the type is equal to 'USAGE'
+                                then the event should have a start time.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@type eq 'USAGE') then xsd:dateTime(@endTime) le (xsd:dateTime(@startTime) + xsd:dayTimeDuration('P1D')) else true()"
+                        xerces:message="Usage events must not span more than 1 Day."
+                        saxon:message="Usage events must not span more than 1 Day.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If the type is equal to 'USAGE'
+                                then the event should not span more than 1 Day.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@type eq 'USAGE_SNAPSHOT') then @eventTime else true()"
+                        xerces:message="Usage snapshots must set eventTime attribute."
+                        saxon:message="Usage snapshots must set eventTime attribute.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If the type is equal to 'USAGE_SNAPSHOT'
+                                then the eventTime attribute must be set.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (not(@eventTime) and not(@startTime) and not(@endTime)) then false() else true()"
+                        xerces:message="The event must have a startTime and endTime or it must have an eventTime."
+                        saxon:message="The event must have a startTime and endTime or it must have an eventTime.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                The event must have a start time and
+                                end time or it must have an eventTime.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@eventTime) then (not(@startTime) and not(@endTime)) else true()"
+                        xerces:message="If the event has an eventTime then it cannot have a startTime or an endTime."
+                        saxon:message="If the event has an eventTime then it cannot have a startTime or an endTime.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If the event has an eventTime then it
+                                must not have a startTime or an
+                                endTime.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@startTime) then (not(@eventTime) and @endTime) else true()"
+                        xerces:message="If the event has a startTime then it cannot have an eventTime and it must have an endTime."
+                        saxon:message="If the event has a startTime then it cannot have an eventTime and it must have an endTime.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If the event has a startTime then it
+                                must not have an eventTime and it must
+                                have an endTime.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@endTime) then (not(@eventTime) and @startTime) else true()"
+                        xerces:message="If the event has a endTime then it cannot have an eventTime and it must have a startTime."
+                        saxon:message="If the event has a endTime then it cannot have an eventTime and it must have a startTime.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If the event has a endTime then it
+                                must not have an eventTime and it must
+                                have a startTime.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@startTime and @endTime) then xsd:dateTime(@startTime) lt xsd:dateTime(@endTime) else true()"
+                        xerces:message="The startTime should come before the endTime."
+                        saxon:message="The startTime should come before the endTime.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                The startTime should always come before the endTime.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@endTime) then xsd:dateTime(@endTime) le (current-dateTime() + xsd:dayTimeDuration('PT10M')) else true()"
+                        xerces:message="The endTime of an event must not be more than 10 mins in the future."
+                        saxon:message="The endTime of an event must not be more than 10 mins in the future.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If there is an endTime, then the
+                                endTime must not be more than 10 mins
+                                in the future.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@eventTime) then xsd:dateTime(@eventTime) le (current-dateTime() + xsd:dayTimeDuration('PT10M')) else true()"
+                        xerces:message="The eventTime of an event must not be more than 10 mins in the future."
+                        saxon:message="The eventTime of an event must not be more than 10 mins in the future.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                If there is an eventTime, then the
+                                eventTime must not be more than 10
+                                mins in the future.
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+                <assert vc:minVersion="1.1" test="if (@region = 'GLOBAL') then (@dataCenter = 'GLOBAL') else
+                                                  if (@region = 'DFW') then (@dataCenter = ('DFW1','DFW2','DFW3')) else
+                                                  if (@region = 'HKG') then (@dataCenter = 'HKG1') else
+                                                  if (@region = 'IAD') then (@dataCenter = ('IAD1','IAD2','IAD3')) else
+                                                  if (@region = 'LON') then (@dataCenter = ('LON1','LON3')) else
+                                                  if (@region = 'ORD') then (@dataCenter = 'ORD1') else
+                                                  if (@region = 'SYD') then (@dataCenter = 'SYD2') else false()
+                                                  "
+                        xerces:message="There is a mismatch between the region and the dataCenter."
+                        saxon:message="There is a mismatch between the region and the dataCenter.">
+                    <annotation>
+                        <documentation>
+                            <html:p>
+                                The region and datacenter must match!
+                            </html:p>
+                        </documentation>
+                    </annotation>
+                </assert>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <simpleType name="UUID">
+        <annotation>
+            <documentation>
+                <html:p>
+                    A universally unique identifier.
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+            <length value="36" fixed="true"/>
+            <pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="UTCDateTime">
+        <annotation>
+            <documentation>
+                <html:p>
+                    A datetime in which the timezone is explicitly
+                    required and must be +00:00 or Z.
+                </html:p>
+                <html:p>
+                    <html:strong>
+                        Only an XSD 1.1 validator will enforce this restriction.
+                    </html:strong>
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:dateTime" vc:minVersion="1.0" vc:maxVersion="1.1"/>
+        <restriction base="xsd:dateTimeStamp" vc:minVersion="1.1">
+            <assertion
+                test="ends-with(string($value),'Z') or ends-with(string($value),'+00:00') or ends-with(string($value),'-00:00')"
+                xerces:message="The dateTime should be in the UTC timezone, it is expect to end in +00:00 or Z."
+                saxon:message="The dateTime should be in the UTC timezone, it is expect to end in +00:00 or Z."/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="EventType">
+        <annotation>
+            <documentation>
+                <html:p>
+                    The type of event.
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+            <enumeration value="CREATE"/>
+            <enumeration value="USAGE"/>
+            <enumeration value="USAGE_SNAPSHOT"/>
+            <enumeration value="UPDATE"/>
+            <enumeration value="DELETE"/>
+            <enumeration value="SUSPEND"/>
+            <enumeration value="UNSUSPEND"/>
+            <enumeration value="UP"/>
+            <enumeration value="DOWN"/>
+            <enumeration value="INFO"/>
+            <enumeration value="EXTENDED"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="NonEmptyString">
+        <annotation>
+            <documentation>
+                <html:p>
+                    Any non-empty string.
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+            <whiteSpace value="collapse"/>
+            <minLength value="1"/>
+            <maxLength value="255"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="Region">
+        <annotation>
+            <documentation>
+                <html:p>
+                    The region in which the event is
+                    located. GLOBAL implies that the resoure is
+                    regionless.
+                </html:p>
+                <html:p>
+                    Note that the source of truth for this is in the
+                    <html:a
+                    href="https://dcwiki.rackspace.com/wiki/Main_Page">DC
+                    Portal</html:a>.
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+            <enumeration value="GLOBAL"/>
+            <enumeration value="DFW"/>
+            <enumeration value="HKG"/>
+            <enumeration value="IAD"/>
+            <enumeration value="LON"/>
+            <enumeration value="ORD"/>
+            <enumeration value="SYD"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="DC">
+        <annotation>
+            <documentation>
+                <html:p>
+                    The datacenter in which the event is
+                    located. GLOBAL implies that the resoure is
+                    regionless.
+                </html:p>
+                <html:p>
+                    Note that the source of truth for this is in the
+                    <html:a
+                    href="https://dcwiki.rackspace.com/wiki/Main_Page">DC
+                    Portal</html:a>.
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+            <enumeration value="GLOBAL"/>
+            <enumeration value="DFW1"/>
+            <enumeration value="DFW2"/>
+            <enumeration value="DFW3"/>
+            <enumeration value="HKG1"/>
+            <enumeration value="IAD1"/>
+            <enumeration value="IAD2"/>
+            <enumeration value="IAD3"/>
+            <enumeration value="LON1"/>
+            <enumeration value="LON3"/>
+            <enumeration value="ORD1"/>
+            <enumeration value="SYD2"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="ENVIRONMENT">
+        <annotation>
+            <documentation>
+                <html:p>
+                    The environment where the message originated.
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+            <enumeration value="PROD"/>
+            <enumeration value="PREPROD"/>
+            <enumeration value="STAGE"/>
+            <enumeration value="QA"/>
+            <enumeration value="DEV"/>
+            <enumeration value="UAT"/>
+            <enumeration value="LOCAL"/>
+        </restriction>
+    </simpleType>
+</schema>

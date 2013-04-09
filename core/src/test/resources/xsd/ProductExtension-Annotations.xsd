@@ -1,0 +1,192 @@
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:usage="http://docs.rackspace.com/core/usage"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:xerces="http://xerces.apache.org"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:event="http://docs.rackspace.com/core/event"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+    targetNamespace="http://docs.rackspace.com/core/usage">
+
+    <import namespace="http://docs.rackspace.com/core/event"
+            schemaLocation="core.xsd"/>
+
+    <element name="attributes" type="usage:AttributeAnnotation"/>
+    <element name="core" type="usage:CoreAttributeAnnotation"/>
+
+    <complexType name="CoreAttributeAnnotation">
+        <annotation>
+            <documentation>
+                <html:p>
+                    These annotations modify how the core attributes
+                    are interpreted. They are placed on the main
+                    complexType for the product schema.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="groupByResource" type="xsd:boolean"
+                   default="true" use="optional"/>
+        <attribute name="type" type="usage:TypeList"
+                   default="USAGE" use="optional"/>
+    </complexType>
+
+    <complexType name="AttributeAnnotation">
+        <annotation>
+            <documentation>
+                <html:p>
+                    Annotations associated with product schema
+                    attributes.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="aggregateFunction" type="usage:AggregateFunction" use="optional" default="NONE"/>
+        <attribute name="displayName" type="xsd:string" use="optional" />
+        <attribute name="frequency" type="usage:Frequency" use="optional"/>
+        <attribute name="frequencyAttribute" type="xsd:string" use="optional"/>
+        <attribute name="unitOfMeasure" type="usage:UnitOfMeasure" use="optional"/>
+        <attribute name="groupBy" type="xsd:boolean" use="optional" default="false"/>
+        <attribute name="billable" type="xsd:boolean" use="optional" default="true"/>
+        <attribute name="searchable" type="xsd:boolean" use="optional" default="false"/>
+        <assert vc:minVersion="1.1" test="if (@aggregateFunction!='NONE') then @unitOfMeasure else true()"
+                xerces:message="If a aggregateFunction is supplied then there should also be a unitOfMeasure."
+                saxon:message="If a aggregateFunction is supplied then there should also be a unitOfMeasure.">
+            <annotation>
+                <documentation>
+                    <html:p>
+                        If an aggregateFunction is supplied then so
+                        should the unit of measure.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </assert>
+        <assert vc:minVersion="1.1" test="if (@aggregateFunction = 'CUMULATIVE_AVG') then @frequency or @frequencyAttribute else true()"
+                xerces:message="If a aggregateFunction is 'CUMULATIVE_AVG' then frequency or frequency attribute should be set."
+                saxon:message="If a aggregateFunction is 'CUMULATIVE_AVG' then frequency or frequency attribute should be set.">
+            <annotation>
+                <documentation>
+                    <html:p>
+                        If an aggregateFunction is set to
+                        'CUMULATIVE_AVG' then frequency or
+                        frequencyAttribute should be set.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </assert>
+        <assert vc:minVersion="1.1" test="if (@frequency) then (@aggregateFunction='CUMULATIVE_AVG') and not(@frequencyAttribute) else true()"
+                xerces:message="If the frequency attribute is set then the aggregateFunction should be 'CUMLATIVE_AVG' and frequencyAttribute should not be set."
+                saxon:message="If the frequency attribute is set then the aggregateFunction should be 'CUMLATIVE_AVG' and frequencyAttribute should not be set.">
+            <annotation>
+                <documentation>
+                    <html:p>
+                        Frequency requires CUMULATIVE_AVG and no
+                        frequencyAttribute.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </assert>
+        <assert vc:minVersion="1.1" test="if (@frequencyAttribute) then (@aggregateFunction='CUMULATIVE_AVG') and not(@frequency) else true()"
+                xerces:message="If the frequencyAttribute attribute is set then the aggregateFunction should be 'CUMLATIVE_AVG' and frequency should not be set."
+                saxon:message="If the frequencyAttribute attribute is set then the aggregateFunction should be 'CUMLATIVE_AVG' and frequency should not be set.">
+            <annotation>
+                <documentation>
+                    <html:p>
+                        FrequencyAttribute requires CUMULATIVE_AVG and
+                        no frequency.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </assert>
+    </complexType>
+
+    <simpleType name="AggregateFunction">
+        <annotation>
+            <documentation>
+                <html:p>
+                    Aggregate Functions.
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+            <enumeration value="NONE"/>
+            <enumeration value="SUM"/>
+            <enumeration value="AVG"/>
+            <enumeration value="CUMULATIVE_AVG"/>
+            <enumeration value="MAX"/>
+            <enumeration value="MIN"/>
+            <enumeration value="LAST"/>
+            <enumeration value="MAX_CONCURRENT"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="UnitOfMeasure">
+        <annotation>
+            <documentation>
+                <html:p>
+                    Unit of measure.
+                </html:p>
+            </documentation>
+        </annotation>
+        <restriction base="xsd:token">
+            <!--
+                Storage Units
+            -->
+            <enumeration value="b"/>
+            <enumeration value="B"/>
+            <enumeration value="KB"/>
+            <enumeration value="MB"/>
+            <enumeration value="GB"/>
+            <enumeration value="TB"/>
+            <enumeration value="PB"/>
+            <enumeration value="EB"/>
+            <enumeration value="Kb"/>
+            <enumeration value="Mb"/>
+            <enumeration value="Gb"/>
+            <enumeration value="Tb"/>
+            <enumeration value="Pb"/>
+            <enumeration value="Eb"/>
+            <!--
+                Time Units
+            -->
+            <enumeration value="mS"/> <!-- microseconds -->
+            <enumeration value="MS"/> <!-- milliseconds -->
+            <enumeration value="S"/>  <!-- seconds -->
+            <enumeration value="M"/>  <!-- mins -->
+            <enumeration value="H"/>  <!-- hours -->
+            <enumeration value="Mo"/> <!-- months -->
+            <enumeration value="D"/>  <!-- days -->
+            <enumeration value="Y"/>  <!-- years -->
+            <!--
+                Anything else is labeled as a COUNT.
+            -->
+            <enumeration value="COUNT"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="TypeList">
+        <list itemType="event:EventType"/>
+    </simpleType>
+    <simpleType name="Frequency">
+        <annotation>
+            <documentation>
+                <html:p>
+                   Describes the frequency used in a
+                   CUMMULATIVE_AVG. The value can be a long constant
+                   or the value 'DURATION' which signifies that the
+                   frequency should be derived from the duration
+                   (startTime, endTime) of the message.
+                </html:p>
+            </documentation>
+        </annotation>
+        <union memberTypes="xsd:long">
+            <simpleType>
+                <restriction base="xsd:token">
+                    <enumeration value="DURATION">
+                    </enumeration>
+                </restriction>
+            </simpleType>
+        </union>
+    </simpleType>
+</schema>

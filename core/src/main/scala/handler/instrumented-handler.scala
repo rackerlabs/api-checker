@@ -10,7 +10,6 @@ import java.lang.management._
 import javax.management._
 
 import com.rackspace.com.papi.components.checker.step.Result
-import com.rackspace.com.papi.components.checker.step.MultiFailResult
 
 import com.rackspace.com.papi.components.checker.servlet._
 
@@ -28,6 +27,10 @@ trait InstrumentedHandlerMBean {
   def getLatestFails : Array[String]
 }
 
+/*
+ * This handler populates Result-related MBeans. Currently populates:
+ *  - Latest failed requests & their Results, and the number of times they occurred
+ */
 class InstrumentedHandler extends ResultHandler with Instrumented with InstrumentedHandlerMBean {
 
   private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
@@ -72,9 +75,6 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
 
   private def markResult (result : Result) : Unit = {
     result.stepIDs.foreach (s => stepMeters(s).mark)
-    if (result.isInstanceOf[MultiFailResult]) {
-      result.asInstanceOf[MultiFailResult].fails.foreach (f => markResult(f))
-    }
   }
 
   private def markFail (result : Result, req : CheckerServletRequest) : Unit = {
