@@ -2283,7 +2283,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     </application>)
     , TestConfig(false, false, true, true, false, 1, false, true, true, "Saxon"))
 
-  //  this is currently broken, see defect D-12072, D-12007
+  //  verfies that the ErrorResult with the longest path in the automaton is used as the result.
   test ("Slice Action without resourceType") {
     val req = request("POST", "/servers/events", "application/atom+xml", sliceActionMissingResourceType)
     assertResultFailed(atomValidator.validate(req, response, chain), 400, "Bad Content: cvc-complex-type.4: Attribute 'resourceType' must appear on element 'csd:product'.")
