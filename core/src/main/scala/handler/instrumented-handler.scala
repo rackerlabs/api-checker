@@ -75,6 +75,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
 
   private def markResult (result : Result) : Unit = {
     result.stepIDs.foreach (s => stepMeters(s).mark)
+    result.otherResults.foreach( f => markResult( f ) )
   }
 
   private def markFail (result : Result, req : CheckerServletRequest) : Unit = {

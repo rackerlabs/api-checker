@@ -5,7 +5,7 @@ import javax.xml.validation.Schema
 
 import com.rackspace.com.papi.components.checker.servlet._
 import javax.servlet.FilterChain
-import collection.mutable.PriorityQueue
+import collection.mutable.ListBuffer
 
 class URIXSD(id : String, label : String, simpleType : QName, schema : Schema, next : Array[Step])  extends ConnectedStep(id, label, next) {
 
@@ -16,33 +16,33 @@ class URIXSD(id : String, label : String, simpleType : QName, schema : Schema, n
                         resp : CheckerServletResponse,
                         chain : FilterChain,
                         uriLevel : Int,
-                        stepCount : Int ) : Option[Result] = {
-       var result : Option[Result] = None
+                        stepCount : Int ) : ListBuffer[Result] = {
+
+       var buffer = new ListBuffer[Result]
+
        if (uriLevel < req.URISegment.size) {
+
          val error = xsd.validate(req.URISegment(uriLevel))
+
          if (error != None) {
-           result = Some(new MismatchResult(error.get.getMessage(), uriLevel, id, stepCount))
+
+           buffer += new MismatchResult(error.get.getMessage(), uriLevel, id, stepCount)
+
          } else {
-           val results : Array[Result] = nextStep (req, resp, chain, uriLevel + 1, stepCount )
-           results.size match {
-             case 0 =>
-               result = None
-             case 1 =>
-               results(0).addStepId(id)
-               result = Some(results(0))
-             case _ =>
 
-               // get the highest priority result
-               val pQueue = new PriorityQueue[Result]
-               pQueue.enqueue( results: _* )
+           buffer = nextStep (req, resp, chain, uriLevel + 1, stepCount )
 
-               result = Some( pQueue.dequeue )
+           if (!buffer.isEmpty) {
+
+             buffer( 0 ).addStepId( id )
            }
          }
        } else {
-         result = Some(new MismatchResult(mismatchMessage, uriLevel, id, stepCount ))
+
+         buffer += new MismatchResult(mismatchMessage, uriLevel, id, stepCount )
        }
-       result
+
+       buffer
      }
 }
 

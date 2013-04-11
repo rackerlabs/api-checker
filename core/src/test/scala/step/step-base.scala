@@ -83,13 +83,11 @@ class BaseStepSuite extends BaseValidatorSuite {
     new CheckerServletResponse (super.response)
   }
 
-  def assertMismatchResult(res :Option[Result]) : Unit = {
-    assert (res.isDefined)
-    assert (res.get.isInstanceOf[MismatchResult])
+  def assertMismatchResult(res : Result) : Unit = {
+    assert (res.isInstanceOf[MismatchResult])
   }
 
-  def assertBadMediaType(res : Option[Result]) : Unit = {
-    assert (res.isDefined)
-    assert (res.get.isInstanceOf[BadMediaTypeResult])
+  def assertBadMediaType(res : Result) : Unit = {
+    assert (res.isInstanceOf[BadMediaTypeResult])
   }
 }

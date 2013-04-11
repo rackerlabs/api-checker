@@ -3,10 +3,7 @@ package com.rackspace.com.papi.components.checker.step
 import java.util.Map
 import java.util.HashMap
 import scala.collection.immutable.List
-
-
-
-
+import collection.mutable.ListBuffer
 //
 //  Base class for all checker results
 //
@@ -18,6 +15,11 @@ abstract class Result(val message : String,   // A message describing the result
                       val stepCount : Int,    // count of of many steps were checked for this result
                       val code : Int = -1,
                       val headers : Map[String,String] = new HashMap() ) extends Ordered[Result] {
+
+  //
+  // Results with less priority than the finally selected Result
+  //
+  val otherResults = new ListBuffer[Result]
 
   //
   // Orders Results by the most appropriate Result value to the least.  The ordering is
