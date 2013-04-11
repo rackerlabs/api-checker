@@ -450,26 +450,16 @@ class BaseValidatorSuite extends FunSuite {
   }
 
   def assertResultFailed(f : => Any, code : Int) : Unit = {
-    var result : ErrorResult = null
-    assertResultFailed(f).get.result match {
-      case mfr : MultiFailResult =>
-        result = mfr.reduce.get.asInstanceOf[ErrorResult]
-      case other : ErrorResult =>
-        result = other
-    }
+    val result = assertResultFailed(f).get.result
+
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
   }
 
   def assertResultFailed(f : => Any, code : Int, message : String) : Unit = {
-    var result : ErrorResult = null
-    assertResultFailed(f).get.result match {
-      case mfr : MultiFailResult =>
-        result = mfr.reduce.get.asInstanceOf[ErrorResult]
-      case other : ErrorResult =>
-        result = other
-    }
+    val result = assertResultFailed(f).get.result
+
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
@@ -479,13 +469,8 @@ class BaseValidatorSuite extends FunSuite {
   }
 
   def assertResultFailed(f : => Any, code : Int, message : List[String]) : Unit = {
-    var result : ErrorResult = null
-    assertResultFailed(f).get.result match {
-      case mfr : MultiFailResult =>
-        result = mfr.reduce.get.asInstanceOf[ErrorResult]
-      case other : ErrorResult =>
-        result = other
-    }
+    val result = assertResultFailed(f).get.result
+
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
@@ -497,13 +482,8 @@ class BaseValidatorSuite extends FunSuite {
   }
 
   def assertResultFailed(f : => Any, code : Int, headers : Map[String, String]) : Unit = {
-    var result : ErrorResult = null
-    assertResultFailed(f).get.result match {
-      case mfr : MultiFailResult =>
-        result = mfr.reduce.get.asInstanceOf[ErrorResult]
-      case other : ErrorResult =>
-        result = other
-    }
+    val result = assertResultFailed(f).get.result
+
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }

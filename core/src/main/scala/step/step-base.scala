@@ -13,14 +13,9 @@ abstract class Step(val id : String, val label : String) {
   //
   //  Checks the step at the given URI level.
   //
-  def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result]
+  // stepCount : default value is 1 is convenience for first step
+  def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int, stepCount : Int = 1 ) : ListBuffer[Result]
 
-  //
-  //  Checks the step at the beginnig of the PATH
-  //
-  def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain) : Option[Result] = {
-    return check(req,resp,chain)
-  }
 }
 
 //
@@ -42,42 +37,50 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //
   //  Go to the next step.
   //
-  def nextStep (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Array[Result] = {
-    val resultBuffer = new ListBuffer[Result]
+  def nextStep (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int, stepCount : Int ) : ListBuffer[Result] = {
+
+    val buffer = new ListBuffer[Result]
+
     for (i <- 0 to next.length-1) {
-      val oresult = next(i).check(req, resp, chain, uriLevel)
-      if (oresult.isDefined) {
-        val result = oresult.get
-        if (result.valid) {
-          return Array(result)
-        } else {
-          resultBuffer += result
-        }
+
+      val moreRes = next(i).check(req, resp, chain, uriLevel, stepCount + 1 )
+      if (!moreRes.isEmpty && moreRes( 0 ).valid ) {
+
+        buffer.clear()
+        buffer += moreRes( 0 )
+        return buffer
+
+      } else {
+
+        buffer ++= moreRes
       }
     }
-    return resultBuffer.toArray
+
+    buffer
   }
 
   //
   //  Check this step, if successful, check next relevant steps.
   //
-  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Option[Result] = {
-    var result : Option[Result] = None
-    val nextURILevel = checkStep(req, resp, chain, uriLevel)
+  override def check(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int, stepCount : Int ) : ListBuffer[Result] = {
+
+    val nextURILevel = checkStep(req, resp, chain, uriLevel )
 
     if (nextURILevel != -1) {
-      val results : Array[Result] = nextStep (req, resp, chain, nextURILevel)
-      if (results.size == 1) {
-        results(0).addStepId(id)
-        result = Some(results(0))
-      } else {
-        result = Some(new MultiFailResult (results, uriLevel, id))
+
+      val buffer = nextStep (req, resp, chain, nextURILevel, stepCount )
+
+      if ( !buffer.isEmpty ) {
+
+        buffer(0).addStepId( id )
       }
 
+      return buffer
     } else {
-      result = Some(new MismatchResult(mismatchMessage, uriLevel, id))
-    }
 
-    return result
+      val buffer = new ListBuffer[Result]
+      buffer += new MismatchResult(mismatchMessage, uriLevel, id, stepCount)
+      return buffer
+    }
   }
 }

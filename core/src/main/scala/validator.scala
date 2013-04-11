@@ -11,17 +11,10 @@ import javax.xml.transform._
 import javax.xml.transform.sax._
 import javax.xml.transform.stream._
 import javax.xml.transform.dom._
-import javax.xml.validation._
-
-import javax.xml.parsers.SAXParser
-import javax.xml.parsers.SAXParserFactory
 
 import java.io.InputStream
-import java.io.ByteArrayOutputStream
-import java.io.Reader
-import java.io.StringWriter
 
-import scala.xml._
+import java.io.StringWriter
 
 import com.rackspace.com.papi.components.checker.wadl.StepBuilder
 import com.rackspace.com.papi.components.checker.wadl.WADLDotBuilder
@@ -42,8 +35,9 @@ import org.apache.commons.codec.digest.DigestUtils.sha1Hex
 import com.yammer.metrics.scala.Instrumented
 import com.yammer.metrics.scala.Meter
 import com.yammer.metrics.scala.Timer
-import com.yammer.metrics.scala.MetricsGroup
 import com.yammer.metrics.util.PercentGauge
+
+import collection.mutable.ListBuffer
 
 class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg, cause) {}
 
@@ -197,7 +191,30 @@ class Validator private (private val _name : String, val startStep : Step, val c
     try {
       val creq = new CheckerServletRequest (req)
       val cres = new CheckerServletResponse(res)
-      val result = startStep.check (creq, cres, chain, 0).get
+
+      val buffer = startStep.check (creq, cres, chain, 0)
+
+      // get list of Results, with the highest priority at the front,
+      // all others are unordered
+      val ordered = new ListBuffer[Result]
+      ordered += buffer.remove( 0 )
+
+      buffer.foldLeft( ordered )(( l : ListBuffer[Result], i : Result) =>
+        if ( l(0).compare( i ) < 0 ) {
+
+          l.prepend( i )
+          l
+        }
+        else {
+          l.append( i )
+          l
+        }
+      )
+
+      // Get the final result & attach list of other Results
+      val result = ordered.remove(0)
+      result.otherResults ++= ordered
+
       resultHandler.handle(creq, cres, chain, result)
       if (!result.valid) failMeter.mark()
       result

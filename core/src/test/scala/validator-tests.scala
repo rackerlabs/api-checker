@@ -411,6 +411,8 @@ class ValidatorSuite extends BaseValidatorSuite {
   // GET /.*/b
   // PUT /a/b (accepting application/xml)
   // POST /c/b (accepting application/xml and application/json)
+  // PUT /d (accepting application/xml)
+  // POST /d (accepting application/json)
   //
   // The of course means that a GET on /a/b is allowed. As is a get on
   // /c/b.
@@ -430,17 +432,26 @@ class ValidatorSuite extends BaseValidatorSuite {
     val get = new Method("GET", "GET", "GET".r, Array (accept))
     val putIn = new ReqType("ReqType", "XML", "((?i)application/xml)()".r, Array(accept))
     val postIn = new ReqType("ReqType", "XML|JSON", "((?i)application/xml|(?i)application/json)()".r, Array(accept))
+    val postJSON = new ReqType("ReqType", "JSON", "((?i)application/json)()".r, Array(accept))
     val put = new Method("PUT", "PUT", "PUT".r, Array (putIn, reqTFail))
     val post = new Method("POST", "POST", "POST".r, Array (postIn, reqTFail2))
+    val postD = new Method( "POST", "POST", "POST".r, Array (postJSON, reqTFail2))
     val b = new URI("b","b", "b".r, Array(put, urlFail, methodFailPut))
     val b2 = new URI("b2","b2", "b".r, Array(get, urlFail, methodFailGet))
     val b3 = new URI("b3","b3", "b".r, Array(post, urlFail, methodFailPost))
     val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
     val any = new URI("any","any", ".*".r, Array(b2, urlFailB, methodFail))
     val c = new URI("c","c", "c".r, Array(b3, urlFailB, methodFail))
-    val start = new Start("START", "Start", Array(a, c, any, methodFail))
+    val d = new URI("d","d", "d".r, Array(put, postD, urlFail, methodFailGet ))
+    val start = new Start("START", "Start", Array(a, c, d, any, methodFail))
     start
   }, assertConfig)
+
+  // verifies that media type supersedes method error
+  test ("PUT on /d should fail if the media type if application/json" ) {
+    assertResultFailed(validator_AM.validate(request("PUT","/d", "application/json"),
+      response,chain), 415 )
+  }
 
   test ("GET on /a/b should succeed on validator_AM") {
     validator_AM.validate(request("GET","/a/b"),response,chain)
@@ -548,6 +559,8 @@ class ValidatorSuite extends BaseValidatorSuite {
   //
   //  GET /a/b
   //  PUT /a/b (accepting valid application/xml)
+  //  GET /a/b/c
+  //  PUT /a/b/c (accepting valid application/xml)
   //
   val validator_XML = Validator({
     val accept = new Accept("A0", "Accept")
@@ -555,6 +568,7 @@ class ValidatorSuite extends BaseValidatorSuite {
     val methodFail = new MethodFail ("MF", "MethodFail")
     val urlFailA = new URLFailMatch("UFA", "URLFail","a".r)
     val urlFailB = new URLFailMatch("UFA", "URLFail","b".r)
+    val urlFailC = new URLFailMatch("UFA", "URLFail","c".r)
     val get = new Method("GET", "GET", "GET".r, Array (accept))
     val methodFailGetPut = new MethodFailMatch ("MFG", "MethodFail", "GET|PUT".r)
     val reqTFail = new ReqTypeFail("RTF", "RTFail", "((?i)application/xml)()".r)
@@ -562,7 +576,8 @@ class ValidatorSuite extends BaseValidatorSuite {
     val wellXML = new WellFormedXML ("WXML", "WELLXML", Array(accept))
     val putIn = new ReqType("ReqType", "XML", "((?i)application/xml)()".r, Array(wellXML, contentFail))
     val put = new Method("PUT", "PUT", "PUT".r, Array (putIn, reqTFail))
-    val b = new URI("b","b", "b".r, Array(put, get, urlFail, methodFailGetPut))
+    val c = new URI("c","c", "c".r, Array(put, get, urlFail, methodFailGetPut))
+    val b = new URI("b","b", "b".r, Array(c, put, get, urlFailC, methodFailGetPut))
     val a = new URI("a","a", "a".r, Array(b, urlFailB, methodFail))
     val start = new Start("START", "Start", Array(a, urlFailA, methodFail))
     start
@@ -588,13 +603,25 @@ class ValidatorSuite extends BaseValidatorSuite {
 
   test ("a POST on /a/b should fail on validator_XML") {
     assertResultFailed(validator_XML.validate(request("POST","/a/b", "application/xml",
-                                                      <some_xml att='1' xmlns='test.org'>
-                                                        <an_element>
-                                                         <another_element />
-                                                        </an_element>
-                                                      </some_xml>
-                                                    ),response,chain), 405, Map("Allow"->"GET, PUT"))
+      <some_xml att='1' xmlns='test.org'>
+        <an_element>
+          <another_element />
+        </an_element>
+      </some_xml>
+    ),response,chain), 405, Map("Allow"->"GET, PUT"))
   }
+
+  // verifies that method fail supersedes URL fail
+  test ("a POST on /a/b/c should fail on validator_XML") {
+    assertResultFailed(validator_XML.validate(request("POST","/a/b/c", "application/xml",
+      <some_xml att='1' xmlns='test.org'>
+        <an_element>
+          <another_element />
+        </an_element>
+      </some_xml>
+    ),response,chain), 405, Map("Allow"->"GET, PUT"))
+  }
+
 
   test ("PUT on /a/b with valid JSON should fail with 415") {
     assertResultFailed(validator_XML.validate(request("PUT","/a/b","application/json",
