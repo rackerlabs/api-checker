@@ -18,9 +18,6 @@ class ServletResultHandler extends ResultHandler {
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
     if (!result.valid) {
       result match {
-        case mrf : MultiFailResult =>
-          val re = mrf.reduce.get.asInstanceOf[ErrorResult]
-          sendError(re, resp)
         case errorResult : ErrorResult =>
           sendError(errorResult, resp)
       }
