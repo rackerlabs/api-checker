@@ -2,23 +2,85 @@ package com.rackspace.com.papi.components.checker.step
 import java.util.Map
 import java.util.HashMap
 import scala.collection.immutable.List
+import scala.collection.mutable.PriorityQueue
 
 //
 //  Base class for all checker results
 //
-abstract class Result(val message : String,   // A message describing the result
-                      val valid : Boolean,    // Was the http req/res valid?
-                      val terminal : Boolean, // Are we at a terminal node in the machine
-                      val uriLevel : Int,     // The URI level at the error
-                      stepId : String) {      // The ID of the machine at the error
+abstract class Result(private val messageP : String,   // A message describing the result
+                      private val validP : Boolean,    // Was the http req/res valid?
+                      private val terminalP : Boolean, // Are we at a terminal node in the machine
+                      private val uriLevelP : Int,     // The URI level at the error
+                      stepId : String,
+                      private val stepCountP : Int) extends Ordered[Result] {      // The ID of the machine at the error
 
-  var stepIDs : List[String] = List[String]() // ID of the linear steps it took to get
-                                              // to this result
-
-  addStepId(stepId)
+  private var stepIDsP : List[String] = List[String]() // ID of the linear steps it took to get
+  // to this result
 
   def addStepId(stepId : String) : Unit = {
-    stepIDs = stepId +: stepIDs
+    stepIDsP = stepId +: stepIDsP
+  }
+
+  // explicitly call this version of addStepId so MutiErrorResult doesn't overwrite
+  stepIDsP = stepId +: stepIDsP
+
+
+  //
+  // In MultiErrorResult, we forward the following calls to another object.  You cannot override val with a def call
+  // since val implies a stable & immutable guarantee which def does not contain.
+  //
+  // We declare private vals and manually create accessors
+  //
+  def message = messageP
+  def valid = validP
+  def terminal = terminalP
+  def uriLevel = uriLevelP
+  def stepCount = stepCountP
+  def stepIDs = stepIDsP
+
+
+  //
+  // Used by MultiFailResult to track all encountered results.  For other Results, contains itself.
+  //
+  def allResults : Traversable[Result] = List( this )
+
+  //
+  // Orders Results by the most appropriate Result value to the least.  The ordering is
+  // dictated as per the match statement in orderValue().
+  //
+  // Within each type, the most appropriate is assumed to be the result whose path
+  // is the longest in the automaton.
+  //
+  def compare( o : Result ) = {
+
+    val order = orderValue() - o.orderValue()
+
+    if ( order != 0 ) {
+
+      order
+    }
+    else {
+
+      stepCount - o.stepCount
+    }
+  }
+
+  //
+  // Declares the ordering for the different Result types.  The bigger number
+  // has the highest priority.  If Result type not found in match statement,
+  // gives it least priority.
+  //
+  def orderValue() = {
+
+    this match {
+      case _ : AcceptResult => 100
+      case _ : BadContentResult => 90
+      case _ : BadMediaTypeResult => 80
+      case _ : MethodFailResult => 70
+      case _ : URLFailResult => 60
+      case _ : MismatchResult => 50
+      case _ => 0
+    }
   }
 
   protected val startPath = "["
@@ -36,58 +98,133 @@ abstract class Result(val message : String,   // A message describing the result
   }
 }
 
-class ErrorResult(message : String, val code : Int, uriLevel : Int, stepId : String,
-                  val headers : Map[String,String] = new HashMap()) extends Result(message, false, true, uriLevel, stepId) {
+class ErrorResult(message : String,
+                  private val codeP : Int,
+                  uriLevel : Int,
+                  stepId : String,
+                  stepCount : Int,
+                  private val headersP : Map[String,String] = new HashMap()) extends Result(message, false, true, uriLevel,
+                                                                                   stepId, stepCount) {
+
+  //
+  // In MultiErrorResult, we forward the following calls to another object.  You cannot override val with a def call
+  // since val implies a stable & immutable guarentee which def does not contain.
+  //
+  // We declare private vals and manually create accessors
+  //
+  def code = codeP
+  def headers = headersP
+
   override def toString : String = path+" "+code+" : "+message
   override def cmpString : String = super.cmpString+" "+code
 }
 
-class AcceptResult(message: String, uriLevel : Int, stepId : String)  extends Result(message, true, true, uriLevel, stepId)
-class BadContentResult(message : String, uriLevel : Int, stepId : String) extends ErrorResult(message, 400, uriLevel, stepId)
-class URLFailResult(message : String, uriLevel : Int, stepId : String) extends ErrorResult(message, 404, uriLevel, stepId)
-class MethodFailResult(message: String, uriLevel : Int, stepId : String, headers : Map[String,String])
-      extends ErrorResult(message, 405, uriLevel, stepId, headers)
-class BadMediaTypeResult(message: String, uriLevel : Int, stepId : String) extends ErrorResult(message, 415, uriLevel, stepId)
-class MismatchResult(message: String, uriLevel : Int, stepId : String) extends Result(message, false, false, uriLevel, stepId) {
+class AcceptResult(message: String,
+                   uriLevel : Int,
+                   stepId : String,
+                   stepCount : Int)  extends Result(message, true, true, uriLevel, stepId, stepCount)
+
+class BadContentResult(message : String,
+                       codeP : Int = 400,
+                       uriLevel : Int,
+                       stepId : String,
+                       stepCount : Int) extends ErrorResult(message, codeP, uriLevel, stepId, stepCount)
+
+class URLFailResult(message : String,
+                    uriLevel : Int,
+                    stepId : String,
+                    stepCount: Int) extends ErrorResult(message, 404, uriLevel, stepId, stepCount)
+
+class MethodFailResult(message: String,
+                       uriLevel : Int,
+                       stepId : String,
+                       stepCount : Int,
+                       headers : Map[String,String]) extends ErrorResult(message, 405, uriLevel, stepId,
+                                                                         stepCount, headers )
+
+class BadMediaTypeResult(message: String,
+                         uriLevel : Int,
+                         stepId : String,
+                         stepCount : Int) extends ErrorResult(message, 415, uriLevel, stepId, stepCount)
+
+class MismatchResult(message: String,
+                     uriLevel : Int,
+                     stepId : String,
+                     stepCount : Int) extends Result(message, false, false, uriLevel, stepId, stepCount) {
   override protected val startPath = "("
   override protected val endPath = ")"
 }
 
-class MultiFailResult(val fails : Array[Result], uriLevel : Int, stepId : String)
-      extends Result ("Multiple possible errors", false, false, uriLevel, stepId)
-{
-  override protected val startPath = "{"
-  override protected val endPath = "}"
 
-  override def path : String = startPath+stepIDs.reduceLeft(_+" "+_)+" "+(for {f <- fails} yield f.path).reduceLeft(_+" "+_)+endPath
+class NoResultsException( val message : String ) extends Exception( message )
 
-  override def toString : String = {
-    reduce match {
-      case Some(e : ErrorResult) => path+" "+e.code+" : "+e.message
-      case Some(r : Result) => path
-      case None => path
+//
+// This class is a wrapper around priorityqueue of several results, delegating the Result methods to the Result
+// at the head of the data structure.
+//
+class MultiFailResult(fails : Array[Result] ) extends ErrorResult ( "Multiple possible errors", -1, -1, "", -1 ) {
+
+  if ( fails.isEmpty ) throw new NoResultsException( "Input array must be non-empty." )
+
+  private val results = new PriorityQueue[Result]()
+
+  results ++= fails
+
+  //
+  // delegate all method calls to the Result with the highest priority
+  //
+  override def message = results.head.message
+  override def uriLevel = results.head.uriLevel
+  override def stepIDs = results.head.stepIDs
+  override def addStepId(stepId : String) = results.head.addStepId( stepId )
+  override def valid = results.head.valid
+  override def terminal = results.head.terminal
+  override def stepCount = results.head.stepCount
+  override def toString = results.head.toString
+
+  override def code = results.head match {
+    case e : ErrorResult => e.code
+  }
+
+  override def headers = results.head match {
+    case e : ErrorResult => e.headers
+  }
+
+  //
+  // This order value is the value of the result in the priorityqueue
+  //
+  override def orderValue() = results.head.orderValue
+
+  //
+  // Define new Traversable instance which calls foreach on each MultiFailResult
+  // and the function on each non-MultiFailResult (i.e., each leaf node in the
+  // Result-tree).  The main result is encountered first in this traversal.
+  //
+  override def allResults : Traversable[Result] = {
+
+    new Traversable[Result] {
+
+      def foreach[U]( f: Result => U ) = {
+        results.foreach(
+          ( r : Result) => {
+            r match {
+              case m : MultiFailResult => r.allResults.foreach( f )
+              case r : Result => f( r )
+            }
+          }
+        )
+      }
     }
   }
 
-  override def cmpString : String = {
-    val cmpStrings : Array[String]= for {f <- fails} yield f.cmpString
-    cmpStrings.reduceLeft(_+" "+_)+" "+uriLevel+" "+stepId
-  }
+  override protected val startPath = "{"
+  override protected val endPath = "}"
 
-  //
-  //  Pick a single fail result out of the possible set of failers.
-  //
-  def reduce : Option[Result] = {
-    fails.foreach (res =>
-      {
-        res match {
-          case f : MultiFailResult =>
-            val red = f.reduce
-            if (red != None) { return red }
-          case other : Result =>
-            if (other.terminal) { return Some(other) }
-        }
-      })
-    None
-  }
+  // TODO:  need to verify this occurs as we want
+
+//  override def path : String = startPath+stepIDs.reduceLeft(_+" "+_)+" " + otherResults.map( _.path ).reduceLeft( _ + " " + _ ) + endPath
+  override def path : String = startPath+stepIDs.reduceLeft(_+" "+_)+" " + allResults.map( _.path ).tail.reduceLeft( _ + " " + _ ) + endPath
+
+//  override def cmpString : String = otherResults.map( _.cmpString ).reduceLeft( _ + " " + _ ) + " " + uriLevel + " " + stepIDs.head
+  override def cmpString : String = allResults.map( _.cmpString ).tail.reduceLeft( _ + " " + _ ) + " " + uriLevel + " " + stepIDs.head
 }
