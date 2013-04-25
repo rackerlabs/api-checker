@@ -126,6 +126,15 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       _schema
     }
   }
+  private[this] def schema (qn : Array[QName]) : Schema = {
+    if ((_schema == null) && (qn.exists(q => q.getNamespaceURI() != "http://www.w3.org/2001/XMLSchema"))) {
+      throw new SAXParseException("No schema available.", locator)
+    } else if (_schema == null) {
+      schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/blank.xsd")))
+    } else {
+      _schema
+    }
+  }
   private[this] def schema : Schema = {
     _schema
   }
@@ -399,14 +408,22 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       }
     }
 
+    val notQNames : Array[QName] = {
+      if (notTypes != null) {
+        notTypes.map(x => qname(x))
+      } else {
+        null
+      }
+    }
+
     if (notMatch == null && notTypes == null) {
       steps += (id -> new URLFail(id, label))
     } else if (notMatch != null && notTypes == null) {
       steps += (id -> new URLFailMatch(id, label, notMatch.r))
     } else if (notMatch == null && notTypes != null) {
-      steps += (id -> new URLFailXSD(id, label, notTypes.map (nt => qname(nt)), schema))
+      steps += (id -> new URLFailXSD(id, label, notQNames, schema(notQNames)))
     } else {
-      steps += (id -> new URLFailXSDMatch(id, label, notMatch.r, notTypes.map(nt => qname(nt)), schema))
+      steps += (id -> new URLFailXSDMatch(id, label, notMatch.r, notQNames, schema(notQNames)))
     }
   }
 
@@ -682,7 +699,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val qn : QName = qname(_match)
 
     next  += (id -> nexts)
-    steps += (id -> new URIXSD(id, label, qn, schema, new Array[Step](nexts.length)))
+    steps += (id -> new URIXSD(id, label, qn, schema(qn), new Array[Step](nexts.length)))
   }
 
   private[this] def qname(_match : String)  : QName = {
