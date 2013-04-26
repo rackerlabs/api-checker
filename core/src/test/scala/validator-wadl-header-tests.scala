@@ -726,6 +726,24 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
     </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
+
+  // testing allResults traversal
+  test ("Ensure allResults returns all Results with main at the head of the list" ) {
+
+    assertAllResultsCorrect( validatorCode_Header.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false),
+                                                           response,
+                                                           chain ),
+                             4 )
+  }
+
+
+  // verifies that header error supersedes media type errors
+  test ( "POST on /a/b with application/JSON and no header should fail") {
+    assertResultFailed( validator_Header.validate( request( "POST", "/a/b", "application/json", goodJSON,
+    false, Map[String, List[String]]()), response, chain),
+                        400 )
+  }
+
   test ("PUT on /a/b with application/xml should succeed on validator_Header with valid XML1") {
     validator_Header.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST"->List("foo"))),response,chain)
   }

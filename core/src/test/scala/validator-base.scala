@@ -449,14 +449,45 @@ class BaseValidatorSuite extends FunSuite {
     result
   }
 
-  def assertResultFailed(f : => Any, code : Int) : Unit = {
+  //
+  // Verify the allResults method is the correct size & has
+  // the correct head element
+  //
+  def assertAllResultsCorrect( f : => Any, size : Int ) : Unit = {
     var result : ErrorResult = null
+
     assertResultFailed(f).get.result match {
-      case mfr : MultiFailResult =>
-        result = mfr.reduce.get.asInstanceOf[ErrorResult]
       case other : ErrorResult =>
         result = other
     }
+
+    val list = result.allResults.toList
+
+    val head = list.head match {
+      case e : ErrorResult => e
+    }
+
+    if ( list.size != size ) {
+      throw new TestFailedException(Some("Expect list of 4 but got " + list.size ), None, 4)
+    }
+
+    if( result.code != head.code
+        || result.message != head.message
+        || result.uriLevel != head.uriLevel
+        || result.stepIDs != head.stepIDs ) {
+      throw new TestFailedException(Some("First item in allResults list did not match main Result" ), None, 4)
+    }
+
+
+  }
+
+  def assertResultFailed(f : => Any, code : Int) : Unit = {
+    var result : ErrorResult = null
+    assertResultFailed(f).get.result match {
+      case other : ErrorResult =>
+        result = other
+    }
+
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
@@ -465,11 +496,10 @@ class BaseValidatorSuite extends FunSuite {
   def assertResultFailed(f : => Any, code : Int, message : String) : Unit = {
     var result : ErrorResult = null
     assertResultFailed(f).get.result match {
-      case mfr : MultiFailResult =>
-        result = mfr.reduce.get.asInstanceOf[ErrorResult]
       case other : ErrorResult =>
         result = other
     }
+
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
@@ -481,11 +511,10 @@ class BaseValidatorSuite extends FunSuite {
   def assertResultFailed(f : => Any, code : Int, message : List[String]) : Unit = {
     var result : ErrorResult = null
     assertResultFailed(f).get.result match {
-      case mfr : MultiFailResult =>
-        result = mfr.reduce.get.asInstanceOf[ErrorResult]
       case other : ErrorResult =>
         result = other
     }
+
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
@@ -499,11 +528,10 @@ class BaseValidatorSuite extends FunSuite {
   def assertResultFailed(f : => Any, code : Int, headers : Map[String, String]) : Unit = {
     var result : ErrorResult = null
     assertResultFailed(f).get.result match {
-      case mfr : MultiFailResult =>
-        result = mfr.reduce.get.asInstanceOf[ErrorResult]
       case other : ErrorResult =>
         result = other
     }
+
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }

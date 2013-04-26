@@ -72,9 +72,6 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
 
   private def markResult (result : Result) : Unit = {
     result.stepIDs.foreach (s => stepMeters(s).mark)
-    if (result.isInstanceOf[MultiFailResult]) {
-      result.asInstanceOf[MultiFailResult].fails.foreach (f => markResult(f))
-    }
   }
 
   private def markFail (result : Result, req : CheckerServletRequest) : Unit = {
@@ -91,7 +88,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
   }
 
   override def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
-    markResult(result)
+    result.allResults.foreach( markResult )
     if (!result.valid) {
       markFail(result, req)
     }
