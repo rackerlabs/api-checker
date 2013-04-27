@@ -1,5 +1,18 @@
 # Releases #
 
+## Release 1.0.8 (2013-04-29) ##
+
+1. Updated Dependecies
+   1. scala: 2.9.1 → 2.9.3
+   1. scala-test: 1.6.1 → 1.9.1
+   1. scala maven plugin: 2.15.1 → 3.1.3
+   1. xerces: 2.12.0-rax → 2.12.1-rax
+   1. wadl-tools: 1.0.12  → 1.0.13
+   1. jetty: 6.1.22 → 8.1.1.20120215
+1. There is now a priority when interpreting multi-fail results
+1. Resolved bug where NPE is possible if XSD types are specifed in a
+WADL without a grammar
+
 ## Release 1.0.7 (2013-03-20) ##
 
 1. Updated WADL Tools to 1.0.12 to fix issue where some resource types
