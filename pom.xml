@@ -19,7 +19,7 @@
     </modules>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/InABlender/api-checker.git</connection>
+        <connection>scm:git:ssh://git@api-checker.github.com/InABlender/api-checker.git</connection>
     </scm>
 
     <repositories>
