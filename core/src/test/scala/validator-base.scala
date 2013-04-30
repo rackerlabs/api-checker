@@ -481,7 +481,7 @@ class BaseValidatorSuite extends FunSuite {
 
   }
 
-  def assertResultFailed(f : => Any, code : Int) : Unit = {
+  def assertResultFailed(f : => Any, code : Int) : ErrorResult = {
     var result : ErrorResult = null
     assertResultFailed(f).get.result match {
       case other : ErrorResult =>
@@ -491,6 +491,7 @@ class BaseValidatorSuite extends FunSuite {
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
+    return result
   }
 
   def assertResultFailed(f : => Any, code : Int, message : String) : Unit = {
