@@ -30,7 +30,9 @@ class ValidatorSuite extends BaseValidatorSuite {
   }, assertConfig)
 
   test ("GET on / should fail on validator_EMPTY") {
-    assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405, Map("Allow"->""))
+    val result = assertResultFailed(validator_EMPTY.validate(request("GET","/"),response,chain), 405, Map("Allow"->""))
+    // this is just a check to make sure the returned result has the same error code
+    assert(result.code == 405)
   }
 
   test ("an empty GET should fail on validator_EMPTY") {
