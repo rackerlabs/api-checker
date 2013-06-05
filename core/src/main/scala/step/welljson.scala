@@ -1,13 +1,13 @@
 package com.rackspace.com.papi.components.checker.step
 
-import com.rackspace.com.papi.components.checker.util.JSONParserPool.borrowParser
-import com.rackspace.com.papi.components.checker.util.JSONParserPool.returnParser
+import com.rackspace.com.papi.components.checker.util.ObjectMapperPool.borrowParser
+import com.rackspace.com.papi.components.checker.util.ObjectMapperPool.returnParser
 
 import com.rackspace.com.papi.components.checker.servlet._
 
-import org.json.simple.parser.JSONParser
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.util.TokenBuffer
 
-import java.io.InputStreamReader
 import javax.servlet.FilterChain
 
 class WellFormedJSON(id : String, label : String, next : Array[Step]) extends ConnectedStep(id, label, next) {
@@ -15,20 +15,12 @@ class WellFormedJSON(id : String, label : String, next : Array[Step]) extends Co
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
     var ret = -1
-    var parser : JSONParser = null
+    var parser : ObjectMapper = null
 
     try {
       if (req.parsedJSON == null) {
-        val encoding : String = {
-          var e = req.getCharacterEncoding()
-          if (e == null) {
-            e = "UTF-8" // According to the RFC it's UTF-8 unless if encoding is not specified
-          }
-          e
-        }
-
         parser = borrowParser
-        req.parsedJSON = parser.parse(new InputStreamReader (req.getInputStream(), encoding))
+        req.parsedJSON = parser.readValue(req.getInputStream(),classOf[TokenBuffer])
       }
       ret = uriLevel
     } catch {

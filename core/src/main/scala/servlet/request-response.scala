@@ -16,12 +16,14 @@ import javax.xml.transform.Transformer
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-import org.json.simple.JSONAware
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.util.TokenBuffer
 import org.w3c.dom.Document
 
 import java.util.Enumeration
 
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
+import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
 
 import scala.collection.JavaConversions._
 
@@ -30,7 +32,7 @@ import scala.collection.JavaConversions._
 //
 object RequestAttributes {
   val PARSED_XML    = "com.rackspace.com.papi.components.checker.servlet.ParsedXML"
-  val PARSED_JSON   = "com.rackspace.com.papi.components.checker.servlet.ParsedJSON"
+  val PARSED_JSON   = "com.rackspace.com.papi.components.checker.servlet.ParsedJSONTokens"
   val CONTENT_ERROR = "com.rackspace.com.papi.components.checker.servlet.ContentError"
   val CONTENT_ERROR_CODE = "com.rackspace.com.papi.components.checker.servlet.ContentErrorCode"
 }
@@ -49,8 +51,8 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   def parsedXML : Document = request.getAttribute(PARSED_XML).asInstanceOf[Document]
   def parsedXML_= (doc : Document):Unit = request.setAttribute (PARSED_XML, doc)
 
-  def parsedJSON : Object = request.getAttribute(PARSED_JSON)
-  def parsedJSON_= (obj : Object):Unit = request.setAttribute (PARSED_JSON, obj)
+  def parsedJSON : TokenBuffer = request.getAttribute(PARSED_JSON).asInstanceOf[TokenBuffer]
+  def parsedJSON_= (tb : TokenBuffer):Unit = request.setAttribute (PARSED_JSON, tb)
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
   def contentError_= (e : Exception):Unit = {
@@ -78,7 +80,15 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
         returnTransformer(transformer)
       }
     } else if (parsedJSON != null) {
-      new ByteArrayServletInputStream(parsedJSON.asInstanceOf[JSONAware].toJSONString().getBytes())
+      var om : ObjectMapper = null
+      try {
+        om = ObjectMapperPool.borrowParser
+        new ByteArrayServletInputStream(om.writeValueAsBytes(parsedJSON))
+      } finally {
+        if (om != null) {
+          ObjectMapperPool.returnParser(om)
+        }
+      }
     } else {
       super.getInputStream()
     }
