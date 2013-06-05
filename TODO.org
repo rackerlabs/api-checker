@@ -404,6 +404,21 @@
          1. [X] XSL 2.0
          2. [X] Xalan 1.0
          3. [X] XalanC 1.0
+** TODO Add support for JSONSchema in body [0/8]
+   1. [ ] Add support for JSON_SCHEMA_CHECK in XSD
+   2. [ ] Add JSON_SCHEMA_CHECK in configs
+   3. [ ] Add support for check in XSLs, include support for rax:ignore-jsonschema
+   4. [ ] Update CLI tools if nessesary
+   5. [ ] Create validator pool if nessesary
+   6. [ ] Creade JSON-Schema check state
+   7. [ ] Add support for schema check in the builder
+   8. [ ] Tests [0/7]
+      1. [ ] States
+      2. [ ] Checker Tests
+      3. [ ] Step Builder Tests
+      4. [ ] WADL Validater Tests
+      5. [ ] validator pool tests
+      6. [ ] Tests when no grammar is available
 ** TODO Header Enhancements [3/4]
    1. [X] Multiple header checks with the same name [4/4]
       1. [X] Allow checks in steps via enumeration
