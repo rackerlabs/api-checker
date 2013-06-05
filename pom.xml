@@ -56,9 +56,9 @@
         <mockito.version>1.9.0</mockito.version>
         <pool.version>1.6</pool.version>
         <codec.version>1.7</codec.version>
-        <json-simple.version>1.1.1</json-simple.version>
         <xalan.version>2.7.1</xalan.version>
         <metrics-scala.version>2.2.0</metrics-scala.version>
+        <jackson-databind.version>2.1.5</jackson-databind.version>
     </properties>
 
     <dependencies>
@@ -83,9 +83,9 @@
             <version>${xalan.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>${json-simple.version}</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -18,7 +18,8 @@ import javax.xml.transform.Transformer
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-import org.json.simple.parser.JSONParser
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.util.TokenBuffer
 
 import scala.collection.mutable.HashMap
 
@@ -28,7 +29,7 @@ import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 
 import com.rackspace.com.papi.components.checker.util.XMLParserPool
-import com.rackspace.com.papi.components.checker.util.JSONParserPool
+import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
 
 import org.scalatest.FunSuite
@@ -363,7 +364,7 @@ class BaseValidatorSuite extends FunSuite {
   def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean) : HttpServletRequest = {
     val req = request (method, url, contentType, content)
     var xmlParser : DocumentBuilder = null
-    var jsonParser : JSONParser = null
+    var jsonParser : ObjectMapper = null
 
     when(req.getHeaders(anyString())).thenAnswer(new Answer[Enumeration[String]] {
 
@@ -381,13 +382,13 @@ class BaseValidatorSuite extends FunSuite {
             xmlParser = XMLParserPool.borrowParser
             req.setAttribute (PARSED_XML, xmlParser.parse(new ByteArrayInputStream(content.getBytes())))
           case "application/json" =>
-            jsonParser = JSONParserPool.borrowParser
-            req.setAttribute (PARSED_JSON, jsonParser.parse(content))
+            jsonParser = ObjectMapperPool.borrowParser
+            req.setAttribute (PARSED_JSON, jsonParser.readValue(content,classOf[TokenBuffer]))
         }
       }
     } finally {
       if (xmlParser != null) XMLParserPool.returnParser(xmlParser)
-      if (jsonParser != null) JSONParserPool.returnParser(jsonParser)
+      if (jsonParser != null) ObjectMapperPool.returnParser(jsonParser)
     }
 
     return req
