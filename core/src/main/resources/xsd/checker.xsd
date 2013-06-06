@@ -18,6 +18,9 @@
     xmlns:xerces="http://xerces.apache.org"
     targetNamespace="http://www.rackspace.com/repose/wadl/checker">
 
+    <import namespace="http://www.w3.org/2001/XMLSchema"
+            schemaLocation="schema.xsd"/>
+
     <import namespace="http://www.w3.org/1999/XSL/Transform"
             schemaLocation="transform.xsd"/>
 
@@ -40,7 +43,10 @@
 
     <complexType name="Checker">
         <sequence>
-            <element name="grammar" type="chk:Grammar" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="grammar" type="chk:Grammar" minOccurs="0" maxOccurs="unbounded">
+                <alternative test="@type eq 'W3C_XML' or not(@type)" type="chk:XSDGrammar"/>
+                <alternative test="@type eq 'SCHEMA_JSON'" type="chk:JSONGrammar"/>
+            </element>
             <element name="step" type="chk:Step" minOccurs="0" maxOccurs="unbounded">
                 <alternative test="@type eq 'START'" type="chk:StartStep"/>
                 <alternative test="@type eq 'URL_FAIL'" type="chk:URLFailStep"/>
@@ -61,6 +67,7 @@
                 <alternative test="@type eq 'HEADERXSD'" type="chk:HeaderXSDStep"/>
                 <alternative test="@type eq 'HEADER_ANY'" type="chk:HeaderAnyStep"/>
                 <alternative test="@type eq 'HEADERXSD_ANY'" type="chk:HeaderXSDAnyStep"/>
+                <alternative test="@type eq 'JSON_SCHEMA'" type="chk:JsonSchemaStep"/>
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
@@ -212,6 +219,20 @@
                 <attribute name="message" type="xsd:string" use="optional"/>
                 <attribute name="code" type="xsd:int" use="optional"/>
             </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="JsonSchemaStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Ensures that the JSON content validates against the
+                    JSONSchemas provided in the grammar.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep"/>
         </complexContent>
     </complexType>
 
@@ -500,25 +521,42 @@
                 </html:p>
             </documentation>
         </annotation>
-        <sequence>
-            <!--
-                 Pretty lax check for now, not really any schema type
-                 we use the assertion to restrict this to
-                 xsd:schema only.
-
-                 TODO, bring in XSD 1.1 schema and actually validate.
-            -->
-            <any minOccurs="0" maxOccurs="1" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax"/>
-        </sequence>
         <attribute name="type" type="chk:GrammarType" use="optional" default="W3C_XML"/>
-        <attribute name="ns" type="xsd:string" use="optional"/>
         <attribute name="href" type="xsd:anyURI" use="optional"/>
-        <assert test="if (xsd:*) then xsd:schema else true()"
-                saxon:message="Only xsd:schema element is allowed!"
-                xerces:message="Only xsd:schema element is allowed!"/>
-        <assert test="if (xsd:schema and @href) then false() else true()"
-                saxon:message="Grammar can't have both an href and a schema"
-                xerces:message="Grammar can't have both an href and a schema"/>
+        <assert test="if (@href) then empty(node()) else not(empty(node()))"
+                saxon:message="Grammar content must be specified inline or via an href attribute (but not both)."
+                xerces:message="Grammar content must be specified inline or via an href attribute (but not both)."/>
+    </complexType>
+
+    <complexType name="XSDGrammar">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    An XSD grammar.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:Grammar">
+                <sequence>
+                    <element minOccurs="0" maxOccurs="1" ref="xsd:schema"/>
+                </sequence>
+                <attribute name="ns" type="xsd:string" use="optional"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="JSONGrammar">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A JSON schema grammar.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent mixed="true">
+            <extension base="chk:Grammar"/>
+        </complexContent>
     </complexType>
 
     <!-- Simple Types -->
@@ -543,6 +581,7 @@
             <enumeration value="HEADERXSD"/>
             <enumeration value="HEADER_ANY"/>
             <enumeration value="HEADERXSD_ANY"/>
+            <enumeration value="JSON_SCHEMA"/>
         </restriction>
     </simpleType>
 
@@ -563,6 +602,7 @@
     <simpleType name="GrammarType">
         <restriction base="xsd:string">
             <enumeration value="W3C_XML"/>
+            <enumeration value="SCHEMA_JSON"/>
             <!-- Others to follow? -->
         </restriction>
     </simpleType>
