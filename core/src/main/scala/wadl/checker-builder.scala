@@ -30,11 +30,13 @@ import com.rackspace.com.papi.components.checker.Config
 object BuilderXSLParams {
   val ENABLE_WELL_FORM = "enableWellFormCheck"
   val ENABLE_XSD       = "enableXSDContentCheck"
+  val ENABLE_JSON_SCHEMA = "enableJSONContentCheck"
   val ENABLE_XSD_TRANSFORM = "enableXSDTransform"
   val ENABLE_ELEMENT   = "enableElementCheck"
   val ENABLE_PLAIN_PARAM = "enablePlainParamCheck"
   val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
   val ENABLE_XSD_IGNORE_EXT  = "enableIgnoreXSDExtension"
+  val ENABLE_JSON_IGNORE_EXT = "enableIgnoreJSONSchemaExtension"
   val ENABLE_MESSAGE_EXT    = "enableMessageExtension"
   val ENABLE_HEADER         = "enableHeaderCheck"
 }
@@ -103,6 +105,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_XSD_IGNORE_EXT, c.enableIgnoreXSDExtension)
       buildHandler.getTransformer().setParameter (ENABLE_MESSAGE_EXT, c.enableMessageExtension)
       buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
+      buildHandler.getTransformer().setParameter (ENABLE_JSON_SCHEMA, c.checkJSONGrammar)
+      buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
 
       var output = out;
 
