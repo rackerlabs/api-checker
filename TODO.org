@@ -404,11 +404,11 @@
          1. [X] XSL 2.0
          2. [X] Xalan 1.0
          3. [X] XalanC 1.0
-** TODO Add support for JSONSchema in body [2/8]
+** TODO Add support for JSONSchema in body [3/8]
    1. [X] Add support for JSON_SCHEMA_CHECK in XSD
    2. [X] Add JSON_SCHEMA_CHECK in configs
-   3. [ ] Add support for check in XSLs, include support for rax:ignore-jsonschema
-   4. [ ] Update CLI tools if nessesary
+   3. [X] Add support for check in XSLs, include support for rax:ignore-jsonschema
+   4. [ ] Update CLI tools
    5. [ ] Create validator pool if nessesary
    6. [ ] Creade JSON-Schema check state
    7. [ ] Add support for schema check in the builder

@@ -22,6 +22,7 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:wadl="http://wadl.dev.java.net/2009/02"
     xmlns:check="http://www.rackspace.com/repose/wadl/checker"
+    xmlns:json="http://json-schema.org/schema#"
     xmlns:rax="http://docs.rackspace.com/api"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
@@ -35,12 +36,14 @@
 
     <!-- Paramenters -->
     <xsl:param name="enableXSDContentCheck" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enableJSONContentCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableXSDTransform" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableWellFormCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableElementCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePlainParamCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enablePreProcessExtension" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableIgnoreXSDExtension" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enableIgnoreJSONSchemaExtension" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableMessageExtension" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableHeaderCheck" as="xsd:boolean" select="false()"/>
 
@@ -52,22 +55,34 @@
                               false()
                           " />
 
+    <!-- Do we have JSON Schema? -->
+    <xsl:variable name="WADLhasJSONSchema" as="xsd:boolean"
+                  select="
+                          if (//wadl:grammars/json:schema) then true() else
+                           if (//wadl:grammars/wadl:include[unparsed-text-available(@href) and check:looksLikeJSONObject(unparsed-text(@href,'UTF-8'))]) then true() else
+                             false()
+                         "/>
+
     <!-- Actual Config Flags -->
     <xsl:variable name="useXSDContentCheck" as="xsd:boolean"
                   select="($enableXSDContentCheck or $enableXSDTransform) and $WADLhasXSD"/>
+    <xsl:variable name="useJSONContentCheck" as="xsd:boolean"
+                  select="$enableJSONContentCheck and $WADLhasJSONSchema"/>
     <xsl:variable name="useXSDTransform" as="xsd:boolean"
                   select="$enableXSDTransform and $useXSDContentCheck"/>
     <xsl:variable name="usePreProcessExtension" as="xsd:boolean"
                   select="$enablePreProcessExtension"/>
     <xsl:variable name="useIgnoreXSDExtension" as="xsd:boolean"
                   select="$enableIgnoreXSDExtension and $useXSDContentCheck"/>
+    <xsl:variable name="useIgnoreJSONSchemaExtension" as="xsd:boolean"
+                  select="$enableIgnoreJSONSchemaExtension and $useJSONContentCheck"/>
     <xsl:variable name="useElementCheck" as="xsd:boolean"
                   select="$enableElementCheck"/>
     <xsl:variable name="usePlainParamCheck" as="xsd:boolean"
                   select="$enablePlainParamCheck"/>
     <xsl:variable name="useWellFormCheck" as="xsd:boolean"
                   select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or
-                          $enablePlainParamCheck"/>
+                          $enablePlainParamCheck or $useJSONContentCheck"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
                   select="$enableHeaderCheck"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
@@ -149,7 +164,15 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:when test="unparsed-text-available(@href)">
-                <xsl:message>[WARNING] Don't understand unparsed grammar of <xsl:value-of select="@href"/> ignoring...</xsl:message>
+                <xsl:variable name="text" select="unparsed-text(@href,'UTF-8')"/>
+                <xsl:choose>
+                    <xsl:when test="check:looksLikeJSONObject($text)">
+                        <grammar type="SCHEMA_JSON" href="{@href}"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:message>[WARNING] Don't understand unparsed grammar of <xsl:value-of select="@href"/> ignoring...</xsl:message>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:message terminate="yes">[ERROR] Couldn't access grammar <xsl:value-of select="@href"/></xsl:message>
@@ -164,6 +187,10 @@
             </xsl:if>
             <xsl:copy-of select="."/>
         </grammar>
+    </xsl:template>
+
+    <xsl:template match="wadl:grammars/json:schema[text()]" mode="grammar">
+        <grammar type="SCHEMA_JSON"><xsl:value-of select="text()"/></grammar>
     </xsl:template>
 
     <xsl:template name="check:getNamespaces">
@@ -398,6 +425,16 @@
         <xsl:apply-templates/>
         <xsl:call-template name="check:addMethodSets"/>
     </xsl:template>
+    <!--
+        Very simple test for JSON Schema.  Must start with '{' and end
+        with '}'. If the text isn't truely JSON, the schema validator
+        will catch it.
+    -->
+    <xsl:function name="check:looksLikeJSONObject" as="xsd:boolean">
+        <xsl:param name="text" as="xsd:string"/>
+        <xsl:variable name="normText" select="normalize-space($text)"/>
+        <xsl:value-of select="starts-with($normText,'{') and ends-with($normText,'}')"/>
+    </xsl:function>
     <xsl:function name="check:isXSDURL" as="xsd:boolean">
         <xsl:param name="path" as="node()"/>
         <xsl:variable name="param" select="check:paramForTemplatePath($path)"/>
@@ -707,6 +744,11 @@
         <xsl:value-of select="concat(generate-id($context),'XSD')"/>
     </xsl:function>
 
+    <xsl:function name="check:JSONID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(generate-id($context),'JSON')"/>
+    </xsl:function>
+
     <xsl:function name="check:XPathID" as="xsd:string">
         <xsl:param name="context" as="node()"/>
         <xsl:param name="number" as="xsd:integer"/>
@@ -735,8 +777,12 @@
                       select="wadl:param[xsd:boolean(@required) and @path and (@style='plain')]"/>
         <xsl:variable name="ignoreXSDCheck" as="xsd:boolean"
                       select="$useIgnoreXSDExtension and (xsd:boolean(@rax:ignoreXSD) or xsd:boolean(../@rax:ignoreXSD))"/>
+        <xsl:variable name="ignoreJSONCheck" as="xsd:boolean"
+                      select="$useIgnoreJSONSchemaExtension and (xsd:boolean(@rax:ignoreJSONSchema) or xsd:boolean(../@rax:ignoreJSONSchema))"/>
         <xsl:variable name="doXSD" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $useXSDContentCheck and not($ignoreXSDCheck)"/>
+        <xsl:variable name="doJSON" as="xsd:boolean"
+                      select="($type = 'WELL_JSON') and $useJSONContentCheck and not($ignoreJSONCheck)"/>
         <xsl:variable name="doPreProcess" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $usePreProcessExtension and exists(rax:preprocess)"/>
         <xsl:variable name="doElement" as="xsd:boolean"
@@ -745,6 +791,8 @@
                       select="($type = 'WELL_XML') and $usePlainParamCheck and exists($defaultPlainParams)"/>
         <xsl:variable name="XSDID" as="xsd:string"
                       select="check:XSDID(.)"/>
+        <xsl:variable name="JSONID" as="xsd:string"
+                      select="check:JSONID(.)"/>
         <xsl:variable name="XPathID" as="xsd:string"
                       select="check:XPathID(.,0)"/>
         <xsl:variable name="FAILID" as="xsd:string"
@@ -768,6 +816,11 @@
                 <xsl:when test="$doXSD">
                     <xsl:attribute name="next"
                                    select="($XSDID, $FAILID)"
+                                   separator=" "/>
+                </xsl:when>
+                <xsl:when test="$doJSON">
+                    <xsl:attribute name="next"
+                                   select="($JSONID, $FAILID)"
                                    separator=" "/>
                 </xsl:when>
                 <xsl:otherwise>
@@ -873,6 +926,9 @@
                     <xsl:copy-of select="child::*"/>
                 </step>
             </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="$doJSON">
+            <step type="JSON_SCHEMA" id="{$JSONID}" next="{$ACCEPT}"/>
         </xsl:if>
         <xsl:if test="$doXSD">
             <step type="XSD" id="{$XSDID}" next="{$ACCEPT}"/>
