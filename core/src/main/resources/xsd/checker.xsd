@@ -92,6 +92,17 @@
                 </documentation>
             </annotation>
         </assert>
+        <assert test="count(chk:grammar[@type='SCHEMA_JSON']) &lt;= 1"
+                saxon:message="Only a single JSON schema may be assigned."
+                xerces:message="Only a single JSON schema may be assigned.">
+            <annotation>
+                <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                    <html:p>
+                        Only a single JSON schema may be assigned.
+                    </html:p>
+                </documentation>
+            </annotation>
+        </assert>
     </complexType>
 
     <!-- Connected Steps -->
