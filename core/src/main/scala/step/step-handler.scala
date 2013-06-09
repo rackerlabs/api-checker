@@ -1,5 +1,7 @@
 package com.rackspace.com.papi.components.checker.step
 
+import java.net.URL
+
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.Source
 import javax.xml.transform.Templates
@@ -30,9 +32,17 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
 import scala.collection.mutable.ArrayBuffer
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.JsonNode
+
+import com.github.fge.jsonschema.main.JsonSchemaFactory
+
 import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
 import com.rackspace.com.papi.components.checker.util.XPathExpressionPool
+import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
+
+import com.fasterxml.jackson.databind.JsonNode
 
 /**
  * The StepHandler assumes it is receiving content that is valid
@@ -64,9 +74,26 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //
   private[this] var processGrammar : Boolean = true
   //
-  // A list of source
+  // A list of XML source
   //
   private[this] val grammarSources : ArrayBuffer[Source] = new ArrayBuffer[Source]
+  //
+  // JSON Schema factory
+  //
+  private[this] val jsonSchemaFactory = JsonSchemaFactory.byDefault()
+  //
+  // JSON Schema grammar
+  //
+  private[this] var jsonGrammar : JsonNode = null
+  //
+  // JSON Schema buffer
+  //
+  private[this] var jsonBuffer : StringBuilder = new StringBuilder()
+  //
+  // Should we be processing the JSON buffer
+  //
+  private[this] var processJSONBuffer : Boolean = false
+
   //
   // Our schema factory...
   //
@@ -265,6 +292,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "HEADERXSD"   => addHeaderXSD(atts)
           case "HEADER_ANY"  => addHeaderAny(atts)
           case "HEADERXSD_ANY"  => addHeaderXSDAny(atts)
+          case "JSON_SCHEMA" => addJSONSchema(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -275,6 +303,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   private[this] def endCheckerElement (uri : String, localName : String, qname : String) = {
     localName match {
       case "step" => if (lastXSL != null) closeXSLTStep
+      case "grammar" => endGrammar
       case _ => //ignore
     }
   }
@@ -314,8 +343,43 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //
   private[this] def addGrammar(atts : Attributes) : Unit = {
     val href = atts.getValue("href")
-    if (href != null) {
-      grammarSources += new SAXSource(new InputSource(href))
+
+    atts.getValue("type") match {
+      case "W3C_XML" => {
+        if (href != null) {
+          grammarSources += new SAXSource(new InputSource(href))
+        }
+      }
+      case "SCHEMA_JSON" => {
+        if (href != null) {
+          var om : ObjectMapper = null
+          try {
+            om = ObjectMapperPool.borrowParser
+            jsonGrammar = om.readValue(new URL(href), classOf[JsonNode])
+          } finally {
+            if (om != null) ObjectMapperPool.returnParser(om)
+          }
+        } else {
+          processJSONBuffer = true
+        }
+      }
+    }
+  }
+
+  //
+  //  Grammar section ends
+  //
+  private[this] def endGrammar : Unit = {
+    if (processJSONBuffer) {
+      var om : ObjectMapper = null
+      try {
+        om = ObjectMapperPool.borrowParser
+        jsonGrammar = om.readValue(jsonBuffer.toString, classOf[JsonNode])
+        jsonBuffer.setLength(0)
+        processJSONBuffer = false
+      } finally {
+        if (om != null) ObjectMapperPool.returnParser(om)
+      }
     }
   }
 
@@ -509,6 +573,15 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new XSD(id, label, schema, transform, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addJSONSchema(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+
+    next += (id -> nexts)
+    steps += (id -> new JSONSchema(id, label, jsonSchemaFactory.getJsonSchema(jsonGrammar), new Array[Step](nexts.length)))
   }
 
   private[this] def addXSLT(atts : Attributes) : Unit = {
@@ -734,6 +807,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
     if (currentXSLHandler != null) {
       currentXSLHandler.characters(ch, start, length)
+    }
+    if (processJSONBuffer) {
+      jsonBuffer.appendAll (ch, start, length)
     }
   }
   override def startPrefixMapping (prefix : String, uri : String) = {
