@@ -35,6 +35,9 @@ import scala.collection.mutable.ArrayBuffer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode
 
+import com.github.fge.jsonschema.report.LogLevel
+import com.github.fge.jsonschema.report.ListReportProvider
+
 import com.github.fge.jsonschema.main.JsonSchemaFactory
 
 import com.rackspace.com.papi.components.checker.Config
@@ -42,7 +45,6 @@ import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
 import com.rackspace.com.papi.components.checker.util.XPathExpressionPool
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
 
-import com.fasterxml.jackson.databind.JsonNode
 
 /**
  * The StepHandler assumes it is receiving content that is valid
@@ -80,7 +82,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //
   // JSON Schema factory
   //
-  private[this] val jsonSchemaFactory = JsonSchemaFactory.byDefault()
+  private[this] val jsonSchemaFactory = JsonSchemaFactory.newBuilder.setReportProvider(new ListReportProvider(LogLevel.WARNING, LogLevel.ERROR)).freeze
   //
   // JSON Schema grammar
   //

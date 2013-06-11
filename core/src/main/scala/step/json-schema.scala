@@ -20,6 +20,10 @@ class JSONSchema(id : String, label : String, schema : JsonSchema, next : Array[
       schema.validate(om.readTree(req.parsedJSON.asParser()))
       uriLevel
     } catch {
+      case pe : ProcessingException => {
+        req.contentError = new Exception(pe.getProcessingMessage().toString(), pe)
+        -1
+      }
       case e : Exception => {
         req.contentError = e
         -1
