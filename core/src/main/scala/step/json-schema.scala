@@ -17,7 +17,7 @@ class JSONSchema(id : String, label : String, schema : JsonSchema, next : Array[
     var om : ObjectMapper = null
     try {
       om = ObjectMapperPool.borrowParser
-      schema.validate(om.readTree(req.parsedJSON.asParser()))
+      schema.validate(req.parsedJSON)
       uriLevel
     } catch {
       case pe : ProcessingException => {

@@ -404,7 +404,7 @@
          1. [X] XSL 2.0
          2. [X] Xalan 1.0
          3. [X] XalanC 1.0
-** TODO Add support for JSONSchema in body [7/9]
+** TODO Add support for JSONSchema in body [8/9]
    1. [X] Add support for JSON_SCHEMA_CHECK in XSD
    2. [X] Add JSON_SCHEMA_CHECK in configs
    3. [X] Add support for check in XSLs, include support for rax:ignore-jsonschema
@@ -412,7 +412,7 @@
    5. [X] Create JSON-Schema check state
    6. [X] Add support for schema check in the builder
    7. [X] Adjust error reporting?
-   8. [ ] Use JSON Node instead of token buffer?
+   8. [X] Use JSON Node instead of token buffer?
    9. [ ] Tests [0/6]
       1. [ ] States
       2. [ ] Checker Tests

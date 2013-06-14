@@ -12,7 +12,7 @@ import org.xml.sax.SAXParseException
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.util.TokenBuffer
+import com.fasterxml.jackson.databind.JsonNode
 
 import scala.xml._
 
@@ -563,17 +563,17 @@ class StepSuite extends BaseStepSuite {
     assert (wfj.checkStep (request("PUT", "/a/b", "application/json", """ { "valid" : [true, true, true] }"""), response, chain, 1) == 1)
   }
 
-  test("In a WellFormedJSON step, if the content contains well formed JSON, the request should contain a TokenBuffer value") {
+  test("In a WellFormedJSON step, if the content contains well formed JSON, the request should contain a JsonNode") {
     val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
     val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
     wfj.checkStep (req1, response, chain, 0)
     assert(req1.parsedJSON != null)
-    assert(req1.parsedJSON.isInstanceOf[TokenBuffer])
+    assert(req1.parsedJSON.isInstanceOf[JsonNode])
 
     val req2 = request("PUT", "/a/b", "application/json", """ { "valid" : [true, true, true] }""")
     wfj.checkStep (req2, response, chain, 1)
     assert(req2.parsedJSON != null)
-    assert(req2.parsedJSON.isInstanceOf[TokenBuffer])
+    assert(req2.parsedJSON.isInstanceOf[JsonNode])
   }
 
   test("In a WellFormedJSON step, if the content contains well formed JSON, you should be able to reparse the JSON by calling getInputStream") {
@@ -622,7 +622,7 @@ class StepSuite extends BaseStepSuite {
     val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
     wfj.checkStep (req1, response, chain, 0)
     assert(req1.parsedJSON != null)
-    assert(req1.parsedJSON.isInstanceOf[TokenBuffer])
+    assert(req1.parsedJSON.isInstanceOf[JsonNode])
 
     val obj = req1.parsedJSON
     wfj.checkStep (req1, response, chain, 0)
@@ -633,13 +633,22 @@ class StepSuite extends BaseStepSuite {
     val wfj = new WellFormedJSON("WFJSON", "WFJSON", Array[Step]())
     val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
     val req2 = request("PUT", "/a/b", "application/json", """ { "valid" : true } """)
+    var jparser : ObjectMapper = null
 
     wfj.checkStep (req1, response, chain, 0)
     assert(req1.parsedJSON != null)
-    assert(req1.parsedJSON.isInstanceOf[TokenBuffer])
+    assert(req1.parsedJSON.isInstanceOf[JsonNode])
     wfj.checkStep (req2, response, chain, 0)
 
-    assert (req1.parsedJSON.toString == req2.parsedJSON.toString)
+    try {
+      jparser = ObjectMapperPool.borrowParser
+      val s1 = jparser.writeValueAsString(req1.parsedJSON)
+      val s2 = jparser.writeValueAsString(req2.parsedJSON)
+
+      assert (s1 == s2)
+    } finally {
+      if (jparser != null) ObjectMapperPool.returnParser(jparser)
+    }
   }
 
   test ("In an XSD test, if the content contains valid XML, the uriLevel should stay the same") {
