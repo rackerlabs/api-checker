@@ -5,10 +5,16 @@ import scala.reflect.BeanProperty
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
 import com.rackspace.com.papi.components.checker.handler.ServletResultHandler
 
+/**
+ * This class contains all the configuration options for a {@link com.rackspace.com.papi.components.checker.Validator}
+ *
+ * A license is required for any SaxonEE functionality.  SaxonEE can be declared in <code>xslEngine</code>
+ * and <code>xsdEngine</code>.
+ */
 class Config {
   //
   //  Setup appropriate factories.  We need these set to ensure config
-  //  options work coccertly.
+  //  options work correctly.
   //
   System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema/saxonica", "com.saxonica.jaxp.SchemaFactoryImpl")
   System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory")
@@ -29,13 +35,57 @@ class Config {
   //
   @BeanProperty var resultHandler : ResultHandler = new ServletResultHandler
 
+
+  //
+  //  Use Xerces or SAXON-EE for XSD validation.  Note that the Saxon
+  //  validator requires a license.
+  //
+  private var xsde : String = "Xerces"
+  private val supportedXSDEngines = Set("Xerces", "SaxonEE")
+
+  def xsdEngine : String = xsde
+  def xsdEngine_= (engine : String) : Unit = {
+    if (!supportedXSDEngines.contains(engine)) {
+      throw new IllegalArgumentException("Unrecognized XSL engine: "+
+        engine+" supported engines: "+supportedXSDEngines)
+    }
+    xsde = engine
+  }
+
+  def setXSDEngine (engine : String) : Unit = { xsdEngine_=(engine) }
+  def getXSDEngine : String = xsdEngine
+
+
   //
   //  Use SAXON-EE for XSD validation: This means that in cases where
   //  XSD validation needs to be done use the Saxon XSD validator
   //  instead of the default Xerces validator.  Note that the Saxon
   //  validator requires a license.
   //
-  @BeanProperty var useSaxonEEValidation : Boolean = false
+  @Deprecated
+  def setUseSaxonEEValidation( use : Boolean ) : Unit = {
+
+    if ( use ) {
+
+      setXSDEngine( "SaxonEE" )
+    }
+    else {
+
+      setXSDEngine( "Xerces" )
+    }
+  }
+
+  @Deprecated
+  def getUseSaxonEEValidation() : Unit = {
+
+    xsdEngine == "SaxonEE"
+  }
+
+  @Deprecated
+  def useSaxonEEValidation = getUseSaxonEEValidation()
+
+  @Deprecated
+  def useSaxonEEValidation_= ( use : Boolean ) : Unit = setUseSaxonEEValidation( use )
 
   //
   //  Check Well-Formed XML and JSON
@@ -67,6 +117,8 @@ class Config {
   private var xpv : Int = 1
 
   def xpathVersion : Int = xpv
+
+  @Deprecated
   def xpathVersion_= (version : Int) : Unit = {
     if ((version != 1) && (version != 2))
       throw new IllegalArgumentException("XPath version can only be 1 or 2.")
@@ -102,7 +154,7 @@ class Config {
   //  XSLs should work fine.
   //
   private var xsle : String = "XalanC"
-  private val supportedXSLEngines = Set("Xalan", "XalanC", "Saxon")
+  private val supportedXSLEngines = Set("Xalan", "XalanC", "SaxonHE", "SaxonEE")
 
   def xslEngine : String = xsle
   def xslEngine_= (engine : String) : Unit = {

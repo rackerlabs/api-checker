@@ -22,6 +22,11 @@ import com.rackspace.cloud.api.wadl.Converters._
 
 import com.rackspace.com.papi.components.checker.Config
 
+/**
+ *  XSL Transformer parameters.
+ *
+ *  {@see javax.xml.transform.Transformer}
+ */
 object BuilderXSLParams {
   val ENABLE_WELL_FORM = "enableWellFormCheck"
   val ENABLE_XSD       = "enableXSDContentCheck"
@@ -34,6 +39,11 @@ object BuilderXSLParams {
   val ENABLE_HEADER         = "enableHeaderCheck"
 }
 
+/**
+ *  XSL TransformerHandler parameters.
+ *
+ *  {@see javax.xml.transform.sax.TransformerHandler}
+ */
 object XPathJoinParams {
   val DEFAULT_XPATH_VERSION = "defaultXPathVersion"
 }
@@ -78,7 +88,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
     var c = config
 
     if (c == null) {
-      c = new Config
+      c = new Config()
     }
 
     try {

@@ -1964,7 +1964,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
            </resource>
         </resources>
     </application>)
-    , TestConfig(false, false, true, true, false, 1, false, true, true, "Saxon"))
+    , TestConfig(false, false, true, true, false, 1, false, true, true, "SaxonHE"))
 
 
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML1") {
