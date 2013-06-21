@@ -65,8 +65,11 @@ class Config {
   @Deprecated
   def setUseSaxonEEValidation( use : Boolean ) : Unit = {
 
+    depUseSaxonEEValidation = use
+
     if ( use ) {
 
+      setXSLEngine( "SaxonEE" )
       setXSDEngine( "SaxonEE" )
     }
     else {
@@ -74,6 +77,8 @@ class Config {
       setXSDEngine( "Xerces" )
     }
   }
+
+  private var depUseSaxonEEValidation : Boolean = false
 
   @Deprecated
   def getUseSaxonEEValidation() : Unit = {
@@ -158,7 +163,20 @@ class Config {
 
   def xslEngine : String = xsle
   def xslEngine_= (engine : String) : Unit = {
-    if (!supportedXSLEngines.contains(engine)) {
+    if ( engine == "Saxon" ) {
+
+      if ( depUseSaxonEEValidation ) {
+
+        xsle = "SaxonEE"
+      }
+      else {
+
+        xsle = "SaxonHE"
+      }
+
+      return
+    }
+    else if (!supportedXSLEngines.contains(engine)) {
       throw new IllegalArgumentException("Unrecognized XSL engine: "+
                                          engine+" supported engines: "+supportedXSLEngines)
     }

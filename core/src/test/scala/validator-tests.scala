@@ -8,6 +8,44 @@ import scala.util.Random
 import com.rackspace.com.papi.components.checker.step._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.FunSuite
+
+/**
+ * Verifies that deprecated methods correctly set the new Config object.
+ * <p>
+ * Delete this when the Config.useSaxonEEValidation related methods are deleted.
+ */
+@RunWith(classOf[JUnitRunner])
+class ConfigSuite extends FunSuite {
+
+  test( "UseSaxonEEValidation == true : xsdEngine == SaxonEE, xslEngine == SaxonEE ") {
+
+    val config = new Config
+
+    config.setUseSaxonEEValidation( true )
+
+    assert( config.xsdEngine === "SaxonEE" )
+    assert( config.xslEngine === "SaxonEE" )
+  }
+
+  test( "UseSaxonEEValidation == false, xslEngine == Saxon : xsdEngine == Xerces, xslEngine == SaxonHE") {
+
+    val config = new Config
+    config.setUseSaxonEEValidation( false )
+    config.setXSLEngine( "Saxon" )
+
+    assert( config.xsdEngine === "Xerces" )
+    assert( config.xslEngine === "SaxonHE" )
+  }
+
+  test( "UseSaxonEEValidation == false : xsdEngine == Xerces, xslEngine == XalanC") {
+
+    val config = new Config
+
+    assert( config.xsdEngine === "Xerces" )
+    assert( config.xslEngine === "XalanC" )
+  }
+}
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorSuite extends BaseValidatorSuite {
