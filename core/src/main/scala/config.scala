@@ -123,7 +123,6 @@ class Config {
 
   def xpathVersion : Int = xpv
 
-  @Deprecated
   def xpathVersion_= (version : Int) : Unit = {
     if ((version != 1) && (version != 2))
       throw new IllegalArgumentException("XPath version can only be 1 or 2.")
@@ -159,28 +158,21 @@ class Config {
   //  XSLs should work fine.
   //
   private var xsle : String = "XalanC"
-  private val supportedXSLEngines = Set("Xalan", "XalanC", "SaxonHE", "SaxonEE")
+  private val supportedXSLEngines = Set("Xalan", "XalanC", "SaxonHE", "SaxonEE",
+  "Saxon" )  // NOTE:  "Saxon" is deprecated as well, remove when removing depUseSaxonEEValidation
 
   def xslEngine : String = xsle
   def xslEngine_= (engine : String) : Unit = {
-    if ( engine == "Saxon" ) {
 
-      if ( depUseSaxonEEValidation ) {
-
-        xsle = "SaxonEE"
-      }
-      else {
-
-        xsle = "SaxonHE"
-      }
-
-      return
-    }
-    else if (!supportedXSLEngines.contains(engine)) {
+    if (!supportedXSLEngines.contains(engine)) {
       throw new IllegalArgumentException("Unrecognized XSL engine: "+
                                          engine+" supported engines: "+supportedXSLEngines)
     }
-    xsle = engine
+
+    xsle =  engine match {
+      case "Saxon" => if (depUseSaxonEEValidation) "SaxonEE" else "SaxonHE"
+      case _ => engine
+    }
   }
 
   def setXSLEngine (engine : String) : Unit = { xslEngine_=(engine) }
