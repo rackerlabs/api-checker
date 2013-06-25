@@ -20,6 +20,11 @@ import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.ValidatorException
 import com.rackspace.com.papi.components.checker.handler._
 
+/**
+ * A filter which can be used to test api-checker.
+ *
+ * <b>This is not the Repose api-validator filter.</b>
+ */
 class ValidatorFilter extends Filter {
   private[this] var validator : Validator = null;
 
@@ -40,7 +45,7 @@ class ValidatorFilter extends Filter {
 
     val conf = new Config
     conf.resultHandler = resultHandler
-    conf.useSaxonEEValidation = true
+    conf.xsdEngine = "SaxonEE"
     conf.checkWellFormed = true
     conf.checkXSDGrammar = true
     conf.checkElements = true

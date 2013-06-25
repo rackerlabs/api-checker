@@ -401,7 +401,7 @@ class ValidatorWADLPlainParamSuite extends BaseValidatorSuite {
         </resources>
     </application>)
     , TestConfig(false, false, true, true, true, 1,
-                 true, false , false, "Saxon", true,
+                 true, false , false, "SaxonHE", true,
                  false, false, true))
 
   //
