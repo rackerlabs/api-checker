@@ -660,7 +660,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
            </resource>
         </resources>
     </application>)
-    , TestConfig(false, true, true, true, false, 1, false, true, true, "Saxon"))
+    , TestConfig(false, true, true, true, false, 1, false, true, true, "SaxonEE"))
 
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML1") {
     validator_XSDContentTT.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
@@ -790,7 +790,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
            </resource>
         </resources>
     </application>)
-    , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
+    , TestConfig(false, true, true, true, true, 1, true, true, true, "SaxonEE", true, true))
 
   //
   // Like validator header, but expects the header to be an int.
@@ -827,7 +827,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
            </resource>
         </resources>
     </application>)
-    , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
+    , TestConfig(false, true, true, true, true, 1, true, true, true, "SaxonEE", true, true))
 
   //
   // Like validator header int, but expects the header only in the put
@@ -864,7 +864,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
            </resource>
         </resources>
     </application>)
-    , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
+    , TestConfig(false, true, true, true, true, 1, true, true, true, "SaxonEE", true, true))
 
   //
   // Like validator header int put, but string header in PUT and POST.
@@ -902,7 +902,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
            </resource>
         </resources>
     </application>)
-    , TestConfig(false, true, true, true, true, 1, true, true, true, "Saxon", true, true))
+    , TestConfig(false, true, true, true, true, 1, true, true, true, "SaxonEE", true, true))
 
   test ("PUT on /a/b with application/xml should succeed on validator_HeaderUUID with valid XML1") {
     validator_HeaderUUID.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST-UUID"->List("b8870590-e584-11e1-91a3-7f4ba748be90"))),response,chain)

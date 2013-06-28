@@ -34,13 +34,13 @@ import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
 import com.rackspace.com.papi.components.checker.util.XPathExpressionPool
 
-//
-//  The StepHandler assumes it is receiving content that is valid
-//  according to the checker schema.  Please ensure that a validation
-//  stage occurs before the handler is called.
-//
-//  The StepHandler is also *not* thread safe.
-//
+/**
+ * The StepHandler assumes it is receiving content that is valid
+ *  according to the checker schema.  Please ensure that a validation
+ * stage occurs before the handler is called.
+ * <p>
+ * The StepHandler is also <b>not</b> thread safe.
+ */
 class StepHandler(var contentHandler : ContentHandler, val config : Config) extends ContentHandler {
   //
   // ID -> Step
@@ -73,21 +73,25 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   private[this] val schemaFactory = {
     var sf : SchemaFactory = null
 
-    if (config.useSaxonEEValidation) {
-      sf = new com.saxonica.jaxp.SchemaFactoryImpl()
-
-      //
-      //  Enable Schema 1.1 support
-      //
-      sf.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
-    } else {
-      sf = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+    config.xsdEngine match {
 
       //
       //  Enable CTA full XPath2.0 checking in XSD 1.1
       //
-      sf.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
+      case "Xerces"  => {
+        sf = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+        sf.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
+      }
+
+      //
+      //  Enable Schema 1.1 support
+      //
+      case "SaxonEE" => {
+        sf = new com.saxonica.jaxp.SchemaFactoryImpl()
+        sf.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
+      }
     }
+
     sf
   }
 
@@ -95,21 +99,28 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //  XSL 2.0 schema factory
   //
   private[this] val transformFactoryXSL2 : TransformerFactory = {
-    if (config.useSaxonEEValidation) {
-      TransformerFactory.newInstance("com.saxonica.config.EnterpriseTransformerFactory", null)
-    } else {
-      TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+
+    config.xslEngine match  {
+
+      case "SaxonEE" => TransformerFactory.newInstance("com.saxonica.config.EnterpriseTransformerFactory", null)
+      case "SaxonHE" => TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+      // TODO:  if the wadl every explicitly calls out for  XSLT2 , we need to give them a SAXON transformer,
+      // Xalan doesn't support 2
+      case _ =>  TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
     }
   }
 
+
+
   //
-  //  XSL 1.0 schema factory
+  //  XSL schema factory
   //
   private[this] val transformFactoryXSL1 : TransformerFactory = {
     config.xslEngine match  {
+
       case "Xalan" => TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl", null)
       case "XalanC" => TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
-      case "Saxon" => transformFactoryXSL2
+      case _ => transformFactoryXSL2
     }
   }
 
@@ -168,7 +179,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   private[this] var lastXSL : XSL = null
   private[this] var lastXSLVersion : String = null
 
-  def this() = this(null, new Config)
+  def this() = this( null, new Config() )
 
   override def startElement (uri : String, localName : String, qname : String, atts : Attributes) = {
     uri match {

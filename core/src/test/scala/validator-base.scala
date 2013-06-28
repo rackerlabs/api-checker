@@ -244,7 +244,7 @@ object TestConfig {
   def apply (saxoneeValidation : Boolean, wellFormed : Boolean) : Config = {
     val config = new Config
     config.resultHandler = assertHandler
-    config.useSaxonEEValidation = saxoneeValidation
+    config.setXSDEngine( if ( saxoneeValidation ) { "SaxonEE" } else { "Xerces" } )
     config.checkWellFormed = wellFormed
 
     config
