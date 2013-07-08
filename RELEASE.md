@@ -1,5 +1,13 @@
 # Releases #
 
+## Release 1.0.9 (2013-07-08) ##
+
+1. Configuration has new XSD-Engine setting which makes clear which XSD
+validator should be used
+1. JSON is now processed with Jackson processor
+1. WADL-Tools updated to 1.0.14 which reduces noise on console when
+processing a WADL
+
 ## Release 1.0.8 (2013-04-29) ##
 
 1. Updated Dependecies
