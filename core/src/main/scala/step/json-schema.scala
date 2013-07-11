@@ -6,6 +6,7 @@ import com.github.fge.jsonschema.main.JsonSchema
 import com.github.fge.jsonschema.exceptions.ProcessingException
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.JsonNode
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
@@ -21,7 +22,12 @@ class JSONSchema(id : String, label : String, schema : JsonSchema, next : Array[
       uriLevel
     } catch {
       case pe : ProcessingException => {
-        req.contentError = new Exception(pe.getProcessingMessage().toString(), pe)
+        val message = {
+          val fmsg = formatMessage(pe.getProcessingMessage().asJson())
+          if (fmsg != null) fmsg else pe.getProcessingMessage().toString()
+        }
+
+        req.contentError = new Exception(message, pe)
         -1
       }
       case e : Exception => {
@@ -30,6 +36,43 @@ class JSONSchema(id : String, label : String, schema : JsonSchema, next : Array[
       }
     } finally {
       if (om != null) ObjectMapperPool.returnParser(om)
+    }
+  }
+
+  private def formatMessage (jpmsg : JsonNode) : String = {
+    val pointer = getPointer(jpmsg)
+
+    if (pointer != null) {
+      "In "+pointer+", "+getMessage(jpmsg)
+    } else {
+      getMessage(jpmsg)
+    }
+  }
+
+  private def nullEmpty (in : String) : String = {
+    if (in == null || in == "") {
+      null
+    } else {
+      in
+    }
+  }
+
+  private def getMessage (jpmsg : JsonNode) : String = {
+    val jms = jpmsg.findValue("message")
+    if (jms != null) nullEmpty(jms.asText()) else null
+  }
+
+  private def getPointer(jpmsg : JsonNode) : String = {
+    val inst = jpmsg.findValue("instance")
+    if (inst != null) {
+      val p = inst.findValue("pointer")
+      if (p != null) {
+        nullEmpty(p.asText())
+      } else {
+        null
+      }
+    } else {
+      null
     }
   }
 }
