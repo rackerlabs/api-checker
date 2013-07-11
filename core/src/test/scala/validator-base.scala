@@ -19,7 +19,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.util.TokenBuffer
+import com.fasterxml.jackson.databind.JsonNode
 
 import scala.collection.mutable.HashMap
 
@@ -383,7 +383,7 @@ class BaseValidatorSuite extends FunSuite {
             req.setAttribute (PARSED_XML, xmlParser.parse(new ByteArrayInputStream(content.getBytes())))
           case "application/json" =>
             jsonParser = ObjectMapperPool.borrowParser
-            req.setAttribute (PARSED_JSON, jsonParser.readValue(content,classOf[TokenBuffer]))
+            req.setAttribute (PARSED_JSON, jsonParser.readValue(content,classOf[JsonNode]))
         }
       }
     } finally {

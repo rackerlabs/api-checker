@@ -10,8 +10,18 @@ import javax.xml.transform.stream.StreamSource
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.JsonNode
+
+import com.github.fge.jsonschema.report.LogLevel
+import com.github.fge.jsonschema.report.ListReportProvider
+
+import com.github.fge.jsonschema.main.JsonSchemaFactory
+
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.BaseValidatorSuite
+
+import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
 
 import javax.xml.validation._
 import javax.xml.transform.stream._
@@ -24,11 +34,14 @@ class BaseStepSuite extends BaseValidatorSuite {
 
   private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
 
+  private val jsonSchemaFactory = JsonSchemaFactory.newBuilder.setReportProvider(new ListReportProvider(LogLevel.WARNING, LogLevel.ERROR)).freeze
+
   val xsl1Factory = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
   val xsl2Factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
 
   val xsl1Templates = xsl1Factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/testXSL1.xsl")))
   val xsl2Templates = xsl2Factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/testXSL2.xsl")))
+
 
   //
   //  Enable CTA full XPath2.0 checking in XSD 1.1
@@ -39,6 +52,20 @@ class BaseStepSuite extends BaseValidatorSuite {
   //  Test schema
   //
   val testSchema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/test-urlxsd.xsd")))
+
+  //
+  // Test json schema
+  //
+  val testJSONSchema = {
+    var om : ObjectMapper = null
+    try {
+      om = ObjectMapperPool.borrowParser
+      val jsonGrammar = om.readValue(getClass().getResource("/jsonSchema/test.json"), classOf[JsonNode])
+      jsonSchemaFactory.getJsonSchema(jsonGrammar)
+    } finally {
+      if (om != null) ObjectMapperPool.returnParser(om)
+    }
+  }
 
   //cd
   // Test simple types

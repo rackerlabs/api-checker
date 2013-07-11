@@ -413,8 +413,8 @@
    6. [X] Add support for schema check in the builder
    7. [X] Adjust error reporting?
    8. [X] Use JSON Node instead of token buffer?
-   9. [ ] Tests [0/6]
-      1. [ ] States
+   9. [-] Tests [1/6]
+      1. [X] States
       2. [ ] Checker Tests
       3. [ ] Step Builder Tests
       4. [ ] WADL Validater Tests

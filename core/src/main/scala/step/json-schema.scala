@@ -27,7 +27,7 @@ class JSONSchema(id : String, label : String, schema : JsonSchema, next : Array[
           if (fmsg != null) fmsg else pe.getProcessingMessage().toString()
         }
 
-        req.contentError = new Exception(message, pe)
+        req.contentError = new ProcessingException(message, pe)
         -1
       }
       case e : Exception => {
