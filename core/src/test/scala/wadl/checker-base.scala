@@ -2,6 +2,7 @@ package com.rackspace.com.papi.components.checker.wadl
 
 import scala.xml._
 
+import java.io.File
 import java.io.ByteArrayOutputStream
 
 import javax.xml.transform._
@@ -16,6 +17,8 @@ import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
 import com.rackspace.com.papi.components.checker.Config
 
 class BaseCheckerSpec extends BaseWADLSpec {
+  val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString
+
   val builder = new WADLCheckerBuilder(wadl)
 
   val stdConfig = new Config
@@ -166,6 +169,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def WellJSON : (NodeSeq) => NodeSeq = stepsWithType(_, "WELL_JSON")
   def XSD : (NodeSeq) => NodeSeq = stepsWithType(_, "XSD")
   def XSL : (NodeSeq) => NodeSeq = stepsWithType(_, "XSL")
+  def JSONSchema : (NodeSeq) => NodeSeq = stepsWithType(_, "JSON_SCHEMA")
   def ContentFail : (NodeSeq) => NodeSeq = stepsWithType(_, "CONTENT_FAIL")
   def URL(url : String) : (NodeSeq) => NodeSeq = stepsWithURLMatch(_, url)
   def URLXSD(url : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatch(_, url)

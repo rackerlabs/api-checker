@@ -413,13 +413,12 @@
    6. [X] Add support for schema check in the builder
    7. [X] Adjust error reporting?
    8. [X] Use JSON Node instead of token buffer?
-   9. [-] Tests [1/6]
+   9. [-] Tests [3/5]
       1. [X] States
-      2. [ ] Checker Tests
-      3. [ ] Step Builder Tests
-      4. [ ] WADL Validater Tests
+      2. [X] Checker Tests
+      3. [X] Tests when no grammar is available
+      4. [ ] WADL Validator Tests
       5. [ ] validator pool tests
-      6. [ ] Tests when no grammar is available
 ** TODO Header Enhancements [3/4]
    1. [X] Multiple header checks with the same name [4/4]
       1. [X] Allow checks in steps via enumeration
