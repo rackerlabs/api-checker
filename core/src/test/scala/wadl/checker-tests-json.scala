@@ -193,6 +193,101 @@ class WADLCheckerJsonSpec extends BaseCheckerSpec {
       assert (checker, "count(/chk:checker/chk:step[@type='JSON_SCHEMA']) = 2")
     }
 
+    scenario("The WADL contains PUT and POST operations accepting JSON which must validate against an JSON Schema (inline schema)") {
+      Given ("a WADL that contains multiple PUT and POST operation with JSON that must validate against an JSON Schema")
+      val grammar = """
+    {
+        "title": "Example Schema",
+        "type": "object",
+        "properties": {
+            "firstName": {
+			       "type": "string"
+		      },
+		      "lastName": {
+			       "type": "string"
+		      },
+		      "age": {
+			       "description": "Age in years",
+			       "type": "integer",
+			       "minimum": 0
+		      }
+	     },
+	     "required": ["firstName", "lastName"]
+    }
+
+      """
+      val inWADL = (localWADLURI,
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:json="http://json-schema.org/schema#">
+        <grammars>
+          <json:schema>
+             { grammar }
+          </json:schema>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
+        </resources>
+    </application>)
+      When("the wadl is translated")
+      val config = TestConfig(removeDups = false, saxoneeValidation = false,
+                              checkXSDGrammar = false,  checkElements = false,
+                              xpathVersion = 1, checkPlainParams = false,
+                              doXSDGrammarTransform = false, enablePreProcessExtension = false,
+                              xslEngine = "XalanC", joinXPathChecks = false,
+                              checkHeaders = false, enableIgnoreXSDExtension = false,
+                              enableMessageExtension= false, enableIgnoreJSONSchemaExtension = false,
+                              checkJSONGrammar = true, wellFormed = true)
+      val checker = builder.build (inWADL, config)
+      reqTypeAssertions(checker)
+      wellFormedAssertions(checker)
+      jsonAssertions(checker)
+      countAssertions(checker)
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 0")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 4")
+      assert (checker, "count(/chk:checker/chk:step[@type='JSON_SCHEMA']) = 2")
+    }
+
     scenario("The WADL contains PUT and POST operations accepting JSON which must validate against an JSON Schema (Well formed not specified)") {
       Given ("a WADL that contains multiple PUT and POST operation with JSON that must validate against an JSON Schema")
       val inWADL = (localWADLURI,
