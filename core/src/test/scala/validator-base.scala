@@ -535,7 +535,7 @@ class BaseValidatorSuite extends FunSuite {
 
   }
 
-  def assertResultFailed(f : => Any, code : Int) : Unit = {
+  def assertResultFailed(f : => Any, code : Int) : ErrorResult = {
     var result : ErrorResult = null
     assertResultFailed(f).get.result match {
       case other : ErrorResult =>
@@ -545,9 +545,10 @@ class BaseValidatorSuite extends FunSuite {
     if (result.code != code) {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
+    return result
   }
 
-  def assertResultFailed(f : => Any, code : Int, message : String) : Unit = {
+  def assertResultFailed(f : => Any, code : Int, message : String) : ErrorResult = {
     var result : ErrorResult = null
     assertResultFailed(f).get.result match {
       case other : ErrorResult =>
@@ -560,9 +561,10 @@ class BaseValidatorSuite extends FunSuite {
     if (result.message != message) {
       throw new TestFailedException(Some("Expected error message '"+message+"' but got '"+result.message+"'"), None, 4)
     }
+    return result
   }
 
-  def assertResultFailed(f : => Any, code : Int, message : List[String]) : Unit = {
+  def assertResultFailed(f : => Any, code : Int, message : List[String]) : ErrorResult = {
     var result : ErrorResult = null
     assertResultFailed(f).get.result match {
       case other : ErrorResult =>
@@ -577,9 +579,10 @@ class BaseValidatorSuite extends FunSuite {
         throw new TestFailedException(Some("Expected error string '"+m+"' in the result message, but it didn't have one. Actual result message: '"+result.message+"'"), None, 4)
       }
     })
+    return result
   }
 
-  def assertResultFailed(f : => Any, code : Int, headers : Map[String, String]) : Unit = {
+  def assertResultFailed(f : => Any, code : Int, headers : Map[String, String]) : ErrorResult = {
     var result : ErrorResult = null
     assertResultFailed(f).get.result match {
       case other : ErrorResult =>
@@ -598,5 +601,6 @@ class BaseValidatorSuite extends FunSuite {
         throw new TestFailedException(Some("Expected result header "+k+" to match value '"+v+"' but instead got '"+result.headers.get(k)+"'"), None, 4)
       }
     })
+    return result
   }
 }
