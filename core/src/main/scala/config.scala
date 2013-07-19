@@ -109,6 +109,11 @@ class Config {
   @BeanProperty var doXSDGrammarTransform : Boolean = false
 
   //
+  //  Check all JSON against JSON Schema Grammars
+  //
+  @BeanProperty var checkJSONGrammar : Boolean = false
+
+  //
   //  Ensure elemets are correct
   //
   @BeanProperty var checkElements : Boolean = false
@@ -146,6 +151,11 @@ class Config {
   //  Enable ignore XSD extension
   //
   @BeanProperty var enableIgnoreXSDExtension : Boolean = true
+
+  //
+  //  Enable ignore JSON Schema extension
+  //
+  @BeanProperty var enableIgnoreJSONSchemaExtension : Boolean = true
 
   //
   //  Enable message extension

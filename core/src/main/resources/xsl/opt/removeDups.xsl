@@ -396,7 +396,7 @@
                 </xsl:for-each-group>
             </xsl:for-each-group>
             <!-- Connected nodes with no match -->
-            <xsl:for-each-group select="$checker//check:step[@type='WELL_XML' or @type='WELL_JSON']" group-by="@type">
+            <xsl:for-each-group select="$checker//check:step[@type=('WELL_XML','WELL_JSON','JSON_SCHEMA')]" group-by="@type">
                 <xsl:for-each-group select="current-group()" group-by="@next">
                     <xsl:if test="count(current-group()) > 1">
                         <group>

@@ -26,6 +26,9 @@ object Wadl2Checker {
   val xsdCheck = parser.flag[Boolean] (List("x", "xsd"),
                                          "Add checks to ensure that XML validates against XSD grammar Default: false")
 
+  val jsonCheck = parser.flag[Boolean] (List("J", "json"),
+                                         "Add checks to ensure that JSON validates against JSON Schema grammar Default: false")
+
   val element = parser.flag[Boolean] (List("l", "element"),
                                          "Add checks to ensure that XML requests use the correct element : false")
 
@@ -40,6 +43,9 @@ object Wadl2Checker {
 
   val ignoreXSD  = parser.flag[Boolean] (List("i", "disable-ignore-xsd-ext"),
                                          "Disable Ignore XSD  extension : false")
+
+  val ignoreJSON  = parser.flag[Boolean] (List("I", "disable-ignore-json-ext"),
+                                          "Disable Ignore JSON Schema  extension : false")
 
   val message  = parser.flag[Boolean] (List("m", "disable-message-ext"),
                                          "Disable Message extension : false")
@@ -99,12 +105,14 @@ object Wadl2Checker {
       c.validateChecker = validate.value.getOrElse(false)
       c.checkWellFormed = wellFormed.value.getOrElse(false)
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
+      c.checkJSONGrammar = jsonCheck.value.getOrElse(false)
       c.checkElements = element.value.getOrElse(false)
       c.checkPlainParams = plainParam.value.getOrElse(false)
       c.enablePreProcessExtension = !(preProc.value.getOrElse(false))
       c.joinXPathChecks = joinXPaths.value.getOrElse(false)
       c.checkHeaders = header.value.getOrElse(false)
       c.enableIgnoreXSDExtension = !(ignoreXSD.value.getOrElse(false))
+      c.enableIgnoreJSONSchemaExtension = !(ignoreJSON.value.getOrElse(false))
       c.enableMessageExtension = !(message.value.getOrElse(false))
       c.xpathVersion = xpathVersion.value.getOrElse(1)
 

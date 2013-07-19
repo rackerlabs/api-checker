@@ -6,7 +6,7 @@ import com.rackspace.com.papi.components.checker.util.ObjectMapperPool.returnPar
 import com.rackspace.com.papi.components.checker.servlet._
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.util.TokenBuffer
+import com.fasterxml.jackson.databind.JsonNode
 
 import javax.servlet.FilterChain
 
@@ -20,7 +20,7 @@ class WellFormedJSON(id : String, label : String, next : Array[Step]) extends Co
     try {
       if (req.parsedJSON == null) {
         parser = borrowParser
-        req.parsedJSON = parser.readValue(req.getInputStream(),classOf[TokenBuffer])
+        req.parsedJSON = parser.readValue(req.getInputStream(),classOf[JsonNode])
       }
       ret = uriLevel
     } catch {
