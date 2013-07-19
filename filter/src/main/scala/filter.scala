@@ -58,6 +58,8 @@ class ValidatorFilter extends Filter {
     conf.joinXPathChecks = true
     conf.enableIgnoreXSDExtension = true
     conf.xslEngine = "XalanC"
+    conf.checkJSONGrammar = true
+    conf.enableIgnoreJSONSchemaExtension = true
 
     validator = Validator("Test Validator",new SAXSource(new InputSource(wadlRef)), conf)
   }

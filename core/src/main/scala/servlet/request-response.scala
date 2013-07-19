@@ -17,7 +17,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.util.TokenBuffer
+import com.fasterxml.jackson.databind.JsonNode
 import org.w3c.dom.Document
 
 import java.util.Enumeration
@@ -51,8 +51,8 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   def parsedXML : Document = request.getAttribute(PARSED_XML).asInstanceOf[Document]
   def parsedXML_= (doc : Document):Unit = request.setAttribute (PARSED_XML, doc)
 
-  def parsedJSON : TokenBuffer = request.getAttribute(PARSED_JSON).asInstanceOf[TokenBuffer]
-  def parsedJSON_= (tb : TokenBuffer):Unit = request.setAttribute (PARSED_JSON, tb)
+  def parsedJSON : JsonNode = request.getAttribute(PARSED_JSON).asInstanceOf[JsonNode]
+  def parsedJSON_= (tb : JsonNode):Unit = request.setAttribute (PARSED_JSON, tb)
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
   def contentError_= (e : Exception):Unit = {

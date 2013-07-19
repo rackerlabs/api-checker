@@ -9230,5 +9230,4 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 5")
   }
-
 }

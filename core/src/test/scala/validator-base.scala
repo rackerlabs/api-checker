@@ -19,7 +19,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.util.TokenBuffer
+import com.fasterxml.jackson.databind.JsonNode
 
 import scala.collection.mutable.HashMap
 
@@ -109,6 +109,43 @@ object TestConfig {
   val assertHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(), 
                                                                     new AssertResultHandler(),
                                                                     new ServletResultHandler()))
+
+
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
+             enablePreProcessExtension : Boolean, xslEngine : String,
+             joinXPathChecks : Boolean, checkHeaders : Boolean,
+             enableIgnoreXSDExtension : Boolean, enableMessageExtension : Boolean,
+             checkJSONGrammar : Boolean, enableIgnoreJSONSchemaExtension : Boolean) : Config = {
+
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
+                       xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension,
+                       xslEngine, joinXPathChecks, checkHeaders, enableIgnoreXSDExtension, enableMessageExtension,
+                       checkJSONGrammar)
+
+    config.enableIgnoreJSONSchemaExtension = enableIgnoreJSONSchemaExtension
+
+    config
+  }
+
+
+  def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
+             checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
+             checkPlainParams : Boolean, doXSDGrammarTransform : Boolean,
+             enablePreProcessExtension : Boolean, xslEngine : String,
+             joinXPathChecks : Boolean, checkHeaders : Boolean,
+             enableIgnoreXSDExtension : Boolean, enableMessageExtension : Boolean,
+             checkJSONGrammar : Boolean) : Config = {
+
+    val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
+                       xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension,
+                       xslEngine, joinXPathChecks, checkHeaders, enableIgnoreXSDExtension, enableMessageExtension)
+
+    config.checkJSONGrammar = checkJSONGrammar
+
+    config
+  }
 
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
              checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int,
@@ -293,6 +330,22 @@ class BaseValidatorSuite extends FunSuite {
                         stepType="ACCEPT"
                         even="22"/>
 
+  val goodJSON_Schema1 = """
+    {
+         "firstName" : "Jorge",
+         "lastName" : "Williams",
+         "age" : 38
+    }
+  """
+
+  val goodJSON_Schema2 = """
+    {
+         "firstName" : "Rachel",
+         "lastName" : "Kraft",
+         "age" : 32
+    }
+  """
+
   val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString
 
 
@@ -383,7 +436,7 @@ class BaseValidatorSuite extends FunSuite {
             req.setAttribute (PARSED_XML, xmlParser.parse(new ByteArrayInputStream(content.getBytes())))
           case "application/json" =>
             jsonParser = ObjectMapperPool.borrowParser
-            req.setAttribute (PARSED_JSON, jsonParser.readValue(content,classOf[TokenBuffer]))
+            req.setAttribute (PARSED_JSON, jsonParser.readValue(content,classOf[JsonNode]))
         }
       }
     } finally {
