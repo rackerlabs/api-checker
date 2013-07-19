@@ -330,6 +330,22 @@ class BaseValidatorSuite extends FunSuite {
                         stepType="ACCEPT"
                         even="22"/>
 
+  val goodJSON_Schema1 = """
+    {
+         "firstName" : "Jorge",
+         "lastName" : "Williams",
+         "age" : 38
+    }
+  """
+
+  val goodJSON_Schema2 = """
+    {
+         "firstName" : "Rachel",
+         "lastName" : "Kraft",
+         "age" : 32
+    }
+  """
+
   val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString
 
 
