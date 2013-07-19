@@ -4378,6 +4378,37 @@ class WADLCheckerSpec extends BaseCheckerSpec {
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), ContentFail)
   }
 
+  scenario("The WADL contains a POST  operation with plain params but a missing mediaType, should validaate but not create XPaths") {
+    Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="POST">
+                  <request>
+                      <representation element="tst:a">
+                         <param name="id" style="plain" path="/tst:a/@id" required="true"/>
+                         <param name="stepType" style="plain" path="/tst:a/@stepType" required="true"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1, true))
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 0")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 0")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 0")
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"),  Accept)
+  }
+
   scenario("The WADL contains a POST  operation accepting xml which must validate against an XSD with elements specified and multiple required plain params (rax:code extension)") {
     Given ("a WADL that contains a POST operation with XML that must validate against an XSD with elemenst specified and multiple plain params")
     val inWADL =

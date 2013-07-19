@@ -246,7 +246,7 @@
         <xsl:apply-templates mode="ns"/>
     </xsl:template>
 
-    <xsl:template match="wadl:representation[check:isXML(@mediaType)]/wadl:param[(@style = 'plain') and @path]" priority="2" mode="ns">
+    <xsl:template match="wadl:representation[@mediaType and check:isXML(@mediaType)]/wadl:param[(@style = 'plain') and @path]" priority="2" mode="ns">
         <!--
             If we have an XPath param in an XML representation, then
             copy all namespace nodes in that param. And enure that we
