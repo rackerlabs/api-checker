@@ -4,19 +4,19 @@
     <parent>
         <groupId>com.rackspace.papi.components</groupId>
         <artifactId>api-checker</artifactId>
-        <version>1.0.10-SNAPSHOT</version>
+        <version>1.0.10</version>
     </parent>
 
     <groupId>com.rackspace.papi.components.api-checker</groupId>
     <artifactId>test-app</artifactId>
-    <version>1.0.10-SNAPSHOT</version>
+    <version>1.0.10</version>
     <packaging>war</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.rackspace.papi.components.api-checker</groupId>
             <artifactId>filter</artifactId>
-            <version>1.0.10-SNAPSHOT</version>
+            <version>1.0.10</version>
         </dependency>
 
     </dependencies>
