@@ -10,6 +10,10 @@ processed as if it were an XML media type
 1. WADL-Tools updated to 1.0.15 which addresses some issues when
 handling namespaces in X-PATHs
 
+## Release 1.0.9.1 (2013-08-22) ##
+1. WADL-Tools updated to 1.0.15 which addresses some issues when
+handling namespaces in X-PATHs
+
 ## Release 1.0.9 (2013-07-08) ##
 
 1. Configuration has new XSD-Engine setting which makes clear which XSD
