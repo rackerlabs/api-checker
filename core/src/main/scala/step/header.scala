@@ -4,6 +4,7 @@ import scala.util.matching.Regex
 
 import com.rackspace.com.papi.components.checker.servlet._
 import javax.servlet.FilterChain
+import com.rackspace.com.papi.components.checker.util.HeaderUtil._
 
 import scala.collection.JavaConversions._
 
@@ -31,7 +32,7 @@ class Header(id : String, label : String, val name : String, val value : Regex,
   }
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    val headers : Iterator[String] = req.getHeaders(name)
+    val headers : Iterator[String] = getHeaders(req, name)
 
     //
     //  If there exists at least one header matching the the name AND
