@@ -103,24 +103,6 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       super.getReader
     }
   }
-
-  override def getHeader (name : String) = {
-    val value = super.getHeader(name)
-    value match {
-      case null => null
-      case _ =>  name.split(",")(0).trim
-    }
-  }
-
-  override def getHeaders (name : String) : Enumeration[String] = {
-    val headers = super.getHeaders(name)
-    headers match {
-      case null => null
-      case _ => var list : List[String] = List()
-                headers.foreach(i => list = list ++ i.split(",").map(j => j.trim))
-                list.iterator
-    }
-  }
 }
 
 //

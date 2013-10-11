@@ -4,6 +4,8 @@ import javax.xml.namespace.QName
 import javax.xml.validation.Schema
 
 import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.util.HeaderUtil._
+
 import javax.servlet.FilterChain
 
 import org.xml.sax.SAXParseException
@@ -36,7 +38,7 @@ class HeaderXSDAny(id : String, label : String, val name : String, val value : Q
   val xsd = new XSDStringValidator(value, schema, id)
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    val headers : Iterator[String] = req.getHeaders(name)
+    val headers : Iterator[String] = getHeaders(req, name)
     var last_err : Option[SAXParseException] = None
 
     //
