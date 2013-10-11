@@ -58,8 +58,8 @@
         <codec.version>1.7</codec.version>
         <xalan.version>2.7.1</xalan.version>
         <metrics-scala.version>2.2.0</metrics-scala.version>
-        <jackson-databind.version>2.1.5</jackson-databind.version>
-        <json-schema-validator.version>2.1.6</json-schema-validator.version>
+        <jackson-databind.version>2.2.3</jackson-databind.version>
+        <json-schema-validator.version>2.1.7</json-schema-validator.version>
     </properties>
 
     <dependencies>
