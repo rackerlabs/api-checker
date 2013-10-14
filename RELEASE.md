@@ -6,7 +6,7 @@
 headers on commas by default.
 1. Updated Dependencies
    1. jackson-databind: 2.1.5 → 2.2.3
-   1. json-schema-validator: 2.1.6 → 2.1.7`
+   1. json-schema-validator: 2.1.6 → 2.1.7
 
 ## Release 1.0.10 (2013-08-16) ##
 
