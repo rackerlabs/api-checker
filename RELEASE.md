@@ -1,5 +1,13 @@
 # Releases #
 
+## Release 1.0.11 (2013-10-14) ##
+
+1. Added utility class for headers.  Modified request wrapper to not split
+headers on commas by default.
+1. Updated Dependencies
+   1. jackson-databind: 2.1.5 → 2.2.3
+   1. json-schema-validator: 2.1.6 → 2.1.7`
+
 ## Release 1.0.10 (2013-08-16) ##
 
 1. Initial support for JSON Schema. Currently a single JSON schema can
