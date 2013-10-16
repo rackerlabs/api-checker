@@ -37,6 +37,7 @@ object BuilderXSLParams {
   val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
   val ENABLE_XSD_IGNORE_EXT  = "enableIgnoreXSDExtension"
   val ENABLE_JSON_IGNORE_EXT = "enableIgnoreJSONSchemaExtension"
+  val ENABLE_RAX_ROLES_EXT = "enableRaxRolesExtension"
   val ENABLE_MESSAGE_EXT    = "enableMessageExtension"
   val ENABLE_HEADER         = "enableHeaderCheck"
 }
@@ -104,6 +105,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_PRE_PROCESS_EXT, c.enablePreProcessExtension)
       buildHandler.getTransformer().setParameter (ENABLE_XSD_IGNORE_EXT, c.enableIgnoreXSDExtension)
       buildHandler.getTransformer().setParameter (ENABLE_MESSAGE_EXT, c.enableMessageExtension)
+      buildHandler.getTransformer().setParameter (ENABLE_RAX_ROLES_EXT, c.enableRaxRolesExtension)
       buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_SCHEMA, c.checkJSONGrammar)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
