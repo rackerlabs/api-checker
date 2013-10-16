@@ -491,6 +491,27 @@
 ** TODO Expand checker to dot conversion in builder
 ** TODO Bring checker to dot conversion to cli
 ** TODO Better XSD tests
+** TODO Rax-Roles support
+   1. [ ] Update the config to account for the rax:roles flag
+   2. [ ] Update the CLI to account for rax:roles (helpful in debugging during dev)
+   3. [ ] Pass the flag to WADL->Checker format XSL
+   4. [ ] Add a step in the checker format XSL to create header params from the rax:roles attribute
+   5. [ ] Lots o' TESTs
+         Setup: rax-roles extension flags on
+
+         1. rax-roles at the resource level
+         2. rax-roles at the method level
+         3. rax-roles including #all
+         4. rax-roles with multiple values
+         5. no rax-roles anywhere in wadl
+         6. no rax-roles on specified resource/method, rax-roles elsewhere
+
+         7. rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
+
+         Setup: rax-roles extension flag off
+
+         1. rax-roles does not influence state machine
+
 * Tests 10 Threads 5000 count
 |--------+---------+--------+----------------+-----------------+----------------------------------------------+----------------------------------------------|
 | Type   | /images | /image | /images/detail | /images/details | /images/de31d986-a7be-11e1-994a-bba4de7e4604 | /images/de31d986-a7be-11e1-994a-bba4de7e460z |
