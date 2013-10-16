@@ -27,14 +27,17 @@
 
     <xsl:template match="wadl:request">
         <xsl:param name="roles" as="xsd:string*" select="()"/>
-        <xsl:if test="count($roles) != 0">
-            <xsl:call-template name="generateRoles">
-                <xsl:with-param name="roles" select="$roles"/>
-            </xsl:call-template>
-        </xsl:if>
-        <xsl:apply-templates select="node()">
-            <xsl:with-param name="roles" select="$roles"/>
-        </xsl:apply-templates>
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:if test="count($roles) != 0">
+               <xsl:call-template name="generateRoles">
+                  <xsl:with-param name="roles" select="$roles"/>
+               </xsl:call-template>
+            </xsl:if>
+           <xsl:apply-templates select="node()">
+              <xsl:with-param name="roles" select="$roles"/>
+           </xsl:apply-templates>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template name="generateRoles">
