@@ -496,6 +496,10 @@
    2. [X] Update the CLI to account for rax:roles (helpful in debugging during dev)
    3. [X] Pass the flag to WADL->Checker format XSL
    4. [ ] Add a step in the checker format XSL to create header params from the rax:roles attribute
+          [X] Process the rax-roles enabled parameters
+          [ ] Add pre-process stage
+          [ ] Inject header params for methods that contain rax-role
+
    5. [ ] Lots o' TESTs
          Setup: rax-roles extension flags on
 

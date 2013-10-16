@@ -81,6 +81,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
 
+
+  val raxRolesTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxRoles.xsl").toString))
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/builder.xsl").toString))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/removeDups.xsl").toString))
   val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/commonJoin.xsl").toString))
@@ -95,6 +97,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
     }
 
     try {
+      val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
       val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
 
       buildHandler.getTransformer().setParameter (ENABLE_WELL_FORM, c.checkWellFormed)
@@ -111,6 +114,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
 
       var output = out;
+      raxRolesHandler.setResult(new SAXResult(buildHandler))
 
       if (c.validateChecker) {
         val outHandler = wadl.saxTransformerFactory.newTransformerHandler();
@@ -144,7 +148,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       } else {
         buildHandler.setResult (output)
       }
-      wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
+      wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
     } catch {
       case e => throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
     }
