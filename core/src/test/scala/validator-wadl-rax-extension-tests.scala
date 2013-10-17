@@ -29,14 +29,14 @@ trait RaxRolesBehaviors {
   def chain: FilterChain = mock(classOf[FilterChain])
 
   def allowAccess(validator: => Validator, method: => String, path: => String, roles: => List[String]) {
-    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-Roles" -> roles))
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles))
     it should "succeed when " +method+ " on " +path+ " and X-Roles has " + roles + "" in {
       validator.validate(request, response, chain)
     }
   }
 
   def preventAccess(validator: => Validator, method: => String, path: => String, roles: => List[String]) {
-    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-Roles" -> roles))
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles))
     it should "fail with a 403 when " + method + " on " + path + " and X-Roles has " + roles + "" in {
       base.assertResultFailed(validator.validate(request, response, chain), 403)
     }
