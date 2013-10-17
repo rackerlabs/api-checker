@@ -1,10 +1,5 @@
 package com.rackspace.com.papi.components.checker
 
-import java.util.Date
-import java.util.UUID
-import java.math.BigInteger
-import scala.util.Random
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -15,55 +10,51 @@ import com.rackspace.cloud.api.wadl.Converters._
 import Converters._
 
 import org.w3c.dom.Document
+import org.scalatest.FlatSpec
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import javax.servlet.FilterChain
+import java.io.File
+import org.mockito.Mockito._
+
+
+trait RaxRolesBehaviors {
+  this: FlatSpec =>
+
+  def base: BaseValidatorSuite = new BaseValidatorSuite()
+
+  val xml = base.goodXML_XSD2
+
+  def response: HttpServletResponse = mock(classOf[HttpServletResponse]);
+
+  def chain: FilterChain = mock(classOf[FilterChain])
+
+  def allowAccess(validator: => Validator, method: => String, path: => String, roles: => List[String]) {
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-Roles" -> roles))
+    it should "succeed when " +method+ " on " +path+ " and X-Roles has " + roles + "" in {
+      validator.validate(request, response, chain)
+    }
+  }
+
+  def preventAccess(validator: => Validator, method: => String, path: => String, roles: => List[String]) {
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-Roles" -> roles))
+    it should "fail with a 403 when " + method + " on " + path + " and X-Roles has " + roles + "" in {
+      base.assertResultFailed(validator.validate(request, response, chain), 403)
+    }
+  }
+
+  def preventAccessWhenNoXRoles(validator: => Validator, method: => String, path: => String) {
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false)
+    it should "fail with a 403 when " + method + " on " + path + " and no X-Roles header" in {
+      base.assertResultFailed(validator.validate(request, response, chain), 403)
+    }
+  }
+}
 
 @RunWith(classOf[JUnitRunner])
-class ValidatorWADLRaxExtensionSuite extends BaseValidatorSuite {
+class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
 
-  //
-  // validator_RolesAtResource allows:
-  //
-  // PUT /a when header X-Roles includes foo:creator
-  // POST /a when header X-Roles includes foo:creator
-  //
-  // The validator checks that the request contains the
-  // appropriate role to access the resource.  You can PUT an a
-  // in /a and POST an e in /a if you have the X-Roles with a value
-  // that includes "foo:creator"
-  //
-  val validator_RolesAtResource = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
-                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
-                   xmlns:rax="http://docs.rackspace.com/api">
-        <resources base="https://test.api.openstack.com">
-           <resource path="/a" rax:roles="foo:creator">
-               <method name="PUT">
-                  <request>
-                      <representation mediaType="application/xml"/>
-                  </request>
-               </method>
-               <method name="POST">
-                  <request>
-                      <representation mediaType="application/xml"/>
-                  </request>
-               </method>
-           </resource>
-        </resources>
-    </application>)
-    , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
-
-  //
-  // validator_RolesAtMethod allows:
-  //
-  // POST /a when header X-Roles includes foo:creator
-  // GET /a when header X-Roles includes foo:observer
-  //
-  // The validator checks that the request contains the
-  // appropriate role to access the resource.  You can GET and
-  // POST to /a only if you have an X-Roles header with the
-  // expected value
-  //
-  val validator_RolesAtMethod = Validator((localWADLURI,
+  val localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
+  val validator = Validator((localWADLURI,
     <application xmlns="http://wadl.dev.java.net/2009/02"
                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                  xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
@@ -85,29 +76,52 @@ class ValidatorWADLRaxExtensionSuite extends BaseValidatorSuite {
     </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
+  "A validator (with WADL containing roles at method level)"
+  it should behave like allowAccess(validator, "GET", "/a", List("foo:observer"))
+  it should behave like allowAccess(validator, "POST", "/a", List("foo:creator"))
 
-  test ("POST on /a should succeed on validator_RolesAtMethod with X-Roles header of foo:creator") {
-    validator_RolesAtMethod.validate(request("POST","/a","application/xml", goodXML_XSD2, false, Map("X-Roles"->List("foo:creator"))),response,chain)
-  }
+  it should behave like preventAccess(validator, "POST", "/a", List("foo:observer"))
+  it should behave like preventAccess(validator, "GET", "/a", List("foo:creator"))
 
-  test ("GET on /a should succeed on validator_RolesAtMethod with X-Roles header of foo:observer") {
-    validator_RolesAtMethod.validate(request("GET","/a","application/xml", goodXML_XSD2, false, Map("X-Roles"->List("foo:observer"))),response,chain)
-  }
+  it should behave like preventAccessWhenNoXRoles(validator, "POST", "/a")
+  it should behave like preventAccessWhenNoXRoles(validator, "GET", "/a")
 
-  test ("POST on /a should fail with a 403, if X-Roles header does not contain foo:creator") {
-    assertResultFailed(validator_RolesAtMethod.validate(request("POST","/a","application/xml", goodXML_XSD2, false, Map("X-Roles"->List("foo:observer"))),response,chain), 403)
-  }
+}
 
-  test ("GET on /a should fail with a 403,  if X-Roles header does not contain foo:observer") {
-    assertResultFailed(validator_RolesAtMethod.validate(request("GET","/a","application/xml", goodXML_XSD2, false, Map("X-Roles"->List("foo:creator"))),response,chain), 403)
-  }
+@RunWith(classOf[JUnitRunner])
+class GivenAWadlWithRolesAtResourceLevel extends FlatSpec with RaxRolesBehaviors {
+  val localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
 
-  test ("POST on /a should fail with a 403, if X-Roles header isn't set") {
-    assertResultFailed(validator_RolesAtMethod.validate(request("POST","/a","application/xml", goodXML_XSD2, false),response,chain), 403)
-  }
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                 xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                 xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a" rax:roles="foo:creator">
+          <method name="POST">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="GET">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+        </resource>
+      </resources>
+    </application>)
+    , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
-  test ("GET on /a should fail with a 403, if X-Roles header isn't set") {
-    assertResultFailed(validator_RolesAtMethod.validate(request("POST","/a","application/xml", goodXML_XSD2, false),response,chain), 403)
-  }
+  "A validator (with WADL containing foo:creator role at resource level)"
+  it should behave like allowAccess(validator, "GET", "/a", List("foo:creator"))
+  it should behave like allowAccess(validator, "POST", "/a", List("foo:creator"))
+
+  it should behave like preventAccess(validator, "POST", "/a", List("foo:observer"))
+  it should behave like preventAccess(validator, "GET", "/a", List("foo:observer"))
+
+  it should behave like preventAccessWhenNoXRoles(validator, "POST", "/a")
+  it should behave like preventAccessWhenNoXRoles(validator, "GET", "/a")
 
 }
