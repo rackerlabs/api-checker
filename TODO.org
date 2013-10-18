@@ -507,14 +507,30 @@
          2. rax-roles at the method level
          3. rax-roles including #all
          4. rax-roles with multiple values
+
+         ASSUMPTION: Multiple values are treated as ORs, user must have one of the values.
+
+         QUESTION: PRODUCT/JORGE: Is this a correct assumption???
+
          5. no rax-roles anywhere in wadl
          6. no rax-roles on specified resource/method, rax-roles elsewhere
+
+            QUESTION: What should happen when no rax-roles on the resource/method, and no rax-roles
+            at a higher level that can be inherited.
+
+            ASSUMPTION: All access is allowed for that resource/method
 
          7. rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
 
          Setup: rax-roles extension flag off
 
          1. rax-roles does not influence state machine
+
+         QUESTION: Jorge: behavior when the role is at resource level (ex observer), and role at method level: (ex creator),
+         does the role at resource level get applied in addition to method level?  Does the role at method level override the
+         role from the resource level???  Should the roles be AND'd to the roles at the method level???
+
+
 
 * Tests 10 Threads 5000 count
 |--------+---------+--------+----------------+-----------------+----------------------------------------------+----------------------------------------------|

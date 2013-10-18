@@ -9,7 +9,6 @@ import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import com.rackspace.cloud.api.wadl.Converters._
 import Converters._
 
-import org.w3c.dom.Document
 import org.scalatest.FlatSpec
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import javax.servlet.FilterChain
@@ -48,6 +47,13 @@ trait RaxRolesBehaviors {
       base.assertResultFailed(validator.validate(request, response, chain), 403)
     }
   }
+
+  def allowAccessWhenNoXRoles(validator: => Validator, method: => String, path: => String) {
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false)
+    it should "succeed when " +method+ " on " +path+ " and no X-Roles" in {
+      validator.validate(request, response, chain)
+    }
+  }
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -71,21 +77,67 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
               <representation mediaType="application/xml"/>
             </request>
           </method>
+          <method name="PUT">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="DELETE" rax:roles="foo:observer foo:creator">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="PATCH" rax:roles="foo:observer foo:creator">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
         </resource>
       </resources>
     </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
-  "A validator (with WADL containing roles at method level)"
+  // GET on /a requires foo:observer role
   it should behave like allowAccess(validator, "GET", "/a", List("foo:observer"))
-  it should behave like allowAccess(validator, "POST", "/a", List("foo:creator"))
-
-  it should behave like preventAccess(validator, "POST", "/a", List("foo:observer"))
+  it should behave like allowAccess(validator, "GET", "/a", List("foo:observer", "foo:bar"))
+  it should behave like preventAccess(validator, "GET", "/a", List("foo:bar"))
+  it should behave like preventAccess(validator, "GET", "/a", List("foo:bar", "foo:creator"))
   it should behave like preventAccess(validator, "GET", "/a", List("foo:creator"))
-
-  it should behave like preventAccessWhenNoXRoles(validator, "POST", "/a")
   it should behave like preventAccessWhenNoXRoles(validator, "GET", "/a")
 
+  // POST on /a requires foo:creator role
+  it should behave like allowAccess(validator, "POST", "/a", List("foo:creator"))
+  it should behave like allowAccess(validator, "POST", "/a", List("foo:bar", "foo:creator"))
+  it should behave like preventAccess(validator, "POST", "/a", List("foo:bar"))
+  it should behave like preventAccess(validator, "POST", "/a", List("foo:bar", "foo:observer"))
+  it should behave like preventAccess(validator, "POST", "/a", List("foo:observer"))
+  it should behave like preventAccessWhenNoXRoles(validator, "POST", "/a")
+
+  // PUT with no role, should allow all access
+  it should behave like allowAccess(validator, "PUT", "/a", List())
+  it should behave like allowAccess(validator, "PUT", "/a", List("foo:bar"))
+  it should behave like allowAccess(validator, "PUT", "/a", List("foo:observer", "foo:bar"))
+  it should behave like allowAccess(validator, "PUT", "/a", List("foo:bar", "foo:jawsome"))
+  it should behave like allowAccessWhenNoXRoles(validator, "PUT", "/a")
+
+  // DELETE has multiple roles, treated as ORs, not ANDs
+  it should behave like allowAccess(validator, "DELETE", "/a", List("foo:observer", "foo:bar"))
+  it should behave like allowAccess(validator, "DELETE", "/a", List("foo:creator", "foo:bar"))
+  it should behave like allowAccess(validator, "DELETE", "/a", List("foo:bar", "foo:creator"))
+  it should behave like allowAccess(validator, "DELETE", "/a", List("foo:observer", "foo:creator"))
+  it should behave like preventAccess(validator, "DELETE", "/a", List())
+  it should behave like preventAccess(validator, "DELETE", "/a", List("foo:bar"))
+  it should behave like preventAccess(validator, "DELETE", "/a", List("foo:bar", "foo:jawsome"))
+  it should behave like preventAccess(validator, "DELETE", "/a", List("observer", "creator"))
+
+  // FUTURE FEATURE???? PATCH has multiple roles, treated as ANDs, not ORs
+  //  it should behave like allowAccess(validator, "PATCH", "/a", List("foo:observer", "foo:creator"))
+  //  it should behave like preventAccess(validator, "PATCH", "/a", List())
+  //  it should behave like preventAccess(validator, "PATCH", "/a", List("foo:observer"))
+  //  it should behave like preventAccess(validator, "PATCH", "/a", List("foo:creator"))
+  //  it should behave like preventAccess(validator, "PATCH", "/a", List("foo:observer", "foo:bar"))
+  //  it should behave like preventAccess(validator, "PATCH", "/a", List("foo:creator", "foo:bar"))
+  //  it should behave like preventAccessWhenNoXRoles(validator, "PATCH", "/a")
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -114,14 +166,12 @@ class GivenAWadlWithRolesAtResourceLevel extends FlatSpec with RaxRolesBehaviors
     </application>)
     , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
 
-  "A validator (with WADL containing foo:creator role at resource level)"
+  // When a single value rax:roles at resource level but not at method level
   it should behave like allowAccess(validator, "GET", "/a", List("foo:creator"))
-  it should behave like allowAccess(validator, "POST", "/a", List("foo:creator"))
-
-  it should behave like preventAccess(validator, "POST", "/a", List("foo:observer"))
   it should behave like preventAccess(validator, "GET", "/a", List("foo:observer"))
-
-  it should behave like preventAccessWhenNoXRoles(validator, "POST", "/a")
   it should behave like preventAccessWhenNoXRoles(validator, "GET", "/a")
 
+  it should behave like allowAccess(validator, "POST", "/a", List("foo:creator"))
+  it should behave like preventAccess(validator, "POST", "/a", List("foo:observer"))
+  it should behave like preventAccessWhenNoXRoles(validator, "POST", "/a")
 }
