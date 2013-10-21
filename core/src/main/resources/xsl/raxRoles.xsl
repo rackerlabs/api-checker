@@ -8,19 +8,28 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="wadl:method[@rax:roles]">
-        <xsl:variable name="roles" as="xsd:string*" select="tokenize(@rax:roles,' ')"/>
+
+
+    <xsl:template match="wadl:method">
+        <xsl:param name="roles" as="xsd:string*" select="()"/>
+
+        <xsl:variable name="allRoles" as="xsd:string*">
+          <xsl:sequence select="$roles"/>
+          <xsl:if test="@rax:roles">
+              <xsl:sequence select="tokenize(@rax:roles,' ')"/>
+          </xsl:if>
+        </xsl:variable>
         <xsl:copy>
           <xsl:apply-templates select="@*"/>
           <xsl:if test="not(wadl:request)">
               <wadl:request>
                   <xsl:call-template name="generateRoles">
-                      <xsl:with-param name="roles" select="$roles"/>
+                      <xsl:with-param name="roles" select="$allRoles"/>
                   </xsl:call-template>
               </wadl:request>
           </xsl:if>
           <xsl:apply-templates select="node()">
-              <xsl:with-param name="roles" select="$roles"/>
+              <xsl:with-param name="roles" select="$allRoles"/>
           </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>

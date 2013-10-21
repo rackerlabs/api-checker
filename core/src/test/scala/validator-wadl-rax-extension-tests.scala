@@ -87,11 +87,6 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
               <representation mediaType="application/xml"/>
             </request>
           </method>
-          <method name="PATCH" rax:roles="foo:observer foo:creator">
-            <request>
-              <representation mediaType="application/xml"/>
-            </request>
-          </method>
         </resource>
       </resources>
     </application>)
@@ -129,15 +124,7 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
   it should behave like preventAccess(validator, "DELETE", "/a", List("foo:bar"))
   it should behave like preventAccess(validator, "DELETE", "/a", List("foo:bar", "foo:jawsome"))
   it should behave like preventAccess(validator, "DELETE", "/a", List("observer", "creator"))
-
-  // FUTURE FEATURE???? PATCH has multiple roles, treated as ANDs, not ORs
-  //  it should behave like allowAccess(validator, "PATCH", "/a", List("foo:observer", "foo:creator"))
-  //  it should behave like preventAccess(validator, "PATCH", "/a", List())
-  //  it should behave like preventAccess(validator, "PATCH", "/a", List("foo:observer"))
-  //  it should behave like preventAccess(validator, "PATCH", "/a", List("foo:creator"))
-  //  it should behave like preventAccess(validator, "PATCH", "/a", List("foo:observer", "foo:bar"))
-  //  it should behave like preventAccess(validator, "PATCH", "/a", List("foo:creator", "foo:bar"))
-  //  it should behave like preventAccessWhenNoXRoles(validator, "PATCH", "/a")
+  it should behave like preventAccessWhenNoXRoles(validator, "DELETE", "/a")
 }
 
 @RunWith(classOf[JUnitRunner])

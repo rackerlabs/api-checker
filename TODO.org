@@ -510,7 +510,7 @@
 
          ASSUMPTION: Multiple values are treated as ORs, user must have one of the values.
 
-         QUESTION: PRODUCT/JORGE: Is this a correct assumption???
+         QUESTION: PRODUCT/JORGE: YES.  It will always be OR.
 
          5. no rax-roles anywhere in wadl
          6. no rax-roles on specified resource/method, rax-roles elsewhere
@@ -518,7 +518,7 @@
             QUESTION: What should happen when no rax-roles on the resource/method, and no rax-roles
             at a higher level that can be inherited.
 
-            ASSUMPTION: All access is allowed for that resource/method
+            ASSUMPTION: All access is allowed for that resource/method.  (Jorge: Correct assumption)
 
          7. rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
 
@@ -526,9 +526,12 @@
 
          1. rax-roles does not influence state machine
 
-         QUESTION: Jorge: behavior when the role is at resource level (ex observer), and role at method level: (ex creator),
-         does the role at resource level get applied in addition to method level?  Does the role at method level override the
-         role from the resource level???  Should the roles be AND'd to the roles at the method level???
+         When the role is at resource level (ex observer), and role at method level: (ex creator),
+         does the role at resource level get applied in addition to method level?  YES
+
+         Does the role at method level override the role from the resource level? NO
+
+         The roles should be OR'd along with the roles at the method level
 
 
 
