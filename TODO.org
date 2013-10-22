@@ -492,50 +492,42 @@
 ** TODO Bring checker to dot conversion to cli
 ** TODO Better XSD tests
 ** TODO Rax-Roles support
+   *** DESIGN DECISIONS
+   1. When no rax:roles on the resource/method and no rax:roles at a higher level that can be inherited
+      BEHAVIOR: All access is allowed for that resource/method.
+   2. Multiple values are treated as ORs, user must have one of the values, not required to have all roles defined.
+      It will always be OR, and there is not a use case or future support plans for AND.
+   3. When a role is defined at the resource level (ex observer), and role at method level: (ex creator),
+      a user must have EITHER observer or creator to access the method.
+
    1. [X] Update the config to account for the rax:roles flag
    2. [X] Update the CLI to account for rax:roles (helpful in debugging during dev)
    3. [X] Pass the flag to WADL->Checker format XSL
-   4. [ ] Add a step in the checker format XSL to create header params from the rax:roles attribute
+   4. [X] Add a step in the checker format XSL to create header params from the rax:roles attribute
           1. [X] Process the rax-roles enabled parameters
           2. [X] Add pre-process stage
           3. [X] Inject header params for methods that contain rax-role
-   5. [ ] rax-roles extension flags on
+   5. [ ] Test with rax-roles extension flags on
           1. [X] rax-roles at the resource level
           2. [X] rax-roles at the method level
-          3. [ ] rax-roles including #all
+          3. [X] rax-roles including #all
           4. [X] rax-roles with multiple values
           5. [ ] no rax-roles anywhere in wadl
           6. [X] no rax-roles on specified method, rax-roles at resource level
-          7. [ ] no rax-roles on specified resource/method, rax-roles elsewhere
-          8. [ ] no rax-roles on specified resource, rax-roles on parent level
+          7. [ ] no rax-roles on specified resource/method, rax-roles exist on a non-parent resource
+          8. [X] no rax-roles on specified resource, rax-roles on parent resource
           9. [ ] rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
+         10. [ ] header roles is disabled, rax-roles is still processed
+         11. [X] access an undefined method on a valid resource, returns 405
    6. [ ] Move rax-roles back into the builder.xsl
           1. [ ] Add enable rax roles flag to builder.xsl
           2. [ ] Pass rax roles flag in CheckerBuilder to builder.xsl
-   7. [ ] Only run the rax-roles xsl if the config is turned on
-   8. [ ] rax-roles extension flag off
+          3. [ ] Only run the rax-roles xsl if the config is turned on
+   7. [ ] Test with rax-roles extension flag off
           1. [ ] Modify TestConfig to support flag for enable raxroles check
           2. [ ] Tests: when rax-roles is disabled, does not affect access
-          3. [ ] rax-roles exist in wadl, all access is allowed
-   9. [ ] rax-roles is enabled, header roles is disabled
-          1. [ ] tests for rax-roles allow/prevent access as expected
-
-         QUESTION: What should happen when no rax-roles on the resource/method, and no rax-roles
-         at a higher level that can be inherited.
-
-         ASSUMPTION: All access is allowed for that resource/method.  (Jorge: Correct assumption)
-         ASSUMPTION: Multiple values are treated as ORs, user must have one of the values.
-
-         QUESTION: PRODUCT/JORGE: YES.  It will always be OR.
-
-
-         When the role is at resource level (ex observer), and role at method level: (ex creator),
-         does the role at resource level get applied in addition to method level?  YES
-
-         Does the role at method level override the role from the resource level? NO
-
-         The roles should be OR'd along with the roles at the method level
-
+          3. [ ] rax-roles exist in wadl, header checks disabled, rax-roles are ignored
+          4. [ ] rax-roles exist in wadl, header checks enabled, rax-roles are ignored
 
 
 * Tests 10 Threads 5000 count
