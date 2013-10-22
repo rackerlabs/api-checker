@@ -512,7 +512,7 @@
           2. [X] rax-roles at the method level
           3. [X] rax-roles including #all
           4. [X] rax-roles with multiple values
-          5. [ ] no rax-roles anywhere in wadl
+          5. [X] no rax-roles anywhere in wadl
           6. [X] no rax-roles on specified method, rax-roles at resource level
           7. [ ] no rax-roles on specified resource/method, rax-roles exist on a non-parent resource
           8. [X] no rax-roles on specified resource, rax-roles on parent resource

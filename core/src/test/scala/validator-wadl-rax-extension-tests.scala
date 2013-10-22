@@ -27,6 +27,10 @@ trait RaxRolesBehaviors {
 
   def chain: FilterChain = mock(classOf[FilterChain])
 
+  def localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
+
+  def configWithRolesEnabled = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true)
+
   def accessIsAllowed(validator: => Validator, method: => String, path: => String, roles: => List[String]) {
     def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles))
     it should "succeed when " +method+ " on " +path+ " and X-Roles has " + roles + "" in {
@@ -66,12 +70,8 @@ trait RaxRolesBehaviors {
 @RunWith(classOf[JUnitRunner])
 class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
 
-  val localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
   val validator = Validator((localWADLURI,
-    <application xmlns="http://wadl.dev.java.net/2009/02"
-                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                 xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
-                 xmlns:rax="http://docs.rackspace.com/api">
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
       <resources base="https://test.api.openstack.com">
         <resource path="/a">
           <method name="POST" rax:roles="a:admin">
@@ -97,7 +97,7 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
         </resource>
       </resources>
     </application>)
-    , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
+    , configWithRolesEnabled)
 
   // GET on /a requires a:observer role
   it should behave like accessIsAllowed(validator, "GET", "/a", List("a:observer"))
@@ -136,39 +136,19 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
 
 @RunWith(classOf[JUnitRunner])
 class GivenAWadlWithRolesAtResourceLevel extends FlatSpec with RaxRolesBehaviors {
-  val localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
 
   val validator = Validator((localWADLURI,
-    <application xmlns="http://wadl.dev.java.net/2009/02"
-                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                 xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
-                 xmlns:rax="http://docs.rackspace.com/api">
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
       <resources base="https://test.api.openstack.com">
         <resource path="/a" rax:roles="a:admin">
-        <method name="POST">
-          <request>
-            <representation mediaType="application/xml"/>
-          </request>
-        </method>
-        <method name="GET">
-          <request>
-            <representation mediaType="application/xml"/>
-          </request>
-        </method>
-        <method name="PUT" rax:roles="a:observer">
-          <request>
-            <representation mediaType="application/xml"/>
-          </request>
-        </method>
-        <method name="DELETE" rax:roles="a:observer a:admin a:creator">
-          <request>
-            <representation mediaType="application/xml"/>
-          </request>
-        </method>          
+        <method name="POST"/>
+        <method name="GET"/>
+        <method name="PUT" rax:roles="a:observer"/>
+        <method name="DELETE" rax:roles="a:observer a:admin a:creator"/>
       </resource>
       </resources>
     </application>)
-    , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
+    , configWithRolesEnabled)
 
   // When a single value rax:roles at resource level but not at method level
   it should behave like accessIsAllowed(validator, "GET", "/a", List("a:admin"))
@@ -205,13 +185,8 @@ class GivenAWadlWithRolesAtResourceLevel extends FlatSpec with RaxRolesBehaviors
 
 @RunWith(classOf[JUnitRunner])
 class GivenAWadlWithNestedResources extends FlatSpec with RaxRolesBehaviors {
-  val localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
-
   val validator = Validator((localWADLURI,
-    <application xmlns="http://wadl.dev.java.net/2009/02"
-                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                 xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
-                 xmlns:rax="http://docs.rackspace.com/api">
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
       <resources base="https://test.api.openstack.com">
         <resource path="/a" rax:roles="a:admin">
           <method name="PUT" rax:roles="a:observer"/>
@@ -223,7 +198,7 @@ class GivenAWadlWithNestedResources extends FlatSpec with RaxRolesBehaviors {
         </resource>
       </resources>
     </application>)
-    , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
+    , configWithRolesEnabled)
 
   // PUT /a has resource level a:admin, method level a:observer
   it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:admin"))
@@ -264,13 +239,8 @@ class GivenAWadlWithNestedResources extends FlatSpec with RaxRolesBehaviors {
 
 @RunWith(classOf[JUnitRunner])
 class GivenAWadlWithRolesOfAll extends FlatSpec with RaxRolesBehaviors {
-
-  val localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
   val validator = Validator((localWADLURI,
-    <application xmlns="http://wadl.dev.java.net/2009/02"
-                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                 xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
-                 xmlns:rax="http://docs.rackspace.com/api">
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
       <resources base="https://test.api.openstack.com">
         <resource path="/a" rax:roles="a:admin">
           <method name="POST" rax:roles="a:creator"/>
@@ -286,7 +256,7 @@ class GivenAWadlWithRolesOfAll extends FlatSpec with RaxRolesBehaviors {
         </resource>
       </resources>
     </application>)
-    , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
+    , configWithRolesEnabled)
 
   // GET on /a has resource level a:admin, method level #all
   it should behave like accessIsAllowed(validator, "GET", "/a", List("a:observer"))
@@ -318,4 +288,33 @@ class GivenAWadlWithRolesOfAll extends FlatSpec with RaxRolesBehaviors {
   it should behave like accessIsAllowed(validator, "POST", "/b/c", List())
   it should behave like accessIsAllowed(validator, "POST", "/b/c", List("bar"))
   it should behave like accessIsAllowedWhenNoXRoles(validator, "POST", "/b/c")
+}
+
+@RunWith(classOf[JUnitRunner])
+class GivenNoRolesInWadl extends FlatSpec with RaxRolesBehaviors {
+
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a">
+          <method name="GET"/>
+          <method name="PUT"/>
+        </resource>
+      </resources>
+    </application>)
+    , configWithRolesEnabled)
+
+  // GET on /a has no roles
+  it should behave like accessIsAllowed(validator, "GET", "/a", List("a:observer"))
+  it should behave like accessIsAllowed(validator, "GET", "/a", List())
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "GET", "/a")
+
+  // PUT on /a has no roles
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List())
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "PUT", "/a")
+
+  // POST on /a has no roles, method is not allowed
+  it should behave like methodNotAllowed(validator, "POST", "/a", List("a:admin"))
+  it should behave like methodNotAllowed(validator, "POST", "/a", List())
 }
