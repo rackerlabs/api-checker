@@ -46,6 +46,7 @@
     <xsl:param name="enableIgnoreJSONSchemaExtension" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableMessageExtension" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableHeaderCheck" as="xsd:boolean" select="false()"/>
+    <xsl:param name="enableRaxRoles" as="xsd:boolean" select="false()"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -84,7 +85,7 @@
                   select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or
                           $enablePlainParamCheck or $useJSONContentCheck"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
-                  select="$enableHeaderCheck"/>
+                  select="$enableHeaderCheck or $enableRaxRoles"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
                   select="$enableMessageExtension"/>
 

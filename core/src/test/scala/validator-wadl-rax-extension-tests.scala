@@ -255,3 +255,61 @@ class GivenAWadlWithRolesAtResourceLevel extends FlatSpec with RaxRolesBehaviors
 
   it should behave like preventAccessWhenNoXRoles(validator, "DELETE", "/a/b")
 }
+
+
+@RunWith(classOf[JUnitRunner])
+class GivenAWadlWithRolesOfAll extends FlatSpec with RaxRolesBehaviors {
+
+  val localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                 xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                 xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a" rax:roles="a:admin">
+          <method name="POST" rax:roles="foo:creator">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="GET" rax:roles="#all">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="PUT">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+        </resource>
+        <resource path="/b" rax:roles="#all">
+          <resource path="/c" rax:roles="c:admin">
+            <method name="POST">
+              <request>
+                <representation mediaType="application/xml"/>
+              </request>
+            </method>
+            <method name="GET">
+              <request>
+                <representation mediaType="application/xml"/>
+              </request>
+            </method>
+          </resource>
+        </resource>
+      </resources>
+    </application>)
+    , TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true))
+
+  // GET on /a allows all access
+  it should behave like allowAccess(validator, "GET", "/a", List("foo:observer"))
+  it should behave like allowAccess(validator, "GET", "/a", List("foo:observer", "foo:bar"))
+  it should behave like allowAccess(validator, "GET", "/a", List("foo:bar"))
+  it should behave like allowAccess(validator, "GET", "/a", List("foo:bar", "foo:creator"))
+  it should behave like allowAccess(validator, "GET", "/a", List("foo:creator"))
+  it should behave like allowAccessWhenNoXRoles(validator, "GET", "/a")
+
+
+
+}

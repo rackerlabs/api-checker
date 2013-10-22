@@ -496,35 +496,38 @@
    2. [X] Update the CLI to account for rax:roles (helpful in debugging during dev)
    3. [X] Pass the flag to WADL->Checker format XSL
    4. [ ] Add a step in the checker format XSL to create header params from the rax:roles attribute
-          [X] Process the rax-roles enabled parameters
-          [ ] Add pre-process stage
-          [ ] Inject header params for methods that contain rax-role
+          1. [X] Process the rax-roles enabled parameters
+          2. [X] Add pre-process stage
+          3. [X] Inject header params for methods that contain rax-role
+   5. [ ] rax-roles extension flags on
+          1. [X] rax-roles at the resource level
+          2. [X] rax-roles at the method level
+          3. [ ] rax-roles including #all
+          4. [X] rax-roles with multiple values
+          5. [ ] no rax-roles anywhere in wadl
+          6. [X] no rax-roles on specified method, rax-roles at resource level
+          7. [ ] no rax-roles on specified resource/method, rax-roles elsewhere
+          8. [ ] no rax-roles on specified resource, rax-roles on parent level
+          9. [ ] rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
+   6. [ ] Move rax-roles back into the builder.xsl
+          1. [ ] Add enable rax roles flag to builder.xsl
+          2. [ ] Pass rax roles flag in CheckerBuilder to builder.xsl
+   7. [ ] Only run the rax-roles xsl if the config is turned on
+   8. [ ] rax-roles extension flag off
+          1. [ ] Modify TestConfig to support flag for enable raxroles check
+          2. [ ] Tests: when rax-roles is disabled, does not affect access
+          3. [ ] rax-roles exist in wadl, all access is allowed
+   9. [ ] rax-roles is enabled, header roles is disabled
+          1. [ ] tests for rax-roles allow/prevent access as expected
 
-   5. [ ] Lots o' TESTs
-         Setup: rax-roles extension flags on
+         QUESTION: What should happen when no rax-roles on the resource/method, and no rax-roles
+         at a higher level that can be inherited.
 
-         1. rax-roles at the resource level
-         2. rax-roles at the method level
-         3. rax-roles including #all
-         4. rax-roles with multiple values
-
+         ASSUMPTION: All access is allowed for that resource/method.  (Jorge: Correct assumption)
          ASSUMPTION: Multiple values are treated as ORs, user must have one of the values.
 
          QUESTION: PRODUCT/JORGE: YES.  It will always be OR.
 
-         5. no rax-roles anywhere in wadl
-         6. no rax-roles on specified resource/method, rax-roles elsewhere
-
-            QUESTION: What should happen when no rax-roles on the resource/method, and no rax-roles
-            at a higher level that can be inherited.
-
-            ASSUMPTION: All access is allowed for that resource/method.  (Jorge: Correct assumption)
-
-         7. rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
-
-         Setup: rax-roles extension flag off
-
-         1. rax-roles does not influence state machine
 
          When the role is at resource level (ex observer), and role at method level: (ex creator),
          does the role at resource level get applied in addition to method level?  YES

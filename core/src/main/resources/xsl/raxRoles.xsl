@@ -66,10 +66,14 @@
 
     <xsl:template name="generateRoles">
         <xsl:param name="roles" as="xsd:string*" select="()"/>
-        <xsl:for-each select="$roles">
-            <wadl:param name="X-ROLES" style="header" rax:code="403" rax:message="You do not have access to this resource" type="xsd:string" required="true">
-                <xsl:attribute name="fixed" select="."/>
-            </wadl:param>
-        </xsl:for-each>
+        <xsl:if test="not('#all' = $roles)">
+            <xsl:for-each select="$roles">
+                <wadl:param name="X-ROLES" style="header" rax:code="403"
+                            rax:message="You do not have access to this resource" type="xsd:string" required="true">
+                    <xsl:attribute name="fixed" select="."/>
+                </wadl:param>
+            </xsl:for-each>
+        </xsl:if>
+
     </xsl:template>
 </xsl:stylesheet>
