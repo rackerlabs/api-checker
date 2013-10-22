@@ -125,6 +125,7 @@ object TestConfig {
       checkJSONGrammar, enableRaxRolesExtension)
 
     config.enableIgnoreJSONSchemaExtension = enableIgnoreJSONSchemaExtension
+    config.enableRaxRolesExtension = enableRaxRolesExtension
 
     config
   }
