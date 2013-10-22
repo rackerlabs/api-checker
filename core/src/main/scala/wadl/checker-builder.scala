@@ -148,7 +148,11 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       } else {
         buildHandler.setResult (output)
       }
-      wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
+      if(c.enableRaxRolesExtension){
+        wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
+      }else{
+        wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
+      }
     } catch {
       case e => throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
     }

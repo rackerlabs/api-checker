@@ -522,9 +522,9 @@
    6. [ ] Move rax-roles back into the builder.xsl
           1. [ ] Add enable rax roles flag to builder.xsl
           2. [ ] Pass rax roles flag in CheckerBuilder to builder.xsl
-          3. [ ] Only run the rax-roles xsl if the config is turned on
+          3. [X] Only run the rax-roles xsl if the config is turned on
    7. [ ] Test with rax-roles extension flag off
-          1. [ ] Modify TestConfig to support flag for enable raxroles check
+          1. [X] Modify TestConfig to support flag for enable raxroles check
           2. [ ] Tests: when rax-roles is disabled, does not affect access
           3. [ ] rax-roles exist in wadl, header checks disabled, rax-roles are ignored
           4. [ ] rax-roles exist in wadl, header checks enabled, rax-roles are ignored
