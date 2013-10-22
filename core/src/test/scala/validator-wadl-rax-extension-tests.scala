@@ -29,9 +29,9 @@ trait RaxRolesBehaviors {
 
   def localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
 
-  def configWithRolesEnabled = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true)
+  def configWithRolesEnabled = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true)
 
-  def configWithRolesEnabledDupsRemoved = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true)
+  def configWithRolesEnabledDupsRemoved = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true,  true, true, false, false, true)
 
   def configWithRolesDisabledHeaderCheckEnabled = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, false)
 

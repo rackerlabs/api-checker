@@ -106,7 +106,7 @@ object Wadl2Dot {
       val c = new Config
 
       c.removeDups = removeDups.value.getOrElse(false)
-      c.enableRaxRolesExtension = !(raxRoles.value.getOrElse(false))
+      c.enableRaxRolesExtension = (raxRoles.value.getOrElse(false))
       c.checkWellFormed = wellFormed.value.getOrElse(false)
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
       c.checkJSONGrammar = jsonCheck.value.getOrElse(false)

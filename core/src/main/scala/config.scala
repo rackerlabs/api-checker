@@ -165,7 +165,7 @@ class Config {
   //
   //  Enable rax-roles extension
   //
-  @BeanProperty var enableRaxRolesExtension : Boolean = true
+  @BeanProperty var enableRaxRolesExtension : Boolean = false
 
 
   //
