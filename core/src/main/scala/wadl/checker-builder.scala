@@ -109,7 +109,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_XSD_IGNORE_EXT, c.enableIgnoreXSDExtension)
       buildHandler.getTransformer().setParameter (ENABLE_MESSAGE_EXT, c.enableMessageExtension)
       buildHandler.getTransformer().setParameter (ENABLE_RAX_ROLES_EXT, c.enableRaxRolesExtension)
-      buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
+      buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders || c.enableRaxRolesExtension)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_SCHEMA, c.checkJSONGrammar)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
 
@@ -148,7 +148,11 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       } else {
         buildHandler.setResult (output)
       }
-      wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
+      if(c.enableRaxRolesExtension){
+        wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
+      }else{
+        wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
+      }
     } catch {
       case e => throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
     }

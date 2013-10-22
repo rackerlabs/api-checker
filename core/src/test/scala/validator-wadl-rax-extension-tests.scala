@@ -31,9 +31,17 @@ trait RaxRolesBehaviors {
 
   def configWithRolesEnabled = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true)
 
+  def configWithRolesEnabledDupsRemoved = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true)
+
+  def configWithRolesDisabledHeaderCheckEnabled = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, false)
+
+  def configWithRolesDisabledHeaderCheckDisabled = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, false, true, true, false, false, false)
+
+  def configWithRolesEnabledHeaderCheckDisabled = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, false, true, true, false, false, true)
+
   def accessIsAllowed(validator: => Validator, method: => String, path: => String, roles: => List[String]) {
     def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles))
-    it should "succeed when " +method+ " on " +path+ " and X-Roles has " + roles + "" in {
+    it should "succeed when " + method + " on " + path + " and X-Roles has " + roles + "" in {
       validator.validate(request, response, chain)
     }
   }
@@ -61,7 +69,7 @@ trait RaxRolesBehaviors {
 
   def accessIsAllowedWhenNoXRoles(validator: => Validator, method: => String, path: => String) {
     def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false)
-    it should "succeed when " +method+ " on " +path+ " and no X-Roles" in {
+    it should "succeed when " + method + " on " + path + " and no X-Roles" in {
       validator.validate(request, response, chain)
     }
   }
@@ -141,11 +149,11 @@ class GivenAWadlWithRolesAtResourceLevel extends FlatSpec with RaxRolesBehaviors
     <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
       <resources base="https://test.api.openstack.com">
         <resource path="/a" rax:roles="a:admin">
-        <method name="POST"/>
-        <method name="GET"/>
-        <method name="PUT" rax:roles="a:observer"/>
-        <method name="DELETE" rax:roles="a:observer a:admin a:creator"/>
-      </resource>
+          <method name="POST"/>
+          <method name="GET"/>
+          <method name="PUT" rax:roles="a:observer"/>
+          <method name="DELETE" rax:roles="a:observer a:admin a:creator"/>
+        </resource>
       </resources>
     </application>)
     , configWithRolesEnabled)
@@ -317,4 +325,196 @@ class GivenNoRolesInWadl extends FlatSpec with RaxRolesBehaviors {
   // POST on /a has no roles, method is not allowed
   it should behave like methodNotAllowed(validator, "POST", "/a", List("a:admin"))
   it should behave like methodNotAllowed(validator, "POST", "/a", List())
+}
+
+@RunWith(classOf[JUnitRunner])
+class GivenRaxRolesDisabled extends FlatSpec with RaxRolesBehaviors {
+
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a" rax:roles="a:admin">
+          <method name="PUT" rax:roles="a:observer"/>
+          <resource path="/b" rax:roles="b:creator">
+            <method name="POST"/>
+            <method name="PUT" rax:roles="b:observer"/>
+            <method name="DELETE" rax:roles="b:observer b:admin"/>
+          </resource>
+        </resource>
+      </resources>
+    </application>)
+    , configWithRolesDisabledHeaderCheckEnabled)
+
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:noone"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:creator"))
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "PUT", "/a")
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "DELETE", "/a/b")
+
+
+}
+
+@RunWith(classOf[JUnitRunner])
+class GivenRaxRolesDisabledHeaderCheckDisabled extends FlatSpec with RaxRolesBehaviors {
+
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a" rax:roles="a:admin">
+          <method name="PUT" rax:roles="a:observer"/>
+          <resource path="/b" rax:roles="b:creator">
+            <method name="POST"/>
+            <method name="PUT" rax:roles="b:observer"/>
+            <method name="DELETE" rax:roles="b:observer b:admin"/>
+          </resource>
+        </resource>
+      </resources>
+    </application>)
+    , configWithRolesDisabledHeaderCheckDisabled)
+
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:noone"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:creator"))
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "PUT", "/a")
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "DELETE", "/a/b")
+
+
+}
+
+@RunWith(classOf[JUnitRunner])
+class GivenRaxRolesEnabledHeaderCheckDisabled extends FlatSpec with RaxRolesBehaviors {
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a" rax:roles="a:admin">
+          <method name="PUT" rax:roles="a:observer"/>
+          <resource path="/b" rax:roles="b:creator">
+            <method name="POST"/>
+            <method name="PUT" rax:roles="b:observer"/>
+            <method name="DELETE" rax:roles="b:observer b:admin"/>
+          </resource>
+        </resource>
+      </resources>
+    </application>)
+    , configWithRolesEnabledHeaderCheckDisabled)
+
+  // PUT /a has resource level a:admin, method level a:observer
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer", "a:admin"))
+  it should behave like accessIsForbidden(validator, "PUT", "/a", List("b:observer"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a")
+
+  // DELETE /a has resource level a:admin, method is not defined
+  it should behave like methodNotAllowed(validator, "DELETE", "/a", List("a:admin"))
+  it should behave like methodNotAllowed(validator, "DELETE", "/a", List())
+
+  // POST /a/b has parent resource level a:admin, resource level b:creator
+  it should behave like accessIsAllowed(validator, "POST", "/a/b", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "POST", "/a/b", List("b:creator"))
+  it should behave like accessIsForbidden(validator, "POST", "/a/b", List("a:observer"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "POST", "/a/b")
+
+  // PUT /a/b has parent resource level a:admin, resource level b:creator, method level b:observer
+  it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("b:creator"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("b:observer", "a:foo"))
+  it should behave like accessIsForbidden(validator, "PUT", "/a/b", List("a:creator"))
+  it should behave like accessIsForbidden(validator, "PUT", "/a/b", List())
+  it should behave like accessIsForbidden(validator, "PUT", "/a/b", List("observer"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a/b")
+
+  // DELETE /a/b has parent resource level a:admin, resource level b:creator, method level b:admin, b:observer
+  it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:creator"))
+  it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:observer", "a:admin"))
+  it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:admin"))
+  it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List())
+  it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("a:observer"))
+  it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("b:foo"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a/b")
+}
+
+@RunWith(classOf[JUnitRunner])
+class RaxRolesNotInheritedFromSibling extends FlatSpec with RaxRolesBehaviors {
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a" rax:roles="a:admin">
+          <method name="POST" rax:roles="a:creator"/>
+          <method name="GET" rax:roles="#all"/>
+          <method name="PUT"/>
+        </resource>
+        <resource path="/b" >
+          <method name="GET"/>
+          <resource path="/c">
+            <method name="POST"/>
+            <method name="GET"/>
+          </resource>
+        </resource>
+      </resources>
+    </application>)
+    , configWithRolesEnabled)
+
+  it should behave like accessIsForbidden(validator, "PUT", "/a", List("a:observer", "a:bar"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a")
+  it should behave like accessIsAllowed(validator, "GET", "/a", List("a:admin"))
+
+  it should behave like accessIsAllowed(validator, "GET", "/b", List("a:noone"))
+  it should behave like accessIsAllowed(validator, "GET", "/b", List("a:creator"))
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "POST", "/b/c")
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "GET", "/b/c")
+
+}
+
+@RunWith(classOf[JUnitRunner])
+class GivenAWadlWithNestedResourcesRemoveDups extends FlatSpec with RaxRolesBehaviors {
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a" rax:roles="a:admin">
+          <method name="PUT" rax:roles="a:observer"/>
+          <resource path="/b" rax:roles="b:creator">
+            <method name="POST"/>
+            <method name="PUT" rax:roles="b:observer"/>
+            <method name="DELETE" rax:roles="b:observer b:admin"/>
+          </resource>
+        </resource>
+      </resources>
+    </application>)
+    , configWithRolesEnabledDupsRemoved)
+
+  // PUT /a has resource level a:admin, method level a:observer
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer", "a:admin"))
+  it should behave like accessIsForbidden(validator, "PUT", "/a", List("b:observer"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a")
+
+  // DELETE /a has resource level a:admin, method is not defined
+  it should behave like methodNotAllowed(validator, "DELETE", "/a", List("a:admin"))
+  it should behave like methodNotAllowed(validator, "DELETE", "/a", List())
+
+  // POST /a/b has parent resource level a:admin, resource level b:creator
+  it should behave like accessIsAllowed(validator, "POST", "/a/b", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "POST", "/a/b", List("b:creator"))
+  it should behave like accessIsForbidden(validator, "POST", "/a/b", List("a:observer"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "POST", "/a/b")
+
+  // PUT /a/b has parent resource level a:admin, resource level b:creator, method level b:observer
+  it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("b:creator"))
+  it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("b:observer", "a:foo"))
+  it should behave like accessIsForbidden(validator, "PUT", "/a/b", List("a:creator"))
+  it should behave like accessIsForbidden(validator, "PUT", "/a/b", List())
+  it should behave like accessIsForbidden(validator, "PUT", "/a/b", List("observer"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a/b")
+
+  // DELETE /a/b has parent resource level a:admin, resource level b:creator, method level b:admin, b:observer
+  it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("a:admin"))
+  it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:creator"))
+  it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:observer", "a:admin"))
+  it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:admin"))
+  it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List())
+  it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("a:observer"))
+  it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("b:foo"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a/b")
 }
