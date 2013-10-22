@@ -527,6 +527,8 @@
           2. [X] Tests: when rax-roles is disabled, does not affect access
           3. [X] rax-roles exist in wadl, header checks disabled, rax-roles are ignored
           4. [X] rax-roles exist in wadl, header checks enabled, rax-roles are ignored
+   8. [ ] Change default behavior of raxRolesEnabled to false
+          1. [ ] Fix tests
 
 
 * Tests 10 Threads 5000 count
