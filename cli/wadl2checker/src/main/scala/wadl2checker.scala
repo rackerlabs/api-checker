@@ -105,7 +105,7 @@ object Wadl2Checker {
       val c = new Config
 
       c.removeDups = removeDups.value.getOrElse(false)
-      c.enableRaxRolesExtension = !(raxRoles.value.getOrElse(false))
+      c.enableRaxRolesExtension = (raxRoles.value.getOrElse(false))
       c.validateChecker = validate.value.getOrElse(false)
       c.checkWellFormed = wellFormed.value.getOrElse(false)
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
