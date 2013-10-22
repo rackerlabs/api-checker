@@ -516,7 +516,7 @@
           6. [X] no rax-roles on specified method, rax-roles at resource level
           7. [X] no rax-roles on specified resource/method, rax-roles exist on a non-parent resource
           8. [X] no rax-roles on specified resource, rax-roles on parent resource
-          9. [ ] rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
+          9. [X] rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
          10. [X] header roles is disabled, rax-roles is still processed
          11. [X] access an undefined method on a valid resource, returns 405
    6. [X] Move rax-roles back into the builder.xsl
