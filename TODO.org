@@ -514,20 +514,19 @@
           4. [X] rax-roles with multiple values
           5. [X] no rax-roles anywhere in wadl
           6. [X] no rax-roles on specified method, rax-roles at resource level
-          7. [ ] no rax-roles on specified resource/method, rax-roles exist on a non-parent resource
+          7. [X] no rax-roles on specified resource/method, rax-roles exist on a non-parent resource
           8. [X] no rax-roles on specified resource, rax-roles on parent resource
           9. [ ] rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
-         10. [ ] header roles is disabled, rax-roles is still processed
+         10. [X] header roles is disabled, rax-roles is still processed
          11. [X] access an undefined method on a valid resource, returns 405
-   6. [ ] Move rax-roles back into the builder.xsl
-          1. [ ] Add enable rax roles flag to builder.xsl
-          2. [ ] Pass rax roles flag in CheckerBuilder to builder.xsl
-          3. [X] Only run the rax-roles xsl if the config is turned on
-   7. [ ] Test with rax-roles extension flag off
+   6. [X] Move rax-roles back into the builder.xsl
+          1. [X] Pass rax roles flag in CheckerBuilder to builder.xsl
+          2. [X] Only run the rax-roles xsl if the config is turned on
+   7. [X] Test with rax-roles extension flag off
           1. [X] Modify TestConfig to support flag for enable raxroles check
-          2. [ ] Tests: when rax-roles is disabled, does not affect access
-          3. [ ] rax-roles exist in wadl, header checks disabled, rax-roles are ignored
-          4. [ ] rax-roles exist in wadl, header checks enabled, rax-roles are ignored
+          2. [X] Tests: when rax-roles is disabled, does not affect access
+          3. [X] rax-roles exist in wadl, header checks disabled, rax-roles are ignored
+          4. [X] rax-roles exist in wadl, header checks enabled, rax-roles are ignored
 
 
 * Tests 10 Threads 5000 count

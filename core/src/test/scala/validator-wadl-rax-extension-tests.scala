@@ -431,3 +431,35 @@ class GivenRaxRolesEnabledHeaderCheckDisabled extends FlatSpec with RaxRolesBeha
   it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a/b")
 }
 
+@RunWith(classOf[JUnitRunner])
+class RaxRolesNotInheritedFromSibling extends FlatSpec with RaxRolesBehaviors {
+  val validator = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a" rax:roles="a:admin">
+          <method name="POST" rax:roles="a:creator"/>
+          <method name="GET" rax:roles="#all"/>
+          <method name="PUT"/>
+        </resource>
+        <resource path="/b" >
+          <method name="GET"/>
+          <resource path="/c">
+            <method name="POST"/>
+            <method name="GET"/>
+          </resource>
+        </resource>
+      </resources>
+    </application>)
+    , configWithRolesEnabled)
+
+  it should behave like accessIsForbidden(validator, "PUT", "/a", List("a:observer", "a:bar"))
+  it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a")
+  it should behave like accessIsAllowed(validator, "GET", "/a", List("a:admin"))
+
+  it should behave like accessIsAllowed(validator, "GET", "/b", List("a:noone"))
+  it should behave like accessIsAllowed(validator, "GET", "/b", List("a:creator"))
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "POST", "/b/c")
+  it should behave like accessIsAllowedWhenNoXRoles(validator, "GET", "/b/c")
+
+}
+
