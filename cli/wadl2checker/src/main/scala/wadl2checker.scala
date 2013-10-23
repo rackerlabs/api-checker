@@ -17,6 +17,9 @@ object Wadl2Checker {
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
 
+  val raxRoles = parser.flag[Boolean] (List("r", "rax-roles"),
+                                       "Disable Rax-Roles extension. Default: false")
+
   val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
                                          "Join multiple XPath and XML well-formed checks into a single check: false")
 
@@ -102,6 +105,7 @@ object Wadl2Checker {
       val c = new Config
 
       c.removeDups = removeDups.value.getOrElse(false)
+      c.enableRaxRolesExtension = (raxRoles.value.getOrElse(false))
       c.validateChecker = validate.value.getOrElse(false)
       c.checkWellFormed = wellFormed.value.getOrElse(false)
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)

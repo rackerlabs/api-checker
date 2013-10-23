@@ -25,6 +25,7 @@ class Wadl2CheckerSuite extends FunSuite {
     }
   }
 
+
   test ("-bad_data should generate usage info") {
     Wadl2Checker.parser.reset()
     intercept[ArgotUsageException] {
@@ -44,6 +45,14 @@ class Wadl2CheckerSuite extends FunSuite {
     assert (Wadl2Checker.removeDups.value == None)
     Wadl2Checker.handleArgs(Array("-d"))
     assert (Wadl2Checker.removeDups.value.get == true)
+  }
+
+
+  test ("-r should set raxRoles") {
+    Wadl2Checker.parser.reset()
+    assert (Wadl2Checker.raxRoles.value == None)
+    Wadl2Checker.handleArgs(Array("-r"))
+    assert (Wadl2Checker.raxRoles.value.get == true)
   }
 
   test ("--remove-dups should set removeDups") {

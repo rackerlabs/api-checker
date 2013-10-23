@@ -37,6 +37,7 @@ object BuilderXSLParams {
   val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
   val ENABLE_XSD_IGNORE_EXT  = "enableIgnoreXSDExtension"
   val ENABLE_JSON_IGNORE_EXT = "enableIgnoreJSONSchemaExtension"
+  val ENABLE_RAX_ROLES_EXT = "enableRaxRoles"
   val ENABLE_MESSAGE_EXT    = "enableMessageExtension"
   val ENABLE_HEADER         = "enableHeaderCheck"
 }
@@ -80,6 +81,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
 
+
+  val raxRolesTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxRoles.xsl").toString))
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/builder.xsl").toString))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/removeDups.xsl").toString))
   val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/commonJoin.xsl").toString))
@@ -94,6 +97,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
     }
 
     try {
+      val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
       val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
 
       buildHandler.getTransformer().setParameter (ENABLE_WELL_FORM, c.checkWellFormed)
@@ -104,11 +108,13 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_PRE_PROCESS_EXT, c.enablePreProcessExtension)
       buildHandler.getTransformer().setParameter (ENABLE_XSD_IGNORE_EXT, c.enableIgnoreXSDExtension)
       buildHandler.getTransformer().setParameter (ENABLE_MESSAGE_EXT, c.enableMessageExtension)
+      buildHandler.getTransformer().setParameter (ENABLE_RAX_ROLES_EXT, c.enableRaxRolesExtension)
       buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_SCHEMA, c.checkJSONGrammar)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
 
       var output = out;
+      raxRolesHandler.setResult(new SAXResult(buildHandler))
 
       if (c.validateChecker) {
         val outHandler = wadl.saxTransformerFactory.newTransformerHandler();
@@ -142,7 +148,11 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       } else {
         buildHandler.setResult (output)
       }
-      wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
+      if(c.enableRaxRolesExtension){
+        wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
+      }else{
+        wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
+      }
     } catch {
       case e => throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
     }

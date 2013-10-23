@@ -46,6 +46,13 @@ class Wadl2DotSuite extends FunSuite {
     assert (Wadl2Dot.removeDups.value.get == true)
   }
 
+  test ("-r should set rax-roles") {
+    Wadl2Dot.parser.reset()
+    assert (Wadl2Dot.raxRoles.value == None)
+    Wadl2Dot.handleArgs(Array("-r"))
+    assert (Wadl2Dot.raxRoles.value.get == true)
+  }
+
   test ("--remove-dups should set removeDups") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.removeDups.value == None)
