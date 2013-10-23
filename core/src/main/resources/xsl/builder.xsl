@@ -87,7 +87,7 @@
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
                   select="$enableHeaderCheck or $enableRaxRoles"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
-                  select="$enableMessageExtension"/>
+                  select="$enableMessageExtension or $enableRaxRoles"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
