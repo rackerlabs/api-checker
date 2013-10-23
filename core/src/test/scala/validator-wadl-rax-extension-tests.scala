@@ -51,7 +51,7 @@ trait RaxRolesBehaviors {
   def accessIsForbidden(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config") {
     def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles))
     it should "fail with a 403 when " + method + " on " + path + " and X-Roles has " + roles + " for " + conf in {
-      base.assertResultFailed(validator.validate(request, response, chain), 403, "You do not have access to this resource")
+      base.assertResultFailed(validator.validate(request, response, chain), 403, "You are forbidden to perform the operation")
     }
   }
 
@@ -65,7 +65,7 @@ trait RaxRolesBehaviors {
   def accessIsForbiddenWhenNoXRoles(validator: => Validator, method: => String, path: => String, conf: => String = "Valid Config") {
     def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false)
     it should "fail with a 403 when " + method + " on " + path + " and no X-Roles header" + " for " + conf in {
-      base.assertResultFailed(validator.validate(request, response, chain), 403, "You do not have access to this resource")
+      base.assertResultFailed(validator.validate(request, response, chain), 403, "You are forbidden to perform the operation")
     }
   }
 
