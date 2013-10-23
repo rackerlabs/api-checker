@@ -122,9 +122,8 @@ object TestConfig {
     val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements,
       xpathVersion, checkPlainParams, doXSDGrammarTransform, enablePreProcessExtension,
       xslEngine, joinXPathChecks, checkHeaders, enableIgnoreXSDExtension, enableMessageExtension,
-      checkJSONGrammar)
+      checkJSONGrammar, enableIgnoreJSONSchemaExtension)
 
-    config.enableIgnoreJSONSchemaExtension = enableIgnoreJSONSchemaExtension
     config.enableRaxRolesExtension = enableRaxRolesExtension
 
     config
