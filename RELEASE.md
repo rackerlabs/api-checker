@@ -1,5 +1,14 @@
 # Releases #
 
+## Release 1.0.12 (2013-10-23) ##
+
+1. Added support for rax:roles extension.  rax:roles extension can be configured
+on a WADL as an attribute at the resource or method level.  A request is checked
+for authorization if the the rax roles check is enabled.  If enabled, and the 
+requested resource or method has a rax:roles defined, the request must have a 
+header value of X-Roles with a header value that matches one of the defined values
+in rax:roles.
+
 ## Release 1.0.11 (2013-10-14) ##
 
 1. Added utility class for headers.  Modified request wrapper to not split
