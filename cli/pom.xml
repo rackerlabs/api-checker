@@ -21,7 +21,7 @@
     </modules>
 
     <properties>
-        <argot.version>0.3.5</argot.version>
+        <argot.version>1.0.1</argot.version>
         <saxon.version>9.3</saxon.version>
     </properties>
 
@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>org.clapper</groupId>
-            <artifactId>argot_2.9.0</artifactId>
+            <artifactId>argot_2.10</artifactId>
             <version>${argot.version}</version>
         </dependency>
     </dependencies>
