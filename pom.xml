@@ -45,11 +45,11 @@
     </distributionManagement>
 
     <properties>
-        <scala.version>2.9.3</scala.version>
+        <scala.version>2.10.3</scala.version>
         <saxon-ee.version>9.4.0.6</saxon-ee.version>
-        <scala.test.version>1.9.1</scala.test.version>
+        <scala.test.version>2.0</scala.test.version>
         <junit.version>4.10</junit.version>
-        <wadl-tools.version>1.0.15</wadl-tools.version>
+        <wadl-tools.version>1.0.20</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.1-rax</xerces.version>
         <servlet.version>3.1</servlet.version>
@@ -101,7 +101,7 @@
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.9.0</artifactId>
+            <artifactId>scalatest_2.10</artifactId>
             <version>${scala.test.version}</version>
         </dependency>
         <dependency>
