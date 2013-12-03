@@ -267,19 +267,19 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a/ 7/c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/+7/c"),response,chain)
+    validator_REG2.validate(request("GET","/a/%207/c"),response,chain)
   }
 
   test ("GET on /a/+7/c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/%2B7/c"),response,chain)
+    validator_REG2.validate(request("GET","/a/+7/c"),response,chain)
   }
 
   test ("GET on /a/    /c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/++++/c"),response,chain)
+    validator_REG2.validate(request("GET","/a/%20%20%20%20/c"),response,chain)
   }
 
   test ("GET on /a/  hi  /c should succeed validator_REG2") {
-    validator_REG2.validate(request("GET","/a/++hi++/c"),response,chain)
+    validator_REG2.validate(request("GET","/a/%20%20hi%20%20/c"),response,chain)
   }
 
   test ("GET on /a//c should fail validator_REG2") {

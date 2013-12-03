@@ -2,7 +2,7 @@ package com.rackspace.com.papi.components.checker.servlet
 
 import java.io.IOException
 import java.io.ByteArrayOutputStream
-import java.net.URLDecoder
+import java.net.URI
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -43,7 +43,7 @@ import RequestAttributes._
 //  An HTTP Request with some additional helper functions
 //
 class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) {
-  val URISegment : Array[String] = request.getRequestURI().split("/").filterNot(e => e == "").map(u => URLDecoder.decode(u,"UTF-8"))
+  val URISegment : Array[String] = (new URI(request.getRequestURI())).getPath.split("/").filterNot(e => e == "")
   def pathToSegment(uriLevel : Int) : String = {
     "/" + URISegment.slice(0, uriLevel).reduceLeft( _ + "/" +_ )
   }
