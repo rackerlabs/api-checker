@@ -1,5 +1,13 @@
 # Releases #
 
+## Release 1.0.13 (2013-11-11) ##
+
+1. Updated Dependencies
+   1. scala: 2.9.3 → 2.10.3
+   1. scala-test: 1.9.1 → 2.0
+   1. wadl-tools: 1.0.15  → 1.0.20
+   1. argot: 0.3.5  → 1.0.1
+
 ## Release 1.0.12 (2013-10-23) ##
 
 1. Added support for rax:roles extension.  rax:roles extension can be configured
