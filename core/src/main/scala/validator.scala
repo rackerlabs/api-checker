@@ -203,7 +203,7 @@ class Validator private (private val _name : String, val startStep : Step, val c
       result
     } catch {
       case v : ValidatorException => throw v
-      case e => throw new ValidatorException("Error while validating request", e)
+      case e : Exception  => throw new ValidatorException("Error while validating request", e)
     } finally {
       context.stop
     }
