@@ -2573,10 +2573,34 @@ class StepSuite extends BaseStepSuite {
                         """, true)
     jsonSchema.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
-    assert (req1.contentError.isInstanceOf[ProcessingException])
+    assert (req1.contentError.getCause.isInstanceOf[ProcessingException])
     jsonSchema.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
-    assert (req2.contentError.isInstanceOf[ProcessingException])
+    assert (req2.contentError.getCause.isInstanceOf[ProcessingException])
+  }
+
+  test ("In a JSON Schema test, if the content contains invalid JSON, error messages should be concise") {
+    val jsonSchema = new JSONSchema("JSONSchema","JSONSchema", testJSONSchema, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/json", """
+    {
+         "firstName" : "Jorge",
+         "lastName" : "Williams",
+         "age" : "38"
+    }
+                        """, true)
+    val req2 = request ("PUT", "/a/b", "application/json", """
+    {
+         "firstName" : false,
+         "lastName" : "Kraft",
+         "age" : 32
+    }
+                        """, true)
+    jsonSchema.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (!req1.contentError.getMessage.contains("\n"))
+    jsonSchema.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (!req2.contentError.getMessage.contains("\n"))
   }
 
   test ("In a JSON Schema test, if the content contains invalid JSON, the request should conatain a ProcessingException which refernces the invalid attribute") {
@@ -2597,12 +2621,38 @@ class StepSuite extends BaseStepSuite {
                         """, true)
     jsonSchema.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
-    assert (req1.contentError.isInstanceOf[ProcessingException])
+    assert (req1.contentError.getCause.isInstanceOf[ProcessingException])
     assert (req1.contentError.getMessage().contains("/age"))
     jsonSchema.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
-    assert (req2.contentError.isInstanceOf[ProcessingException])
+    assert (req2.contentError.getCause.isInstanceOf[ProcessingException])
     assert (req2.contentError.getMessage().contains("/firstName"))
+  }
+
+  test ("In a JSON Schema test, if the content contains invalid JSON, that references an invalid attribute, the error message must be concise") {
+    val jsonSchema = new JSONSchema("JSONSchema","JSONSchema", testJSONSchema, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/json", """
+    {
+         "firstName" : "Jorge",
+         "lastName" : "Williams",
+         "age" : "38"
+    }
+                        """, true)
+    val req2 = request ("PUT", "/a/b", "application/json", """
+    {
+         "firstName" : false,
+         "lastName" : "Kraft",
+         "age" : 32
+    }
+                        """, true)
+    jsonSchema.checkStep (req1, response, chain, 0)
+    assert (req1.contentError != null)
+    assert (req1.contentError.getCause.isInstanceOf[ProcessingException])
+    assert (!req1.contentError.getMessage.contains("\n"))
+    jsonSchema.checkStep (req2, response, chain, 1)
+    assert (req2.contentError != null)
+    assert (req2.contentError.getCause.isInstanceOf[ProcessingException])
+    assert (!req2.contentError.getMessage.contains("\n"))
   }
 
 }
