@@ -30,7 +30,7 @@ class URIXSD(id : String, label : String, simpleType : QName, schema : Schema, n
                results(0).addStepId(id)
                result = Some(results(0))
              case _ =>
-               result = Some(new MultiFailResult (results))
+               result = Some(new MultiFailResult (results, id))
            }
          }
        } else {

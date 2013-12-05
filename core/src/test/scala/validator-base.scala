@@ -540,18 +540,10 @@ class BaseValidatorSuite extends FunSuite {
       case e : ErrorResult => e
     }
 
-    if ( list.size != size ) {
-      throw new TestFailedException(Some("Expect list of 4 but got " + list.size ), None, 4)
-    }
-
-    if( result.code != head.code
-        || result.message != head.message
-        || result.uriLevel != head.uriLevel
-        || result.stepIDs != head.stepIDs ) {
-      throw new TestFailedException(Some("First item in allResults list did not match main Result" ), None, 4)
-    }
-
-
+    assert(list.size == size, "Bad list size")
+    assert(result.code == head.code, "First item in allResults list did not match main Result" )
+    assert(result.message == head.message, "First item in allResults list did not match main Result" )
+    assert(result.uriLevel == head.uriLevel, "First item in allResults list did not match main Result" )
   }
 
   def assertResultFailed(f : => Any, code : Int) : Unit = {
