@@ -79,7 +79,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
         results(0).addStepId(id)
         result = Some(results(0))
       } else {
-        result = Some(new MultiFailResult (results))
+        result = Some(new MultiFailResult (results, id))
       }
 
     } else {
