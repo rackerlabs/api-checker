@@ -1,6 +1,6 @@
 # Releases #
 
-## Release 1.0.14 (2013-11-12) ##
+## Release 1.0.14 (2013-12-12) ##
 
 1. Fixed URI decoding and handling of '+' in URL path segment
 1. Better handling of exceptions in validator and checker-builder
