@@ -6,6 +6,7 @@
 1. Better handling of exceptions in validator and checker-builder
 1. Ensure JSON schema errors are concise
 1. Fixed and enhanced printing paths for multifail results
+1. Addressed Compilation Warnings on Scala 2.10
 
 ## Release 1.0.13 (2013-11-11) ##
 
