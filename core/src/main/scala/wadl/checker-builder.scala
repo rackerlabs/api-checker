@@ -49,6 +49,7 @@ object BuilderXSLParams {
  */
 object XPathJoinParams {
   val DEFAULT_XPATH_VERSION = "defaultXPathVersion"
+  val PRESERVE_REQUEST_BODY = "preserveRequestBody"
 }
 
 import BuilderXSLParams._
@@ -139,6 +140,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
           val xpathHandler = wadl.saxTransformerFactory.newTransformerHandler(joinXPathTemplates)
 
           xpathHandler.getTransformer().setParameter(DEFAULT_XPATH_VERSION, c.xpathVersion)
+          xpathHandler.getTransformer().setParameter(PRESERVE_REQUEST_BODY, c.preserveRequestBody)
 
           joinHeaderHandler.setResult(new SAXResult(xpathHandler))
           xpathHandler.setResult(output)

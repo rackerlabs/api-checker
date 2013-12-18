@@ -205,4 +205,13 @@ class Config {
   //
 
   @BeanProperty var checkHeaders : Boolean = false
+
+  //
+  // Preserve the ability to process the request body always. Setting
+  // this to true ensures that the request remains readable after
+  // validation is performed. Setting this to true, however, may also
+  // disable some optimizations.
+  //
+
+  @BeanProperty var preserveRequestBody : Boolean = false
 }

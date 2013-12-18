@@ -25,6 +25,8 @@
     <xsl:import href="../util/join.xsl"/>
 
     <xsl:param name="defaultXPathVersion" as="xsd:integer" select="1"/>
+    <xsl:param name="preserveRequestBody" as="xsd:boolean" select="false()"/>
+
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
 
     <!--
@@ -77,8 +79,28 @@
                 <xsl:otherwise>1</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+        <xsl:variable name="preserveWellFormedStep" as="xsd:boolean" select="$preserveRequestBody and ($root/@type = 'WELL_XML')"/>
+        <xsl:variable name="idBase" as="xsd:string" select="generate-id(.)"/>
+        <xsl:variable name="newStepID" as="xsd:string">
+            <xsl:choose>
+                <xsl:when test="$preserveWellFormedStep">
+                    <xsl:value-of select="concat($idBase, 'NS')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$idBase"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
-        <step id="{generate-id(.)}" type="XSL" version="{$version}">
+        <!--
+            If we are interested in preserving the request body, we
+            must leave the WELL_XML check in tact.
+        -->
+        <xsl:if test="$preserveWellFormedStep">
+            <step id="{$idBase}" type="WELL_XML" next="{$newStepID}"/>
+        </xsl:if>
+
+        <step id="{$newStepID}" type="XSL" version="{$version}">
             <xsl:call-template name="joinNext">
                 <xsl:with-param name="checker" select="$checker"/>
                 <xsl:with-param name="joins" select="$joins"/>
