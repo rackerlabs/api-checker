@@ -477,5 +477,275 @@ xmlns:atom="http://www.w3.org/2005/Atom">
       assert (checker, "count(/chk:checker/chk:step[@type='XSL']//xsl:when[@test='/foo:bar']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='XSL']//xsl:when[@test='/foo:bar/@junk']) = 1")
     }
+
+    val sharedXPathWADL3 =
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:foo="http://www.rackspace.com/foo/bar"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+             xmlns:rax="http://docs.rackspace.com/api"
+             xmlns:check="http://www.rackspace.com/repose/wadl/checker"
+             xmlns:atom="http://www.w3.org/2005/Atom">
+    <resources base="http://localhost/">
+        <resource path="y" type="#FOO"/>
+        <resource path="x" type="#FOO #BAR"/>
+    </resources>
+    <resource_type id="FOO">
+        <method name="POST">
+            <request>
+                <representation mediaType="application/xml" element="foo:bar">
+                    <param name="stuff"
+                           style="plain"
+                           required="true"
+                           path="/foo:bar/@junk"/>
+               <rax:preprocess>
+                  <xsl:transform check:mergable="true" version="2.0">
+                     <xsl:output method="xml" encoding="UTF-8"/>
+                     <xsl:variable name="entry" select="/atom:entry"/>
+                     <xsl:variable name="event" select="$entry/atom:content/event:event"/>
+                     <xsl:template match="/">
+                        <xsl:choose>
+                           <xsl:when xmlns:p="http://docs.rackspace.com/event/identity/user"
+                                     test="$event/p:product">
+                              <xsl:variable name="product" select="$event/p:product"/>
+                              <xsl:choose>
+                                 <xsl:when test="$product[@version = '2']">
+                                    <xsl:choose>
+                                       <xsl:when test="if ($event/@type = 'UPDATE') then $product/@updatedAttributes else true()"/>
+                                       <xsl:otherwise>
+                                          <xsl:message terminate="yes">For version 2 and type is UPDATE, the updatedAttributes attribute is required.</xsl:message>
+                                       </xsl:otherwise>
+                                    </xsl:choose>
+                                    <xsl:choose>
+                                       <xsl:when test="if ($event/@type != 'UPDATE') then not($product/@updatedAttributes) else true()"/>
+                                       <xsl:otherwise>
+                                          <xsl:message terminate="yes">For version 2 and type is other than UPDATE, the updatedAttributes attribute should not be used.</xsl:message>
+                                       </xsl:otherwise>
+                                    </xsl:choose>
+                                 </xsl:when>
+                              </xsl:choose>
+                           </xsl:when>
+                        </xsl:choose>
+                        <xsl:copy>
+                           <xsl:apply-templates/>
+                        </xsl:copy>
+                     </xsl:template>
+                  </xsl:transform>
+               </rax:preprocess>
+                </representation>
+            </request>
+        </method>
+    </resource_type>
+    <resource_type id="BAR">
+        <method name="POST">
+            <request>
+                <representation mediaType="application/xml" element="foo:foo">
+                    <param name="stuff"
+                           style="plain"
+                           required="true"
+                           path="/foo:foo/@junk"/>
+               <rax:preprocess>
+                  <xsl:stylesheet version="2.0">
+                     <xsl:output method="xml" encoding="UTF-8"/>
+                     <xsl:variable name="entry" select="/atom:entry"/>
+                     <xsl:variable name="event" select="$entry/atom:content/event:event"/>
+                     <xsl:template match="/">
+                        <xsl:choose>
+                           <xsl:when xmlns:p="http://docs.rackspace.com/event/identity/user"
+                                     test="$event/p:product">
+                              <xsl:variable name="product" select="$event/p:product"/>
+                              <xsl:choose>
+                                 <xsl:when test="$product[@version = '2']">
+                                    <xsl:choose>
+                                       <xsl:when test="if ($event/@type = 'UPDATE') then $product/@updatedAttributes else true()"/>
+                                       <xsl:otherwise>
+                                          <xsl:message terminate="yes">For version 2 and type is UPDATE, the updatedAttributes attribute is required.</xsl:message>
+                                       </xsl:otherwise>
+                                    </xsl:choose>
+                                    <xsl:choose>
+                                       <xsl:when test="if ($event/@type != 'UPDATE') then not($product/@updatedAttributes) else true()"/>
+                                       <xsl:otherwise>
+                                          <xsl:message terminate="yes">For version 2 and type is other than UPDATE, the updatedAttributes attribute should not be used.</xsl:message>
+                                       </xsl:otherwise>
+                                    </xsl:choose>
+                                 </xsl:when>
+                              </xsl:choose>
+                           </xsl:when>
+                        </xsl:choose>
+                        <xsl:copy>
+                           <xsl:apply-templates/>
+                        </xsl:copy>
+                     </xsl:template>
+                  </xsl:stylesheet>
+               </rax:preprocess>
+                </representation>
+            </request>
+        </method>
+    </resource_type>
+</application>
+
+    scenario ("The sharedXPathWADL3 is processed checking wellformness, elemnts, and plain parameters, preprocess extension, but without optimizations") {
+      Given("the sharedXPathWADL3")
+      When("The WADL is transalted")
+      val config = TestConfig(removeDups = false, saxoneeValidation = false, wellFormed = true,
+                              checkXSDGrammar = false, checkElements = true, xpathVersion = 2,
+                              checkPlainParams = true, doXSDGrammarTransform = false,
+                              enablePreProcessExtension = true, xslEngine = "XalanC",
+                              joinXPathChecks = false, checkHeaders = false,
+                              enableIgnoreXSDExtension = false, enableMessageExtension = false,
+                              checkJSONGrammar = false, enableIgnoreJSONSchemaExtension = false,
+                              enableRaxRolesExtension = false, preserveRequestBody = false)
+      val checker = builder.build(sharedXPathWADL3, config)
+
+      Then ("The following paths should hold")
+
+      assert(checker,Start, URL("y"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
+             XPath("/foo:bar/@junk"), XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"), Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
+             XPath("/foo:bar/@junk"), XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"), Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
+             XPath("/foo:foo/@junk"), XSL, Accept)
+
+      And ("The Following counts should hold")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 4")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH']) = 6")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar/@junk']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo/@junk']) = 1")
+    }
+
+    scenario ("The sharedXPathWADL3 is processed checking wellformness, elemnts, and plain parameters, with remove dups optimization") {
+      Given("the sharedXPathWADL3")
+      When("The WADL is transalted")
+
+      val config = TestConfig(removeDups = true, saxoneeValidation = false, wellFormed = true,
+                              checkXSDGrammar = false, checkElements = true, xpathVersion = 2,
+                              checkPlainParams = true, doXSDGrammarTransform = false,
+                              enablePreProcessExtension = true, xslEngine = "XalanC",
+                              joinXPathChecks = false, checkHeaders = false,
+                              enableIgnoreXSDExtension = false, enableMessageExtension = false,
+                              checkJSONGrammar = false, enableIgnoreJSONSchemaExtension = false,
+                              enableRaxRolesExtension = false, preserveRequestBody = false)
+
+      val checker = builder.build(sharedXPathWADL3, config)
+
+      Then ("The following paths should hold")
+
+      assert(checker,Start, URL("y"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
+             XPath("/foo:bar/@junk"), XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
+             XPath("/foo:bar/@junk"), XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
+             XPath("/foo:foo/@junk"), XSL, Accept)
+
+      And ("The Following counts should hold")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH']) = 6")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar/@junk']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo/@junk']) = 1")
+    }
+
+    scenario ("The sharedXPathWADL3 is processed checking wellformness, elemnts, and plain parameters, with remove dups and joinpath optimizations") {
+      Given("the sharedXPathWADL3")
+      When("The WADL is transalted")
+      val config = TestConfig(removeDups = true, saxoneeValidation = false, wellFormed = true,
+                              checkXSDGrammar = false, checkElements = true, xpathVersion = 2,
+                              checkPlainParams = true, doXSDGrammarTransform = false,
+                              enablePreProcessExtension = true, xslEngine = "XalanC",
+                              joinXPathChecks = true, checkHeaders = false,
+                              enableIgnoreXSDExtension = false, enableMessageExtension = false,
+                              checkJSONGrammar = false, enableIgnoreJSONSchemaExtension = false,
+                              enableRaxRolesExtension = false, preserveRequestBody = false)
+
+      val checker = builder.build(sharedXPathWADL3, config)
+      Then ("The following paths should hold")
+
+      assert(checker,Start, URL("y"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
+             XPath("/foo:bar/@junk"), XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
+             XPath("/foo:foo/@junk"), XSL, Accept)
+
+      And ("The Following counts should hold")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH']) = 4")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar/@junk']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo/@junk']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']//xsl:when[@test='/foo:bar']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']//xsl:when[@test='/foo:bar/@junk']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']/xsl:transform/@chk:mergable) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']/xsl:stylesheet) = 1")
+    }
+
+    scenario ("The sharedXPathWADL3 is processed checking wellformness, elemnts, and plain parameters, with remove dups and joinpath optimizations (preserve request body)") {
+      Given("the sharedXPathWADL3")
+      When("The WADL is transalted")
+      val config = TestConfig(removeDups = true, saxoneeValidation = false, wellFormed = true,
+                              checkXSDGrammar = false, checkElements = true, xpathVersion = 2,
+                              checkPlainParams = true, doXSDGrammarTransform = false,
+                              enablePreProcessExtension = true, xslEngine = "XalanC",
+                              joinXPathChecks = true, checkHeaders = false,
+                              enableIgnoreXSDExtension = false, enableMessageExtension = false,
+                              checkJSONGrammar = false, enableIgnoreJSONSchemaExtension = false,
+                              enableRaxRolesExtension = false, preserveRequestBody = true)
+
+      val checker = builder.build(sharedXPathWADL3, config)
+      Then ("The following paths should hold")
+
+      assert(checker,Start, URL("y"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
+             XPath("/foo:bar/@junk"), XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
+             XPath("/foo:foo/@junk"), XSL, Accept)
+
+      And ("The Following counts should hold")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH']) = 4")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:bar/@junk']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/foo:foo/@junk']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']//xsl:when[@test='/foo:bar']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']//xsl:when[@test='/foo:bar/@junk']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']/xsl:transform/@chk:mergable) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSL']/xsl:stylesheet) = 1")
+    }
   }
 }
