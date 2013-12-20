@@ -187,6 +187,7 @@
         </xsl:choose>
     </xsl:function>
 
+    <xsl:template match="text()" mode="#all"/>
     <xsl:template match="check:step[@next]" mode="getJoins">
         <xsl:param name="checker" as="node()"/>
         <!--

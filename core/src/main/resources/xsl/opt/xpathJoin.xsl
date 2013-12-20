@@ -41,22 +41,31 @@
         </xsl:apply-templates>
     </xsl:template>
 
-    <xsl:template match="check:step[@type=('XSL', 'WELL_XML')]" mode="targetJoins">
+    <xsl:template match="check:step[@type='WELL_XML']" mode="targetJoins">
         <xsl:param name="checker" as="node()"/>
         <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
         <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts and @type='XPATH']"/>
+        <xsl:if test="count($nextStep) = 1">
+            <join type="{@type}" steps="{@id}">
+                <xsl:attribute name="mergeSteps">
+                    <xsl:value-of select="$nextStep/@id" separator=' '/>
+                </xsl:attribute>
+            </join>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template match="check:step[@type='XSL' and xsl:transform/@check:mergable]" mode="targetJoins">
+        <xsl:param name="checker" as="node()"/>
+        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
+        <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts and
+                                                           (@type='XPATH' or (@type='XSL' and xsl:transform/@check:mergable))]"/>
 
         <xsl:if test="count($nextStep) = 1">
-            <xsl:choose>
-                <xsl:when test="@type='XSL' and not(xsl:transform/@check:mergable)"/>
-                <xsl:otherwise>
-                    <join type="{@type}" steps="{@id}">
-                        <xsl:attribute name="mergeSteps">
-                            <xsl:value-of select="$nextStep/@id" separator=' '/>
-                        </xsl:attribute>
-                    </join>
-                </xsl:otherwise>
-            </xsl:choose>
+            <join type="{@type}" steps="{@id}">
+                <xsl:attribute name="mergeSteps">
+                    <xsl:value-of select="$nextStep/@id" separator=' '/>
+                </xsl:attribute>
+            </join>
         </xsl:if>
     </xsl:template>
 
@@ -91,6 +100,7 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+        <xsl:variable name="vars" as="node()*" select="if ($root/@type='XSL') then $root/xsl:transform/xsl:variable else ()"/>
 
         <!--
             If we are interested in preserving the request body, we
@@ -107,29 +117,37 @@
              </xsl:call-template>
 
              <xslout:transform version="{$version}.0" check:mergable="true">
+                 <xsl:if test="$root/@type = 'XSL' and $vars">
+                     <xsl:copy-of select="$vars"/>
+                 </xsl:if>
+                 <xsl:apply-templates select="$steps" mode="xslVars">
+                     <xsl:with-param name="vars" select="$vars"/>
+                 </xsl:apply-templates>
                  <xslout:template match="/">
                      <xsl:if test="$root/@type = 'XSL'">
                          <xsl:copy-of select="$root/xsl:transform/xsl:template[@match='/']/xsl:choose"/>
                      </xsl:if>
-                     <xslout:choose>
-                         <xsl:apply-templates select="$steps" mode="joinXPath"/>
-                         <xslout:otherwise>
-                             <xslout:message terminate="yes">
-                                 <xsl:value-of select="for $s in $steps[@type='XPATH'] return
-                                                       if ($s/@message) then $s/@message
-                                                       else concat('Expecting ',$s/@match)" separator=" or "/>
-                                 <!--
-                                     Since XPath or operations are not
-                                     joined at the moment, then only
-                                     the first error code need apply.
-                                 -->
-                                 <xsl:if test="$steps[@type='XPATH' and exists(@code)]">
-                                     <xsl:value-of select="concat('C:',$steps[@type='XPATH']/@code[1],':C')"/>
-                                 </xsl:if>
-                             </xslout:message>
-                         </xslout:otherwise>
-                     </xslout:choose>
-
+                     <xsl:apply-templates select="$steps" mode="joinXSL"/>
+                     <xsl:if test="$steps[@type='XPATH']">
+                         <xslout:choose>
+                             <xsl:apply-templates select="$steps" mode="joinXPath"/>
+                             <xslout:otherwise>
+                                 <xslout:message terminate="yes">
+                                     <xsl:value-of select="for $s in $steps[@type='XPATH'] return
+                                                           if ($s/@message) then $s/@message
+                                                           else concat('Expecting ',$s/@match)" separator=" or "/>
+                                     <!--
+                                         Since XPath or operations are not
+                                         joined at the moment, then only
+                                         the first error code need apply.
+                                     -->
+                                     <xsl:if test="$steps[@type='XPATH' and exists(@code)]">
+                                         <xsl:value-of select="concat('C:',$steps[@type='XPATH']/@code[1],':C')"/>
+                                     </xsl:if>
+                                 </xslout:message>
+                             </xslout:otherwise>
+                         </xslout:choose>
+                     </xsl:if>
                      <xslout:copy>
                          <xslout:apply-templates select="node()"/>
                      </xslout:copy>
@@ -146,6 +164,16 @@
 
     <xsl:template match="check:step[@type='XPATH']" mode="joinXPath">
         <xslout:when test="{@match}"/>
+    </xsl:template>
+
+    <xsl:template match="check:step[@type='XSL' and xsl:transform/@check:mergable]" mode="joinXSL">
+        <xsl:copy-of select="xsl:transform/xsl:template[@match='/']/xsl:choose"/>
+    </xsl:template>
+
+    <xsl:template match="check:step[@type='XSL' and xsl:transform/@check:mergable]" mode="xslVars">
+        <xsl:param name="vars" as="node()*" />
+        <xsl:variable name="names" as="xsd:string*" select="for $v in $vars return $v/@name"/>
+        <xsl:copy-of select="xsl:transform/xsl:variable[not(@name = $names)]"/>
     </xsl:template>
 
     <!--
