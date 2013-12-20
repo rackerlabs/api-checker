@@ -23,6 +23,10 @@ object Wadl2Checker {
   val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
                                          "Join multiple XPath and XML well-formed checks into a single check: false")
 
+
+  val preserveRequestBody = parser.flag[Boolean] (List("b", "preserve-req-body"),
+                                              "Ensure that the request body is preserved after validating the request.")
+
   val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
                                          "Add checks to ensure that XML and JSON are well formed. Default: false")
 
@@ -119,6 +123,7 @@ object Wadl2Checker {
       c.enableIgnoreJSONSchemaExtension = !(ignoreJSON.value.getOrElse(false))
       c.enableMessageExtension = !(message.value.getOrElse(false))
       c.xpathVersion = xpathVersion.value.getOrElse(1)
+      c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)
     } catch {

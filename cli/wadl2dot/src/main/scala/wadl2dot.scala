@@ -26,6 +26,9 @@ object Wadl2Dot {
   val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
                                          "Join multiple XPath and XML well-formed checks into a single check: false")
 
+  val preserveRequestBody = parser.flag[Boolean] (List("b", "preserve-req-body"),
+                                              "Ensure that the request body is preserved after validating the request.")
+
   val xsdCheck = parser.flag[Boolean] (List("x", "xsd"),
                                          "Add checks to ensure that XML validates against XSD grammar Default: false")
 
@@ -118,6 +121,7 @@ object Wadl2Dot {
       c.enableIgnoreXSDExtension = !(ignoreXSD.value.getOrElse(false))
       c.enableIgnoreJSONSchemaExtension = !(ignoreJSON.value.getOrElse(false))
       c.enableMessageExtension = !(message.value.getOrElse(false))
+      c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
       c.validateChecker = true
 
       new WADLDotBuilder().build (getSource, getResult,
