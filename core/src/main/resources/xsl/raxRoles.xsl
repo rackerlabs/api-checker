@@ -2,8 +2,12 @@
 <!--
   raxRoles.xsl
 
-  This stylesheet is responsible for transforming rax:roles found
-  in resource or method attributes into header params
+  This stylesheet is responsible for transforming rax:roles found in
+  resource or method attributes in a WADL into header params.  Header
+  params are always placed at the method level.
+
+  The header checks are instructed to always return a 403 with the
+  message: "You are forbidden to perform the operation"
 -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:wadl="http://wadl.dev.java.net/2009/02"
