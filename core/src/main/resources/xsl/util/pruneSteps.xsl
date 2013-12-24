@@ -88,4 +88,11 @@
         </xsl:choose>
     </xsl:template>
 
+    <xsl:function name="util:pruneSteps" as="node()*">
+        <xsl:param name="checker" as="node()*"/>
+        <xsl:call-template name="util:pruneSteps">
+            <xsl:with-param name="checker" select="$checker"/>
+        </xsl:call-template>
+    </xsl:function>
+
 </xsl:stylesheet>
