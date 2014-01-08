@@ -2,6 +2,16 @@
 
 ## Release 1.0.14 (2013-12-12) ##
 
+1. Added preserveRequestBody. Normally api-checker will simply stream the request
+body through the state machine for validation. This works fine for a single validator,
+but if multiple validators are used this will cause unexpected errors. preserveRequestBody
+will add an extra step in the state machine to 'save' the request body in a buffer
+so as validators further down the line can read it. Turning this feature on will cause
+a slight performance hit as it adds a step in the state machine.
+1. Updated XPath join optimization to be able to join adjacent mergable XSLs.
+
+## Release 1.0.14 (2013-12-12) ##
+
 1. Fixed URI decoding and handling of '+' in URL path segment
 1. Better handling of exceptions in validator and checker-builder
 1. Ensure JSON schema errors are concise
