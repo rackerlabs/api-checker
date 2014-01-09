@@ -6,8 +6,8 @@
 body through the state machine for validation. This works fine for a single validator,
 but if multiple validators are used this will cause unexpected errors. preserveRequestBody
 will add an extra step in the state machine to 'save' the request body in a buffer
-so as validators further down the line can read it. Turning this feature on will cause
-a slight performance hit as it adds a step in the state machine.
+so as validators further down the line can read it. Turning this feature on will add an extra
+step in the state machine to capture the request body.
 1. Updated XPath join optimization to be able to join adjacent mergable XSLs.
 
 ## Release 1.0.14 (2013-12-12) ##
