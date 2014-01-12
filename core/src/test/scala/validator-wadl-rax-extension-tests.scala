@@ -410,7 +410,73 @@ class GivenAWadlWithNestedResources extends FlatSpec with RaxRolesBehaviors {
     it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("b:foo"), description)
     it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a/b", description)
 
+  }
+}
 
+@RunWith(classOf[JUnitRunner])
+class GivenAWadlWithNestedResourcesAndMethodReferences extends FlatSpec with RaxRolesBehaviors {
+
+  val configs = Map[String, Config]("Config With Roles Enabled" -> configWithRolesEnabled,
+    "Config With Roles Enabled and Messsage Extensions Disabled" -> configWithRolesEnabledMessageExtDisabled,
+    "Config With Roles Enabled and Duplications Removed" -> configWithRolesEnabledDupsRemoved,
+    "Config With Roles Enabled and Header Checks Disabled" -> configWithRolesEnabledHeaderCheckDisabled)
+
+  for ((description, configuration) <- configs) {
+
+    val validator = Validator((localWADLURI,
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+        <resources base="https://test.api.openstack.com">
+          <resource path="/a" rax:roles="a:admin">
+            <method href="#putOnA" rax:roles="a:observer"/>
+            <resource path="/b" rax:roles="b:creator">
+              <method href="#postOnB"/>
+              <method href="#putOnB"/>
+              <method href="#deleteOnB" rax:roles="b:observer b:admin"/>
+            </resource>
+          </resource>
+        </resources>
+        <method id="putOnA" name="PUT"/>
+        <method id="postOnB" name="POST"/>
+        <method id="putOnB" name="PUT" rax:roles="b:observer"/>
+        <method id="deleteOnB" name="DELETE" rax:roles="b:foo"/>
+      </application>)
+      , configuration)
+
+    // PUT /a has resource level a:admin, method level a:observer
+    it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:admin"), description)
+    it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer"), description)
+    it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer", "a:admin"), description)
+    it should behave like accessIsForbidden(validator, "PUT", "/a", List("b:observer"), description)
+    it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a", description)
+
+    // DELETE /a has resource level a:admin, method is not defined
+    it should behave like methodNotAllowed(validator, "DELETE", "/a", List("a:admin"), description)
+    it should behave like methodNotAllowed(validator, "DELETE", "/a", List(), description)
+
+    // POST /a/b has parent resource level a:admin, resource level b:creator
+    it should behave like accessIsAllowed(validator, "POST", "/a/b", List("a:admin"), description)
+    it should behave like accessIsAllowed(validator, "POST", "/a/b", List("b:creator"), description)
+    it should behave like accessIsForbidden(validator, "POST", "/a/b", List("a:observer"), description)
+    it should behave like accessIsForbiddenWhenNoXRoles(validator, "POST", "/a/b", description)
+
+    // PUT /a/b has parent resource level a:admin, resource level b:creator, method level b:observer
+    it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("a:admin"), description)
+    it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("b:creator"), description)
+    it should behave like accessIsAllowed(validator, "PUT", "/a/b", List("b:observer", "a:foo"), description)
+    it should behave like accessIsForbidden(validator, "PUT", "/a/b", List("a:creator"), description)
+    it should behave like accessIsForbidden(validator, "PUT", "/a/b", List(), description)
+    it should behave like accessIsForbidden(validator, "PUT", "/a/b", List("observer"), description)
+    it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a/b", description)
+
+    // DELETE /a/b has parent resource level a:admin, resource level b:creator, method level b:admin, b:observer
+    it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("a:admin"), description)
+    it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:creator"), description)
+    it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:observer", "a:admin"), description)
+    it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:admin"), description)
+    it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List(), description)
+    it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("a:observer"), description)
+    it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("b:foo"), description)
+    it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a/b", description)
   }
 }
 

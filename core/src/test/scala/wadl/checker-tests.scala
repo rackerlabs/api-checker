@@ -7928,6 +7928,70 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
   }
 
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (method ref)") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method href="#headerMethod"/>
+               <method href="#postOnAB"/>
+           </resource>
+           <resource path="/c">
+               <method href="#postOnC"/>
+               <method href="#getOnC"/>
+           </resource>
+        </resources>
+        <method id="headerMethod" name="PUT">
+          <request>
+           <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
+           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+           <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
+           <representation mediaType="application/xml"/>
+           <representation mediaType="application/json"/>
+         </request>
+       </method>
+       <method id="postOnAB" name="POST">
+         <request>
+           <representation mediaType="application/xml"/>
+         </request>
+       </method>
+       <method id="postOnC" name="POST">
+          <request>
+            <representation mediaType="application/json"/>
+          </request>
+       </method>
+       <method id="getOnC" name="GET"/>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndReqHeaderAssertions(checker)
+    wellFormedAndReqHeaderAssertions(checker)
+    xsdAndReqHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (rax:code)") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
