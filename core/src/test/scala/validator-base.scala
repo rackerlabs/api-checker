@@ -40,6 +40,7 @@ import org.mockito.Matchers._
 import org.mockito.stubbing.Answer
 import org.mockito.invocation.InvocationOnMock
 
+import scala.language.implicitConversions
 import scala.collection.JavaConversions._
 
 import org.w3c.dom.Document
