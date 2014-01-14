@@ -9,7 +9,7 @@ will add an extra step in the state machine to 'save' the request body in a buff
 so as validators further down the line can read it. Turning this feature on will add an extra
 step in the state machine to capture the request body.
 1. Updated XPath join optimization to be able to join adjacent mergable XSLs.
-1. Updated WADL-Tools to 1.0.21
+1. Updated wadl-tools: 1.0.20 → 1.0.21
 1. Fixed issue: rax:roles in method references were not handled correctly. 
 1. Enable implicit conversions in core tests. Removes warnings during compilation.
 
