@@ -1,6 +1,6 @@
 # Releases #
 
-## Release 1.0.14 (2014-01-14) ##
+## Release 1.0.15 (2014-01-14) ##
 
 1. Added preserveRequestBody. Normally api-checker will simply stream the request
 body through the state machine for validation. This works fine for a single validator,
