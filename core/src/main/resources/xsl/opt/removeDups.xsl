@@ -365,6 +365,21 @@
                     </xsl:if>
                 </xsl:for-each-group>
             </xsl:for-each-group>
+            <!-- URL and method fails with no match -->
+            <xsl:for-each-group select="$checker//check:step[@type = ('METHOD_FAIL','URL_FAIL') and not(@notTypes) and not(@notMatch)]" group-by="@type">
+                <xsl:if test="count(current-group()) > 1">
+                    <group>
+                        <xsl:attribute name="include">
+                            <xsl:value-of select="current-group()[1]/@id"></xsl:value-of>
+                        </xsl:attribute>
+                        <xsl:attribute name="exclude">
+                            <xsl:value-of separator=" ">
+                                <xsl:sequence select="current-group()[position() != 1]/@id"></xsl:sequence>
+                            </xsl:value-of>
+                        </xsl:attribute>
+                    </group>
+                </xsl:if>
+            </xsl:for-each-group>
             <!-- URL fail with @notTypes only -->
             <xsl:for-each-group select="$checker//check:step[@type='URL_FAIL' and not(@notMatch)]" group-by="@notTypes">
                 <xsl:if test="count(current-group()) > 1">
