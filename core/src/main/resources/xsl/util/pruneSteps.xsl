@@ -58,26 +58,28 @@
         <xsl:variable name="all" as="xsd:integer" select="count($checker//check:step[@type != 'START'])"/>
         <xsl:choose>
             <xsl:when test="$connected = $all">
-                <checker>
-                    <xsl:copy-of select="$checker//check:step"/>
-                </checker>
+                <xsl:copy-of select="$checker"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="util:pruneSteps">
                     <xsl:with-param name="checker">
-                        <checker>
-                            <xsl:apply-templates select="$checker" mode="util:pruneSteps">
-                                <xsl:with-param name="nexts" select="$nexts"/>
-                            </xsl:apply-templates>
-                        </checker>
+                        <xsl:apply-templates select="$checker" mode="util:pruneSteps">
+                            <xsl:with-param name="nexts" select="$nexts" tunnel="yes"/>
+                        </xsl:apply-templates>
                     </xsl:with-param>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template match="@* | node()" mode="util:pruneSteps">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" mode="util:pruneSteps"/>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:template match="check:step" mode="util:pruneSteps">
-        <xsl:param name="nexts" as="xsd:string*"/>
+        <xsl:param name="nexts" as="xsd:string*" tunnel="yes"/>
         <xsl:choose>
             <xsl:when test="(@id = $nexts) or (@type='START')">
                 <xsl:copy-of select="."/>
@@ -87,5 +89,12 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+    <xsl:function name="util:pruneSteps" as="node()">
+        <xsl:param name="checker" as="node()"/>
+        <xsl:call-template name="util:pruneSteps">
+            <xsl:with-param name="checker" select="$checker"/>
+        </xsl:call-template>
+    </xsl:function>
 
 </xsl:stylesheet>
