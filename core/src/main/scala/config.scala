@@ -167,6 +167,13 @@ class Config {
   //
   @BeanProperty var enableRaxRolesExtension : Boolean = false
 
+  //
+  //  Mask rax-roles with 404 and 405 errors. By default rax-roles
+  //  response with a 403 if there is a role mismatch, if
+  //  maskRaxRoles403 is true then the respose will be 404 if no
+  //  methods are accessible or 405 if some methods are available.
+  //
+  @BeanProperty var maskRaxRoles403 : Boolean = false
 
   //
   //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,

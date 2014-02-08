@@ -64,6 +64,18 @@ class BaseCheckerSpec extends BaseWADLSpec {
     (checker \\ "step").filter(n => (n \ "@label").text == labelMatch)
   }
 
+  def stepsWithMethodFailNotMatch (checker : NodeSeq, notMatch : String) : NodeSeq = {
+    stepsWithType(checker,"METHOD_FAIL").filter(n => (n \ "@notMatch").text == notMatch)
+  }
+
+  def stepsWithURLFailNotMatch (checker : NodeSeq, notMatch : String) : NodeSeq = {
+    stepsWithType(checker,"URL_FAIL").filter(n => (n \ "@notMatch").text == notMatch)
+  }
+
+  def stepsWithURLFailNotTypes (checker : NodeSeq, notTypes : String) : NodeSeq = {
+    stepsWithType(checker,"URL_FAIL").filter(n => (n \ "@notTypes").text == notTypes)
+  }
+
   def stepsWithURLMatch (checker : NodeSeq, urlMatch  : String) : NodeSeq = {
     stepsWithMatch (checker, urlMatch).filter(n => (n \ "@type").text == "URL")
   }
@@ -163,7 +175,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def Start : (NodeSeq) => NodeSeq = stepsWithType(_, "START")
   def Accept : (NodeSeq) => NodeSeq = stepsWithType(_, "ACCEPT")
   def URLFail : (NodeSeq) => NodeSeq = stepsWithType(_, "URL_FAIL")
+  def URLFail(notMatch : String)  : (NodeSeq) => NodeSeq = stepsWithURLFailNotMatch(_, notMatch)
+  def URLFailT(notTypes : String)  : (NodeSeq) => NodeSeq = stepsWithURLFailNotTypes(_, notTypes)
   def MethodFail : (NodeSeq) => NodeSeq = stepsWithType(_, "METHOD_FAIL")
+  def MethodFail(notMatch : String) : (NodeSeq) => NodeSeq = stepsWithMethodFailNotMatch(_, notMatch)
   def ReqTypeFail : (NodeSeq) => NodeSeq = stepsWithType(_, "REQ_TYPE_FAIL")
   def WellXML : (NodeSeq) => NodeSeq = stepsWithType(_, "WELL_XML")
   def WellJSON : (NodeSeq) => NodeSeq = stepsWithType(_, "WELL_JSON")

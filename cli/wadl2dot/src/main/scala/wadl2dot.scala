@@ -18,7 +18,10 @@ object Wadl2Dot {
                                          "Remove duplicate nodes. Default: false")
 
   val raxRoles = parser.flag[Boolean] (List("r", "rax-roles"),
-                                         "Disable Rax-Roles extension. Default: false")
+                                         "Enable Rax-Roles extension. Default: false")
+
+  val raxRolesMask403 = parser.flag[Boolean] (List("M", "rax-roles-mask-403s"),
+                                              "When Rax-Roles is enable mask 403 errors with 404 or 405s. Default: false")
 
   val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
                                          "Add checks to ensure that XML and JSON are well formed. Default: false")
@@ -109,7 +112,8 @@ object Wadl2Dot {
       val c = new Config
 
       c.removeDups = removeDups.value.getOrElse(false)
-      c.enableRaxRolesExtension = (raxRoles.value.getOrElse(false))
+      c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
+      c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
       c.checkWellFormed = wellFormed.value.getOrElse(false)
       c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
       c.checkJSONGrammar = jsonCheck.value.getOrElse(false)

@@ -84,6 +84,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
 
   val raxRolesTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxRoles.xsl").toString))
+  val raxRolesMaskTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxRolesMask.xsl").toString))
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/builder.xsl").toString))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/removeDups.xsl").toString))
   val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/commonJoin.xsl").toString))
@@ -98,7 +99,6 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
     }
 
     try {
-      val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
       val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
 
       buildHandler.getTransformer().setParameter (ENABLE_WELL_FORM, c.checkWellFormed)
@@ -114,17 +114,28 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_JSON_SCHEMA, c.checkJSONGrammar)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
 
-      var output = out;
-      raxRolesHandler.setResult(new SAXResult(buildHandler))
+      val output = {
+        if (c.validateChecker) {
+          val outHandler = wadl.saxTransformerFactory.newTransformerHandler();
+          outHandler.setResult(out)
 
-      if (c.validateChecker) {
-        val outHandler = wadl.saxTransformerFactory.newTransformerHandler();
-        outHandler.setResult(output)
+          val schemaHandler = checkerSchema.newValidatorHandler()
+          schemaHandler.setContentHandler(outHandler)
 
-        val schemaHandler = checkerSchema.newValidatorHandler()
-        schemaHandler.setContentHandler(outHandler)
+          new SAXResult(schemaHandler)
+        } else {
+          out
+        }
+      }
 
-        output = new SAXResult(schemaHandler)
+      val optInputHandler = {
+        if (c.maskRaxRoles403) {
+          val raxRolesMaskHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesMaskTemplates)
+          buildHandler.setResult(new SAXResult(raxRolesMaskHandler))
+          raxRolesMaskHandler
+        } else {
+          buildHandler
+        }
       }
 
       if (c.removeDups || c.joinXPathChecks) {
@@ -132,7 +143,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
         val joinHandler = wadl.saxTransformerFactory.newTransformerHandler(joinTemplates)
         val joinHeaderHandler = wadl.saxTransformerFactory.newTransformerHandler(joinHeaderTemplates)
 
-        buildHandler.setResult (new SAXResult (dupsHandler))
+        optInputHandler.setResult (new SAXResult (dupsHandler))
         dupsHandler.setResult(new SAXResult(joinHandler))
         joinHandler.setResult(new SAXResult (joinHeaderHandler))
 
@@ -148,9 +159,11 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
           joinHeaderHandler.setResult(output)
         }
       } else {
-        buildHandler.setResult (output)
+        optInputHandler.setResult (output)
       }
       if(c.enableRaxRolesExtension){
+        val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
+        raxRolesHandler.setResult(new SAXResult(buildHandler))
         wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
       }else{
         wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
