@@ -1,13 +1,15 @@
 package com.rackspace.com.papi.components.checker.handler
 
-import java.util.Date
-import java.util.UUID
-import java.math.BigInteger
-import scala.util.Random
-
 import java.lang.management.ManagementFactory
 import javax.management.MBeanServer
 import javax.management.ObjectName
+
+import javax.xml.transform.Transformer
+import javax.xml.transform.stream.StreamSource
+import javax.xml.transform.sax.SAXResult
+
+import com.rackspace.com.papi.components.checker.step.StepHandler
+import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
 
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.BaseValidatorSuite
@@ -24,11 +26,6 @@ import org.scalatest.FunSuite
 @RunWith(classOf[JUnitRunner])
 class InstrumentedHandlerSuite extends BaseValidatorSuite {
 
-  //
-  // validator a simple machine used to test the insturmentation
-  // handler.
-  //
-
   val instrumentedHandler = new InstrumentedHandler()
 
   val handlerConfig = {
@@ -40,13 +37,6 @@ class InstrumentedHandlerSuite extends BaseValidatorSuite {
     cnfg.resultHandler = handler
     cnfg
   }
-
-  //
-  //  This is silly, we use the xml checker format as an intermediate
-  //  representation so we have no way to input it directly. As a
-  //  result, I manually build the format here and the corresponding
-  //  states. Eventually need to fix this.
-  //
 
   val xmlChecker =
     <checker xmlns="http://www.rackspace.com/repose/wadl/checker">
@@ -62,19 +52,19 @@ class InstrumentedHandlerSuite extends BaseValidatorSuite {
       <step id="badURL" type="URL_FAIL"/>
     </checker>
 
-  val validator = Validator("MyInstTestValidator",{
-    val badURL = new URLFail("badURL", "URLFail")
-    val badMethod = new MethodFail("badMethod", "MethodFail")
-    val badMethodGet = new MethodFailMatch("badMethodGet","MethodFail", "GET".r)
-    val badBURL = new URLFailMatch("badBURL", "URLFail", "b".r)
-    val badAURL = new URLFailMatch("badAURL", "URLFail", "a".r)
-    val accept = new Accept("Accept", "Accept")
-    val get = new Method("GET", "GET", "GET".r, Array(accept))
-    val b = new URI("b","b","b".r, Array(get, badURL, badMethodGet))
-    val a = new URI("a","a","a".r, Array(b, badBURL, badMethod))
-    val start = new Start("S0", "Start", Array(a, badAURL, badMethod))
-    start
-  }, handlerConfig)
+  val steps = {
+    var transf : Transformer = null
+    val stepHandler = new StepHandler (null, handlerConfig)
+    try {
+      transf = IdentityTransformPool.borrowTransformer
+      transf.transform (new StreamSource(xmlChecker), new SAXResult(stepHandler))
+      stepHandler.step
+    } finally {
+      if (transf != null) IdentityTransformPool.returnTransformer(transf)
+    }
+  }
+
+  val validator = Validator("MyInstTestValidator", steps, handlerConfig)
 
   //
   //  Reinitialize the handlers so that we can connect the state
@@ -84,7 +74,7 @@ class InstrumentedHandlerSuite extends BaseValidatorSuite {
   handlerConfig.resultHandler.destroy
   handlerConfig.resultHandler.init(validator, Some(xmlChecker))
 
-  val allSteps = List("S0", "a", "b", "GET", "Accept", "badAURL", "badBURL", "badMethodGet", "badMethod", "badURL")
+  val allSteps = (xmlChecker \\ "step" \\ "@id").map (n => n.text).toList
 
   val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
 
