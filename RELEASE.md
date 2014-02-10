@@ -1,5 +1,23 @@
 # Releases #
 
+## Release 1.0.16 (2014-02-10) ##
+
+1. Added raxRolesMask. Normally api-checker will return 403s when
+authorization is denied.  When the raxRolesMask feature is enabled,
+404s or 405s will be returned instead to hide the fact that failure is
+due to lack of privileges.
+1. The removeDups optimization can now correctly handle METHOD\_FAIL
+and URL\_FAIL steps with no match.
+1. Fixed bug where the instrumented handler was not counting steps
+correctly.
+1. Fixed a potential bug where METHOD\_FAIL and URL\_FAIL messages
+could be confused with one another in the removeDups optimization.
+1. Fixed a bug where the next attribute is not taken into account in
+the header join optimization.
+1. Fixed a bug in the prune step transform where checker elements may
+not be copied correctly.
+1. Updated wadl-tools: 1.0.21 → 1.0.22
+
 ## Release 1.0.15 (2014-01-14) ##
 
 1. Added preserveRequestBody. Normally api-checker will simply stream the request
