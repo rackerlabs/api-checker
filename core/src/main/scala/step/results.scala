@@ -156,7 +156,7 @@ class NoResultsException( val message : String ) extends Exception( message )
 // This class is a wrapper around priorityqueue of several results, delegating the Result methods to the Result
 // at the head of the data structure.
 //
-class MultiFailResult(fails : Array[Result], stepId : String) extends ErrorResult ( "Multiple possible errors", -1, -1, stepId, -1 ) {
+class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorResult ( "Multiple possible errors", -1, -1, stepId, -1 ) {
 
   if ( fails.isEmpty ) throw new NoResultsException( "Input array must be non-empty." )
 
