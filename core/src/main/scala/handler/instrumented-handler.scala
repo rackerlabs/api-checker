@@ -11,6 +11,7 @@ import javax.management._
 
 import com.rackspace.com.papi.components.checker.step.Result
 import com.rackspace.com.papi.components.checker.step.MultiFailResult
+import com.rackspace.com.papi.components.checker.step.MismatchResult
 
 import com.rackspace.com.papi.components.checker.servlet._
 
@@ -71,7 +72,12 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
   }
 
   private def markResult (result : Result) : Unit = {
-    result.stepIDs.foreach (s => stepMeters(s).mark)
+    result match {
+      case m : MultiFailResult => m.stepIDs.foreach(s => stepMeters(s).mark)
+                                  m.fails.foreach (f => markResult(f))
+      case mr : MismatchResult => ; /* Ignore these, since it's a mismatch */
+      case r : Result => r.stepIDs.foreach (s => stepMeters(s).mark)
+    }
   }
 
   private def markFail (result : Result, req : CheckerServletRequest) : Unit = {
@@ -88,7 +94,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
   }
 
   override def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
-    result.allResults.foreach( markResult )
+    markResult(result)
     if (!result.valid) {
       markFail(result, req)
     }

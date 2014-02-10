@@ -16,7 +16,9 @@ import javax.servlet.FilterChain
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.transform.Transformer
 import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.stream.StreamSource
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode
@@ -91,6 +93,19 @@ object Converters {
       transf = IdentityTransformPool.borrowTransformer
       transf.transform(new DOMSource(doc), new StreamResult(swriter))
       XML.loadString (swriter.toString())
+    } finally {
+      if (transf != null) IdentityTransformPool.returnTransformer(transf)
+    }
+  }
+
+  implicit def nodeSeq2Doc (n : NodeSeq) : Document = {
+    var transf : Transformer = null
+    try {
+      val result = new DOMResult()
+      transf = IdentityTransformPool.borrowTransformer
+      transf.transform(new StreamSource(new ByteArrayInputStream(n.toString().getBytes())),
+                       result)
+      result.getNode.asInstanceOf[Document]
     } finally {
       if (transf != null) IdentityTransformPool.returnTransformer(transf)
     }
