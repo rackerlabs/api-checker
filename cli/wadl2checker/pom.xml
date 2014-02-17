@@ -57,7 +57,7 @@
                     <minimizeJar>false</minimizeJar>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
-                    <shadedClassifierName>complete</shadedClassifierName>
+                    <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
                     <transformers>
                       <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                         <mainClass>com.rackspace.com.papi.components.checker.cli.Wadl2Checker</mainClass>
