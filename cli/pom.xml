@@ -22,7 +22,6 @@
 
     <properties>
         <argot.version>1.0.1</argot.version>
-        <saxon.version>9.3</saxon.version>
     </properties>
 
     <dependencies>
@@ -30,11 +29,6 @@
             <groupId>com.rackspace.papi.components.api-checker</groupId>
             <artifactId>checker-core</artifactId>
             <version>1.0.17-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon</artifactId>
-            <version>${saxon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.clapper</groupId>
