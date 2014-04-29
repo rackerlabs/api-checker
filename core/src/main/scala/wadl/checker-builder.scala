@@ -1,5 +1,7 @@
 package com.rackspace.com.papi.components.checker.wadl
 
+import scala.language.reflectiveCalls
+
 import scala.xml._
 
 import java.io.InputStream
@@ -21,6 +23,10 @@ import com.rackspace.cloud.api.wadl.XSDVersion._
 import com.rackspace.cloud.api.wadl.Converters._
 
 import com.rackspace.com.papi.components.checker.Config
+
+import com.typesafe.scalalogging.slf4j.LazyLogging
+
+import net.sf.saxon.Controller
 
 /**
  *  XSL Transformer parameters.
@@ -60,7 +66,7 @@ import XPathJoinParams._
  */
 class WADLException(private val msg : String, private val cause : Throwable) extends Throwable(msg, cause) {}
 
-class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
+class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends LazyLogging {
 
   if (wadl == null) {
     wadl = new WADLNormalizer
@@ -113,6 +119,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_SCHEMA, c.checkJSONGrammar)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
+      buildHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
 
       val output = {
         if (c.validateChecker) {
@@ -132,6 +139,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
         if (c.maskRaxRoles403) {
           val raxRolesMaskHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesMaskTemplates)
           buildHandler.setResult(new SAXResult(raxRolesMaskHandler))
+          raxRolesMaskHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
           raxRolesMaskHandler
         } else {
           buildHandler
@@ -143,6 +151,10 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
         val joinHandler = wadl.saxTransformerFactory.newTransformerHandler(joinTemplates)
         val joinHeaderHandler = wadl.saxTransformerFactory.newTransformerHandler(joinHeaderTemplates)
 
+        dupsHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
+        joinHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
+        joinHeaderHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
+
         optInputHandler.setResult (new SAXResult (dupsHandler))
         dupsHandler.setResult(new SAXResult(joinHandler))
         joinHandler.setResult(new SAXResult (joinHeaderHandler))
@@ -152,6 +164,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
           xpathHandler.getTransformer().setParameter(DEFAULT_XPATH_VERSION, c.xpathVersion)
           xpathHandler.getTransformer().setParameter(PRESERVE_REQUEST_BODY, c.preserveRequestBody)
+          xpathHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
 
           joinHeaderHandler.setResult(new SAXResult(xpathHandler))
           xpathHandler.setResult(output)
@@ -164,12 +177,14 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) {
       if(c.enableRaxRolesExtension){
         val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
         raxRolesHandler.setResult(new SAXResult(buildHandler))
+        raxRolesHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
         wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
       }else{
         wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
       }
     } catch {
-      case e : Exception => throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
+      case e : Exception => logger.error(e.getMessage())
+                            throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
     }
   }
 
