@@ -13,7 +13,7 @@ import org.xml.sax.SAXParseException
 class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
 
   test("URLFailXSD should return None if URI level has been exceeded : StepType, uuid, evenIntType") {
-    val ufx = new URLFailXSD("ufx", "ufx", Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon)
+    val ufx = new URLFailXSD("ufx", "ufx", Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon, 10)
     val res = ufx.check (request("GET", "/START/b"), response,chain, 2)
     assert (res == None)
     val res2 = ufx.check (request("GET", "/ACCEPT/b"), response,chain, 3)
@@ -21,7 +21,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test("URLFailXSD should return URL fail result if URI level has not been exceeded and the uri type does not match : StepType, uuid, evenIntType") {
-    val ufx = new URLFailXSD ("ufmx", "ufmx", Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon)
+    val ufx = new URLFailXSD ("ufmx", "ufmx", Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon, 10)
     val res = ufx.check (request("GET", "/a/b"), response,chain, 0)
     assert (res.isDefined)
     assert (res.get.isInstanceOf[URLFailResult])
@@ -32,7 +32,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
 
 
   test("URLFailXSD should return URL None if URI level has not been exceeded and the uri type matches : StepType, uuid, evenIntType") {
-    val ufx = new URLFailXSD ("ufmx", "ufmx", Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon)
+    val ufx = new URLFailXSD ("ufmx", "ufmx", Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon, 10)
     val res = ufx.check (request("GET", "/START/b"), response,chain, 0)
     assert (res == None)
     val res2 = ufx.check (request("GET", "/eb507026-6463-11e1-b7aa-8b7b918a1623/b"), response,chain, 0)
@@ -42,7 +42,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test("URLFailXSDMatch should return None if URI level has been exceeded : StepType, uuid, evenIntType") {
-    val ufx = new URLFailXSDMatch("ufx", "ufx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon)
+    val ufx = new URLFailXSDMatch("ufx", "ufx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon, 10)
     val res = ufx.check (request("GET", "/START/b"), response,chain, 2)
     assert (res == None)
     val res2 = ufx.check (request("GET", "/ACCEPT/b"), response,chain, 3)
@@ -52,7 +52,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test("URLFailXSDMatch should return URL fail result if URI level has not been exceeded and the uri type does not match : StepType, uuid, evenIntType") {
-    val ufx = new URLFailXSDMatch ("ufmx", "ufmx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon)
+    val ufx = new URLFailXSDMatch ("ufmx", "ufmx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon, 10)
     val res = ufx.check (request("GET", "/a/b"), response,chain, 0)
     assert (res.isDefined)
     assert (res.get.isInstanceOf[URLFailResult])
@@ -62,7 +62,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test("URLFailXSDMatch should return URL None if URI level has not been exceeded and the uri type matches : StepType, uuid, evenIntType") {
-    val ufx = new URLFailXSDMatch ("ufmx", "ufmx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon)
+    val ufx = new URLFailXSDMatch ("ufmx", "ufmx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchemaSaxon, 10)
     val res = ufx.check (request("GET", "/START/b"), response,chain, 0)
     assert (res == None)
     val res2 = ufx.check (request("GET", "/eb507026-6463-11e1-b7aa-8b7b918a1623/b"), response,chain, 0)
@@ -189,7 +189,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD test, if the content contains valid XML, the uriLevel should stay the same") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64a</id>
@@ -206,8 +206,28 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD test, if the content contains valid XML, the contentErrorPriority should be -1") {
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, 10, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/xml",
+                        <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                          <id>f76d5638-bb4f-11e1-abb0-539c4b93e64a</id>
+                          <stepType>START</stepType>
+                          <even>22</even>
+                        </e>, true)
+    val req2 = request ("PUT", "/a/b", "application/xml",
+                        <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                           id="f76d5638-bb4f-11e1-abb0-539c4b93e64a"
+                           stepType="START"
+                           even="22"/>, true)
+
+    xsd.checkStep (req1, response, chain, 0)
+    xsd.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
   test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64aaa</id>
@@ -224,8 +244,29 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == -1)
   }
 
+
+  test ("In an XSD test, if the content contains invalid XML, the contentErrorPriority should be set") {
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, 10, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/xml",
+                        <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                          <id>f76d5638-bb4f-11e1-abb0-539c4b93e64aaa</id>
+                          <stepType>START</stepType>
+                          <even>22</even>
+                        </e>, true)
+    val req2 = request ("PUT", "/a/b", "application/xml",
+                        <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                           id="f76d5638-bb4f-11e1-abb0-539c4b93e64aaaa"
+                           stepType="START"
+                           even="22"/>, true)
+
+    xsd.checkStep (req1, response, chain, 0)
+    xsd.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
   test ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64aaa</id>
@@ -248,7 +289,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1 (XSD 1.1 assert)") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>309a8f1e-bb52-11e1-b9d9-b7652ca2118a</id>
@@ -265,8 +306,29 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD test, if the content contains invalid XML, the contentErrorPrioirty should be set (XSD 1.1 assert)") {
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, 1000, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/xml",
+                        <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                          <id>309a8f1e-bb52-11e1-b9d9-b7652ca2118a</id>
+                          <stepType>START</stepType>
+                          <even>23</even>
+                        </e>, true)
+    val req2 = request ("PUT", "/a/b", "application/xml",
+                        <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                           id="309a8f1e-bb52-11e1-b9d9-b7652ca2118a"
+                           stepType="START"
+                           even="23"/>, true)
+
+    xsd.checkStep (req1, response, chain, 0)
+    xsd.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 1000)
+    assert (req2.contentErrorPriority == 1000)
+  }
+
+
   test ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException (XSD 1.1 assert)") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, false, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>309a8f1e-bb52-11e1-b9d9-b7652ca2118a</id>
@@ -289,7 +351,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD test, if the content contains valid XML, the uriLevel should stay the same (transform == true)") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64a</id>
@@ -306,8 +368,29 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD test, if the content contains valid XML, the contentErrorPrioirty should be -1 (transform == true)") {
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/xml",
+                        <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                          <id>f76d5638-bb4f-11e1-abb0-539c4b93e64a</id>
+                          <stepType>START</stepType>
+                          <even>22</even>
+                        </e>, true)
+    val req2 = request ("PUT", "/a/b", "application/xml",
+                        <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                           id="f76d5638-bb4f-11e1-abb0-539c4b93e64a"
+                           stepType="START"
+                           even="22"/>, true)
+
+    xsd.checkStep (req1, response, chain, 0)
+    xsd.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
+
   test ("In an XSD test, if the content contains valid XML1, with transform == true, then default values should be filled in") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                          <id>21f1fcf6-bf38-11e1-878e-133ab65fcec3</id>
@@ -323,7 +406,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD test, if the content contains valid XML2, with transform == true, then default values should be filled in") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
                            id="f76d5638-bb4f-11e1-abb0-539c4b93e64a"/>, true)
@@ -336,7 +419,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1 (transform == true)") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64aaa</id>
@@ -353,8 +436,29 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD test, if the content contains invalid XML, the contentErrorPriority should be set (transform == true)") {
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/xml",
+                        <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                          <id>f76d5638-bb4f-11e1-abb0-539c4b93e64aaa</id>
+                          <stepType>START</stepType>
+                          <even>22</even>
+                        </e>, true)
+    val req2 = request ("PUT", "/a/b", "application/xml",
+                        <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                           id="f76d5638-bb4f-11e1-abb0-539c4b93e64aaaa"
+                           stepType="START"
+                           even="22"/>, true)
+
+    xsd.checkStep (req1, response, chain, 0)
+    xsd.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
+
   test ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException (transform == true)") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>f76d5638-bb4f-11e1-abb0-539c4b93e64aaa</id>
@@ -377,7 +481,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD test, if the content contains invalid XML, the uriLevel should be -1 (XSD 1.1 assert, transform == true)") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>309a8f1e-bb52-11e1-b9d9-b7652ca2118a</id>
@@ -394,8 +498,29 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (xsd.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD test, if the content contains invalid XML, the contentErrorPrioirty should be set (XSD 1.1 assert, transform == true)") {
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
+    val req1 = request ("PUT", "/a/b", "application/xml",
+                        <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
+                          <id>309a8f1e-bb52-11e1-b9d9-b7652ca2118a</id>
+                          <stepType>START</stepType>
+                          <even>23</even>
+                        </e>, true)
+    val req2 = request ("PUT", "/a/b", "application/xml",
+                        <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+                           id="309a8f1e-bb52-11e1-b9d9-b7652ca2118a"
+                           stepType="START"
+                           even="23"/>, true)
+
+    xsd.checkStep (req1, response, chain, 0)
+    xsd.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
+
   test ("In an XSD test, if the content contains invalid XML, the request should contain a SAXException (XSD 1.1 assert, transform == true)") {
-    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, Array[Step]())
+    val xsd = new XSD("XSD", "XSD", testSchemaSaxon, true, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/xml",
                         <e xmlns="http://www.rackspace.com/repose/wadl/checker/step/test">
                           <id>309a8f1e-bb52-11e1-b9d9-b7652ca2118a</id>
@@ -418,7 +543,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD header step, if the header is available then the uri level should stay the same.") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
 
@@ -426,8 +551,19 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD header step, if the header is available then the contentErrorPriority should be -1.") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
   test ("In an XSD header step, if the header is available then the uri level should stay the same. (Multiple Headers)") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353", "c8678844-3288-11e2-835c-c71ff3985a57")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20", "d389f680-3288-11e2-b58a-638ddd4222be")))
 
@@ -435,8 +571,20 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == 1)
   }
 
-  test ("In an XSD header step, if the header is available then the uri level should stay the same. (Multiple Items in a singl header)") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+  test ("In an XSD header step, if the header is available then the contentErrorPriority should be -1 (Multiple Headers)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353", "c8678844-3288-11e2-835c-c71ff3985a57")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20", "d389f680-3288-11e2-b58a-638ddd4222be")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
+
+  test ("In an XSD header step, if the header is available then the uri level should stay the same. (Multiple Items in a single header)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353, c8678844-3288-11e2-835c-c71ff3985a57")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20, d389f680-3288-11e2-b58a-638ddd4222be")))
 
@@ -444,8 +592,19 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD header step, if the header is available then the contentErrorPriority should be -1. (Multiple Items in a single header)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353, c8678844-3288-11e2-835c-c71ff3985a57")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20, d389f680-3288-11e2-b58a-638ddd4222be")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
   test ("In an XSD header step, if the header is available, but the content is not correct, the uri level should be -1") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
 
@@ -453,17 +612,39 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD header step, if the header is available, but the content is not correct, the contentErrorPriority should be set") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
   test ("In an XSD header step, if the header is available, but the content is not correct, the uri level should be -1 (Multiple Headers)") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("c8678844-3288-11e2-835c-c71ff3985a57", "28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("d389f680-3288-11e2-b58a-638ddd4222be", "2fbf4592-e25a-11e1bae1-93374682bd20")))
 
     assert (header.checkStep (req1, response, chain, 0) == -1)
     assert (header.checkStep (req2, response, chain, 1) == -1)
+  }
+
+  test ("In an XSD header step, if the header is available, but the content is not correct, the contentErrorPrioroty should be set (Multiple Headers)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("c8678844-3288-11e2-835c-c71ff3985a57", "28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("d389f680-3288-11e2-b58a-638ddd4222be", "2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
   }
 
   test ("In an XSD header step, if the header is available, but the content is not correct, the uri level should be -1 (Multiple Items in a single header)") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("c8678844-3288-11e2-835c-c71ff3985a57", "28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("d389f680-3288-11e2-b58a-638ddd4222be", "2fbf4592-e25a-11e1bae1-93374682bd20")))
 
@@ -471,8 +652,19 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD header step, if the header is available, but the content is not correct, the contentErrorPriority should be set (Multiple Items in a single header)") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("c8678844-3288-11e2-835c-c71ff3985a57", "28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("d389f680-3288-11e2-b58a-638ddd4222be", "2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
   test ("In an XSD header step, if the header is not available then the uri level should be -1") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
 
@@ -480,8 +672,19 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD header step, if the header is not available then the contentErrorPriority should be set") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
   test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
 
@@ -494,7 +697,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Headers)") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("c8678844-3288-11e2-835c-c71ff3985a57", "28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("d389f680-3288-11e2-b58a-638ddd4222be", "2fbf4592-e25a-11e1bae1-93374682bd20")))
 
@@ -507,7 +710,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD header step, if the header is available, but the content is not correct, the request should conatin an Exception (Multiple Items in a single header)") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("ed2127f6-327b-11e2-abc3ebcd8ddbb97, 28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("f5bc95d0327b11e29f31e79a818b84c8, 2fbf4592-e25a-11e1bae1-93374682bd20")))
 
@@ -520,7 +723,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD header step, if the header is not available then the request should contain an Exception") {
-    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
 
@@ -533,7 +736,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD any header step, if the header is available then the uri level should stay the same.") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
 
@@ -541,8 +744,20 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD any header step, if the header is available then the contentErrorPriority should be -1.") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
+
   test ("In an XSD any header step, if the header is available then the uri level should stay the same. (Multiple Headers)") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353","9457bff8-56d5-11e2-8033-a39a52706e3e")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20","9ce63532-56d5-11e2-a5a1-b3291df67c83")))
 
@@ -550,8 +765,20 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD any header step, if the header is available then the contentErrorPriority should be -1 (Multiple Headers)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353","9457bff8-56d5-11e2-8033-a39a52706e3e")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20","9ce63532-56d5-11e2-a5a1-b3291df67c83")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
+
   test ("In an XSD any header step, if the header is available then the uri level should stay the same. (Multiple Items single header)") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353, 9457bff8-56d5-11e2-8033-a39a52706e3e")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20, 9ce63532-56d5-11e2-a5a1-b3291df67c83")))
 
@@ -559,8 +786,19 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD any header step, if the header is available then the contentErrorPriority should be -1. (Multiple Items single header)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353, 9457bff8-56d5-11e2-8033-a39a52706e3e")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20, 9ce63532-56d5-11e2-a5a1-b3291df67c83")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
   test ("In an XSD any header step, if the header is available then the uri level should stay the same, even if other headers don't match") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353","9457bff856d5-11e2-8033-a39a52706e3e")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20","9ce6353256d5-11e2-a5a1b3291df67c83")))
 
@@ -568,8 +806,19 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD any header step, if the header is available then the contentErrorPriority should be -1, even if other headers don't match") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353","9457bff856d5-11e2-8033-a39a52706e3e")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20","9ce6353256d5-11e2-a5a1b3291df67c83")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
   test ("In an XSD any header step, if the header is available, but the content is not correct, the uri level should be -1") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
 
@@ -577,8 +826,19 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the contentErrorPriority should be set") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
   test ("In an XSD any header step, if the header is available, but the content is not correct, the uri level should be -1 (Multiple headers, all incorrect)") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353","foo")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20","bar")))
 
@@ -586,8 +846,20 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the contentErrorPriority should be set (Multiple headers, all incorrect)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353","foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20","bar")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
+
   test ("In an XSD any header step, if the header is available, but the content is not correct, the uri level should be -1 (Multiple items in single header, all incorrect)") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353, foo")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20, bar")))
 
@@ -595,8 +867,21 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == -1)
   }
 
+
+  test ("In an XSD any header step, if the header is available, but the content is not correct, the contentErrorPriority should be set (Multiple items in single header, all incorrect)") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353, foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20, bar")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
+
   test ("In an XSD any header step, if the header is not available, the uri level should be -1") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("509acc44-56d8-11e2-a542-cbb2f2d12c96")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("5be28dda-56d8-11e2-9cf0-4728d4210e49")))
 
@@ -604,8 +889,20 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
     assert (header.checkStep (req2, response, chain, 1) == -1)
   }
 
+  test ("In an XSD any header step, if the header is not available, the contentErrorPriority should be set") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("509acc44-56d8-11e2-a542-cbb2f2d12c96")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("5be28dda-56d8-11e2-9cf0-4728d4210e49")))
+
+    header.checkStep (req1, response, chain, 0)
+    header.checkStep (req2, response, chain, 1)
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
+
   test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
 
@@ -618,7 +915,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple headers all incorrect)") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353", "foo")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20", "bar")))
 
@@ -631,7 +928,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD any header step, if the header is available, but the content is not correct, the request should conatin an Exception (multiple items, all incorrect)") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353, foo")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20, bar")))
 
@@ -644,7 +941,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
   }
 
   test ("In an XSD any header step, if the header not available, the request should conatin an Exception") {
-    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, Array[Step]())
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchemaSaxon, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("28d42e00-e25a-11e1-9897-efbf2Za68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("ID"->List("2fbf4592-e25a-11e1bae1-93374682bd20")))
 

@@ -16,8 +16,7 @@ abstract class Step(val id : String, val label : String) {
   def check(req : CheckerServletRequest,
             resp : CheckerServletResponse,
             chain : FilterChain,
-            uriLevel : Int,
-            stepCount : Int = 1 ) : Option[Result]
+            uriLevel : Int) : Option[Result]
 
 }
 
@@ -43,12 +42,11 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   def nextStep (req : CheckerServletRequest,
                 resp : CheckerServletResponse,
                 chain : FilterChain,
-                uriLevel : Int,
-                stepCount : Int) : Array[Result] = {
+                uriLevel : Int) : Array[Result] = {
 
     val resultBuffer = new ListBuffer[Result]
     for (i <- 0 to next.length-1) {
-      val oresult = next(i).check(req, resp, chain, uriLevel, stepCount + 1 )
+      val oresult = next(i).check(req, resp, chain, uriLevel)
       if (oresult.isDefined) {
         val result = oresult.get
         if (result.valid) {
@@ -67,14 +65,13 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int,
-                     stepCount : Int ) : Option[Result] = {
+                     uriLevel : Int) : Option[Result] = {
 
     var result : Option[Result] = None
     val nextURILevel = checkStep(req, resp, chain, uriLevel)
 
     if (nextURILevel != -1) {
-      val results : Array[Result] = nextStep (req, resp, chain, nextURILevel, stepCount )
+      val results : Array[Result] = nextStep (req, resp, chain, nextURILevel)
       if (results.size == 1) {
         results(0).addStepId(id)
         result = Some(results(0))
@@ -83,7 +80,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
       }
 
     } else {
-      result = Some( new MismatchResult( mismatchMessage, uriLevel, id, stepCount ) )
+      result = Some( new MismatchResult( mismatchMessage, uriLevel, id) )
     }
 
     return result

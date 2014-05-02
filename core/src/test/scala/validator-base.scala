@@ -438,6 +438,7 @@ class BaseValidatorSuite extends FunSuite {
     reqAttribs += (PARSED_XML -> null)
     reqAttribs += (PARSED_JSON -> null)
     reqAttribs += (CONTENT_ERROR -> null)
+    reqAttribs += (CONTENT_ERROR_PRIORITY -> null)
 
     when(req.getCharacterEncoding()).thenReturn("UTF-8")
     when(req.getMethod()).thenReturn(method)

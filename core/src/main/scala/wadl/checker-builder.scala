@@ -96,6 +96,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/commonJoin.xsl").toString))
   val joinHeaderTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/headerJoin.xsl").toString))
   val joinXPathTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/xpathJoin.xsl").toString))
+  val priorityTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/priority.xsl").toString))
+  val adjustNextTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/adjust-next-cont-error.xsl").toString))
 
   def build (in : Source, out: Result, config : Config) : Unit = {
     var c = config
@@ -122,6 +124,14 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
       buildHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
 
       val output = {
+        val priorityHandler = wadl.saxTransformerFactory.newTransformerHandler(priorityTemplates)
+        priorityHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
+
+        val adjustNextHandler = wadl.saxTransformerFactory.newTransformerHandler(adjustNextTemplates)
+        adjustNextHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
+
+        priorityHandler.setResult(new SAXResult(adjustNextHandler))
+
         if (c.validateChecker) {
           val outHandler = wadl.saxTransformerFactory.newTransformerHandler();
           outHandler.setResult(out)
@@ -129,10 +139,11 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
           val schemaHandler = checkerSchema.newValidatorHandler()
           schemaHandler.setContentHandler(outHandler)
 
-          new SAXResult(schemaHandler)
+          adjustNextHandler.setResult(new SAXResult(schemaHandler))
         } else {
-          out
+          adjustNextHandler.setResult(out)
         }
+        new SAXResult(priorityHandler)
       }
 
       val optInputHandler = {

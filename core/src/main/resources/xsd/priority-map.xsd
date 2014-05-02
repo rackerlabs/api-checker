@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  priority-map.xsd
+
+  This XSD describes the format of priority rules that are used by
+  priority.xsl to set priority to certain error states.
+-->
+
+<schema elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
+        xmlns:chkp="http://www.rackspace.com/repose/wadl/checker/priority"
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:xerces="http://xerces.apache.org"
+        targetNamespace="http://www.rackspace.com/repose/wadl/checker/priority">
+
+    <import namespace="http://www.rackspace.com/repose/wadl/checker"
+            schemaLocation="checker.xsd"/>
+
+    <!-- Priority map element -->
+    <element name="priority-map" type="chkp:PriorityMap"/>
+
+    <!-- Complex Types -->
+    <complexType name="PriorityMap">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Root element for priority rules.
+                </html:p>
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="map" type="chkp:Map" minOccurs="1" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="Map">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Describes the priority of a step.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="type" type="chk:StepType" use="required"/>
+        <attribute name="priority" type="xsd:unsignedInt"
+                   use="required"/>
+        <attribute name="attributeMultipliers"
+                   type="chkp:AttributeList" use="optional"/>
+        <attribute name="multValue" type="xsd:unsignedInt"
+                   use="optional"/>
+        <assert test="if (@multValue) then @attributeMultipliers else
+                      true()"
+                saxon:message="If multValue is specified then
+                               attributeMultipliers should be
+                               specified"
+                xerces:message="If multValue is specified then
+                               attributeMultipliers should be
+                               specified"/>
+        <assert test="if (@attributeMultipliers) then @multValue else
+                      true()"
+                saxon:message="If attributeMultiplers is specified then
+                               multValue should be
+                               specified"
+                xerces:message="If attributeMultipliers is specified then
+                               multValue should be
+                               specified"/>
+        <assert test="if (@multValue and @attributeMultipliers) then
+                      (xsd:integer(@priority) + (xsd:integer(@multValue)
+                      * xsd:integer(count(@attributeMultipliers)))) &lt;
+                      4294967295 else true()"
+                saxon:message="Possible priority overflow! Make
+                               priorities smaller."
+                xerces:message="Possible priority overflow! Make
+                               priorities smaller.">
+        </assert>
+    </complexType>
+
+    <!-- Simple Types -->
+    <simpleType name="AttributeList">
+        <list itemType="xsd:string"/>
+    </simpleType>
+</schema>

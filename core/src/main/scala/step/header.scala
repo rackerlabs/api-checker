@@ -9,11 +9,11 @@ import com.rackspace.com.papi.components.checker.util.HeaderUtil._
 import scala.collection.JavaConversions._
 
 class Header(id : String, label : String, val name : String, val value : Regex,
-             val message : Option[String], val code : Option[Int],
+             val message : Option[String], val code : Option[Int], val priority : Long,
              next : Array[Step]) extends ConnectedStep(id, label, next) {
 
-  def this(id : String, label : String, name : String, value : Regex,
-           next : Array[Step]) = this(id, label, name, value, None, None, next)
+  def this(id : String, label : String, name : String, value : Regex, priority : Long,
+           next : Array[Step]) = this(id, label, name, value, None, None, priority, next)
 
   override val mismatchMessage : String = {
     if (message == None) {
@@ -42,7 +42,7 @@ class Header(id : String, label : String, val name : String, val value : Regex,
     if (!headers.isEmpty && headers.filterNot(v => v match { case value() => true ; case _ => false } ).isEmpty) {
       uriLevel
     } else {
-      req.contentError(new Exception(mismatchMessage), mismatchCode)
+      req.contentError(new Exception(mismatchMessage), mismatchCode, priority)
       -1
     }
   }

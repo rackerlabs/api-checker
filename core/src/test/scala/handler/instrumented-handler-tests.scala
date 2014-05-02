@@ -44,12 +44,12 @@ class InstrumentedHandlerSuite extends BaseValidatorSuite {
       <step id="a" type="URL" match="a" next="b badBURL badMethod"/>
       <step id="b" type="URL" match="b" next="GET badURL badMethodGet"/>
       <step id="GET" type="METHOD" match="GET" next="Accept"/>
-      <step id="Accept" type="ACCEPT"/>
-      <step id="badAURL" type="URL_FAIL" notMatch="a"/>
-      <step id="badBURL" type="URL_FAIL" notMatch="b"/>
-      <step id="badMethodGet" type="METHOD_FAIL" notMatch="GET"/>
-      <step id="badMethod" type="METHOD_FAIL"/>
-      <step id="badURL" type="URL_FAIL"/>
+      <step id="Accept" type="ACCEPT" priority="100000"/>
+      <step id="badAURL" type="URL_FAIL" notMatch="a" priority="1000"/>
+      <step id="badBURL" type="URL_FAIL" notMatch="b" priority="1000"/>
+      <step id="badMethodGet" type="METHOD_FAIL" notMatch="GET" priority="2000"/>
+      <step id="badMethod" type="METHOD_FAIL" priority="2000"/>
+      <step id="badURL" type="URL_FAIL" priority="1000"/>
     </checker>
 
   val steps = {

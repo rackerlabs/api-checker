@@ -4,6 +4,8 @@ import java.util.HashMap
 import scala.collection.immutable.List
 import scala.collection.mutable.PriorityQueue
 
+import com.typesafe.scalalogging.slf4j.LazyLogging
+
 //
 //  Base class for all checker results
 //
@@ -11,8 +13,8 @@ abstract class Result(private val messageP : String,   // A message describing t
                       private val validP : Boolean,    // Was the http req/res valid?
                       private val terminalP : Boolean, // Are we at a terminal node in the machine
                       private val uriLevelP : Int,     // The URI level at the error
-                      val stepId : String,
-                      private val stepCountP : Int) extends Ordered[Result] {      // The ID of the machine at the error
+                      val stepId : String, // The ID of the machine at the error
+                      private val priorityP : Long = 1) extends Ordered[Result] {
 
   private var stepIDsP : List[String] = List[String]() // ID of the linear steps it took to get
   // to this result
@@ -33,49 +35,15 @@ abstract class Result(private val messageP : String,   // A message describing t
   def valid = validP
   def terminal = terminalP
   def uriLevel = uriLevelP
-  def stepCount = stepCountP
+  def priority = priorityP
   def stepIDs = stepIDsP
 
   def allResults : Traversable[Result] = List( this )
 
   //
-  // Orders Results by the most appropriate Result value to the least.  The ordering is
-  // dictated as per the match statement in orderValue().
+  // Orders Results by priority
   //
-  // Within each type, the most appropriate is assumed to be the result whose path
-  // is the longest in the automaton.
-  //
-  def compare( o : Result ) = {
-
-    val order = orderValue() - o.orderValue()
-
-    if ( order != 0 ) {
-
-      order
-    }
-    else {
-
-      stepCount - o.stepCount
-    }
-  }
-
-  //
-  // Declares the ordering for the different Result types.  The bigger number
-  // has the highest priority.  If Result type not found in match statement,
-  // gives it least priority.
-  //
-  def orderValue() = {
-
-    this match {
-      case _ : AcceptResult => 100
-      case _ : BadContentResult => 90
-      case _ : BadMediaTypeResult => 80
-      case _ : MethodFailResult => 70
-      case _ : URLFailResult => 60
-      case _ : MismatchResult => 50
-      case _ => 0
-    }
-  }
+  def compare( o : Result ) = (priority - o.priority).asInstanceOf[Int]
 
   protected val startPath = "["
   protected val endPath = "]"
@@ -96,9 +64,9 @@ class ErrorResult(private val messageP : String,
                   private val codeP : Int,
                   uriLevel : Int,
                   stepId : String,
-                  stepCount : Int,
+                  priority : Long,
                   private val headersP : Map[String,String] = new HashMap()) extends Result(messageP, false, true, uriLevel,
-                                                                                   stepId, stepCount) {
+                                                                                   stepId, priority) {
 
   //
   // In MultiErrorResult, we forward the following calls to another object.  You cannot override val with a def call
@@ -116,35 +84,34 @@ class ErrorResult(private val messageP : String,
 class AcceptResult(message: String,
                    uriLevel : Int,
                    stepId : String,
-                   stepCount : Int)  extends Result(message, true, true, uriLevel, stepId, stepCount)
+                   priority : Long)  extends Result(message, true, true, uriLevel, stepId, priority)
 
 class BadContentResult(message : String,
                        codeP : Int = 400,
                        uriLevel : Int,
                        stepId : String,
-                       stepCount : Int) extends ErrorResult(message, codeP, uriLevel, stepId, stepCount)
+                       priority : Long) extends ErrorResult(message, codeP, uriLevel, stepId, priority)
 
 class URLFailResult(message : String,
                     uriLevel : Int,
                     stepId : String,
-                    stepCount: Int) extends ErrorResult(message, 404, uriLevel, stepId, stepCount)
+                    priority: Long) extends ErrorResult(message, 404, uriLevel, stepId, priority)
 
 class MethodFailResult(message: String,
                        uriLevel : Int,
                        stepId : String,
-                       stepCount : Int,
+                       priority : Long,
                        headers : Map[String,String]) extends ErrorResult(message, 405, uriLevel, stepId,
-                                                                         stepCount, headers )
+                                                                         priority, headers )
 
 class BadMediaTypeResult(message: String,
                          uriLevel : Int,
                          stepId : String,
-                         stepCount : Int) extends ErrorResult(message, 415, uriLevel, stepId, stepCount)
+                         priority : Long) extends ErrorResult(message, 415, uriLevel, stepId, priority)
 
 class MismatchResult(message: String,
                      uriLevel : Int,
-                     stepId : String,
-                     stepCount : Int) extends Result(message, false, false, uriLevel, stepId, stepCount) {
+                     stepId : String) extends Result(message, false, false, uriLevel, stepId) {
   override protected val startPath = "("
   override protected val endPath = ")"
 }
@@ -156,7 +123,7 @@ class NoResultsException( val message : String ) extends Exception( message )
 // This class is a wrapper around priorityqueue of several results, delegating the Result methods to the Result
 // at the head of the data structure.
 //
-class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorResult ( "Multiple possible errors", -1, -1, stepId, -1 ) {
+class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorResult ( "Multiple possible errors", -1, -1, stepId, -1 ) with LazyLogging {
 
   if ( fails.isEmpty ) throw new NoResultsException( "Input array must be non-empty." )
 
@@ -171,20 +138,21 @@ class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorR
   override def uriLevel = results.head.uriLevel
   override def valid = results.head.valid
   override def terminal = results.head.terminal
-  override def stepCount = results.head.stepCount
+  override def priority = results.head.priority
 
-  override def code = results.head match {
-    case e : ErrorResult => e.code
+  override def code = asErrorResult(results.head).code
+  override def headers = asErrorResult(results.head).headers
+
+  private def asErrorResult (r : Result) : ErrorResult = {
+    try {
+      r.asInstanceOf[ErrorResult]
+    } catch {
+      case cce : ClassCastException  => logger.error(
+        "Internal Error: A non[ErrorResult] has bubbled up as the top priority error in a [MultiFailResult]. "+
+        "This should never happen. Perhaps there is something wrong with the priority-map.xml in the CLASSPATH?")
+        throw cce
+    }
   }
-
-  override def headers = results.head match {
-    case e : ErrorResult => e.headers
-  }
-
-  //
-  // This order value is the value of the result in the priorityqueue
-  //
-  override def orderValue() = results.head.orderValue
 
   //
   // Define new Traversable instance which calls foreach on each MultiFailResult

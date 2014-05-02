@@ -418,6 +418,31 @@
       2. [X] Checker Tests
       3. [X] Tests when no grammar is available
       4. [X] WADL Validator Tests
+** DONE Better Handling of Step priorities [6/6]
+   1. [X] Extend XSD to support step priority. (Default should be 1)
+   2. [X] Show priority in wadl2dot
+   3. [X] Add support for setting priority at the end of the pipeline
+   4. [X] Add priority to scala steps [3/3]
+      1. [X] Rework scala steps
+      2. [X] Rework scala results
+      3. [X] Add priority to scala-step handler
+   5. [X] Cleanups [5/5]
+      1. [X] Priority-map XSD (with test)
+      2. [X] Make sure there are no issues related to overflow.
+         Confirmed: there are no issues regarding to overflow if
+         validate checker is set to ture.  This is true by
+         default. The priority only changes when creating the state
+         machine, the checker XSD will catch the overflow.
+      3. [X] Proper waning if mismatch error bubbles to the top
+      4. [X] Clean step code, esp xsl, xsd, jsonSchema
+      5. [X] Document / clean up XSL
+   6. [X] Test [3/3]
+      1. [X] Priority map assertion
+      2. [X] Test priorities in steps
+      3. [X] Test similar to usage schema issue
+** TODO Better XSL step error tests [0/2]
+   1. [ ] Test XSL fail message.
+   2. [ ] Test XSL fail code.
 ** TODO Header Enhancements [3/4]
    1. [X] Multiple header checks with the same name [4/4]
       1. [X] Allow checks in steps via enumeration

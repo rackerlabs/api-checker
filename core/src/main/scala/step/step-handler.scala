@@ -452,6 +452,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     processGrammar = false
   }
 
+
+  private[this] def getPriority(atts : Attributes) : Long = atts.getValue("priority") match {
+    case null => 1
+    case s : String => s.toLong
+  }
+
   //
   //  The following add steps...
   //
@@ -468,8 +474,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   private[this] def addAccept(atts : Attributes) : Unit = {
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val priority = getPriority (atts)
 
-    steps += (id -> new Accept(id, label))
+    steps += (id -> new Accept(id, label, priority))
   }
 
   private[this] def addURLFail(atts : Attributes) : Unit = {
@@ -484,6 +491,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         null
       }
     }
+    val priority = getPriority (atts)
 
     val notQNames : Array[QName] = {
       if (notTypes != null) {
@@ -494,13 +502,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
 
     if (notMatch == null && notTypes == null) {
-      steps += (id -> new URLFail(id, label))
+      steps += (id -> new URLFail(id, label, priority))
     } else if (notMatch != null && notTypes == null) {
-      steps += (id -> new URLFailMatch(id, label, notMatch.r))
+      steps += (id -> new URLFailMatch(id, label, notMatch.r, priority))
     } else if (notMatch == null && notTypes != null) {
-      steps += (id -> new URLFailXSD(id, label, notQNames, schema(notQNames)))
+      steps += (id -> new URLFailXSD(id, label, notQNames, schema(notQNames), priority))
     } else {
-      steps += (id -> new URLFailXSDMatch(id, label, notMatch.r, notQNames, schema(notQNames)))
+      steps += (id -> new URLFailXSDMatch(id, label, notMatch.r, notQNames, schema(notQNames), priority))
     }
   }
 
@@ -508,26 +516,29 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val notMatch : String = atts.getValue("notMatch")
+    val priority = getPriority (atts)
 
-    steps += (id -> new ReqTypeFail(id, label, notMatch.r))
+    steps += (id -> new ReqTypeFail(id, label, notMatch.r, priority))
   }
 
   private[this] def addContentFail(atts : Attributes) : Unit = {
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val priority = getPriority (atts)
 
-    steps += (id -> new ContentFail(id, label))
+    steps += (id -> new ContentFail(id, label, priority))
   }
 
   private[this] def addMethodFail(atts : Attributes) : Unit = {
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val notMatch : String = atts.getValue("notMatch")
+    val priority = getPriority (atts)
 
     if (notMatch == null) {
-      steps += (id -> new MethodFail(id, label))
+      steps += (id -> new MethodFail(id, label, priority))
     } else {
-      steps += (id -> new MethodFailMatch (id, label, notMatch.r))
+      steps += (id -> new MethodFailMatch (id, label, notMatch.r, priority))
     }
   }
 
@@ -545,18 +556,20 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val priority = getPriority (atts)
 
     next += (id -> nexts)
-    steps += (id -> new WellFormedXML (id, label, new Array[Step](nexts.length)))
+    steps += (id -> new WellFormedXML (id, label, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addWellJSON(atts : Attributes) : Unit = {
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val priority = getPriority (atts)
 
     next += (id -> nexts)
-    steps += (id -> new WellFormedJSON (id, label, new Array[Step](nexts.length)))
+    steps += (id -> new WellFormedJSON (id, label, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addXSD(atts : Attributes) : Unit = {
@@ -572,18 +585,20 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         stransform.toBoolean
       }
     }
+    val priority = getPriority (atts)
 
     next += (id -> nexts)
-    steps += (id -> new XSD(id, label, schema, transform, new Array[Step](nexts.length)))
+    steps += (id -> new XSD(id, label, schema, transform, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addJSONSchema(atts : Attributes) : Unit = {
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val priority = getPriority (atts)
 
     next += (id -> nexts)
-    steps += (id -> new JSONSchema(id, label, jsonSchemaFactory.getJsonSchema(jsonGrammar), new Array[Step](nexts.length)))
+    steps += (id -> new JSONSchema(id, label, jsonSchemaFactory.getJsonSchema(jsonGrammar), priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addXSLT(atts : Attributes) : Unit = {
@@ -592,6 +607,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val label : String = atts.getValue("label")
     val href : String = atts.getValue("href")
     val version : String = atts.getValue("version")
+    val priority = getPriority (atts)
 
     try {
       val templates : Templates = {
@@ -605,7 +621,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         }
       }
 
-      val xsl = new XSL(id, label, templates, new Array[Step](nexts.length))
+      val xsl = new XSL(id, label, templates, priority, new Array[Step](nexts.length))
 
       next += (id -> nexts)
       steps += (id -> xsl)
@@ -629,7 +645,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         }
       }
 
-      steps += (lastXSL.id -> new XSL(lastXSL.id, lastXSL.label, templates, lastXSL.next))
+      steps += (lastXSL.id -> new XSL(lastXSL.id, lastXSL.label, templates, lastXSL.priority, lastXSL.next))
 
     } catch {
       case e : Exception => throw new SAXParseException("Error while parsing XSLT", locator, e)
@@ -676,6 +692,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         sversion.toInt
       }
     }
+    val priority = getPriority (atts)
 
     //
     //  Make an attempt to compile the XPath expression. Throw a
@@ -692,7 +709,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
 
     next += (id -> nexts)
-    steps += (id -> new XPath(id, label, _match, message, code, context, version, new Array[Step](nexts.length)))
+    steps += (id -> new XPath(id, label, _match, message, code, context, version, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {
@@ -714,10 +731,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val mc = getMessageCode(atts)
     val message = mc._1
     val code = mc._2
+    val priority = getPriority (atts)
 
     next += (id -> nexts)
     steps += (id -> new Header(id, label, name, _match.r,
-                               message, code, new Array[Step](nexts.length)))
+                               message, code, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderAny(atts : Attributes) : Unit = {
@@ -729,10 +747,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val mc = getMessageCode(atts)
     val message = mc._1
     val code = mc._2
+    val priority = getPriority (atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderAny(id, label, name, _match.r,
-                                  message, code, new Array[Step](nexts.length)))
+                                  message, code, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderXSD(atts : Attributes) : Unit = {
@@ -745,10 +764,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val mc = getMessageCode(atts)
     val message = mc._1
     val code = mc._2
+    val priority = getPriority (atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderXSD(id, label, name, qn, schema(qn),
-                                  message, code, new Array[Step](nexts.length)))
+                                  message, code, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderXSDAny(atts : Attributes) : Unit = {
@@ -761,10 +781,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val mc = getMessageCode(atts)
     val message = mc._1
     val code = mc._2
+    val priority = getPriority (atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderXSDAny(id, label, name, qn, schema(qn),
-                                     message, code, new Array[Step](nexts.length)))
+                                     message, code, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addMethod(atts : Attributes) : Unit = {

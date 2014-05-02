@@ -201,6 +201,9 @@
                          <xsl:value-of select="@type"/>
                      </xsl:otherwise>
                  </xsl:choose>
+                 <xsl:if test="not($nfaMode) and exists(@priority)">
+                     <xsl:value-of select="concat('\n[',@priority,']')"/>
+                 </xsl:if>
                  <xsl:value-of select="'&quot;'"/>
                  <xsl:choose>
                      <xsl:when test="@type = $source_types">

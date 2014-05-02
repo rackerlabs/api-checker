@@ -28,7 +28,7 @@
     <element name="checker" type="chk:Checker"/>
 
     <!-- Complex Types -->
-    <complexType name="Step">
+    <complexType name="Step" abstract="true">
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
@@ -121,6 +121,22 @@
         </complexContent>
     </complexType>
 
+    <complexType name="GenContentFailStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A base step type for for conected steps that may
+                    generate content errors.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep">
+                <attribute name="priority" type="xsd:unsignedInt" use="optional" default="1"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
     <complexType name="StartStep">
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
@@ -143,7 +159,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep"/>
+            <extension base="chk:GenContentFailStep"/>
         </complexContent>
     </complexType>
 
@@ -156,7 +172,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep"/>
+            <extension base="chk:GenContentFailStep"/>
         </complexContent>
     </complexType>
 
@@ -170,7 +186,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep">
+            <extension base="chk:GenContentFailStep">
                 <attribute name="transform" type="xsd:boolean" use="optional">
                     <annotation>
                         <documentation xmlns:html="http://www.w3.org/1999/xhtml">
@@ -195,7 +211,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep">
+            <extension base="chk:GenContentFailStep">
                 <sequence>
                     <choice minOccurs="0">
                         <element ref="xsl:transform"/>
@@ -224,7 +240,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep">
+            <extension base="chk:GenContentFailStep">
                 <attribute name="match" type="xsd:string" use="required"/>
                 <attribute name="version" type="chk:XPathVersion" use="optional"/>
                 <attribute name="message" type="xsd:string" use="optional"/>
@@ -243,7 +259,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep"/>
+            <extension base="chk:GenContentFailStep"/>
         </complexContent>
     </complexType>
 
@@ -297,7 +313,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep">
+            <extension base="chk:GenContentFailStep">
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:string" use="required"/>
                 <attribute name="message" type="xsd:string" use="optional"/>
@@ -332,7 +348,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:ConnectedStep">
+            <extension base="chk:GenContentFailStep">
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:QName" use="required"/>
                 <attribute name="message" type="xsd:string" use="optional"/>
@@ -390,7 +406,22 @@
         </complexContent>
     </complexType>
 
-    <!-- End Steps -->
+    <!-- Terminal Steps -->
+    <complexType name="TerminalStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A base step type for all terminal steps.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:Step">
+                <attribute name="priority" type="xsd:unsignedInt" use="optional" default="1"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
     <complexType name="AcceptStep">
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
@@ -400,7 +431,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step"/>
+            <extension base="chk:TerminalStep"/>
         </complexContent>
     </complexType>
 
@@ -417,7 +448,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step">
+            <extension base="chk:TerminalStep">
                 <attribute name="notMatch" type="xsd:string" use="optional">
                     <annotation>
                         <documentation xmlns:html="http://www.w3.org/1999/xhtml">
@@ -461,7 +492,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step">
+            <extension base="chk:TerminalStep">
                 <attribute name="notMatch" type="xsd:string" use="optional">
                     <annotation>
                         <documentation xmlns:html="http://www.w3.org/1999/xhtml">
@@ -490,7 +521,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step">
+            <extension base="chk:TerminalStep">
                 <attribute name="notMatch" type="xsd:string" use="required">
                     <annotation>
                         <documentation xmlns:html="http://www.w3.org/1999/xhtml">
@@ -518,7 +549,7 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:Step"/>
+            <extension base="chk:TerminalStep"/>
         </complexContent>
     </complexType>
 

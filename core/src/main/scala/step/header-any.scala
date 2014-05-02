@@ -9,11 +9,11 @@ import javax.servlet.FilterChain
 import scala.collection.JavaConversions._
 
 class HeaderAny(id : String, label : String, val name : String, val value : Regex,
-                val message : Option[String], val code : Option[Int],
+                val message : Option[String], val code : Option[Int], val priority : Long,
                 next : Array[Step]) extends ConnectedStep(id, label, next) {
 
-  def this(id : String, label : String, name : String, value : Regex,
-           next : Array[Step]) = this(id, label, name, value, None, None, next)
+  def this(id : String, label : String, name : String, value : Regex, priority : Long,
+           next : Array[Step]) = this(id, label, name, value, None, None, priority, next)
 
   override val mismatchMessage : String = {
     if (message == None) {
@@ -42,7 +42,7 @@ class HeaderAny(id : String, label : String, val name : String, val value : Rege
     if (headers.exists(v => v match { case value() => true ; case _ => false })) {
       uriLevel
     } else {
-      req.contentError(new Exception(mismatchMessage), mismatchCode)
+      req.contentError(new Exception(mismatchMessage), mismatchCode, priority)
       -1
     }
   }

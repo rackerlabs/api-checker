@@ -26,7 +26,7 @@ import com.rackspace.com.papi.components.checker.util.XMLParserPool.borrowParser
 import com.rackspace.com.papi.components.checker.util.XMLParserPool.returnParser
 
 
-class XSL(id : String, label : String, templates : Templates, next : Array[Step]) extends ConnectedStep(id, label, next) {
+class XSL(id : String, label : String, templates : Templates, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "Error while performing translation"
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
@@ -67,10 +67,11 @@ class XSL(id : String, label : String, templates : Templates, next : Array[Step]
     }
 
     if (capture.error != None) {
-      req.contentError(capture.error.get, capture.code.get)
+      req.contentError(capture.error.get, capture.code.get, priority)
       ret = -1
     } else if (error != null) {
       req.contentError = error
+      req.contentErrorPriority = priority
       ret = -1
     }
 
