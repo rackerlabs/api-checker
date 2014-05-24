@@ -80,6 +80,8 @@
         <xsl:variable name="mergeSteps" as="xsd:string*" select="tokenize(@mergeSteps,' ')"/>
         <xsl:variable name="steps" as="node()*" select="$checker//check:step[@id = $mergeSteps]"/>
         <xsl:variable name="root" as="node()" select="$checker//check:step[@id = $rootID]"/>
+        <xsl:variable name="rootNextSteps" as="xsd:string*" select="tokenize($root/@next, ' ')"/>
+        <xsl:variable name="rootNext" as="node()*" select="$checker//check:step[@id = $rootNextSteps]"/>
         <xsl:variable name="version" as="xsd:integer">
             <xsl:choose>
                 <xsl:when test="$root/@type = 'XSL' and $root/@version='2'">2</xsl:when>
@@ -88,7 +90,12 @@
                 <xsl:otherwise>1</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="preserveWellFormedStep" as="xsd:boolean" select="$preserveRequestBody and ($root/@type = 'WELL_XML')"/>
+        <!--
+            We preserve the WellFormedStep if the root type is
+            WELL_XML and preserveRequestBody is set to true or there
+            are next steps that are not XPATH or CONTENT_FAIL.
+        -->
+        <xsl:variable name="preserveWellFormedStep" as="xsd:boolean" select="($preserveRequestBody or $rootNext[@type!= 'XPATH' and @type!='CONTENT_FAIL']) and ($root/@type = 'WELL_XML')"/>
         <xsl:variable name="idBase" as="xsd:string" select="generate-id(.)"/>
         <xsl:variable name="newStepID" as="xsd:string">
             <xsl:choose>
@@ -101,13 +108,20 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="vars" as="node()*" select="if ($root/@type='XSL') then $root/xsl:transform/xsl:variable else ()"/>
-
         <!--
             If we are interested in preserving the request body, we
             must leave the WELL_XML check in tact.
         -->
         <xsl:if test="$preserveWellFormedStep">
-            <step id="{$idBase}" type="WELL_XML" next="{$newStepID}"/>
+            <xsl:variable name="wellNexts" as="xsd:string*">
+                <xsl:sequence select="$newStepID"/>
+                <xsl:sequence select="$rootNext[@type!='XPATH']/@id"/>
+            </xsl:variable>
+            <step id="{$idBase}" type="WELL_XML">
+                <xsl:attribute name="next">
+                    <xsl:value-of select="$wellNexts" separator=" "/>
+                </xsl:attribute>
+            </step>
         </xsl:if>
 
         <step id="{$newStepID}" type="XSL" version="{$version}">
