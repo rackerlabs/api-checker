@@ -13,11 +13,11 @@ import org.xml.sax.SAXParseException
 import scala.collection.JavaConversions._
 
 class HeaderXSD(id : String, label : String, val name : String, val value : QName, schema : Schema,
-                val message : Option[String], val code : Option[Int],
+                val message : Option[String], val code : Option[Int], val priority : Long,
                 next : Array[Step]) extends ConnectedStep(id, label, next) {
 
-  def this(id : String, label : String, name : String, value : QName, schema : Schema,
-           next : Array[Step]) = this(id, label, name, value, schema, None, None, next)
+  def this(id : String, label : String, name : String, value : QName, schema : Schema, priority : Long,
+           next : Array[Step]) = this(id, label, name, value, schema, None, None, priority, next)
 
   override val mismatchMessage : String = {
     if (message == None) {
@@ -51,8 +51,8 @@ class HeaderXSD(id : String, label : String, val name : String, val value : QNam
       uriLevel
     } else {
      last_err match {
-        case Some(_) => req.contentError(new Exception(mismatchMessage+" "+last_err.get.getMessage(), last_err.get), mismatchCode)
-        case None => req.contentError(new Exception(mismatchMessage), mismatchCode)
+        case Some(_) => req.contentError(new Exception(mismatchMessage+" "+last_err.get.getMessage(), last_err.get), mismatchCode, priority)
+        case None => req.contentError(new Exception(mismatchMessage), mismatchCode, priority)
       }
       -1
     }

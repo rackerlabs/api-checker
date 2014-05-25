@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode
 
 import com.rackspace.com.papi.components.checker.servlet._
 
-class JSONSchema(id : String, label : String, schema : JsonSchema, next : Array[Step]) extends ConnectedStep(id, label, next) {
+class JSONSchema(id : String, label : String, schema : JsonSchema, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The JSON does not validate against the schema."
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
@@ -24,10 +24,12 @@ class JSONSchema(id : String, label : String, schema : JsonSchema, next : Array[
         }
 
         req.contentError = new Exception(message, pe)
+        req.contentErrorPriority = priority
         -1
       }
       case e : Exception => {
         req.contentError = e
+        req.contentErrorPriority = priority
         -1
       }
     }

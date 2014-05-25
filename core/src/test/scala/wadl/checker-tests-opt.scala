@@ -287,6 +287,10 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              XPath("/atom:entry/w_ns18:usage"),
              XPath("/atom:entry/@only_usage"), Accept)
 
+      assert(checker,Start, URL("servers"), URL("entries"),
+             Method("POST"),
+             ReqType("(application/atom\\+xml)(;.*)?"), WellXML,
+             ContentFail)
 
       assert(checker,Start, URL("nova"), URL("entries"),
              Method("POST"),
@@ -301,6 +305,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XSL,
              XPath("/atom:entry/w_ns18:usage"),
              XPath("/atom:entry/@only_usage"), Accept)
+
+      assert(checker,Start, URL("nova"), URL("entries"),
+             Method("POST"),
+             ReqType("(application/atom\\+xml)(;.*)?"), WellXML,
+             ContentFail)
 
       And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
@@ -456,9 +465,15 @@ xmlns:atom="http://www.w3.org/2005/Atom">
       assert(checker,Start, URL("y"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XSL)
 
+      assert(checker,Start, URL("y"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
              XPath("/foo:bar/@junk"), Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
@@ -724,9 +739,15 @@ xmlns:atom="http://www.w3.org/2005/Atom">
       assert(checker,Start, URL("y"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XSL, Accept)
 
+      assert(checker,Start, URL("y"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
              XPath("/foo:bar/@junk"), XSL, Accept)
+
+      assert(checker,Start, URL("x"),  Method("POST"),
+             ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),

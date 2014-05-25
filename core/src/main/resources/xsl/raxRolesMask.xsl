@@ -60,13 +60,12 @@
     version="2.0">
 
     <xsl:import href="util/pruneSteps.xsl"/>
+    <xsl:import href="util/funs.xsl"/>
 
     <xsl:variable name="checker" select="/chk:checker" as="node()"/>
     <xsl:variable name="roles" select="distinct-values(/chk:checker/chk:step[@type='HEADER_ANY' and
                                                              @name='X-ROLES' and @code='403']/@match)"
                                as="xs:string*"/>
-    <xsl:key name="checker-by-id" match="chk:step" use="@id"/>
-
 
     <xsl:template match="/">
         <xsl:choose>
@@ -108,7 +107,7 @@
             <xsl:attribute name="next">
                 <xsl:variable name="next" as="xs:string*">
                     <xsl:sequence select="$headerCheckIds"/>
-                    <xsl:sequence select="rol:next($noRoleStart[@type='START'][1])"/>
+                    <xsl:sequence select="chk:next($noRoleStart[@type='START'][1])"/>
                 </xsl:variable>
                 <xsl:value-of select="$next" separator=" "/>
             </xsl:attribute>
@@ -117,7 +116,7 @@
     </xsl:template>
     <xsl:template name="copyPathsForRole">
         <xsl:param name="role" as="xs:string"/>
-        <xsl:variable name="nexts" as="node()*" select="for $n in rol:next(.) return key('checker-by-id',$n,$checker)"/>
+        <xsl:variable name="nexts" as="node()*" select="for $n in chk:next(.) return key('checker-by-id',$n,$checker)"/>
         <xsl:variable name="nextPathSteps" as="node()*"
             select="for $n in $nexts[@type=('URL','URLXSD','METHOD')] return if (rol:stepInRole($n, $role)) then $n else ()"/>
         <xsl:variable name="URLFailId" as="xs:string" select="rol:id(concat(@id,'UF'),$role)"/>
@@ -208,7 +207,7 @@
         <xsl:param name="role" as="xs:string"/>
         <xsl:choose>
             <xsl:when test="$step/@type = ('URL', 'URLXSD','METHOD')">
-                <xsl:sequence select="true() = (for $n in rol:next($step) return rol:stepInRole(key('checker-by-id',$n,$checker),$role))"/>
+                <xsl:sequence select="true() = (for $n in chk:next($step) return rol:stepInRole(key('checker-by-id',$n,$checker),$role))"/>
             </xsl:when>
             <xsl:when test="contains($step/@type,'_FAIL')">
                 <xsl:sequence select="false()"/>
@@ -221,10 +220,6 @@
                 <xsl:sequence select="true()"/>
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:function>
-    <xsl:function as="xs:string*" name="rol:next">
-        <xsl:param name="step" as="node()"/>
-        <xsl:sequence select="tokenize($step/@next, ' ')"/>
     </xsl:function>
     <xsl:function as="xs:string" name="rol:id">
         <xsl:param name="oldId" as="xs:string"/>

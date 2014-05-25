@@ -35,9 +35,16 @@ object RequestAttributes {
   val PARSED_JSON   = "com.rackspace.com.papi.components.checker.servlet.ParsedJSONTokens"
   val CONTENT_ERROR = "com.rackspace.com.papi.components.checker.servlet.ContentError"
   val CONTENT_ERROR_CODE = "com.rackspace.com.papi.components.checker.servlet.ContentErrorCode"
+  val CONTENT_ERROR_PRIORITY = "com.rackspace.com.papi.components.checker.servlet.ContentErrorPriority"
 }
 
 import RequestAttributes._
+
+object CherkerServletRequest {
+  val DEFAULT_CONTENT_ERROR_CODE : Integer = 400
+}
+
+import CherkerServletRequest._
 
 //
 //  An HTTP Request with some additional helper functions
@@ -57,13 +64,21 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
   def contentError_= (e : Exception):Unit = {
     request.setAttribute(CONTENT_ERROR, e)
-    request.setAttribute(CONTENT_ERROR_CODE, 400)
+    request.setAttribute(CONTENT_ERROR_CODE, DEFAULT_CONTENT_ERROR_CODE)
   }
-  def contentError(e : Exception, c : Int) : Unit = {
+  def contentError(e : Exception, c : Int, p : Long = -1) : Unit = {
     request.setAttribute(CONTENT_ERROR, e)
     request.setAttribute(CONTENT_ERROR_CODE, c)
+    request.setAttribute(CONTENT_ERROR_PRIORITY, p)
   }
+
   def contentErrorCode : Int = request.getAttribute(CONTENT_ERROR_CODE).asInstanceOf[Int]
+
+  def contentErrorPriority : Long = request.getAttribute(CONTENT_ERROR_PRIORITY) match {
+    case l : Object => l.asInstanceOf[Long]
+    case null => -1
+  }
+  def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
 
   override def getInputStream : ServletInputStream = {
     if (parsedXML != null) {

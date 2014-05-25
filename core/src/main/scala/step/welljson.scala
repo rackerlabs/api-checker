@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode
 
 import javax.servlet.FilterChain
 
-class WellFormedJSON(id : String, label : String, next : Array[Step]) extends ConnectedStep(id, label, next) {
+class WellFormedJSON(id : String, label : String, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The JSON is not well formed!"
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
@@ -25,6 +25,7 @@ class WellFormedJSON(id : String, label : String, next : Array[Step]) extends Co
       ret = uriLevel
     } catch {
       case e : Exception => req.contentError = e
+                            req.contentErrorPriority = priority
     } finally {
       if (parser != null) returnParser(parser)
     }

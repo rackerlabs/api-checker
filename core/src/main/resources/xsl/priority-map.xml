@@ -1,0 +1,33 @@
+<!--
+    priority-map.xml
+
+    This data file creates a map from step type to a inital
+    priority. The @multValue is added to the priority for any
+    attribute listed in @attributeMultipliers.
+
+    For example if an URL_FAIL type has a priority of 10000,
+    attributeMultiplers "notMatch notTypes" and a multValue of 150. If
+    an instance of an URL_FAIL step has the notMatch value then the
+    initial priority will be 10000+150=10150.  If both the notMatch
+    and notTypes atttribute is said then the initial priority will be
+    10000+150+150=10300.
+
+    The actual priority of a step is set in priority.xsl.
+-->
+<priority-map xmlns="http://www.rackspace.com/repose/wadl/checker/priority">
+    <map type="URL_FAIL"      priority="10000" attributeMultipliers="notMatch notTypes" multValue="150"/>
+    <map type="METHOD_FAIL"   priority="20000" attributeMultipliers="notMatch" multValue="150"/>
+    <map type="REQ_TYPE_FAIL" priority="30000"/>
+    <map type="CONTENT_FAIL"  priority="40000"/>
+    <map type="HEADER"        priority="41000"/>
+    <map type="HEADERXSD"     priority="41000"/>
+    <map type="HEADER_ANY"    priority="41000"/>
+    <map type="HEADERXSD_ANY" priority="41000"/>
+    <map type="WELL_XML"      priority="41000"/>
+    <map type="WELL_JSON"     priority="41000"/>
+    <map type="XPATH"         priority="41000"/>
+    <map type="XSL"           priority="41000"/>
+    <map type="XSD"           priority="45000"/>
+    <map type="JSON_SCHEMA"   priority="45000"/>
+    <map type="ACCEPT"        priority="100000"/>
+</priority-map>
