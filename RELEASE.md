@@ -1,5 +1,17 @@
 # Releases #
 
+## Release 1.0.17 (2014-05-25) ##
+
+1. New strategy when deciding error message that involves longest path
+from Start and a priority value based on step type.
+1. Fixed bug in xpath join optimization where WELL_XML steps were not
+always correctly handled.
+1. Better logging using slf4j.
+1. Fixed bug where Saxon 9.3 was added as a dependency in addition to Saxon 9.4.
+1. Transition from maven-assembly-plugin to maven-shade-plugin when
+creating single jar cli utils.
+1. Updated wadl-tools: 1.0.22 → 1.0.25.
+
 ## Release 1.0.16 (2014-02-10) ##
 
 1. Added raxRolesMask. Normally api-checker will return 403s when
