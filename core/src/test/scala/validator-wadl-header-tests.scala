@@ -756,6 +756,10 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
     validator_Header.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-TEST"->List("foo, bar"))),response,chain)
   }
 
+  test ("PUT on /a/b with camel case X-test header should succeed on validator_Header") {
+    validator_Header.validate(request("PUT","/a/b","application/xml", goodXML_XSD2, false, Map("X-test"->List("foo"))),response,chain)
+  }
+
   test ("POST on /a/b with application/xml should succeed on validator_Header with valid XML1") {
     validator_Header.validate(request("POST","/a/b","application/xml", goodXML_XSD1, false, Map("X-TEST"->List("foo"))),response,chain)
   }
