@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode
 
 import scala.collection.mutable.HashMap
+import scala.collection.immutable.TreeMap
 
 import com.rackspace.com.papi.components.checker.step._
 import com.rackspace.com.papi.components.checker.handler._
@@ -526,17 +527,18 @@ class BaseValidatorSuite extends FunSuite {
   def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean, headers : Map[String, List[String]]) : HttpServletRequest = {
     val req = request(method, url, contentType, content, parseContent)
 
+    val caseInSensitiveHeaders = new TreeMap[String, List[String]]()(Ordering.by(_.toLowerCase)) ++ headers
     when(req.getHeader(anyString())).thenAnswer(new Answer[String] {
       override def answer(invocation : InvocationOnMock) : String = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
-        headers.getOrElse(key, null)(0)
+        caseInSensitiveHeaders.getOrElse(key, null)(0)
       }
     })
 
     when(req.getHeaders(anyString())).thenAnswer(new Answer[Enumeration[String]] {
       override def answer(invocation : InvocationOnMock) : Enumeration[String] = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
-        headers.getOrElse(key, List()).iterator
+        caseInSensitiveHeaders.getOrElse(key, List()).iterator
       }
     })
 
