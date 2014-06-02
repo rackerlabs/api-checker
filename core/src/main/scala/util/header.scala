@@ -17,7 +17,7 @@ object HeaderUtil {
   def getHeaders (request : HttpServletRequest, name : String) : Enumeration[String] = {
     val headers = request.getHeaders(name)
     headers match {
-      case null => null
+      case null => List[String]().iterator
       case _ => var list : List[String] = List()
         headers.foreach(i => list = list ++ i.split(",").map(j => j.trim))
         list.iterator
