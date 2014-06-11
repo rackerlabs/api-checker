@@ -99,7 +99,9 @@
                     <xsl:for-each select="$mults">
                         <xsl:variable name="attr" as="xs:string" select="."/>
                         <xsl:if test="$step[@*[local-name() = $attr]]">
-                            <xsl:value-of select="xs:integer($map/@multValue)"/>
+                            <xsl:for-each select="chkp:matchList($step/@*[local-name() = $attr])">
+                                <xsl:value-of select="xs:integer($map/@multValue)"/>
+                            </xsl:for-each>
                         </xsl:if>
                     </xsl:for-each>
                 </xsl:when>
@@ -110,5 +112,14 @@
         </xsl:variable>
         <xsl:message>[DEBUG] ID=<xsl:value-of select="$step/@id"/> inPriority=<xsl:value-of select="$inPriority"/> offsets=<xsl:value-of select="$offsets"/> priority=<xsl:value-of select="$map/@priority"/> total: <xsl:value-of select="sum(($inPriority,$offsets,$map/@priority))"/></xsl:message>
         <xsl:value-of select="sum(($inPriority,$offsets,$map/@priority))"/>
+    </xsl:function>
+
+    <!--
+        Split matches by ' ' and '|' since this is how matches
+        are normally grouped.
+    -->
+    <xsl:function name="chkp:matchList" as="xs:string*">
+        <xsl:param as="xs:string" name="match"/>
+        <xsl:sequence select="for $t in tokenize($match,' ') return tokenize($t,'\|')"/>
     </xsl:function>
 </xsl:stylesheet>
