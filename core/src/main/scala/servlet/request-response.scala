@@ -21,6 +21,8 @@ import java.net.URI
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+import java.net.URISyntaxException
+
 import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
@@ -36,6 +38,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.w3c.dom.Document
 
 import java.util.Enumeration
+
+import com.netaporter.uri.encoding.PercentEncoder
+
+import com.typesafe.scalalogging.slf4j.LazyLogging
 
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
@@ -57,6 +63,9 @@ import RequestAttributes._
 
 object CherkerServletRequest {
   val DEFAULT_CONTENT_ERROR_CODE : Integer = 400
+  val DEFAULT_URI_CHARSET : String = "ASCII"
+
+  val uriEncoder = new PercentEncoder()
 }
 
 import CherkerServletRequest._
@@ -64,8 +73,32 @@ import CherkerServletRequest._
 //
 //  An HTTP Request with some additional helper functions
 //
-class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) {
-  val URISegment : Array[String] = (new URI(request.getRequestURI())).getPath.split("/").filterNot(e => e == "")
+class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) with LazyLogging {
+
+  //
+  //  We maintain our own version of the request URI. If a request URI
+  //  is submitted by the client without being properly encoded then
+  //  this can cause greif when trying to parse it.  We attempt to
+  //  parse the request URI if we recieve a syntax error, then we
+  //  encode the URI and try again. If that fails again, well then it
+  //  fails, we throw a syntax exception which should be handled by
+  //  the validator.
+  //
+  //  Note that we don't always encode the URI because we don't want
+  //  to risk double encoding it.
+  //
+  private val requestURI = {
+    val uri = request.getRequestURI()
+    try {
+      new URI(uri)
+    } catch {
+      case u : URISyntaxException =>  logger.warn(s"Syntax error while attempting to parse the URI {$uri} will try encoding it.")
+                                      new URI(uriEncoder.encode(uri, DEFAULT_URI_CHARSET))
+    }
+  }
+
+  val URISegment : Array[String] = requestURI.getPath.split("/").filterNot(e => e == "")
+
   def pathToSegment(uriLevel : Int) : String = {
     "/" + URISegment.slice(0, uriLevel).reduceLeft( _ + "/" +_ )
   }
@@ -94,6 +127,8 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
     case null => -1
   }
   def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
+
+  override def getRequestURI : String = requestURI.getRawPath
 
   override def getInputStream : ServletInputStream = {
     if (parsedXML != null) {

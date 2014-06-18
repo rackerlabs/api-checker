@@ -36,6 +36,8 @@ import java.io.ByteArrayOutputStream
 import java.io.Reader
 import java.io.StringWriter
 
+import java.net.URISyntaxException
+
 import scala.xml._
 
 import com.rackspace.com.papi.components.checker.wadl.StepBuilder
@@ -43,6 +45,7 @@ import com.rackspace.com.papi.components.checker.wadl.WADLDotBuilder
 
 import com.rackspace.com.papi.components.checker.step.Step
 import com.rackspace.com.papi.components.checker.step.Result
+import com.rackspace.com.papi.components.checker.step.ErrorResult
 
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
 
@@ -59,6 +62,8 @@ import com.yammer.metrics.scala.Meter
 import com.yammer.metrics.scala.Timer
 import com.yammer.metrics.scala.MetricsGroup
 import com.yammer.metrics.util.PercentGauge
+
+import com.typesafe.scalalogging.slf4j.LazyLogging
 
 class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg, cause) {}
 
@@ -123,7 +128,8 @@ trait ValidatorMBean {
   def getDotSHA1 : String
 }
 
-class Validator private (private val _name : String, val startStep : Step, val config : Config, val checker : Option[Document] = None) extends Instrumented  with ValidatorMBean {
+class Validator private (private val _name : String, val startStep : Step, val config : Config, val checker : Option[Document] = None) extends Instrumented 
+     with ValidatorMBean with LazyLogging {
 
   val name = _name match {
     case null => Integer.toHexString(hashCode())
@@ -217,6 +223,10 @@ class Validator private (private val _name : String, val startStep : Step, val c
       if (!result.valid) failMeter.mark()
       result
     } catch {
+      case u : URISyntaxException => val uri = req.getRequestURI()
+                                     logger.error(s"Could not parse URI {$uri} even after encoding it. Giving client 400. Handlers will be bypassed.", u)
+                                     res.sendError (400, u.getMessage())
+                                     new ErrorResult(u.getMessage(), 400, 0, "0", 1000000)
       case v : ValidatorException => throw v
       case e : Exception  => throw new ValidatorException("Error while validating request", e)
     } finally {
