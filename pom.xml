@@ -49,6 +49,7 @@
         <scala.dep.version>2.10</scala.dep.version>
         <saxon-ee.version>9.4.0.6</saxon-ee.version>
         <scala.test.version>2.0</scala.test.version>
+        <scala.uri.version>0.4.2</scala.uri.version>
         <junit.version>4.10</junit.version>
         <wadl-tools.version>1.0.25</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
@@ -106,6 +107,11 @@
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_2.10</artifactId>
             <version>${scala.test.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.netaporter</groupId>
+            <artifactId>scala-uri_2.10</artifactId>
+            <version>${scala.uri.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>

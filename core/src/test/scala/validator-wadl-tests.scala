@@ -118,6 +118,14 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     assertResultFailed(validator_AB.validate(request("GET","/index.html"),response,chain), 404)
   }
 
+  test ("GET on /v1.0/ZZZZZZZZZ/foo/bar/c:\\boot.ini should fail on validator_AB") {
+    assertResultFailed(validator_AB.validate(request("GET","/v1.0/ZZZZZZZZZ/foo/bar/c:\\boot.ini"),response,chain), 404)
+  }
+
+  test ("GET on /v1.0/ZZZZZZZZZ/foo/bar/c:%5Cboot.ini should fail on validator_AB") {
+    assertResultFailed(validator_AB.validate(request("GET","/v1.0/ZZZZZZZZZ/foo/bar/c:%5Cboot.ini"),response,chain), 404)
+  }
+
 
   //
   // validator_ABAC allows a GET on /a/b and /a/c. The validator is used in the
