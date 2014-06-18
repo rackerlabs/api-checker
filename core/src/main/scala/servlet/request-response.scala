@@ -39,9 +39,9 @@ import org.w3c.dom.Document
 
 import java.util.Enumeration
 
-import com.netaporter.uri.encoding.PercentEncoder
-
 import com.typesafe.scalalogging.slf4j.LazyLogging
+
+import com.netaporter.uri.encoding.PercentEncoder
 
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
@@ -75,29 +75,25 @@ import CherkerServletRequest._
 //
 class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) with LazyLogging {
 
-  //
-  //  We maintain our own version of the request URI. If a request URI
-  //  is submitted by the client without being properly encoded then
-  //  this can cause greif when trying to parse it.  We attempt to
-  //  parse the request URI if we recieve a syntax error, then we
-  //  encode the URI and try again. If that fails again, well then it
-  //  fails, we throw a syntax exception which should be handled by
-  //  the validator.
-  //
-  //  Note that we don't always encode the URI because we don't want
-  //  to risk double encoding it.
-  //
-  private val requestURI = {
-    val uri = request.getRequestURI()
+  val parsedRequestURI : (Option[URI], Option[URISyntaxException]) = {
     try {
-      new URI(uri)
+      (Some(new URI(request.getRequestURI())), None)
     } catch {
-      case u : URISyntaxException =>  logger.warn(s"Syntax error while attempting to parse the URI {$uri} will try encoding it.")
-                                      new URI(uriEncoder.encode(uri, DEFAULT_URI_CHARSET))
+      case u : URISyntaxException => (None, Some(u))
     }
   }
 
-  val URISegment : Array[String] = requestURI.getPath.split("/").filterNot(e => e == "")
+  val URISegment : Array[String] = parsedRequestURI match {
+    case (Some(u), None) => u.getPath.split("/").filterNot(e => e == "")
+    case (None, Some(e)) => Array[String]()
+    case (Some(u), Some(e)) => val ru = request.getRequestURI()
+                               logger.warn (s"Very strange, was simultaneously able to parse the request uri: '{$ru}' and also got a syntax error. Assuming a bad URI.")
+                               Array[String]()
+    case (None, None) => val ru = request.getRequestURI()
+                         val e = new URISyntaxException(ru, s"Unable to parse URI, don't know why???")
+                         logger.error ("Very strange, unable to parse the URI, but didn't recieve a URISyntaxException, so I'm generating one anyway", e)
+                         Array[String]()
+  }
 
   def pathToSegment(uriLevel : Int) : String = {
     "/" + URISegment.slice(0, uriLevel).reduceLeft( _ + "/" +_ )
@@ -128,7 +124,12 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
   def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
 
-  override def getRequestURI : String = requestURI.getRawPath
+  override def getRequestURI : String = parsedRequestURI match {
+    case (Some(u), _) => request.getRequestURI()
+    case _  => // Try to encode the URI if there was a syntax error.
+               // Handlers may try to parse it.
+               uriEncoder.encode(super.getRequestURI(), DEFAULT_URI_CHARSET)
+  }
 
   override def getInputStream : ServletInputStream = {
     if (parsedXML != null) {

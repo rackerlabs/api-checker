@@ -35,7 +35,22 @@ class Start(id : String, label : String, next : Array[Step]) extends ConnectedSt
                          resp : CheckerServletResponse,
                          chain : FilterChain,
                          uriLevel : Int ) : Int = uriLevel
-  override val mismatchMessage : String = "Bad Start Node?"
+
+  override def check(req : CheckerServletRequest,
+                     resp : CheckerServletResponse,
+                     chain : FilterChain,
+                     uriLevel : Int) : Option[Result] = {
+    //
+    // If we have a malformed URI, then we can't even start the
+    // machine, so return a 400 result.
+    //
+    req.parsedRequestURI match {
+      case (_, Some(e)) => Some(new ErrorResult(e.getMessage(), 400, uriLevel, id, Long.MaxValue))
+      case _ => super.check(req, resp, chain, uriLevel)
+    }
+  }
+
+  override val mismatchMessage : String = "Bad Request?"
 }
 
 //

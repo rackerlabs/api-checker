@@ -119,7 +119,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /v1.0/ZZZZZZZZZ/foo/bar/c:\\boot.ini should fail on validator_AB") {
-    assertResultFailed(validator_AB.validate(request("GET","/v1.0/ZZZZZZZZZ/foo/bar/c:\\boot.ini"),response,chain), 404)
+    assertResultFailed(validator_AB.validate(request("GET","/v1.0/ZZZZZZZZZ/foo/bar/c:\\boot.ini"),response,chain), 400)
   }
 
   test ("GET on /v1.0/ZZZZZZZZZ/foo/bar/c:%5Cboot.ini should fail on validator_AB") {
