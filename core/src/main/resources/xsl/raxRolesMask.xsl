@@ -238,6 +238,6 @@
     <xsl:function as="xs:string" name="rol:id">
         <xsl:param name="oldId" as="xs:string"/>
         <xsl:param name="role" as="xs:string"/>
-        <xsl:value-of select="replace(concat($oldId,'_',$role),':','_')"/>
+        <xsl:value-of select="chk:string-to-id(replace(concat($oldId,'_',$role),':','_'))"/>
     </xsl:function>
 </xsl:stylesheet>

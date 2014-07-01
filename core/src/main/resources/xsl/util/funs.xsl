@@ -56,5 +56,67 @@
         <xsl:sequence select="tokenize($step/@next, ' ')"/>
     </xsl:function>
 
+    <!--
+        Given a string, convert it to a valid ID.
+    -->
+    <xsl:function as="xs:string" name="chk:string-to-id">
+        <xsl:param name="in" as="xs:string"/>
+        <xsl:choose>
+            <xsl:when test="chk:is-valid-id($in)" >
+                <!-- If the value is castable as an ID don't mess with it -->
+                <xsl:sequence select="$in"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:sequence select="concat('_',chk:string-to-hex($in))"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <!--
+       Returns true if the string is a valid ID
+    -->
+    <xsl:function as="xs:boolean" name="chk:is-valid-id">
+        <xsl:param name="in" as="xs:string"/>
+        <xsl:choose>
+            <xsl:when test="matches($in,'^[\i-[:]][\c-[:]]*$')" use-when="system-property('xsl:is-schema-aware') eq 'no'">
+                <xsl:sequence select="true()"/>
+            </xsl:when>
+            <xsl:when test="$in castable as xs:ID" use-when="system-property('xsl:is-schema-aware') eq 'yes'">
+                <xsl:sequence select="true()"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:sequence select="false()"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <!--
+       Hexadecimal encode a string.
+    -->
+    <xsl:function as="xs:string" name="chk:string-to-hex">
+        <xsl:param name="in" as="xs:string"/>
+        <xsl:sequence select="string-join(for $i in string-to-codepoints($in)
+                                          return chk:int-to-hex($i), '')"/>
+    </xsl:function>
+
+    <!--
+      Converts an integer to a hex string.
+
+      This clever function was borrowed from Yves Forkl and Michael
+      Kay:
+      http://www.oxygenxml.com/archives/xsl-list/200902/msg00215.html
+    -->
+    <xsl:function name="chk:int-to-hex" as="xs:string">
+        <xsl:param name="in" as="xs:integer"/>
+        <xsl:sequence
+        select="if ($in eq 0)
+                then '0'
+                else
+                concat(if ($in gt 16)
+                then chk:int-to-hex($in idiv 16)
+                else '',
+                substring('0123456789ABCDEF',
+                ($in mod 16) + 1, 1))"/>
+    </xsl:function>
 
 </xsl:stylesheet>
