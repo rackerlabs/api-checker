@@ -1,5 +1,20 @@
 # Releases #
 
+## Release 1.0.18 (2014-07-01) ##
+
+1. Fixed bug in raxRolesMask where illegal step IDs were generated in the
+case where a role name contained a non-alphanumeric character.
+1. Fixed bug where a malformed URI resulted in a 500 error code instead of
+400.
+1. Fixed a potential bug where an NPE would result in the rare but
+plausible case where a container does not provide access to an HTTP
+header.
+1. Fixed bug where single mismatch method and URI errors contain the
+same priority as multiple mismatch errors.
+1. HTTP servlet request mocks now handle HTTP headers in a case
+insensitive manner.
+1. Licensed code under Apache License version 2.0.
+
 ## Release 1.0.17 (2014-05-25) ##
 
 1. New strategy when deciding error message that involves longest path
