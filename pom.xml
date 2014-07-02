@@ -47,11 +47,11 @@
     <properties>
         <scala.version>2.10.3</scala.version>
         <scala.dep.version>2.10</scala.dep.version>
-        <saxon-ee.version>9.4.0.6</saxon-ee.version>
+        <saxon-ee.version>9.4.0.9</saxon-ee.version>
         <scala.test.version>2.0</scala.test.version>
         <scala.uri.version>0.4.2</scala.uri.version>
         <junit.version>4.10</junit.version>
-        <wadl-tools.version>1.0.25</wadl-tools.version>
+        <wadl-tools.version>1.0.28</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.1-rax</xerces.version>
         <servlet.version>3.1</servlet.version>

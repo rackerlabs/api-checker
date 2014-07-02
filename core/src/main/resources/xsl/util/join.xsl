@@ -41,6 +41,9 @@
        replacement checker steps. So in the example above it would
        match on the join produced in step 1 and generate step E.
 
+   3.  A template named 'addMetadata' which produces metadata for
+      the output checker, this is optional.
+
    See the bottom of this file for details.
 
    Copyright 2014 Rackspace US, Inc.
@@ -81,6 +84,7 @@
             <xsl:when test="empty($joins)">
                 <checker>
                     <xsl:copy-of select="/check:checker/namespace::*"/>
+                    <xsl:apply-templates select="/check:checker/check:meta" mode="copyMeta"/>
                     <xsl:copy-of select="/check:checker/check:grammar"/>
                     <xsl:variable name="pruned">
                         <xsl:call-template name="util:pruneSteps">
@@ -101,6 +105,20 @@
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+
+    <xsl:template match="@* | node()" mode="copyMeta" priority="10">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" mode="copyMeta"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="check:meta" mode="copyMeta" priority="11">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" mode="copyMeta"/>
+            <xsl:call-template name="addMetadata"/>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template name="doJoin">
@@ -245,4 +263,10 @@
              </xsl:call-template>
         </step>
     </xsl:template>
+
+    <!--
+        Provide content to be output in metadata section of the
+        checker file. You do not need to implement this template.
+    -->
+    <xsl:template name="addMetadata"/>
 </xsl:stylesheet>

@@ -57,6 +57,7 @@
 
     <complexType name="Checker">
         <sequence>
+            <element name="meta" type="chk:Meta" minOccurs="0" maxOccurs="unbounded"/>
             <element name="grammar" type="chk:Grammar" minOccurs="0" maxOccurs="unbounded">
                 <alternative test="@type eq 'W3C_XML' or not(@type)" type="chk:XSDGrammar"/>
                 <alternative test="@type eq 'SCHEMA_JSON'" type="chk:JSONGrammar"/>
@@ -613,6 +614,22 @@
         <complexContent mixed="true">
             <extension base="chk:Grammar"/>
         </complexContent>
+    </complexType>
+
+    <!-- Metadata -->
+    <complexType name="Meta">
+        <all>
+          <element name="built-by"   type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <element name="created-on"  type="xsd:dateTime" minOccurs="0" maxOccurs="1"/>
+          <element name="created-by" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <element name="created-from" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="config"   type="chk:ConfigOption" minOccurs="0" maxOccurs="unbounded"/>
+        </all>
+    </complexType>
+
+    <complexType name="ConfigOption">
+        <attribute name="option" use="required" type="xsd:string"/>
+        <attribute name="value" use="required" type="xsd:string"/>
     </complexType>
 
     <!-- Simple Types -->

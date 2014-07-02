@@ -156,11 +156,11 @@ xmlns:atom="http://www.w3.org/2005/Atom">
              XPath("/atom:entry/@only_usage"), Accept)
 
       And ("The Following counts should hold")
-      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 6")
-      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 4")
-      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 4")
-      assert (checker, "count(/chk:checker/chk:step[@type='XPATH']) = 16")
-      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry']) = 4")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE']) = 3")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH']) = 13")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry']) = 3")
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns17:usage']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns17:usage/w_ns17:up']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down']) = 1")
@@ -168,8 +168,8 @@ xmlns:atom="http://www.w3.org/2005/Atom">
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns16:usage']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns16:usage/w_ns16:up']) = 1")
       assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down']) = 1")
-      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns18:usage']) = 2")
-      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/@only_usage']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/w_ns18:usage']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/atom:entry/@only_usage']) = 1")
     }
 
     scenario ("The sharedXPathWADL is processed checking wellformness, XSD, elemnts, and plain parameters, with remove dups optimization") {

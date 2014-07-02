@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application [<!ENTITY % common  SYSTEM "common.ent">
+%common;]>
+
+<application
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://wadl.dev.java.net/2009/02"
+    xmlns:db="http://docbook.org/ns/docbook"
+    xmlns:xsdxt="http://docs.rackspacecloud.com/xsd-ext/v1.0"
+    xmlns:osapi="http://docs.openstack.org/compute/api/v1.1"
+    xmlns:atom="http://www.w3.org/2005/Atom">
+
+    <resources base="https://servers.api.openstack.com">
+        <resource id="Metadata" path="metadata">
+            <method href="#getMetadataItem"/>
+        </resource>
+    </resources>
+
+    <method name="GET" id="getMetadataItem">
+        <doc xml:lang="EN" title="Get Metadata Item">
+            <db:para role="shortdesc">
+                Get a metadata item associated with a resource.
+            </db:para>
+            <db:para>
+                Retrieves a single metadata item by key.
+            </db:para>
+        </doc>
+        <response status="200 203">
+            <representation mediaType="application/xml" element="osapi:meta">
+                <doc xml:lang="EN">
+                    <xsdxt:code href="samples/metadata_item.xml" />
+                </doc>
+            </representation>
+            <representation mediaType="application/json">
+                <doc xml:lang="EN">
+                    <xsdxt:code href="samples/metadata_item.json" />
+                </doc>
+            </representation>
+        </response>
+        <!-- Common Faults and GET Faults-->
+        &commonFaults;
+        &getFaults;
+    </method>
+</application>

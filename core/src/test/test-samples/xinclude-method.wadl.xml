@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE method [<!ENTITY % common  SYSTEM "common.ent">
+%common;]>
+
+<method name="POST" id="createServer"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://wadl.dev.java.net/2009/02"
+        xmlns:osapi="http://docs.openstack.org/compute/api/v1.1"
+        xmlns:atom="http://www.w3.org/2005/Atom">
+    <doc xml:lang="EN" title="Create Server">
+        <p xmlns="http://www.w3.org/1999/xhtml">
+            Creates a new server.
+        </p>
+    </doc>
+    <request>
+        <representation mediaType="application/xml" />
+        <representation mediaType="application/json" />
+    </request>
+    <response status="202">
+        <param name="Location" style="header"
+               required="true" type="xsd:anyURI"/>
+        <representation mediaType="application/xml"  />
+        <representation mediaType="application/json" />
+    </response>
+    <!-- All other common faults except build in progess -->
+    &commonFaults;
+    &getFaults;
+    &postPutFaults;
+</method>

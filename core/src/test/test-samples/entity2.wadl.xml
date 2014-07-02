@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://wadl.dev.java.net/2009/02"
+    xmlns:atom="http://www.w3.org/2005/Atom">
+
+    <resources base="https://servers.api.openstack.com">
+        <resource id="Servers" path="servers">
+            <method href="entity2-method.wadl.xml#createServer"/>
+        </resource>
+    </resources>
+</application>

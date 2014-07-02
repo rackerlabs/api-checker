@@ -1,0 +1,5 @@
+<application xmlns="http://wadl.dev.java.net/2009/02">
+    <resource_type id="foo">
+        <method name="GET"/>
+    </resource_type>
+</application>

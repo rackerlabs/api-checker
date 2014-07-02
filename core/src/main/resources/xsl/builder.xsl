@@ -40,7 +40,8 @@
     xmlns:rax="http://docs.rackspace.com/api"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
-    exclude-result-prefixes="xsd wadl rax check"
+    xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
+    exclude-result-prefixes="xsd wadl rax check svrl"
     version="2.0">
 
     <!-- Add prune steps template -->
@@ -49,6 +50,8 @@
     <xsl:output indent="yes" method="xml"/>
 
     <!-- Paramenters -->
+    <xsl:param name="user" as="xsd:string" select="'unknown'" />
+    <xsl:param name="creator" as="xsd:string" select="'unknown'"/>
     <xsl:param name="enableXSDContentCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableJSONContentCheck" as="xsd:boolean" select="false()"/>
     <xsl:param name="enableXSDTransform" as="xsd:boolean" select="false()"/>
@@ -98,10 +101,12 @@
     <xsl:variable name="useWellFormCheck" as="xsd:boolean"
                   select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or
                           $enablePlainParamCheck or $useJSONContentCheck"/>
+    <xsl:variable name="useRaxRoles" as="xsd:boolean"
+                  select="$enableRaxRoles"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
-                  select="$enableHeaderCheck or $enableRaxRoles"/>
+                  select="$enableHeaderCheck or $useRaxRoles"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
-                  select="$enableMessageExtension or $enableRaxRoles"/>
+                  select="$enableMessageExtension or $useRaxRoles"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -151,10 +156,11 @@
             </checker>
         </xsl:variable>
         <!--
-            Finally add namespaces and remove unconnected nodes.
+            Finally add metadata, namespaces, and remove unconnected nodes.
         -->
         <checker>
             <xsl:call-template name="check:addNamespaceNodes"/>
+            <xsl:call-template name="check:addMetadata"/>
             <xsl:apply-templates mode="grammar"/>
             <xsl:variable name="pruned">
                 <xsl:call-template name="util:pruneSteps">
@@ -234,6 +240,35 @@
                 </xsl:otherwise>
             </xsl:choose>
         </namespaces>
+    </xsl:template>
+
+    <xsl:template name="check:addMetadata">
+        <meta>
+            <xsl:if test="$user"><built-by><xsl:value-of select="$user"/></built-by></xsl:if>
+            <xsl:if test="$creator"><created-by><xsl:value-of select="$creator"/></created-by></xsl:if>
+            <created-on><xsl:value-of select="current-dateTime()"/></created-on>
+            <xsl:apply-templates mode="addMetadata"/>
+            <xsl:if test="$enableXSDContentCheck"><config option="enableXSDContentCheck" value="{$enableXSDContentCheck}"/></xsl:if>
+            <xsl:if test="$enableJSONContentCheck"><config option="enableJSONContentCheck" value="{$enableJSONContentCheck}"/></xsl:if>
+            <xsl:if test="$enableXSDTransform"><config option="enableXSDTransform" value="{$enableXSDTransform}"/></xsl:if>
+            <xsl:if test="$enableWellFormCheck"><config option="enableWellFormCheck" value="{$enableWellFormCheck}"/></xsl:if>
+            <xsl:if test="$enableElementCheck"><config option="enableElementCheck" value="{$enableElementCheck}"/></xsl:if>
+            <xsl:if test="$enablePlainParamCheck"><config option="enablePlainParamCheck" value="{$enablePlainParamCheck}"/></xsl:if>
+            <xsl:if test="$enablePreProcessExtension"><config option="enablePreProcessExtension" value="{$enablePreProcessExtension}"/></xsl:if>
+            <xsl:if test="$enableIgnoreXSDExtension"><config option="enableIgnoreXSDExtension" value="{$enableIgnoreXSDExtension}"/></xsl:if>
+            <xsl:if test="$enableIgnoreJSONSchemaExtension"><config option="enableIgnoreJSONSchemaExtension" value="{$enableIgnoreJSONSchemaExtension}"/></xsl:if>
+            <xsl:if test="$enableMessageExtension"><config option="enableMessageExtension" value="{$enableMessageExtension}"/></xsl:if>
+            <xsl:if test="$enableHeaderCheck"><config option="enableHeaderCheck" value="{$enableHeaderCheck}"/></xsl:if>
+            <xsl:if test="$enableRaxRoles"><config option="enableRaxRoles" value="{$enableRaxRoles}"/></xsl:if>
+        </meta>
+    </xsl:template>
+
+    <xsl:template match="svrl:active-pattern[@name='References']" mode="addMetadata">
+        <created-from><xsl:value-of select="@document"/></created-from>
+    </xsl:template>
+
+    <xsl:template match="svrl:successful-report[@role=('unparsedReference','includeReference')]/svrl:text" mode="addMetadata">
+        <created-from><xsl:value-of select="."/></created-from>
     </xsl:template>
 
     <xsl:template name="check:addNamespaceNodes">
