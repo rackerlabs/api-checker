@@ -2730,6 +2730,76 @@ class WADLCheckerSpec extends BaseCheckerSpec {
               </resource>
            </resources>
         </application>),
+    ("With mix RAXIDs and IDs in resourceTypes", true,
+     <application xmlns="http://wadl.dev.java.net/2009/02"
+                  xmlns:rax="http://docs.rackspace.com/api">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method rax:id="action1" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method rax:id="action2" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method rax:id="action3" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method rax:id="action4" name="POST">
+                      <response status="201"/>
+                   </method>
+              </resource>
+           </resources>
+           <resource_type id="test">
+                <method id="action1" name="POST">
+                   <response status="201"/>
+                </method>
+                <method id="action2" name="POST">
+                  <response status="201"/>
+                </method>
+                <method id="action3" name="POST">
+                  <response status="201"/>
+                </method>
+                <method id="action4" name="POST">
+                  <response status="201"/>
+                </method>
+           </resource_type>
+        </application>),
+    ("With mix RAXIDs and IDs in resourceTypes (not all ids)", false,
+     <application xmlns="http://wadl.dev.java.net/2009/02"
+                  xmlns:rax="http://docs.rackspace.com/api">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method rax:id="action1" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method name="POST">
+                      <response status="201"/>
+                   </method>
+              </resource>
+           </resources>
+           <resource_type id="test">
+                <method id="action1" name="POST">
+                   <response status="201"/>
+                </method>
+                <method name="POST">
+                  <response status="201"/>
+                </method>
+                <method name="POST">
+                  <response status="201"/>
+                </method>
+                <method name="POST">
+                  <response status="201"/>
+                </method>
+           </resource_type>
+        </application>),
     ("With mix RAXIds and IDs", true,
      <application xmlns="http://wadl.dev.java.net/2009/02"
                   xmlns:rax="http://docs.rackspace.com/api">
