@@ -495,10 +495,7 @@
                      match="{current-grouping-key()}" label="ε">
                     <xsl:attribute name="next">
                         <xsl:value-of separator=" ">
-                            <xsl:sequence select="for $m in current-group() return
-                                                   if ($m/@rax:id) then
-                                                     generate-id($from/ancestor::*/wadl:method[@id=$m/@rax:id])
-                                                     else generate-id($m)"></xsl:sequence>
+                            <xsl:sequence select="for $m in current-group() return check:MethodID($m)"/>
                         </xsl:value-of>
                     </xsl:attribute>
                 </step>
@@ -606,7 +603,7 @@
             as the source.
         -->
         <xsl:variable name="raxid" select="@rax:id"/>
-        <xsl:if test="(not($raxid) or 
+        <xsl:if test="(not($raxid) or @id or
                       (not(//wadl:method[@id=$raxid]) and (generate-id((//wadl:method[@rax:id = $raxid])[1]) = generate-id())))">
             <step type="METHOD">
                 <xsl:attribute name="id" select="generate-id()"/>
@@ -779,6 +776,17 @@
     <xsl:function name="check:getXSLVersion" as="xsd:integer">
         <xsl:param name="root" as="node()"/>
         <xsl:value-of select="xsd:integer(substring($root/(xsl:transform | xsl:stylesheet)/@version,1,1))"/>
+    </xsl:function>
+
+    <xsl:function name="check:MethodID" as="xsd:string">
+        <xsl:param name="m" as="node()"/>
+        <xsl:variable name="parent" as="node()" select="$m/.."/>
+        <xsl:value-of select="if ($m/@rax:id) then
+                                 if ($parent/ancestor::*/wadl:method[@id=$m/@rax:id]) then
+                                    generate-id($parent/ancestor::*/wadl:method[@id=$m/@rax:id])
+                                 else
+                                    generate-id(($parent/ancestor::*//wadl:method[@rax:id = $m/@rax:id])[1])
+                              else generate-id($m)"/>
     </xsl:function>
 
     <xsl:template name="check:addWellFormNext">
@@ -965,16 +973,19 @@
     
     <xsl:template name="check:addLabel">
         <!--
-            If an id or doc title exists, use it as the label.
+            If an id a rax:id or doc title exists, use it as the label.
         -->
-        <xsl:if test="@id or wadl:doc/@title">
+        <xsl:if test="@id or @rax:id or wadl:doc/@title">
             <xsl:attribute name="label">
                 <xsl:choose>
                     <xsl:when test="wadl:doc/@title">
                         <xsl:value-of select="normalize-space(wadl:doc/@title)"/>
                     </xsl:when>
-                    <xsl:otherwise>
+                    <xsl:when test="@id">
                         <xsl:value-of select="normalize-space(@id)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="normalize-space(@rax:id)"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
@@ -1075,12 +1086,7 @@
                     <xsl:sequence select="concat(current-grouping-key(),'_',generate-id($from))"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:sequence select="for $m in current-group() return
-                                          if ($m/@rax:id) then
-                                            if ($from/ancestor::*/wadl:method[@id=$m/@rax:id]) then
-                                                generate-id($from/ancestor::*/wadl:method[@id=$m/@rax:id])
-                                            else generate-id(($from/ancestor::*//wadl:method[@rax:id = $m/@rax:id])[1])
-                                          else generate-id($m)"/>
+                    <xsl:sequence select="for $m in current-group() return check:MethodID($m)"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:for-each-group>
