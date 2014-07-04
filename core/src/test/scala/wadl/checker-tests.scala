@@ -2685,10 +2685,12 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     multipleDupAsserts(checker_dupon, checker_dupoff)
   }
 
-  scenario("The WADL contains a single resource with multiple methods of the same type") {
-      Given("a WADL that contains a single resource with multiple methods of the same type")
-      val inWADL =
-        <application xmlns="http://wadl.dev.java.net/2009/02">
+  //
+  // The following used by the next scenarios
+  //
+  val multi_post_tests : List[(String, Boolean, NodeSeq)] = List(
+    ("With IDs", true,
+     <application xmlns="http://wadl.dev.java.net/2009/02">
            <grammars/>
            <resources base="https://test.api.openstack.com">
               <resource path="path/to/my/resource">
@@ -2706,24 +2708,101 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                    </method>
               </resource>
            </resources>
-        </application>
+        </application>),
+    ("With RAXIds", true,
+     <application xmlns="http://wadl.dev.java.net/2009/02"
+                  xmlns:rax="http://docs.rackspace.com/api">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method rax:id="action1" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method rax:id="action2" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method rax:id="action3" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method rax:id="action4" name="POST">
+                      <response status="201"/>
+                   </method>
+              </resource>
+           </resources>
+        </application>),
+    ("With mix RAXIds and IDs", true,
+     <application xmlns="http://wadl.dev.java.net/2009/02"
+                  xmlns:rax="http://docs.rackspace.com/api">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method id="action1" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method rax:id="action2" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method id="action3" rax:id="action3" name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method rax:id="action4" name="POST">
+                      <response status="201"/>
+                   </method>
+              </resource>
+           </resources>
+        </application>),
+    ("Without IDs", false,
+     <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method name="POST">
+                      <response status="201"/>
+                   </method>
+                   <method name="POST">
+                      <response status="201"/>
+                   </method>
+              </resource>
+           </resources>
+        </application>))
+
+  for (t <- multi_post_tests) {
+    scenario("The WADL contains a single resource with multiple methods of the same type "+t._1) {
+      Given("a WADL that contains a single resource with multiple methods of the same type"+t._1)
+      val inWADL = t._3
       When("the wadl is translated")
       val checker = builder.build (inWADL, stdConfig)
       Then("There should be a total of 5 POST method steps...4 specified plus 1 collecting them")
       assert(checker, "count(//chk:step[@type='METHOD']) = 5")
       And ("All paths should go through POST step.")
-      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Method("POST"))
-      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action1"))
-      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action2"))
-      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action3"))
-      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action4"))
+      assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Method("POST"), Accept)
+      if (t._2) {
+        assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action1"))
+        assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action2"))
+        assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action3"))
+        assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"), Label("action4"))
+      } else {
+        assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"))
+        assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"))
+        assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"))
+        assert(checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Method("POST"))
+      }
       And ("One of the post steps is labeled ε, the rest are labeled according to thier ID")
-      assert(checker, "//chk:step[@type='METHOD' and @label='action1']")
-      assert(checker, "//chk:step[@type='METHOD' and @label='action2']")
-      assert(checker, "//chk:step[@type='METHOD' and @label='action3']")
-      assert(checker, "//chk:step[@type='METHOD' and @label='action4']")
+      if (t._2) {
+        assert(checker, "//chk:step[@type='METHOD' and @label='action1']")
+        assert(checker, "//chk:step[@type='METHOD' and @label='action2']")
+        assert(checker, "//chk:step[@type='METHOD' and @label='action3']")
+        assert(checker, "//chk:step[@type='METHOD' and @label='action4']")
+      }
       assert(checker, "//chk:step[@type='METHOD' and @label='ε']")
     }
+  }
 
   //
   //  The following assertions are used to test WellFormXML and
