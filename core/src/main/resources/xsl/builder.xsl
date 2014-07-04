@@ -782,8 +782,8 @@
         <xsl:param name="m" as="node()"/>
         <xsl:variable name="parent" as="node()" select="$m/.."/>
         <xsl:value-of select="if ($m/@rax:id) then
-                                 if ($parent/ancestor::*/wadl:method[@id=$m/@rax:id]) then
-                                    generate-id($parent/ancestor::*/wadl:method[@id=$m/@rax:id])
+                                 if ($parent/ancestor::*//wadl:method[@id=$m/@rax:id]) then
+                                    generate-id($parent/ancestor::*//wadl:method[@id=$m/@rax:id])
                                  else
                                     generate-id(($parent/ancestor::*//wadl:method[@rax:id = $m/@rax:id])[1])
                               else generate-id($m)"/>
