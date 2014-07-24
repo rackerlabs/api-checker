@@ -61,6 +61,8 @@ object BuilderXSLParams {
   val ENABLE_RAX_ROLES_EXT = "enableRaxRoles"
   val ENABLE_MESSAGE_EXT    = "enableMessageExtension"
   val ENABLE_HEADER         = "enableHeaderCheck"
+  val USER = "user"
+  val CREATOR = "creator"
 }
 
 /**
@@ -88,6 +90,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   }
 
   def this() = this(null)
+
+  val creatorString = {
+    val title = getClass.getPackage.getImplementationTitle
+    val version = getClass.getPackage.getImplementationVersion
+    s"$title ($version)"
+  }
 
   private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
 
@@ -136,6 +144,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
       buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_SCHEMA, c.checkJSONGrammar)
       buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
+      buildHandler.getTransformer().setParameter (USER, System.getProperty("user.name"))
+      buildHandler.getTransformer().setParameter (CREATOR, creatorString)
       buildHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
 
       val output = {
@@ -204,9 +214,9 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
         raxRolesHandler.setResult(new SAXResult(buildHandler))
         raxRolesHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
-        wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP)
+        wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP, true)
       }else{
-        wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP)
+        wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP, true)
       }
     } catch {
       case e : Exception => logger.error(e.getMessage())

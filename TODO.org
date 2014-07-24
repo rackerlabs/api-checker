@@ -440,6 +440,65 @@
       1. [X] Priority map assertion
       2. [X] Test priorities in steps
       3. [X] Test similar to usage schema issue
+** DONE Log on failures
+** DONE Better log handling...ERROR, INFO, etc..carried out to XSL as well
+** DONE Rax-Roles support
+   *** DESIGN DECISIONS
+   1. When no rax:roles on the resource/method and no rax:roles at a higher level that can be inherited
+      BEHAVIOR: All access is allowed for that resource/method.
+   2. Multiple values are treated as ORs, user must have one of the values, not required to have all roles defined.
+      It will always be OR, and there is not a use case or future support plans for AND.
+   3. When a role is defined at the resource level (ex observer), and role at method level: (ex creator),
+      a user must have EITHER observer or creator to access the method.
+
+   1. [X] Update the config to account for the rax:roles flag
+   2. [X] Update the CLI to account for rax:roles (helpful in debugging during dev)
+   3. [X] Pass the flag to WADL->Checker format XSL
+   4. [X] Add a step in the checker format XSL to create header params from the rax:roles attribute
+          1. [X] Process the rax-roles enabled parameters
+          2. [X] Add pre-process stage
+          3. [X] Inject header params for methods that contain rax-role
+   5. [ ] Test with rax-roles extension flags on
+          1. [X] rax-roles at the resource level
+          2. [X] rax-roles at the method level
+          3. [X] rax-roles including #all
+          4. [X] rax-roles with multiple values
+          5. [X] no rax-roles anywhere in wadl
+          6. [X] no rax-roles on specified method, rax-roles at resource level
+          7. [X] no rax-roles on specified resource/method, rax-roles exist on a non-parent resource
+          8. [X] no rax-roles on specified resource, rax-roles on parent resource
+          9. [X] rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
+         10. [X] header roles is disabled, rax-roles is still processed
+         11. [X] access an undefined method on a valid resource, returns 405
+   6. [X] Move rax-roles back into the builder.xsl
+          1. [X] Pass rax roles flag in CheckerBuilder to builder.xsl
+          2. [X] Only run the rax-roles xsl if the config is turned on
+   7. [X] Test with rax-roles extension flag off
+          1. [X] Modify TestConfig to support flag for enable raxroles check
+          2. [X] Tests: when rax-roles is disabled, does not affect access
+          3. [X] rax-roles exist in wadl, header checks disabled, rax-roles are ignored
+          4. [X] rax-roles exist in wadl, header checks enabled, rax-roles are ignored
+   8. [X] Change default behavior of raxRolesEnabled to false
+          1. [X] Fix tests
+** DONE Add Metadata to checker docs [10/10]
+   1. [X] Metadata XSD
+   2. [X] pub date
+   3. [X] Configs
+   4. [X] Username
+   5. [X] Version
+   6. [X] Tests
+   7. [X] Default XPathVersion, PreserveRequestBody
+   8. [X] XSLT, XSD defaults??? Not needed, these are runtime checks.
+   9. [X] Resolve issue with method count on 1.0.28-SNAPSHOT of WADL tools.
+   10. [X] Deps [5/5]
+       1. [X] Update XSD...
+       2. [X] XSD deps
+       3. [X] XSLT deps
+       4. [X] JSON schema deps (top level for now)
+       5. [X] Included specs [3/3]
+          1. [X] XIncludes
+          2. [X] Entity References
+          3. [X] Samples
 ** TODO Better XSL step error tests [0/2]
    1. [ ] Test XSL fail message.
    2. [ ] Test XSL fail code.
@@ -502,7 +561,6 @@
 ** TODO Namespace Enhancements [0/2]
    1. [ ] Namespace cleanup task should look into XPath expressions
    2. [ ] Namespace cleanup task should account for default namespaces.
-** TODO Log on failures
 ** TODO Fix test error, where register is not working in step-test.scala
 ** TODO Review Skipped Tests[0/2]
    1. [ ] Saxon validation
@@ -510,50 +568,10 @@
 ** TODO Saxon report error(?) where casting is always nessesary.
 ** TODO Support XML schema validation, adding default parameters
 ** TODO Modify filter to handle different groups
-** TODO Better log handling...ERROR, INFO, etc..carried out to XSL as well
-** TODO WADL Change Detector...
 ** TODO Real tests on DOT output
 ** TODO Expand checker to dot conversion in builder
 ** TODO Bring checker to dot conversion to cli
 ** TODO Better XSD tests
-** TODO Rax-Roles support
-   *** DESIGN DECISIONS
-   1. When no rax:roles on the resource/method and no rax:roles at a higher level that can be inherited
-      BEHAVIOR: All access is allowed for that resource/method.
-   2. Multiple values are treated as ORs, user must have one of the values, not required to have all roles defined.
-      It will always be OR, and there is not a use case or future support plans for AND.
-   3. When a role is defined at the resource level (ex observer), and role at method level: (ex creator),
-      a user must have EITHER observer or creator to access the method.
-
-   1. [X] Update the config to account for the rax:roles flag
-   2. [X] Update the CLI to account for rax:roles (helpful in debugging during dev)
-   3. [X] Pass the flag to WADL->Checker format XSL
-   4. [X] Add a step in the checker format XSL to create header params from the rax:roles attribute
-          1. [X] Process the rax-roles enabled parameters
-          2. [X] Add pre-process stage
-          3. [X] Inject header params for methods that contain rax-role
-   5. [ ] Test with rax-roles extension flags on
-          1. [X] rax-roles at the resource level
-          2. [X] rax-roles at the method level
-          3. [X] rax-roles including #all
-          4. [X] rax-roles with multiple values
-          5. [X] no rax-roles anywhere in wadl
-          6. [X] no rax-roles on specified method, rax-roles at resource level
-          7. [X] no rax-roles on specified resource/method, rax-roles exist on a non-parent resource
-          8. [X] no rax-roles on specified resource, rax-roles on parent resource
-          9. [X] rax-roles functions with different combinations of optimizations (remove dupes - (validate further in unit tests))
-         10. [X] header roles is disabled, rax-roles is still processed
-         11. [X] access an undefined method on a valid resource, returns 405
-   6. [X] Move rax-roles back into the builder.xsl
-          1. [X] Pass rax roles flag in CheckerBuilder to builder.xsl
-          2. [X] Only run the rax-roles xsl if the config is turned on
-   7. [X] Test with rax-roles extension flag off
-          1. [X] Modify TestConfig to support flag for enable raxroles check
-          2. [X] Tests: when rax-roles is disabled, does not affect access
-          3. [X] rax-roles exist in wadl, header checks disabled, rax-roles are ignored
-          4. [X] rax-roles exist in wadl, header checks enabled, rax-roles are ignored
-   8. [X] Change default behavior of raxRolesEnabled to false
-          1. [X] Fix tests
 
 
 * Tests 10 Threads 5000 count

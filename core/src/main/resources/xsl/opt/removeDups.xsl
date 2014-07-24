@@ -63,6 +63,7 @@
                 <!-- No duplicats found, tidy up empty epsillon cases -->
                 <checker>
                   <xsl:copy-of select="/check:checker/namespace::*"/>
+                  <xsl:apply-templates select="/check:checker/check:meta" mode="copyMeta"/>
                   <xsl:copy-of select="/check:checker/check:grammar"/>
                   <xsl:apply-templates select="$checker" mode="epsilonRemove"/>
                 </checker>
@@ -78,6 +79,19 @@
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="@* | node()" mode="copyMeta" priority="10">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" mode="copyMeta"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="check:meta" mode="copyMeta" priority="11">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" mode="copyMeta"/>
+            <config option="enableRemoveDups" value="true"/>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template match="check:checker" name="replaceEpsilons" mode="epsilonRemove">

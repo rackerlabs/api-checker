@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://wadl.dev.java.net/2009/02"
+    xmlns:osapi="http://docs.openstack.org/compute/api/v1.1"
+    xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <xi:include href="xinclude-method.wadl.xml"/>
+
+</application>
