@@ -57,6 +57,15 @@
     </xsl:function>
 
     <!--
+        Given check:meta return a configuration option value.
+    -->
+    <xsl:function name="chk:optionValue" as="xs:string?">
+        <xsl:param name="configMetadata" as="node()"/>
+        <xsl:param name="option" as="xs:string"/>
+        <xsl:value-of select="$configMetadata/chk:meta/chk:config[@option=$option]/@value"/>
+    </xsl:function>
+
+    <!--
         Given a string, convert it to a valid ID.
     -->
     <xsl:function as="xs:string" name="chk:string-to-id">

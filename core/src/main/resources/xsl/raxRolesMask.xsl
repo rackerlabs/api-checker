@@ -99,12 +99,6 @@
             <xsl:apply-templates select="@* | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
-    <xsl:template match="chk:meta" mode="processRoles copy">
-        <xsl:copy>
-            <xsl:apply-templates select="@* | node()" mode="copy"/>
-            <config option="enableMaskRaxRoles403" value="true"/>
-        </xsl:copy>
-    </xsl:template>
     <xsl:template match="chk:step[@type='START']" mode="processRoles">
         <xsl:variable name="start" as="node()" select="."/>
         <xsl:variable name="headerChecks" as="node()*">

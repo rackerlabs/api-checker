@@ -19,6 +19,9 @@ import scala.language.reflectiveCalls
 
 import scala.xml._
 
+import java.net.URI
+import java.net.URISyntaxException
+
 import java.io.InputStream
 import java.io.ByteArrayOutputStream
 import java.io.Reader
@@ -36,6 +39,8 @@ import com.rackspace.cloud.api.wadl.WADLFormat._
 import com.rackspace.cloud.api.wadl.RType._
 import com.rackspace.cloud.api.wadl.XSDVersion._
 import com.rackspace.cloud.api.wadl.Converters._
+import com.rackspace.cloud.api.wadl.util.LogErrorListener
+
 
 import com.rackspace.com.papi.components.checker.Config
 
@@ -48,35 +53,13 @@ import net.sf.saxon.Controller
  *
  *  {@see javax.xml.transform.Transformer}
  */
-object BuilderXSLParams {
-  val ENABLE_WELL_FORM = "enableWellFormCheck"
-  val ENABLE_XSD       = "enableXSDContentCheck"
-  val ENABLE_JSON_SCHEMA = "enableJSONContentCheck"
-  val ENABLE_XSD_TRANSFORM = "enableXSDTransform"
-  val ENABLE_ELEMENT   = "enableElementCheck"
-  val ENABLE_PLAIN_PARAM = "enablePlainParamCheck"
-  val ENABLE_PRE_PROCESS_EXT = "enablePreProcessExtension"
-  val ENABLE_XSD_IGNORE_EXT  = "enableIgnoreXSDExtension"
-  val ENABLE_JSON_IGNORE_EXT = "enableIgnoreJSONSchemaExtension"
-  val ENABLE_RAX_ROLES_EXT = "enableRaxRoles"
-  val ENABLE_MESSAGE_EXT    = "enableMessageExtension"
-  val ENABLE_HEADER         = "enableHeaderCheck"
-  val USER = "user"
+object XSLParams {
+  val CONFIG_METADATA = "configMetadata"
+  val USER    = "user"
   val CREATOR = "creator"
 }
 
-/**
- *  XSL TransformerHandler parameters.
- *
- *  {@see javax.xml.transform.sax.TransformerHandler}
- */
-object XPathJoinParams {
-  val DEFAULT_XPATH_VERSION = "defaultXPathVersion"
-  val PRESERVE_REQUEST_BODY = "preserveRequestBody"
-}
-
-import BuilderXSLParams._
-import XPathJoinParams._
+import XSLParams._
 
 /**
  * An exception when transating the WADL into a checker.
@@ -121,8 +104,16 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   val joinXPathTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/xpathJoin.xsl").toString))
   val priorityTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/priority.xsl").toString))
   val adjustNextTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/adjust-next-cont-error.xsl").toString))
+  val metaCheckTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/meta-check.xsl").toString))
 
-  def build (in : Source, out: Result, config : Config) : Unit = {
+  //
+  //  We purposly do the identity transform using xalan instead of
+  //  Saxon, because of SaxonEE license issue.
+  //
+  private val idTransform = TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl",null).newTransformer()
+  idTransform.setErrorListener (new LogErrorListener)
+
+  private def buildFromWADL (in : Source, out: Result, config : Config) : Unit = {
     var c = config
 
     if (c == null) {
@@ -132,18 +123,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
     try {
       val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
 
-      buildHandler.getTransformer().setParameter (ENABLE_WELL_FORM, c.checkWellFormed)
-      buildHandler.getTransformer().setParameter (ENABLE_XSD, c.checkXSDGrammar)
-      buildHandler.getTransformer().setParameter (ENABLE_XSD_TRANSFORM, c.doXSDGrammarTransform)
-      buildHandler.getTransformer().setParameter (ENABLE_ELEMENT, c.checkElements)
-      buildHandler.getTransformer().setParameter (ENABLE_PLAIN_PARAM, c.checkPlainParams)
-      buildHandler.getTransformer().setParameter (ENABLE_PRE_PROCESS_EXT, c.enablePreProcessExtension)
-      buildHandler.getTransformer().setParameter (ENABLE_XSD_IGNORE_EXT, c.enableIgnoreXSDExtension)
-      buildHandler.getTransformer().setParameter (ENABLE_MESSAGE_EXT, c.enableMessageExtension)
-      buildHandler.getTransformer().setParameter (ENABLE_RAX_ROLES_EXT, c.enableRaxRolesExtension)
-      buildHandler.getTransformer().setParameter (ENABLE_HEADER, c.checkHeaders)
-      buildHandler.getTransformer().setParameter (ENABLE_JSON_SCHEMA, c.checkJSONGrammar)
-      buildHandler.getTransformer().setParameter (ENABLE_JSON_IGNORE_EXT, c.enableIgnoreJSONSchemaExtension)
+      buildHandler.getTransformer().setParameter (CONFIG_METADATA, new StreamSource(c.checkerMetaElem))
       buildHandler.getTransformer().setParameter (USER, System.getProperty("user.name"))
       buildHandler.getTransformer().setParameter (CREATOR, creatorString)
       buildHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
@@ -198,8 +178,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         if (c.joinXPathChecks) {
           val xpathHandler = wadl.saxTransformerFactory.newTransformerHandler(joinXPathTemplates)
 
-          xpathHandler.getTransformer().setParameter(DEFAULT_XPATH_VERSION, c.xpathVersion)
-          xpathHandler.getTransformer().setParameter(PRESERVE_REQUEST_BODY, c.preserveRequestBody)
+          xpathHandler.getTransformer().setParameter(CONFIG_METADATA, new StreamSource(c.checkerMetaElem))
           xpathHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
 
           joinHeaderHandler.setResult(new SAXResult(xpathHandler))
@@ -221,6 +200,72 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
     } catch {
       case e : Exception => logger.error(e.getMessage())
                             throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
+    }
+  }
+
+  private def buildFromChecker (in : Source, out : Result, config : Config) : Unit = {
+    val configSet = config == null
+    val checkConfig = config match {
+      case null => new Config
+      case _ => config
+    }
+
+    val vout = {
+      if (config.validateChecker) {
+        val outHandler = wadl.saxTransformerFactory.newTransformerHandler()
+        outHandler.setResult(out)
+
+        val schemaHandler = checkerSchema.newValidatorHandler()
+        schemaHandler.setContentHandler(outHandler)
+
+        new SAXResult(schemaHandler)
+      } else {
+        out
+      }
+    }
+
+    val metaHandler = wadl.saxTransformerFactory.newTransformerHandler(metaCheckTemplates)
+    metaHandler.getTransformer().setParameter (CONFIG_METADATA, new StreamSource(checkConfig.checkerMetaElem))
+    metaHandler.getTransformer().setParameter (CREATOR, creatorString)
+    metaHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
+
+    metaHandler.setResult(vout)
+
+    idTransform.transform (in, new SAXResult(metaHandler))
+  }
+
+  /*
+   * We are starting with a very simple approach to detect if we the source contians
+   * a checker format vs a wadl.
+   *
+   * 1. The Path compontent of the systemID ends with .checker
+   * 2. The Query component contains the string checker=true
+   *
+   */
+  private def useCheckerFormat (in : Source) : Boolean = {
+    def nullGuard(s : String) : String = s match {
+      case null => ""
+      case _ => s
+    }
+
+    try {
+      in.getSystemId() match {
+        case null => false
+        case s : String => val sysURI = new URI(s)
+                           nullGuard(sysURI.getPath()).endsWith(".checker") ||
+                           nullGuard(sysURI.getQuery()).contains("checker=true")
+      }
+    } catch {
+      case u : URISyntaxException => logger.warn("Unable to parse systemId ("+in.getSystemId()+")URI continuing...")
+                                     false
+    }
+  }
+
+  def build (in : Source, out: Result, config : Config) : Unit = {
+    if (useCheckerFormat(in)) {
+      buildFromChecker (in, out, config)
+    } else {
+      buildFromWADL (in, out, config)
     }
   }
 

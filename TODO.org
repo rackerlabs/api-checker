@@ -499,6 +499,36 @@
           1. [X] XIncludes
           2. [X] Entity References
           3. [X] Samples
+** DONE Load checker format directly [10/10]
+   1. [X] Detect checker format
+   2. [X] Bypass compilation -- but *NOT* validation if it is
+      configured
+   3. [X] Add static annotiation to configs to denote which config
+      affect checker format
+   4. [X] Code to get list of config settings that affect compilation
+      in Meta xml format
+   5. [X] Code to get config from annotation name (in config class??)
+   6. [X] Rework builder to automate the building of the checker
+      config stuff and the passing of parameters based on config
+   7. [X] Meta detector handler to detect metadata
+   8. [X] Have a metadetector that WARNs if version mismatch later versions, newer versions..
+   9. [X] Have same metadetector Compare compile configs, WARN when these differ from set config
+   10. [X] Tests [3/3]
+       1. [X] Test that checker format detection is working correctly
+       2. [X] Test that meta detactor is warning correctly [2/2]
+          1. [X] Version
+          2. [X] Configs
+       3. [X] Rework meta tests to automate the checking of configs in metadata
+** TODO Fix issue where dependecies may be listed more than once in metadata
+** TODO Cache checker format on load [0/3]
+   1. [ ] New config option...enable cache...defualt to true
+   2. [ ] Check for cache on load XML, if cache exists [0/4]
+      1. [ ] Compare configs, if any differ don't use cache
+      2. [ ] Compare version, if it differs don't use cache
+      3. [ ] Compare date on dependices file date, if any is
+         newer...don't use cache
+      4. [ ] Otherwise...use cache, log the fact that cach is being used.
+   3. [ ] Check for cache on load XML, if it doesn't exist, create it
 ** TODO Better XSL step error tests [0/2]
    1. [ ] Test XSL fail message.
    2. [ ] Test XSL fail code.
