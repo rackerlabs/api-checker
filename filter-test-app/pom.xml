@@ -9,7 +9,6 @@
 
     <groupId>com.rackspace.papi.components.api-checker</groupId>
     <artifactId>test-app</artifactId>
-    <version>1.0.19-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <dependencies>

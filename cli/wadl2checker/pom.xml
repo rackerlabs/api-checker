@@ -9,7 +9,6 @@
 
     <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
     <artifactId>wadl2checker</artifactId>
-    <version>1.0.19-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>API Checker CLI WADL2Checker</name>
