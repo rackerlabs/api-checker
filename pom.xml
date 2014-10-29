@@ -64,6 +64,7 @@
         <json-schema-validator.version>2.1.7</json-schema-validator.version>
         <scala-logging.version>2.1.2</scala-logging.version>
         <slf4j.log4j.version>1.7.7</slf4j.log4j.version>
+        <http.delegation.version>1.0.0</http.delegation.version>
     </properties>
 
     <dependencies>
@@ -167,6 +168,11 @@
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrepose</groupId>
+            <artifactId>http-delegation</artifactId>
+            <version>${http.delegation.version}</version>
         </dependency>
     </dependencies>
     <profiles>
