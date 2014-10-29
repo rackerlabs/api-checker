@@ -22,6 +22,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 import java.net.URISyntaxException
+import java.util
 
 import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
@@ -37,8 +38,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode
 import org.w3c.dom.Document
 
-import java.util.Enumeration
-
 import com.typesafe.scalalogging.slf4j.LazyLogging
 
 import com.netaporter.uri.encoding.PercentEncoder
@@ -47,6 +46,8 @@ import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
 
 import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 //
 //  Request Keys
@@ -74,6 +75,8 @@ import CherkerServletRequest._
 //  An HTTP Request with some additional helper functions
 //
 class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) with LazyLogging {
+
+  private val auxiliaryHeaders = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
 
   val parsedRequestURI : (Option[URI], Option[URISyntaxException]) = {
     try {
@@ -123,6 +126,61 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
     case null => -1
   }
   def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
+
+  def addHeader(name: String, value: String): Unit = auxiliaryHeaders.addBinding(name, value)
+
+  // TODO: Implement this. I am opting to skip implementing this method since there are not plans to use it at this time,
+  // and the implementation is non-trivial. This method will work for headers in the wrapped request, but will always
+  // return -1 for headers added via this wrapper.
+  override def getDateHeader(name: String): Long = super.getDateHeader(name)
+
+  override def getHeader(name: String): String = {
+    auxiliaryHeaders.find { case (headerName, headerValues) =>
+        headerName.equalsIgnoreCase(name)
+    } match {
+      // TODO: Return the header value with the highest quality
+      case Some((_, headerValues)) => headerValues.headOption.orNull
+      case None => super.getHeader(name)
+    }
+  }
+
+  override def getHeaders(name: String): util.Enumeration[String] = {
+    auxiliaryHeaders.find { case (headerName, headerValues) =>
+      headerName.equalsIgnoreCase(name)
+    } match {
+      case Some((_, auxiliaryHeaderValues)) =>
+        Option(super.getHeaders(name)) match {
+          case Some(primaryHeaderValues) =>
+            // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
+            // being a Java Enumeration).
+            val headerValuesSet = primaryHeaderValues.asScala.toSet
+            (auxiliaryHeaderValues ++ headerValuesSet).toIterator.asJavaEnumeration
+          case None => null
+        }
+      case None => super.getHeaders(name)
+    }
+  }
+
+  override def getHeaderNames: util.Enumeration[String] = {
+    Option(super.getHeaderNames) match {
+      case Some(primaryHeaderNames) =>
+        // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
+        // being a Java Enumeration).
+        val headerNamesSet = primaryHeaderNames.asScala.toSet
+        (auxiliaryHeaders.keySet ++ headerNamesSet).toIterator.asJavaEnumeration
+      case None => null
+    }
+  }
+
+  override def getIntHeader(name: String): Int = {
+    auxiliaryHeaders.find { case (headerName, headerValues) =>
+      headerName.equalsIgnoreCase(name)
+    } match {
+      // TODO: Return the header value with the highest quality
+      case Some((_, headerValues)) => headerValues.headOption.getOrElse("-1").toInt
+      case None => super.getIntHeader(name)
+    }
+  }
 
   override def getRequestURI : String = parsedRequestURI match {
     case (Some(u), _) => request.getRequestURI()

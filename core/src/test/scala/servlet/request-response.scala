@@ -16,6 +16,9 @@
 package com.rackspace.com.papi.components.checker
 
 import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
+import org.mockito.Mockito.when
+
+import scala.collection.JavaConverters._
 
 class RequestResponseSuite extends BaseValidatorSuite {
 
@@ -31,4 +34,51 @@ class RequestResponseSuite extends BaseValidatorSuite {
     assert(wrap.getHeaders("User-Agent").nextElement()=="Bla, bla bla")
   }
 
+  test("Ensure headers added via addHeader are accessible via getHeader") {
+    val req = request("GET","/foo","application/XML","",false,Map("a"->List("1")))
+    val wrap = new CheckerServletRequest(req)
+    wrap.addHeader("b", "2")
+    assert(wrap.getHeader("b")=="2")
+  }
+
+  test("Ensure headers added via addHeader are accessible via getHeader in a case-insensitive manner") {
+    val req = request("GET","/foo","application/XML","",false,Map("a"->List("1")))
+    val wrap = new CheckerServletRequest(req)
+    wrap.addHeader("b", "2")
+    assert(wrap.getHeader("B")=="2")
+  }
+
+  test("Ensure headers added via addHeader are accessible via getHeaders") {
+    val req = request("GET","/foo","application/XML","",false,Map("a"->List("1")))
+    val wrap = new CheckerServletRequest(req)
+    wrap.addHeader("b", "2")
+    wrap.addHeader("b", "3")
+
+    val headerValues = wrap.getHeaders("b").asScala.toSet
+    assert(headerValues.contains("2"))
+    assert(headerValues.contains("3"))
+  }
+
+  test("Ensure getHeaderNames returns all header names") {
+    val req = request("GET","/foo","application/XML","",false,Map("a"->List("1")))
+    when(req.getHeaderNames).thenReturn(Iterator("a").asJavaEnumeration)
+
+    val wrap = new CheckerServletRequest(req)
+    wrap.addHeader("b", "2")
+
+    val headerNameSet = wrap.getHeaderNames.asScala.toSet
+    assert(headerNameSet.contains("a"))
+    assert(headerNameSet.contains("b"))
+  }
+
+  test("Ensure getIntHeader returns the Int value of a header value") {
+    val req = request("GET","/foo","application/XML","",false,Map("a"->List("1")))
+    when(req.getIntHeader("a")).thenReturn(1)
+
+    val wrap = new CheckerServletRequest(req)
+    wrap.addHeader("b", "2")
+
+    assert(wrap.getIntHeader("a")==1)
+    assert(wrap.getIntHeader("b")==2)
+  }
 }
