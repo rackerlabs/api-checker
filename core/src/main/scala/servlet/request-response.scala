@@ -36,6 +36,7 @@ import javax.xml.transform.stream.StreamResult
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode
+import org.apache.http.client.utils.DateUtils
 import org.w3c.dom.Document
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
@@ -129,10 +130,16 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   def addHeader(name: String, value: String): Unit = auxiliaryHeaders.addBinding(name, value)
 
-  // TODO: Implement this. I am opting to skip implementing this method since there are not plans to use it at this time,
-  // and the implementation is non-trivial. This method will work for headers in the wrapped request, but will always
-  // return -1 for headers added via this wrapper.
-  override def getDateHeader(name: String): Long = super.getDateHeader(name)
+  override def getDateHeader(name: String): Long = {
+    Option(getHeader(name)) match {
+      case Some(headerValue) =>
+        Option(DateUtils.parseDate(headerValue)) match {
+          case Some(parsedDate) => parsedDate.getTime
+          case None => throw new IllegalArgumentException("Header value could not be converted to a date")
+        }
+      case None => -1
+    }
+  }
 
   override def getHeader(name: String): String = {
     auxiliaryHeaders.find { case (headerName, headerValues) =>

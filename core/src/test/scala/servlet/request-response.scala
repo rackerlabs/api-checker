@@ -85,4 +85,20 @@ class RequestResponseSuite extends BaseValidatorSuite {
     assert(wrap.getIntHeader("a")==1)
     assert(wrap.getIntHeader("b")==2)
   }
+
+  test("Ensure getDateHeader can parse a supported date format") {
+    val req = request("GET","/foo","application/XML","",false,Map("Last-Modified"->List("Wed, 01 Jan 1970 00:00:01 GMT")))
+    val wrap = new CheckerServletRequest(req)
+
+    assert(wrap.getDateHeader("Last-Modified")==1000)
+  }
+
+  test("Ensure getDateHeader throws an IllegalArgumentException when an unsupported date format is provided") {
+    val req = request("GET","/foo","application/XML","",false,Map("Last-Modified"->List("01/01/1970/00/00/00 GMT")))
+    val wrap = new CheckerServletRequest(req)
+
+    intercept[IllegalArgumentException] {
+      wrap.getDateHeader("Last-Modified")
+    }
+  }
 }
