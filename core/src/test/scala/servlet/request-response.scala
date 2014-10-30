@@ -51,12 +51,16 @@ class RequestResponseSuite extends BaseValidatorSuite {
   test("Ensure headers added via addHeader are accessible via getHeaders") {
     val req = request("GET","/foo","application/XML","",false,Map("a"->List("1")))
     val wrap = new CheckerServletRequest(req)
+    wrap.addHeader("a", "2")
     wrap.addHeader("b", "2")
     wrap.addHeader("b", "3")
 
-    val headerValues = wrap.getHeaders("b").asScala.toSet
-    assert(headerValues.contains("2"))
-    assert(headerValues.contains("3"))
+    val headerValuesA = wrap.getHeaders("a").asScala.toSet
+    val headerValuesB = wrap.getHeaders("b").asScala.toSet
+    assert(headerValuesA.contains("1"))
+    assert(headerValuesA.contains("2"))
+    assert(headerValuesB.contains("2"))
+    assert(headerValuesB.contains("3"))
   }
 
   test("Ensure getHeaderNames returns all header names") {
