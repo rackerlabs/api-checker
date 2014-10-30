@@ -136,9 +136,8 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   override def getHeader(name: String): String = {
     auxiliaryHeaders.find { case (headerName, headerValues) =>
-        headerName.equalsIgnoreCase(name)
+      headerName.equalsIgnoreCase(name)
     } match {
-      // TODO: Return the header value with the highest quality
       case Some((_, headerValues)) => headerValues.headOption.orNull
       case None => super.getHeader(name)
     }
