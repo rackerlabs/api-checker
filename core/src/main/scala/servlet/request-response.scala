@@ -173,12 +173,9 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
 
   override def getIntHeader(name: String): Int = {
-    auxiliaryHeaders.find { case (headerName, headerValues) =>
-      headerName.equalsIgnoreCase(name)
-    } match {
-      // TODO: Return the header value with the highest quality
-      case Some((_, headerValues)) => headerValues.headOption.getOrElse("-1").toInt
-      case None => super.getIntHeader(name)
+    Option(getHeader(name)) match {
+      case Some(headerValue) => headerValue.toInt
+      case None => -1
     }
   }
 
