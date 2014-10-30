@@ -77,7 +77,7 @@ import CherkerServletRequest._
 //
 class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) with LazyLogging {
 
-  private val auxiliaryHeaders = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
+  private val auxiliaryHeaders = new mutable.HashMap[String, List[String]]
 
   val parsedRequestURI : (Option[URI], Option[URISyntaxException]) = {
     try {
@@ -128,7 +128,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
   def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
 
-  def addHeader(name: String, value: String): Unit = auxiliaryHeaders.addBinding(name, value)
+  def addHeader(name: String, value: String): Unit = auxiliaryHeaders(name) = auxiliaryHeaders.getOrElse(name, List()) :+ value
 
   override def getDateHeader(name: String): Long = {
     Option(getHeader(name)) match {
@@ -159,7 +159,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
           case Some(primaryHeaderValues) =>
             // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
             // being a Java Enumeration).
-            val headerValuesSet = primaryHeaderValues.asScala.toSet
+            val headerValuesSet = primaryHeaderValues.asScala.toList
             (auxiliaryHeaderValues ++ headerValuesSet).toIterator.asJavaEnumeration
           case None => null
         }
@@ -172,7 +172,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       case Some(primaryHeaderNames) =>
         // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
         // being a Java Enumeration).
-        val headerNamesSet = primaryHeaderNames.asScala.toSet
+        val headerNamesSet = primaryHeaderNames.asScala.toList
         (auxiliaryHeaders.keySet ++ headerNamesSet).toIterator.asJavaEnumeration
       case None => null
     }
