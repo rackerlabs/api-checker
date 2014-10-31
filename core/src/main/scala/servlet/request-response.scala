@@ -17,11 +17,10 @@ package com.rackspace.com.papi.components.checker.servlet
 
 import java.io.IOException
 import java.io.ByteArrayOutputStream
-import java.net.URI
+import java.net.{URI, URISyntaxException}
 import java.io.BufferedReader
 import java.io.InputStreamReader
-
-import java.net.URISyntaxException
+import java.text.{ParseException, SimpleDateFormat}
 import java.util
 
 import javax.servlet.ServletInputStream
@@ -36,7 +35,6 @@ import javax.xml.transform.stream.StreamResult
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode
-import org.apache.http.client.utils.DateUtils
 import org.w3c.dom.Document
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
@@ -133,9 +131,12 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   override def getDateHeader(name: String): Long = {
     Option(getHeader(name)) match {
       case Some(headerValue) =>
-        Option(DateUtils.parseDate(headerValue)) match {
-          case Some(parsedDate) => parsedDate.getTime
-          case None => throw new IllegalArgumentException("Header value could not be converted to a date")
+        val rfc1123DateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz")
+
+        try {
+          rfc1123DateFormat.parse(headerValue).getTime
+        } catch {
+          case e: ParseException => throw new IllegalArgumentException("Header value could not be converted to a date")
         }
       case None => -1
     }
