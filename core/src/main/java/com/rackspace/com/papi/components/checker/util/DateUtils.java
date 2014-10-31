@@ -1,10 +1,4 @@
 /*
- * Modified by Damien Johnson
- *  - Removed the usage of org.apache.http.annotation.Immutable
- *  - Removed the usage of org.apache.http.util.Args
- *  + Added null checks where Args.notNull was used previously, and an IllegalArgumentException for when the check fails
- *
- *
  * ====================================================================
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -35,6 +29,12 @@
  *
  * This product includes software developed at
  * The Apache Software Foundation (http://www.apache.org/).
+ *
+ *
+ * Modified by Damien Johnson (damien.johnson@rackspace.com)
+ *  - Removed the usage of org.apache.http.annotation.Immutable
+ *  - Removed the usage of org.apache.http.util.Args
+ *  + Added null checks where Args.notNull was used previously, and an IllegalArgumentException for when the check fails
  */
 package com.rackspace.com.papi.components.checker.util;
 
