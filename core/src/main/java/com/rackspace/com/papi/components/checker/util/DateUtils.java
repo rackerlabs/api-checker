@@ -31,7 +31,7 @@
  * The Apache Software Foundation (http://www.apache.org/).
  *
  *
- * Modified by Damien Johnson (damien.johnson@rackspace.com)
+ * Modified by Damien Johnson <damien.johnson@rackspace.com>
  *  - Removed the usage of org.apache.http.annotation.Immutable
  *  - Removed the usage of org.apache.http.util.Args
  *  + Added null checks where Args.notNull was used previously, and an IllegalArgumentException for when the check fails
@@ -52,8 +52,6 @@ import java.util.TimeZone;
  * A utility class for parsing and formatting HTTP dates as used in cookies and
  * other headers.  This class handles dates as defined by RFC 2616 section
  * 3.3.1 as well as some other common non-standard formats.
- *
- * @since 4.3
  */
 public final class DateUtils {
 
@@ -180,8 +178,6 @@ public final class DateUtils {
 
     /**
      * Clears thread-local variable containing {@link java.text.DateFormat} cache.
-     *
-     * @since 4.3
      */
     public static void clearThreadLocal() {
         DateFormatHolder.clearThreadLocal();
