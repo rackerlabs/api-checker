@@ -64,6 +64,7 @@
         <json-schema-validator.version>2.1.7</json-schema-validator.version>
         <scala-logging.version>2.1.2</scala-logging.version>
         <slf4j.log4j.version>1.7.7</slf4j.log4j.version>
+        <http.delegation.version>2.0.0</http.delegation.version>
     </properties>
 
     <dependencies>
@@ -168,7 +169,26 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openrepose</groupId>
+            <artifactId>http-delegation</artifactId>
+            <version>${http.delegation.version}</version>
+        </dependency>
     </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
     <profiles>
         <profile>
             <id>Rackspace Research Repositories</id>
