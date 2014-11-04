@@ -64,7 +64,7 @@
         <json-schema-validator.version>2.1.7</json-schema-validator.version>
         <scala-logging.version>2.1.2</scala-logging.version>
         <slf4j.log4j.version>1.7.7</slf4j.log4j.version>
-        <http.delegation.version>1.0.0</http.delegation.version>
+        <http.delegation.version>2.0.0</http.delegation.version>
     </properties>
 
     <dependencies>
