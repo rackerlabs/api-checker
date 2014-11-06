@@ -1,5 +1,21 @@
 # Releases #
 
+## Release 1.0.19 (2014-11-06) ##
+
+1. Checker format now contains metadata including:
+   1. The creator
+   1. The creation time
+   1. The version of api-checker
+   1. The user
+   1. Dependencies that were used to build the checker
+   1. Configuration options
+1. Added support for Delegation Handler which provides info on
+errors via headers without actually rejecting the request.
+1. Minor cleanup to POMs.
+1. Fixed a bug where method IDs are not always properly generated.
+1. Updated wadl-tools: 1.0.25 → 1.0.28.
+1. Updated saxon: 9.4.0.6 → 9.4.0.9.
+
 ## Release 1.0.18 (2014-07-01) ##
 
 1. Fixed bug in raxRolesMask where illegal step IDs were generated in the
