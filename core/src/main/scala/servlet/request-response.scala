@@ -17,11 +17,10 @@ package com.rackspace.com.papi.components.checker.servlet
 
 import java.io.IOException
 import java.io.ByteArrayOutputStream
-import java.net.URI
+import java.net.{URI, URISyntaxException}
 import java.io.BufferedReader
 import java.io.InputStreamReader
-
-import java.net.URISyntaxException
+import java.util
 
 import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
@@ -37,16 +36,17 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode
 import org.w3c.dom.Document
 
-import java.util.Enumeration
-
 import com.typesafe.scalalogging.slf4j.LazyLogging
 
 import com.netaporter.uri.encoding.PercentEncoder
 
+import com.rackspace.com.papi.components.checker.util.DateUtils
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
 
 import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import scala.collection.immutable.TreeMap
 
 //
 //  Request Keys
@@ -70,10 +70,16 @@ object CherkerServletRequest {
 
 import CherkerServletRequest._
 
+object CaseInsensitiveStringOrdering extends Ordering[String] {
+  override def compare(x: String, y: String): Int = x compareToIgnoreCase y
+}
+
 //
 //  An HTTP Request with some additional helper functions
 //
 class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) with LazyLogging {
+
+  private var auxiliaryHeaders = new TreeMap[String, List[String]]()(CaseInsensitiveStringOrdering)
 
   val parsedRequestURI : (Option[URI], Option[URISyntaxException]) = {
     try {
@@ -123,6 +129,59 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
     case null => -1
   }
   def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
+
+  def addHeader(name: String, value: String): Unit = auxiliaryHeaders = auxiliaryHeaders + (name -> (auxiliaryHeaders.getOrElse(name, List()) :+ value))
+
+  override def getDateHeader(name: String): Long = {
+    Option(getHeader(name)) match {
+      case Some(headerValue) =>
+        Option(DateUtils.parseDate(headerValue)) match {
+          case Some(parsedDate) => parsedDate.getTime
+          case None => throw new IllegalArgumentException("Header value could not be converted to a date")
+        }
+      case None => -1
+    }
+  }
+
+  override def getHeader(name: String): String = {
+    auxiliaryHeaders.get(name) match {
+      case Some(firstValue :: _) => firstValue
+      case None => super.getHeader(name)
+    }
+  }
+
+  override def getHeaders(name: String): util.Enumeration[String] = {
+    auxiliaryHeaders.get(name) match {
+      case Some(auxiliaryHeaderValues) =>
+        Option(super.getHeaders(name)) match {
+          case Some(primaryHeaderValues) =>
+            // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
+            // being a Java Enumeration).
+            val headerValuesSet = primaryHeaderValues.asScala.toList
+            (auxiliaryHeaderValues ++ headerValuesSet).toIterator.asJavaEnumeration
+          case None => null
+        }
+      case None => super.getHeaders(name)
+    }
+  }
+
+  override def getHeaderNames: util.Enumeration[String] = {
+    Option(super.getHeaderNames) match {
+      case Some(primaryHeaderNames) =>
+        // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
+        // being a Java Enumeration).
+        val headerNamesSet = primaryHeaderNames.asScala.toList
+        (auxiliaryHeaders.keySet ++ headerNamesSet).toIterator.asJavaEnumeration
+      case None => null
+    }
+  }
+
+  override def getIntHeader(name: String): Int = {
+    Option(getHeader(name)) match {
+      case Some(headerValue) => headerValue.toInt
+      case None => -1
+    }
+  }
 
   override def getRequestURI : String = parsedRequestURI match {
     case (Some(u), _) => request.getRequestURI()
