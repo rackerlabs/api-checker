@@ -19,7 +19,7 @@
     </modules>
 
     <scm>
-        <connection>scm:git:ssh://git@api-checker.github.com/rackerlabs/api-checker.git</connection>
+        <connection>scm:git:git@github.com:rackerlabs/api-checker.git</connection>
     </scm>
 
     <repositories>
