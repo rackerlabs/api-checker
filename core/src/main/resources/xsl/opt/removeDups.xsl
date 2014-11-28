@@ -87,13 +87,6 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="check:meta" mode="copyMeta" priority="11">
-        <xsl:copy>
-            <xsl:apply-templates select="@* | node()" mode="copyMeta"/>
-            <config option="enableRemoveDups" value="true"/>
-        </xsl:copy>
-    </xsl:template>
-
     <xsl:template match="check:checker" name="replaceEpsilons" mode="epsilonRemove">
         <xsl:param name="checker" select="." as="node()"/>
         <xsl:variable name="dups" as="node()">

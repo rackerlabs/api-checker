@@ -15,10 +15,29 @@
  */
 package com.rackspace.com.papi.components.checker
 
+import scala.xml._
+
+import scala.annotation.StaticAnnotation
 import scala.reflect.BeanProperty
+
+import scala.reflect.runtime.universe
 
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
 import com.rackspace.com.papi.components.checker.handler.ServletResultHandler
+
+/**
+ * If set the annotation states that the configuration option
+ * affects the state machine in checker format, if not set the
+ * config option only affects runtime.
+ */
+final class AffectsChecker extends StaticAnnotation
+
+object Config {
+  private val checkerConfigTypes = {
+    val affectsCheckerType = universe.typeOf[AffectsChecker]
+    universe.typeOf[Config].members.filter(i => i.annotations.map(a => a.tpe).contains(affectsCheckerType))
+  }
+}
 
 /**
  * This class contains all the configuration options for a {@link com.rackspace.com.papi.components.checker.Validator}
@@ -38,7 +57,9 @@ class Config {
   //
   //  Don't allow duplicate nodes in the machine.
   //
-  @BeanProperty var removeDups : Boolean = true
+  @BeanProperty
+  @AffectsChecker
+  var removeDups : Boolean = true
 
   //
   //  Run code to validate that the validator was correctly generated
@@ -110,28 +131,38 @@ class Config {
   //
   //  Check Well-Formed XML and JSON
   //
-  @BeanProperty var checkWellFormed : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var checkWellFormed : Boolean = false
 
   //
   //  Check all XML against XSD Grammars
   //
-  @BeanProperty var checkXSDGrammar : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var checkXSDGrammar : Boolean = false
 
   //
   //  Allow XSD grammar transform.  Transform the XML after
   //  validation, to fill in things like default values etc.
   //
-  @BeanProperty var doXSDGrammarTransform : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var doXSDGrammarTransform : Boolean = false
 
   //
   //  Check all JSON against JSON Schema Grammars
   //
-  @BeanProperty var checkJSONGrammar : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var checkJSONGrammar : Boolean = false
 
   //
   //  Ensure elemets are correct
   //
-  @BeanProperty var checkElements : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var checkElements : Boolean = false
 
   //
   //  XPath version used in the WADL.  Can be 1 or 2. If 1 is set the
@@ -141,6 +172,7 @@ class Config {
   //
   private var xpv : Int = 1
 
+  @AffectsChecker
   def xpathVersion : Int = xpv
 
   def xpathVersion_= (version : Int) : Unit = {
@@ -155,32 +187,44 @@ class Config {
   //
   //  Check plain parameters
   //
-  @BeanProperty var checkPlainParams : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var checkPlainParams : Boolean = false
 
   //
   //  Enable preprocess extension
   //
-  @BeanProperty var enablePreProcessExtension : Boolean = true
+  @BeanProperty
+  @AffectsChecker
+  var enablePreProcessExtension : Boolean = true
 
   //
   //  Enable ignore XSD extension
   //
-  @BeanProperty var enableIgnoreXSDExtension : Boolean = true
+  @BeanProperty
+  @AffectsChecker
+  var enableIgnoreXSDExtension : Boolean = true
 
   //
   //  Enable ignore JSON Schema extension
   //
-  @BeanProperty var enableIgnoreJSONSchemaExtension : Boolean = true
+  @BeanProperty
+  @AffectsChecker
+  var enableIgnoreJSONSchemaExtension : Boolean = true
 
   //
   //  Enable message extension
   //
-  @BeanProperty var enableMessageExtension : Boolean = true
+  @BeanProperty
+  @AffectsChecker
+  var enableMessageExtension : Boolean = true
 
   //
   //  Enable rax-roles extension
   //
-  @BeanProperty var enableRaxRolesExtension : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var enableRaxRolesExtension : Boolean = false
 
   //
   //  Mask rax-roles with 404 and 405 errors. By default rax-roles
@@ -188,7 +232,9 @@ class Config {
   //  maskRaxRoles403 is true then the respose will be 404 if no
   //  methods are accessible or 405 if some methods are available.
   //
-  @BeanProperty var maskRaxRoles403 : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var maskRaxRoles403 : Boolean = false
 
   //
   //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,
@@ -220,13 +266,17 @@ class Config {
   //  This is an optimization where the well formness check and
   //  multiple XPath checks can be merged into a single check.
   //
-  @BeanProperty var joinXPathChecks : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var joinXPathChecks : Boolean = false
 
   //
   //  Check that required headers are set.
   //
 
-  @BeanProperty var checkHeaders : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var checkHeaders : Boolean = false
 
   //
   // Preserve the ability to process the request body always. Setting
@@ -235,5 +285,33 @@ class Config {
   // disable some optimizations.
   //
 
-  @BeanProperty var preserveRequestBody : Boolean = false
+  @BeanProperty
+  @AffectsChecker
+  var preserveRequestBody : Boolean = false
+
+  /**
+   * Returns checker metadata (<meta/> element in checker format) for
+   * the config options that affect the checker.
+   */
+  def checkerMetaElem : Elem = {
+    <meta xmlns="http://www.rackspace.com/repose/wadl/checker">
+      {
+        checkerMetaMap.map(c => <config option={c._1} value={c._2.toString} />)
+      }
+    </meta>
+  }
+
+  /**
+   * Provides a map from checker meta option to its value.
+   */
+  def checkerMetaMap : Map[String, Any] = {
+    val conf_ref = universe.runtimeMirror(this.getClass.getClassLoader).reflect(this)
+    val fields = Config.checkerConfigTypes.filter(s => !s.isMethod).map(s =>s.asTerm).map(s => {
+      (s.name.toString.trim -> conf_ref.reflectField(s).get)
+    }).toList
+    val methods = Config.checkerConfigTypes.filter(s => s.isMethod).map(s =>s.asMethod).map(s => {
+      (s.name.toString.trim -> conf_ref.reflectMethod(s).apply())
+    }).toList
+    Map() ++ (fields ::: methods)
+  }
 }

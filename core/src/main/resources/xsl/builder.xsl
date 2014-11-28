@@ -46,24 +46,42 @@
 
     <!-- Add prune steps template -->
     <xsl:import href="util/pruneSteps.xsl"/>
+    <xsl:include href="util/funs.xsl"/>
 
     <xsl:output indent="yes" method="xml"/>
 
     <!-- Paramenters -->
     <xsl:param name="user" as="xsd:string" select="'unknown'" />
     <xsl:param name="creator" as="xsd:string" select="'unknown'"/>
-    <xsl:param name="enableXSDContentCheck" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableJSONContentCheck" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableXSDTransform" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableWellFormCheck" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableElementCheck" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enablePlainParamCheck" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enablePreProcessExtension" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableIgnoreXSDExtension" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableIgnoreJSONSchemaExtension" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableMessageExtension" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableHeaderCheck" as="xsd:boolean" select="false()"/>
-    <xsl:param name="enableRaxRoles" as="xsd:boolean" select="false()"/>
+    <xsl:param name="configMetadata" as="node()">
+        <meta>
+            <config option="checkXSDGrammar"  value="false"/>
+            <config option="checkJSONGrammar" value="false"/>
+            <config option="checkWellFormed"  value="false"/>
+            <config option="checkElements"    value="false"/>
+            <config option="checkPlainParams" value="false"/>
+            <config option="checkHeaders"     value="false"/>
+            <config option="doXSDGrammarTransform" value="false"/>
+            <config option="enablePreProcessExtension" value="false"/>
+            <config option="enableIgnoreXSDExtension" value="false"/>
+            <config option="enableIgnoreJSONSchemaExtension" value="false"/>
+            <config option="enableMessageExtension" value="false"/>
+            <config option="enableRaxRolesExtension" value="false"/>
+        </meta>
+    </xsl:param>
+
+    <xsl:variable name="checkXSDGrammar"  as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkXSDGrammar'))"/>
+    <xsl:variable name="checkJSONGrammar" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkJSONGrammar'))"/>
+    <xsl:variable name="checkWellFormed"  as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkWellFormed'))"/>
+    <xsl:variable name="checkElements"    as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkElements'))"/>
+    <xsl:variable name="checkPlainParams" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkPlainParams'))"/>
+    <xsl:variable name="checkHeaders"     as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkHeaders'))"/>
+    <xsl:variable name="doXSDGrammarTransform" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'doXSDGrammarTransform'))"/>
+    <xsl:variable name="enablePreProcessExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enablePreProcessExtension'))"/>
+    <xsl:variable name="enableIgnoreXSDExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableIgnoreXSDExtension'))"/>
+    <xsl:variable name="enableIgnoreJSONSchemaExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableIgnoreJSONSchemaExtension'))"/>
+    <xsl:variable name="enableMessageExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableMessageExtension'))"/>
+    <xsl:variable name="enableRaxRolesExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRolesExtension'))"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -83,11 +101,11 @@
 
     <!-- Actual Config Flags -->
     <xsl:variable name="useXSDContentCheck" as="xsd:boolean"
-                  select="($enableXSDContentCheck or $enableXSDTransform) and $WADLhasXSD"/>
+                  select="($checkXSDGrammar or $doXSDGrammarTransform) and $WADLhasXSD"/>
     <xsl:variable name="useJSONContentCheck" as="xsd:boolean"
-                  select="$enableJSONContentCheck and $WADLhasJSONSchema"/>
+                  select="$checkJSONGrammar and $WADLhasJSONSchema"/>
     <xsl:variable name="useXSDTransform" as="xsd:boolean"
-                  select="$enableXSDTransform and $useXSDContentCheck"/>
+                  select="$doXSDGrammarTransform and $useXSDContentCheck"/>
     <xsl:variable name="usePreProcessExtension" as="xsd:boolean"
                   select="$enablePreProcessExtension"/>
     <xsl:variable name="useIgnoreXSDExtension" as="xsd:boolean"
@@ -95,16 +113,16 @@
     <xsl:variable name="useIgnoreJSONSchemaExtension" as="xsd:boolean"
                   select="$enableIgnoreJSONSchemaExtension and $useJSONContentCheck"/>
     <xsl:variable name="useElementCheck" as="xsd:boolean"
-                  select="$enableElementCheck"/>
+                  select="$checkElements"/>
     <xsl:variable name="usePlainParamCheck" as="xsd:boolean"
-                  select="$enablePlainParamCheck"/>
+                  select="$checkPlainParams"/>
     <xsl:variable name="useWellFormCheck" as="xsd:boolean"
-                  select="$enableWellFormCheck or $useXSDContentCheck or $enableElementCheck or
-                          $enablePlainParamCheck or $useJSONContentCheck"/>
+                  select="$checkWellFormed or $useXSDContentCheck or $checkElements or
+                          $checkPlainParams or $useJSONContentCheck"/>
     <xsl:variable name="useRaxRoles" as="xsd:boolean"
-                  select="$enableRaxRoles"/>
+                  select="$enableRaxRolesExtension"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
-                  select="$enableHeaderCheck or $useRaxRoles"/>
+                  select="$checkHeaders or $useRaxRoles"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
                   select="$enableMessageExtension or $useRaxRoles"/>
 
@@ -248,18 +266,7 @@
             <xsl:if test="$creator"><created-by><xsl:value-of select="$creator"/></created-by></xsl:if>
             <created-on><xsl:value-of select="current-dateTime()"/></created-on>
             <xsl:apply-templates mode="addMetadata"/>
-            <xsl:if test="$enableXSDContentCheck"><config option="enableXSDContentCheck" value="{$enableXSDContentCheck}"/></xsl:if>
-            <xsl:if test="$enableJSONContentCheck"><config option="enableJSONContentCheck" value="{$enableJSONContentCheck}"/></xsl:if>
-            <xsl:if test="$enableXSDTransform"><config option="enableXSDTransform" value="{$enableXSDTransform}"/></xsl:if>
-            <xsl:if test="$enableWellFormCheck"><config option="enableWellFormCheck" value="{$enableWellFormCheck}"/></xsl:if>
-            <xsl:if test="$enableElementCheck"><config option="enableElementCheck" value="{$enableElementCheck}"/></xsl:if>
-            <xsl:if test="$enablePlainParamCheck"><config option="enablePlainParamCheck" value="{$enablePlainParamCheck}"/></xsl:if>
-            <xsl:if test="$enablePreProcessExtension"><config option="enablePreProcessExtension" value="{$enablePreProcessExtension}"/></xsl:if>
-            <xsl:if test="$enableIgnoreXSDExtension"><config option="enableIgnoreXSDExtension" value="{$enableIgnoreXSDExtension}"/></xsl:if>
-            <xsl:if test="$enableIgnoreJSONSchemaExtension"><config option="enableIgnoreJSONSchemaExtension" value="{$enableIgnoreJSONSchemaExtension}"/></xsl:if>
-            <xsl:if test="$enableMessageExtension"><config option="enableMessageExtension" value="{$enableMessageExtension}"/></xsl:if>
-            <xsl:if test="$enableHeaderCheck"><config option="enableHeaderCheck" value="{$enableHeaderCheck}"/></xsl:if>
-            <xsl:if test="$enableRaxRoles"><config option="enableRaxRoles" value="{$enableRaxRoles}"/></xsl:if>
+            <xsl:copy-of select="$configMetadata/check:meta/check:config"/>
         </meta>
     </xsl:template>
 

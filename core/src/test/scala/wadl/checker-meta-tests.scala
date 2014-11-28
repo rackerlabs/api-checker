@@ -27,6 +27,8 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers._
 
+import scala.reflect.runtime.universe
+
 import com.rackspace.com.papi.components.checker.Config
 
 @RunWith(classOf[JUnitRunner])
@@ -454,14 +456,12 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
       conf
     }
 
-    def checkConfigOptionTrue(option : String, setter : (Config) => Unit) : MetaTest = {
-      (s"Metadata $option check should be true if set", setConfig(setter),
-       s"/chk:checker/chk:meta/chk:config[@option='$option' and @value='true']")
-    }
-
-    def checkConfigOptionFalse(option : String, setter : (Config) => Unit) : MetaTest = {
-      (s"Metadata $option check should be false if not set", setConfig(setter),
-       s"not(/chk:checker/chk:meta/chk:config[@option='$option']) or /chk:checker/chk:meta/chk:config[@option='$option' and @value='false']")
+    def setBoolConfig(name : String, value : Boolean) : Config = {
+      val conf = clearConfig(new Config)
+      val conf_ref = universe.runtimeMirror(conf.getClass.getClassLoader).reflect(conf)
+      val cType = universe.typeOf[Config]
+      conf_ref.reflectField(cType.member(universe.newTermName(name)).asTerm).set(value)
+      conf
     }
 
     def checkConfigOptionMatch(option : String, value: String, setter : (Config) => Unit) : MetaTest = {
@@ -470,44 +470,25 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
     }
 
     //
-    // Test for individual configuration flags
+    //  We can generate tests for boolean options.
     //
-    val optionTests :  MetaTests =
-      List(checkConfigOptionTrue("enableXSDContentCheck", (c : Config) => c.checkXSDGrammar=true),
-           checkConfigOptionFalse("enableXSDContentCheck", (c : Config) => c.checkXSDGrammar=false),
-           checkConfigOptionTrue("enableJSONContentCheck", (c : Config) => c.checkJSONGrammar=true),
-           checkConfigOptionFalse("enableJSONContentCheck", (c : Config) => c.checkJSONGrammar=false),
-           checkConfigOptionTrue("enableXSDTransform", (c : Config) => c.doXSDGrammarTransform=true),
-           checkConfigOptionFalse("enableXSDTransform", (c : Config) => c.doXSDGrammarTransform=false),
-           checkConfigOptionTrue("enableWellFormCheck", (c : Config) => c.checkWellFormed=true),
-           checkConfigOptionFalse("enableWellFormCheck", (c : Config) => c.checkWellFormed=false),
-           checkConfigOptionTrue("enableElementCheck", (c : Config) => c.checkElements=true),
-           checkConfigOptionFalse("enableElementCheck", (c : Config) => c.checkElements=false),
-           checkConfigOptionTrue("enablePlainParamCheck", (c : Config) => c.checkPlainParams=true),
-           checkConfigOptionFalse("enablePlainParamCheck", (c : Config) => c.checkPlainParams=false),
-           checkConfigOptionTrue("enablePreProcessExtension", (c : Config) => c.enablePreProcessExtension=true),
-           checkConfigOptionFalse("enablePreProcessExtension", (c : Config) => c.enablePreProcessExtension=false),
-           checkConfigOptionTrue("enableIgnoreXSDExtension", (c : Config) => c.enableIgnoreXSDExtension=true),
-           checkConfigOptionFalse("enableIgnoreXSDExtension", (c : Config) => c.enableIgnoreXSDExtension=false),
-           checkConfigOptionTrue("enableIgnoreJSONSchemaExtension", (c : Config) => c.enableIgnoreJSONSchemaExtension=true),
-           checkConfigOptionFalse("enableIgnoreJSONSchemaExtension", (c : Config) => c.enableIgnoreJSONSchemaExtension=false),
-           checkConfigOptionTrue("enableMessageExtension", (c : Config) => c.enableMessageExtension=true),
-           checkConfigOptionFalse("enableMessageExtension", (c : Config) => c.enableMessageExtension=false),
-           checkConfigOptionTrue("enableHeaderCheck", (c : Config) => c.checkHeaders=true),
-           checkConfigOptionFalse("enableHeaderCheck", (c : Config) => c.checkHeaders=false),
-           checkConfigOptionTrue("enableRaxRoles", (c : Config) => c.enableRaxRolesExtension=true),
-           checkConfigOptionFalse("enableRaxRoles", (c : Config) => c.enableRaxRolesExtension=false),
-           checkConfigOptionTrue("enableMaskRaxRoles403", (c : Config)  => {c.enableRaxRolesExtension = true; c.maskRaxRoles403=true} ),
-           checkConfigOptionFalse("enableMaskRaxRoles403", (c : Config) => {c.enableRaxRolesExtension = true;  c.maskRaxRoles403=false}),
-           checkConfigOptionTrue("enableRemoveDups", (c : Config) => c.removeDups=true),
-           checkConfigOptionFalse("enableRemoveDups", (c : Config) => c.removeDups=false),
-           checkConfigOptionTrue("enableJoinXPathChecks", (c : Config) => c.joinXPathChecks=true),
-           checkConfigOptionFalse("enableJoinXPathChecks", (c : Config) => c.joinXPathChecks=false),
-           checkConfigOptionTrue("preserveRequestBody", (c : Config) => {c.joinXPathChecks=true; c.preserveRequestBody=true}),
-           checkConfigOptionFalse("preserveRequestBody", (c : Config) => {c.joinXPathChecks=true; c.preserveRequestBody=false}),
-           checkConfigOptionMatch("defaultXPathVersion","1",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=1}),
-           checkConfigOptionMatch("defaultXPathVersion","2",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=2})
+    val boolOptionNames : List[String] = (new Config).checkerMetaMap.filter(c => c._2.isInstanceOf[Boolean]).map(c => c._1).toList
+
+    val trueTests : MetaTests = boolOptionNames.map(option => (s"Metadata $option check should be true if set", setBoolConfig(option, true),
+                                                               s"/chk:checker/chk:meta/chk:config[@option='$option' and @value='true']"))
+    val falseTests : MetaTests = boolOptionNames.map(option => (s"Metadata $option check should be false if not set", setBoolConfig(option, false),
+                                                               s"not(/chk:checker/chk:meta/chk:config[@option='$option']) or /chk:checker/chk:meta/chk:config[@option='$option' and @value='false']"))
+
+    //
+    // Test for non-boolean config flagsconfiguration flags
+    //
+    val nonBoolTests :  MetaTests =
+      List(
+           checkConfigOptionMatch("xpathVersion","1",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=1}),
+           checkConfigOptionMatch("xpathVersion","2",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=2})
          )
+
+    val optionTests : MetaTests = trueTests ++ falseTests ++ nonBoolTests
 
     //
     //  These assertions should hold true, regardress of configuration.
@@ -523,6 +504,15 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
 
     val allConfigTests = optionTests ++ standardTests
 
+    //
+    // Let's make sure all configs are accounted for in our tests
+    //
+    val allOptions = (new Config).checkerMetaMap.keys
+    allOptions.foreach (o => assert(allConfigTests.exists (t => t._1.contains(o)),s"No meta test found for $o option!"))
+
+    //
+    // Generate the tests...
+    //
     for ( t <- allConfigTests ) {
       for ((w, deps) <- testWADLs) {
         scenario ("The checker for "+w._1+" contains Metadata and "+t._1) {

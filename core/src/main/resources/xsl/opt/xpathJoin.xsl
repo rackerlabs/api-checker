@@ -37,20 +37,19 @@
         their replacement steps.
     -->
     <xsl:import href="../util/join.xsl"/>
+    <xsl:include href="../util/funs.xsl"/>
 
-    <xsl:param name="defaultXPathVersion" as="xsd:integer" select="1"/>
-    <xsl:param name="preserveRequestBody" as="xsd:boolean" select="false()"/>
+    <xsl:param name="configMetadata" as="node()">
+        <meta>
+            <config option="xpathVersion"  value="1"/>
+            <config option="preserveRequestBody" value="false"/>
+        </meta>
+    </xsl:param>
+
+    <xsl:param name="xpathVersion" as="xsd:integer" select="xsd:integer(check:optionValue($configMetadata, 'xpathVersion'))"/>
+    <xsl:param name="preserveRequestBody" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'preserveRequestBody'))"/>
 
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
-
-    <!--
-        Document that we are using this feature...
-    -->
-    <xsl:template name="addMetadata">
-        <config option="enableJoinXPathChecks" value="true"/>
-        <config option="defaultXPathVersion" value="{$defaultXPathVersion}"/>
-        <config option="preserveRequestBody" value="{$preserveRequestBody}"/>
-    </xsl:template>
 
     <!--
         Identify the steps to join.
@@ -109,7 +108,7 @@
             <xsl:choose>
                 <xsl:when test="$root/@type = 'XSL' and $root/@version='2'">2</xsl:when>
                 <xsl:when test="$steps[@version='2']">2</xsl:when>
-                <xsl:when test="$steps[not(@version)] and $defaultXPathVersion=2">2</xsl:when>
+                <xsl:when test="$steps[not(@version)] and $xpathVersion=2">2</xsl:when>
                 <xsl:otherwise>1</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
