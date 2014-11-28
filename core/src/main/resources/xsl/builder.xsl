@@ -261,20 +261,25 @@
     </xsl:template>
 
     <xsl:template name="check:addMetadata">
+        <xsl:variable name="created-from" as="node()*">
+            <xsl:apply-templates mode="addCreatedFrom"/>
+        </xsl:variable>
         <meta>
             <xsl:if test="$user"><built-by><xsl:value-of select="$user"/></built-by></xsl:if>
             <xsl:if test="$creator"><created-by><xsl:value-of select="$creator"/></created-by></xsl:if>
             <created-on><xsl:value-of select="current-dateTime()"/></created-on>
-            <xsl:apply-templates mode="addMetadata"/>
+            <xsl:for-each-group select="$created-from" group-by=".">
+                <xsl:copy-of select="current-group()[1]"/>
+            </xsl:for-each-group>
             <xsl:copy-of select="$configMetadata/check:meta/check:config"/>
         </meta>
     </xsl:template>
 
-    <xsl:template match="svrl:active-pattern[@name='References']" mode="addMetadata">
+    <xsl:template match="svrl:active-pattern[@name='References']" mode="addCreatedFrom">
         <created-from><xsl:value-of select="@document"/></created-from>
     </xsl:template>
 
-    <xsl:template match="svrl:successful-report[@role=('unparsedReference','includeReference')]/svrl:text" mode="addMetadata">
+    <xsl:template match="svrl:successful-report[@role=('unparsedReference','includeReference')]/svrl:text" mode="addCreatedFrom">
         <created-from><xsl:value-of select="."/></created-from>
     </xsl:template>
 
