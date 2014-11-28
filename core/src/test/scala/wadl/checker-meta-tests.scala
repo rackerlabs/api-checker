@@ -135,13 +135,25 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
             <method name="PUT" rax:roles="a:observer"/>
             <resource path="/b" rax:roles="b:creator">
               <method name="POST"/>
-              <method name="PUT" rax:roles="b:observer"/>
+              <method name="PUT" rax:roles="b:observer">
+                 <request>
+                   <representation mediaType="application/xml">
+                       <rax:preprocess href="foo.xsl"/>
+                   </representation>
+                 </request>
+              </method>
               <method name="DELETE" rax:roles="b:observer b:admin"/>
               <method name="GET"  rax:roles="#all"/>
             </resource>
             <resource path="{yn}">
               <param name="yn" style="template" type="tst:yesno"/>
-              <method name="POST"/>
+              <method name="POST">
+                 <request>
+                   <representation mediaType="application/xml">
+                       <rax:preprocess href="bar.xsl"/>
+                   </representation>
+                 </request>
+              </method>
               <method name="PUT" rax:roles="b:observer"/>
             </resource>
           </resource>
@@ -155,6 +167,25 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
                    targetNamespace="test://schema/a">
                   <include schemaLocation="mytest2.xsd"/>
                   </schema>),
+                 ("test://path/to/test/util.xsl",
+                  <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                  xpath-default-namespace="http://www.datypic.com/books/ns">
+                  <xsl:output method="html"/>
+                  </xsl:stylesheet>),
+                 ("test://path/to/test/foo.xsl",
+                  <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                  xpath-default-namespace="http://www.datypic.com/books/ns">
+                  <xsl:output method="html"/>
+                  <xsl:import href="util.xsl"/>
+                  </xsl:stylesheet>),
+                 ("test://path/to/test/bar.xsl",
+                  <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                  xpath-default-namespace="http://www.datypic.com/books/ns">
+                  <xsl:output method="html"/>
+                  <xsl:import href="util.xsl"/>
+                  <xsl:import-schema namespace="test://schema/a"
+                     schema-location="xsd/mytest2.xsd"/>
+                  </xsl:stylesheet>),
                ("test://path/to/test/xsd/mytest2.xsd",
                   <schema elementFormDefault="qualified"
                    attributeFormDefault="unqualified"
@@ -523,7 +554,7 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
           assert(checker, t._3)
           for (dep <- w._2 +: deps) {
             val durl = dep._1
-            assert(checker, s"/chk:checker/chk:meta/chk:created-from[. = '$durl']")
+            assert(checker, s"exactly-one(/chk:checker/chk:meta/chk:created-from[. = '$durl'])")
           }
         }
       }
@@ -534,7 +565,7 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
           builder.build (new StreamSource(new File(fw._2)), new StreamResult(checkerOutBytes), t._2)
           val checker = XML.loadString(checkerOutBytes.toString())
           for (dep <- fw._2 +: fw._3) {
-            assert(checker, s"/chk:checker/chk:meta/chk:created-from[contains (., '$dep')]")
+            assert(checker, s"exactly-one(/chk:checker/chk:meta/chk:created-from[contains(.,'$dep')])")
           }
         }
       }

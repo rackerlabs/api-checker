@@ -519,7 +519,7 @@
           1. [X] Version
           2. [X] Configs
        3. [X] Rework meta tests to automate the checking of configs in metadata
-** TODO Fix issue where dependecies may be listed more than once in metadata
+** DONE Fix issue where dependecies may be listed more than once in metadata
 ** TODO Cache checker format on load [0/3]
    1. [ ] New config option...enable cache...defualt to true
    2. [ ] Check for cache on load XML, if cache exists [0/4]
