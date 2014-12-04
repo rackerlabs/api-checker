@@ -20,10 +20,10 @@ import javax.servlet.FilterChain
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
 import com.rackspace.com.papi.components.checker.step.{ErrorResult, Result}
-import com.rackspace.httpdelegation.impl.HttpDelegationManagerImpl.buildDelegationHeaders
+import com.rackspace.httpdelegation.HttpDelegationManager
 import org.w3c.dom.Document
 
-class DelegationHandler(delegationQuality: Double) extends ResultHandler {
+class DelegationHandler(delegationQuality: Double) extends ResultHandler with HttpDelegationManager {
 
   def init (validator : Validator, checker : Option[Document]) : Unit = {}
 
