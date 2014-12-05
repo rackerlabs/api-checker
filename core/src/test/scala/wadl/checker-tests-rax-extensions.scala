@@ -71,6 +71,11 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
               <method name="PUT" rax:roles="b:observer"/>
             </resource>
           </resource>
+          <resource path="/c">
+            <param name="X-Auth-Token" style="header" required="true" />
+            <method name="GET" rax:roles="a:admin"/>
+            <method name="POST" rax:roles="a:observer a:admin"/>
+          </resource>
         </resources>
       </application>
 
@@ -106,17 +111,25 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
               <method href="#putOnB"/>
             </resource>
           </resource>
+          <resource path="/c">
+            <param name="X-Auth-Token" style="header" required="true" />
+            <method href="#getOnC"/>
+            <method href="#postOnC"/>
+          </resource>
         </resources>
         <method id="putOnA" name="PUT"/>
         <method id="postOnB" name="POST"/>
         <method id="putOnB" name="PUT" rax:roles="b:observer"/>
         <method id="deleteOnB" name="DELETE" rax:roles="b:foo"/>
         <method id="getOnB" name="GET" rax:roles="#all"/>
+        <method id="getOnC" name="GET" rax:roles="a:admin"/>
+        <method id="postOnC" name="POST" rax:roles="a:observer a:admin"/>
       </application>
 
     val raxRolesDisabled = {
       val tf = TestConfig()
       tf.removeDups = false
+      tf.checkHeaders = true
       tf
     }
     val raxRolesEnabled  = {
@@ -171,6 +184,7 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, URL("a"), URL("b"), Method("DELETE"), Accept)
         assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("POST"), Accept)
         assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("PUT"), Accept)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("GET"), Accept)
       }
 
       scenario ("The WADL contains rax:roles and rax:roles checks are enabled without RemoveDups with "+desc) {
@@ -180,8 +194,8 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         val checker = builder.build (inWADL, config)
         Then("Header checks should be set for each method")
         assert (checker, "exactly-one(chk:checker/chk:grammar[@type='W3C_XML']/xsd:schema/xsd:simpleType[@name='yesno'])")
-        assert (checker, "count(chk:checker/chk:step[@type='HEADER_ANY' and @code='403']) = 14")
-        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 4")
+        assert (checker, "count(chk:checker/chk:step[@type='HEADER_ANY' and @code='403']) = 17")
+        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 5")
         assert (checker, "count(chk:checker/chk:step[@type='URL_FAIL']) = 3")
         assert (checker, """every $s in chk:checker/chk:step[@type='URLXSD'] satisfies
                              namespace-uri-from-QName(resolve-QName($s/@match, $s)) = 'test://schema/a' and
@@ -239,6 +253,15 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, URL("a"), URL("b"), Method("DELETE"), ContentFail)
         assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("POST"), ContentFail)
         assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("PUT"), ContentFail)
+        assert (checker, Start, MethodFail)
+        assert (checker, Start, URL("c"), ContentFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), URLFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), MethodFail("GET|POST"))
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("GET"), HeaderAny("X-ROLES","a:admin"), Accept)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("GET"), ContentFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), HeaderAny("X-ROLES","a:admin"), Accept)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), HeaderAny("X-ROLES","a:observer"), Accept)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), ContentFail)
       }
 
       scenario ("The WADL contains rax:roles and rax:roles checks are enabled without RemoveDups with 403s masked and with "+desc) {
@@ -249,8 +272,8 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         Then("Header checks should be set at the begining of each path")
         assert (checker, "exactly-one(chk:checker/chk:grammar[@type='W3C_XML']/xsd:schema/xsd:simpleType[@name='yesno'])")
         assert (checker, "count(chk:checker/chk:step[@type='HEADER_ANY']) = 5")
-        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 26")
-        assert (checker, "count(chk:checker/chk:step[@type='URL_FAIL']) = 26")
+        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 30")
+        assert (checker, "count(chk:checker/chk:step[@type='URL_FAIL']) = 30")
         assert (checker, """every $s in chk:checker/chk:step[@type='URLXSD'] satisfies
                              namespace-uri-from-QName(resolve-QName($s/@match, $s)) = 'test://schema/a' and
                              local-name-from-QName(resolve-QName($s/@match, $s)) = 'yesno'""")
@@ -262,7 +285,7 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), MethodFail("PUT"))
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), URLFail("b"))
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), URLFailT("tst:yesno"))
-        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URLFail("a"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URLFail("a|c"))
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("POST"),Accept)
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("PUT"), Accept)
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("DELETE"), Accept)
@@ -275,7 +298,7 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), Method("PUT"), Accept)
         assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), MethodFail("PUT"))
         assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), URLFail)
-        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URLFail("a"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URLFail("a|c"))
         assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("POST"),Accept)
         assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("PUT"), Accept)
         assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("DELETE"), Accept)
@@ -295,6 +318,13 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), Method("GET"), Accept)
         assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), MethodFail("DELETE|GET"))
         assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), URLFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), MethodFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), ContentFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", ".*"), Method("GET"), Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", ".*"), MethodFail("GET|POST"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URL("c"), Header("X-Auth-Token", ".*"), MethodFail("POST"))
         assert (checker, Start, URLFail("a"))
         assert (checker, Start, URL("a"), URLFail("b"))
         assert (checker, Start, URL("a"), MethodFail)
@@ -312,7 +342,7 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         Then("Header checks should be set for each method")
         assert (checker, "exactly-one(chk:checker/chk:grammar[@type='W3C_XML']/xsd:schema/xsd:simpleType[@name='yesno'])")
         assert (checker, "count(chk:checker/chk:step[@type='HEADER_ANY' and @code='403']) = 6")
-        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 4")
+        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 5")
         assert (checker, "count(chk:checker/chk:step[@type='URL_FAIL']) = 3")
         assert (checker, """every $s in chk:checker/chk:step[@type='URLXSD'] satisfies
                              namespace-uri-from-QName(resolve-QName($s/@match, $s)) = 'test://schema/a' and
@@ -346,6 +376,14 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, URL("a"), URL("b"), Method("DELETE"), ContentFail)
         assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("POST"), ContentFail)
         assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("PUT"), ContentFail)
+        assert (checker, Start, MethodFail)
+        assert (checker, Start, URL("c"), ContentFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), URLFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), MethodFail("GET|POST"))
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("GET"), HeaderAny("X-ROLES","a:admin"), Accept)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("GET"), ContentFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), HeaderAny("X-ROLES","a:admin|a:observer"), Accept)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), ContentFail)
       }
 
       scenario ("The WADL contains rax:roles and rax:roles checks are enabled with RemoveDups with 403s masked and with "+desc) {
@@ -356,8 +394,8 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         Then("Header checks should be set for each method")
         assert (checker, "exactly-one(chk:checker/chk:grammar[@type='W3C_XML']/xsd:schema/xsd:simpleType[@name='yesno'])")
         assert (checker, "count(chk:checker/chk:step[@type='HEADER_ANY']) = 5")
-        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 7")
-        assert (checker, "count(chk:checker/chk:step[@type='URL_FAIL']) = 4")
+        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 9")
+        assert (checker, "count(chk:checker/chk:step[@type='URL_FAIL']) = 5")
         assert (checker, """every $s in chk:checker/chk:step[@type='URLXSD'] satisfies
                              namespace-uri-from-QName(resolve-QName($s/@match, $s)) = 'test://schema/a' and
                              local-name-from-QName(resolve-QName($s/@match, $s)) = 'yesno'""")
@@ -369,7 +407,7 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), MethodFail("PUT"))
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), URLFail("b"))
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), URLFailT("tst:yesno"))
-        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URLFail("a"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URLFail("a|c"))
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("POST"),Accept)
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("PUT"), Accept)
         assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("DELETE"), Accept)
@@ -382,7 +420,7 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), Method("PUT"), Accept)
         assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), MethodFail("PUT"))
         assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), URLFail)
-        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URLFail("a"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URLFail("a|c"))
         assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("POST"),Accept)
         assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("PUT"), Accept)
         assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("DELETE"), Accept)
@@ -402,6 +440,13 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), Method("GET"), Accept)
         assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), MethodFail("DELETE|GET"))
         assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), URLFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), MethodFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), ContentFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", ".*"), Method("GET"), Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", ".*"), MethodFail("GET|POST"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URL("c"), Header("X-Auth-Token", ".*"), Method("POST"), Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URL("c"), Header("X-Auth-Token", ".*"), MethodFail("POST"))
         assert (checker, Start, URLFail("a"))
         assert (checker, Start, URL("a"), URLFail("b"))
         assert (checker, Start, URL("a"), MethodFail)

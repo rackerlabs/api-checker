@@ -103,7 +103,7 @@
         <xsl:variable name="start" as="node()" select="."/>
         <xsl:variable name="headerChecks" as="node()*">
             <xsl:for-each select="$roles">
-                <step id="{$start/@id}" next="{$start/@next}" type='HEADER_ANY' name="X-ROLES" match="{.}"/>
+                <step id="{$start/@id}" next="{$start/@next}" type='HEADER_ANY' priority="5" name="X-ROLES" match="{.}" />
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="noRoleStart" as="node()*">
@@ -132,7 +132,7 @@
         <xsl:param name="role" as="xs:string"/>
         <xsl:variable name="nexts" as="node()*" select="for $n in chk:next(.) return key('checker-by-id',$n,$checker)"/>
         <xsl:variable name="nextPathSteps" as="node()*"
-            select="for $n in $nexts[@type=('URL','URLXSD','METHOD')] return if (rol:stepInRole($n, $role)) then $n else ()"/>
+            select="for $n in $nexts[@type=('URL','URLXSD','METHOD','HEADER','HEADER_ANY')] return if (rol:stepInRole($n, $role)) then $n else ()"/>
         <xsl:variable name="URLFailId" as="xs:string" select="rol:id(concat(@id,'UF'),$role)"/>
         <xsl:variable name="MethodFailId" as="xs:string" select="rol:id(concat(@id,'MF'),$role)"/>
         <xsl:variable name="finalCheck" as="node()?" select="$nexts[@type='HEADER_ANY' and @name='X-ROLES'
@@ -147,7 +147,7 @@
                     <xsl:otherwise>
                         <xsl:variable name="next" as="xs:string*">
                             <xsl:sequence select="for $n in $nextPathSteps return rol:id($n/@id, $role)"/>
-                            <xsl:sequence select="$nexts[not(@type=('URL_FAIL','METHOD_FAIL','URL','METHOD','URLXSD'))]/@id"/>
+                            <xsl:sequence select="$nexts[not(@type=('URL_FAIL','METHOD_FAIL','URL','METHOD','URLXSD','HEADER','HEADER_ANY'))]/@id"/>
                             <xsl:sequence select="($URLFailId, $MethodFailId)"/>
                         </xsl:variable>
                         <xsl:value-of select="$next" separator=" "/>
@@ -220,14 +220,14 @@
         <xsl:param name="step" as="node()"/>
         <xsl:param name="role" as="xs:string"/>
         <xsl:choose>
-            <xsl:when test="$step/@type = ('URL', 'URLXSD','METHOD')">
+            <xsl:when test="$step/@type='HEADER_ANY' and $step/@name='X-ROLES' and
+                            $step/@code='403' and not($step/@match = $role)">
+                <xsl:sequence select="false()"/>
+            </xsl:when>
+            <xsl:when test="$step/@type = ('URL', 'URLXSD','METHOD','HEADER','HEADER_ANY')">
                 <xsl:sequence select="true() = (for $n in chk:next($step) return rol:stepInRole(key('checker-by-id',$n,$checker),$role))"/>
             </xsl:when>
             <xsl:when test="contains($step/@type,'_FAIL')">
-                <xsl:sequence select="false()"/>
-            </xsl:when>
-            <xsl:when test="$step/@type='HEADER_ANY' and $step/@name='X-ROLES' and
-                            $step/@code='403' and not($step/@match = $role)">
                 <xsl:sequence select="false()"/>
             </xsl:when>
             <xsl:otherwise>
