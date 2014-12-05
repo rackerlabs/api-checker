@@ -147,7 +147,7 @@
         </annotation>
         <complexContent>
             <extension base="chk:ConnectedStep">
-                <attribute name="priority" type="xsd:unsignedInt" use="optional" default="1"/>
+                <attribute name="priority" type="xsd:unsignedInt" use="optional" default="0"/>
             </extension>
         </complexContent>
     </complexType>
@@ -432,7 +432,7 @@
         </annotation>
         <complexContent>
             <extension base="chk:Step">
-                <attribute name="priority" type="xsd:unsignedInt" use="optional" default="1"/>
+                <attribute name="priority" type="xsd:unsignedInt" use="optional" default="0"/>
             </extension>
         </complexContent>
     </complexType>

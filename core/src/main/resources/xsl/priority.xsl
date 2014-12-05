@@ -106,26 +106,33 @@
         <xsl:if test="not($map)">
             <xsl:message  terminate="yes">[ERROR] Cannot find priority information for step type <xsl:value-of select="$step/@type"/> that's very strange</xsl:message>
         </xsl:if>
-        <xsl:variable name="offsets" as="xs:integer*">
-            <xsl:choose>
-                <xsl:when test="$map/@attributeMultipliers and $map/@multValue">
-                    <xsl:variable name="mults" as="xs:string*" select="tokenize($map/@attributeMultipliers,' ')"/>
-                    <xsl:for-each select="$mults">
-                        <xsl:variable name="attr" as="xs:string" select="."/>
-                        <xsl:if test="$step[@*[local-name() = $attr]]">
-                            <xsl:for-each select="chkp:matchList($step/@*[local-name() = $attr])">
-                                <xsl:value-of select="xs:integer($map/@multValue)"/>
+        <xsl:choose>
+            <xsl:when test="$step/@priority and not($step/@priority = 0)">
+                <xsl:value-of select="$step/@priority"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="offsets" as="xs:integer*">
+                    <xsl:choose>
+                        <xsl:when test="$map/@attributeMultipliers and $map/@multValue">
+                            <xsl:variable name="mults" as="xs:string*" select="tokenize($map/@attributeMultipliers,' ')"/>
+                            <xsl:for-each select="$mults">
+                                <xsl:variable name="attr" as="xs:string" select="."/>
+                                <xsl:if test="$step[@*[local-name() = $attr]]">
+                                    <xsl:for-each select="chkp:matchList($step/@*[local-name() = $attr])">
+                                        <xsl:value-of select="xs:integer($map/@multValue)"/>
+                                    </xsl:for-each>
+                                </xsl:if>
                             </xsl:for-each>
-                        </xsl:if>
-                    </xsl:for-each>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="0"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:message>[DEBUG] ID=<xsl:value-of select="$step/@id"/> inPriority=<xsl:value-of select="$inPriority"/> offsets=<xsl:value-of select="$offsets"/> priority=<xsl:value-of select="$map/@priority"/> total: <xsl:value-of select="sum(($inPriority,$offsets,$map/@priority))"/></xsl:message>
-        <xsl:value-of select="sum(($inPriority,$offsets,$map/@priority))"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="0"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                <xsl:message>[DEBUG] ID=<xsl:value-of select="$step/@id"/> inPriority=<xsl:value-of select="$inPriority"/> offsets=<xsl:value-of select="$offsets"/> priority=<xsl:value-of select="$map/@priority"/> total: <xsl:value-of select="sum(($inPriority,$offsets,$map/@priority))"/></xsl:message>
+                <xsl:value-of select="sum(($inPriority,$offsets,$map/@priority))"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 
     <!--
