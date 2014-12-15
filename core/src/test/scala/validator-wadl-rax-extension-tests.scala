@@ -170,7 +170,7 @@ trait RaxRolesBehaviors {
 
   def badRequestWhenOneHeaderIsMissing(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config") {
     def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles, "X-Auth-Token" -> List("something")))
-    it should "fail with a 400 when " + method + " on " + path + " and no X-Auth-Token header" + " for " + conf in {
+    it should "fail with a 400 when " + method + " on " + path + " and no one X-Auth-Token header" + " for " + conf in {
       base.assertResultFailed(validator.validate(request, response, chain), 400, "Bad Content: Expecting an HTTP header some-generic-header to have a value matching .*")
     }
   }
@@ -214,6 +214,11 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
             </request>
           </method>
           <method name="POST" rax:roles="a:observer a:admin">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="PUT" rax:roles="#all">
             <request>
               <representation mediaType="application/xml"/>
             </request>
@@ -276,13 +281,20 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
   it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a", description)
 
   //GET on /c requires a header and a:admin role
+  it should behave like accessIsAllowedWithHeader(validator, "PUT", "/c", List("a:admin"), description)
+  it should behave like accessIsAllowedWithHeader(validator, "PUT", "/c", List("a:observer"), description)
+  it should behave like accessIsAllowedWithHeader(validator, "PUT", "/c", List("a:bar"), description)
+  it should behave like accessIsAllowedWithHeader(validator, "PUT", "/c", List("a:admin", "a:bar"), description)
   it should behave like accessIsAllowedWithHeader(validator, "GET", "/c", List("a:admin"), description)
   it should behave like accessIsAllowedWithHeader(validator, "POST", "/c", List("a:admin"), description)
   it should behave like accessIsAllowedWithHeader(validator, "GET", "/c", List("a:admin", "a:bar"), description)
+  it should behave like accessIsAllowedWithHeader(validator, "DELETE", "/c", List("a:admin", "a:bar"), description)
   it should behave like accessIsForbiddenWithHeader(validator, "GET", "/c", List("a:bar"), description)
   it should behave like accessIsForbiddenWithHeader(validator, "GET", "/c", List("a:bar", "a:observer"))
   it should behave like accessIsForbiddenWithHeader(validator, "GET", "/c", List("a:observer"), description)
   it should behave like badRequestWhenHeaderIsMissing(validator, "GET", "/c", List("a:observer"), description)
+  it should behave like badRequestWhenOneHeaderIsMissing(validator, "DELETE", "/c", List("a:admin"), description)
+  it should behave like badRequestWhenHeaderIsMissing(validator, "DELETE", "/c", List("a:bar"), description)
 
   //GET on /d requires a header and admin but POST does not
   it should behave like accessIsAllowedWithHeader(validator, "GET", "/d", List("a:admin"), description)
@@ -345,6 +357,11 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
               <representation mediaType="application/xml"/>
             </request>
           </method>
+          <method name="PUT" rax:roles="#all">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
           <method name="DELETE" rax:roles="a:admin">
             <request>
               <param name="some-generic-header" style="header" required="true" />
@@ -379,8 +396,8 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
   // POST on /b requires admin role
   it should behave like accessIsAllowed(validator, "POST", "/b", List("a:admin"), description)
   it should behave like accessIsAllowed(validator, "POST", "/b", List("a:observer","a:admin"), description)
-  it should behave like resourceNotFound(validator,"POST", "/b", List("a:bar"), description, List("does not match","'a|d'"))
-  it should behave like resourceNotFound(validator,"POST", "/foo", List("a:bar"), description, List("does not match","'a|d'"))
+  it should behave like resourceNotFound(validator,"POST", "/b", List("a:bar"), description, List("does not match","'a|c|d'"))
+  it should behave like resourceNotFound(validator,"POST", "/foo", List("a:bar"), description, List("does not match","'a|c|d'"))
   it should behave like resourceNotFound(validator,"POST", "/foo", List("a:admin"), description, List("does not match","'a|b|c|d'"))
   it should behave like methodNotAllowed(validator,"GET",  "/b", List("a:admin"), description, List("does not match","'DELETE|POST'"))
   it should behave like methodNotAllowed(validator,"POST", "/b", List("a:observer"), description, List("does not match","'DELETE'"))
@@ -399,10 +416,10 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
   // DELETE on /b requires a:admin role
   it should behave like accessIsAllowed(validator, "DELETE", "/b", List("a:admin"), description)
   it should behave like accessIsAllowed(validator, "DELETE", "/b", List("a:bar", "a:admin"), description)
-  it should behave like resourceNotFound(validator, "DELETE", "/b", List("a:bar"), description, List("does not match","'a|d'"))
+  it should behave like resourceNotFound(validator, "DELETE", "/b", List("a:bar"), description, List("does not match","'a|c|d'"))
   it should behave like accessIsAllowed(validator, "DELETE", "/b", List("a:bar", "a:observer"), description)
   it should behave like accessIsAllowed(validator, "DELETE", "/b", List("a:observer"), description)
-  it should behave like resourceNotFoundWhenNoXRoles(validator, "DELETE", "/b", description, List("does not match","'a|d'"))
+  it should behave like resourceNotFoundWhenNoXRoles(validator, "DELETE", "/b", description, List("does not match","'a|c|d'"))
 
 
   // PUT has no rax:roles defined, should allow all access
@@ -424,16 +441,20 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
   it should behave like methodNotAllowedWhenNoXRoles(validator, "DELETE", "/a", description, List("does not match","'PUT'"))
 
   //GET on /c requires a header and a:admin role
+  it should behave like accessIsAllowedWithHeader(validator, "PUT", "/c", List("a:admin"), description)
+  it should behave like accessIsAllowedWithHeader(validator, "PUT", "/c", List("a:observer"), description)
+  it should behave like accessIsAllowedWithHeader(validator, "PUT", "/c", List("a:bar"), description)
+  it should behave like accessIsAllowedWithHeader(validator, "PUT", "/c", List("a:admin", "a:bar"), description)
   it should behave like accessIsAllowedWithHeader(validator, "GET", "/c", List("a:admin"), description)
   it should behave like accessIsAllowedWithHeader(validator, "POST", "/c", List("a:admin"), description)
   it should behave like accessIsAllowedWithHeader(validator, "GET", "/c", List("a:admin", "a:bar"), description)
   it should behave like accessIsAllowedWithHeader(validator, "DELETE", "/c", List("a:admin", "a:bar"), description)
-  it should behave like resourceNotFoundWithHeader(validator, "GET", "/c", List("a:bar"), description, List("does not match","'a|d'"))
-  it should behave like methodNotAllowedWithHeader(validator, "GET", "/c", List("a:bar", "a:observer"), description, List("does not match","'POST'"))
-  it should behave like methodNotAllowedWithHeader(validator, "GET", "/c", List("a:observer"), description, List("does not match","'POST'"))
+  it should behave like methodNotAllowedWithHeader (validator, "GET", "/c", List("a:bar"), description, List("does not match","'PUT'"))
+  it should behave like methodNotAllowedWithHeader(validator, "GET", "/c", List("a:bar", "a:observer"), description, List("does not match","'POST|PUT'"))
+  it should behave like methodNotAllowedWithHeader(validator, "GET", "/c", List("a:observer"), description, List("does not match","'POST|PUT'"))
   it should behave like badRequestWhenHeaderIsMissing(validator, "GET", "/c", List("a:observer"), description)
   it should behave like badRequestWhenOneHeaderIsMissing(validator, "DELETE", "/c", List("a:admin"), description)
-  it should behave like resourceNotFoundWhenNoXRoles(validator, "DELETE", "/c", description, List("does not match","'a|d'"))
+  it should behave like badRequestWhenHeaderIsMissing(validator, "DELETE", "/c", List("a:bar"), description)
 
   //GET on /d requires a header and admin but POST does not
   it should behave like accessIsAllowedWithHeader(validator, "GET", "/d", List("a:admin"), description)
