@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.rackspace.papi.components</groupId>
         <artifactId>api-checker</artifactId>
-        <version>1.0.20</version>
+        <version>1.0.21-SNAPSHOT</version>
     </parent>
 
     <groupId>com.rackspace.papi.components.api-checker</groupId>
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.rackspace.papi.components.api-checker</groupId>
             <artifactId>checker-core</artifactId>
-            <version>1.0.20</version>
+            <version>1.0.21-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
