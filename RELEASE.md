@@ -1,5 +1,17 @@
 # Releases #
 
+## Release 1.0.20 (2014-12-18) ##
+
+1. Checker format can now be loaded directly by a validator. The
+checker document must end with a ```.checker``` extension or the query
+component of the systemID must contain ```checker=true```.
+1. Fixed an issue where dependencies are listed more than one time in
+checker metadata.
+1. Fixed an issue where having a header check next to rax:roles would
+break raxRolesMask.
+1. Updated to use log4j 2 in test and CLI utilities.
+1. Updated http delegation library: 2.0.0 → 4.0.0.
+
 ## Release 1.0.19 (2014-11-06) ##
 
 1. Checker format now contains metadata including:
