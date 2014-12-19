@@ -36,7 +36,7 @@ object XMLParserPool extends Instrumented {
 }
 
 private class XMLParserFactory extends PoolableObjectFactory[DocumentBuilder] {
-  val builderFactory = DocumentBuilderFactory.newInstance ("org.apache.xerces.jaxp.DocumentBuilderFactoryImpl", null)
+  val builderFactory = DocumentBuilderFactory.newInstance ("org.apache.xerces.jaxp.DocumentBuilderFactoryImpl", this.getClass.getClassLoader)
 
   //
   //  Setup the builder factory so that it works within the security

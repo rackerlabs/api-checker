@@ -38,7 +38,7 @@ object IdentityTransformPool extends Instrumented  {
   //  avoid licence check in SaxonEE, which for some reason is always
   //  trigged by id transform.
   //
-  private val tf = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
+  private val tf = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", this.getClass.getClassLoader)
   private val pool = new SoftReferenceObjectPool[Transformer](new IdentityTransformerFactory(tf))
   private val activeGauge = metrics.gauge("Active")(numActive)
   private val idleGauge = metrics.gauge("Idle")(numIdle)

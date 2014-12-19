@@ -71,7 +71,7 @@ object Validator {
 
   def apply (name : String, in : Source, config : Config = new Config) : Validator = {
     val builder = new StepBuilder()
-    val transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+    val transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
 
     if (!transformerFactory.getFeature(SAXTransformerFactory.FEATURE)) {
       throw new RuntimeException("Need a SAX-compatible TransformerFactory!")

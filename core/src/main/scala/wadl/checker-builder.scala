@@ -110,7 +110,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   //  We purposly do the identity transform using xalan instead of
   //  Saxon, because of SaxonEE license issue.
   //
-  private val idTransform = TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl",null).newTransformer()
+  private val idTransform = TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl",this.getClass.getClassLoader).newTransformer()
   idTransform.setErrorListener (new LogErrorListener)
 
   private def buildFromWADL (in : Source, out: Result, config : Config) : Unit = {

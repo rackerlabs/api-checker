@@ -19,9 +19,7 @@ import javax.xml.validation._
 import javax.xml.transform.stream._
 
 class BaseStepSuiteSaxonEE extends BaseStepSuite {
-  System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema", "com.saxonica.jaxp.SchemaFactoryImpl")
-
-  private val schemaFactorySaxon = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema")
+  private val schemaFactorySaxon = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema", "com.saxonica.jaxp.SchemaFactoryImpl", this.getClass.getClassLoader)
 
   //
   //  Enable 1.1 support in saxon

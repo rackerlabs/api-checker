@@ -45,14 +45,14 @@ import javax.xml.namespace.QName
 import org.mockito.Mockito._
 
 class BaseStepSuite extends BaseValidatorSuite {
-  System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory")
-
-  private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+  private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1",
+    "org.apache.xerces.jaxp.validation.XMLSchema11Factory",
+    this.getClass.getClassLoader)
 
   private val jsonSchemaFactory = JsonSchemaFactory.newBuilder.setReportProvider(new ListReportProvider(LogLevel.WARNING, LogLevel.ERROR)).freeze
 
-  val xsl1Factory = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
-  val xsl2Factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+  val xsl1Factory = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", this.getClass.getClassLoader)
+  val xsl2Factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
 
   val xsl1Templates = xsl1Factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/testXSL1.xsl")))
   val xsl2Templates = xsl2Factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/testXSL2.xsl")))
