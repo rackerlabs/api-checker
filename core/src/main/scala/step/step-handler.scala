@@ -35,6 +35,7 @@ import javax.xml.validation.SchemaFactory
 import javax.xml.namespace.NamespaceContext
 import javax.xml.namespace.QName
 
+import com.saxonica.config.EnterpriseTransformerFactory
 import org.xml.sax.ContentHandler
 import org.xml.sax.Locator
 import org.xml.sax.Attributes
@@ -123,7 +124,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       //  Enable CTA full XPath2.0 checking in XSD 1.1
       //
       case "Xerces"  => {
-        sf = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+        sf = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory", this.getClass.getClassLoader)
         sf.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
       }
 
@@ -146,11 +147,26 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     config.xslEngine match  {
 
-      case "SaxonEE" => TransformerFactory.newInstance("com.saxonica.config.EnterpriseTransformerFactory", null)
-      case "SaxonHE" => TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+      case "SaxonEE" => {
+        val factory = TransformerFactory.newInstance("com.saxonica.config.EnterpriseTransformerFactory", this.getClass.getClassLoader)
+       /*
+       * I found this through here: http://sourceforge.net/p/saxon/mailman/message/29737564/
+       * A bit of deduction and stuff let me to assume that all dynamic loading is done with the DynamicLoader
+       * object. The only way to get ahold of that is to typecast the TransformerFactory to the actual class, and
+       * then get the DynamicLoader out of it, and set it's classloader to the one where the saxonica classes
+       * are located.
+       */
+        //Now that we have a Saxon EE transformer factory, we need to configure it...
+        //We have to do casting to get the configuration object, to configure the DynamicLoader for our classloader
+        //This is only needed for saxon EE, because it generates bytecode.
+        val cast = factory.asInstanceOf[EnterpriseTransformerFactory]
+        cast.getConfiguration.getDynamicLoader.setClassLoader(this.getClass.getClassLoader)
+        factory
+      }
+      case "SaxonHE" => TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
       // TODO:  if the wadl every explicitly calls out for  XSLT2 , we need to give them a SAXON transformer,
       // Xalan doesn't support 2
-      case _ =>  TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+      case _ =>  TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
     }
   }
 
@@ -162,8 +178,8 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   private[this] val transformFactoryXSL1 : TransformerFactory = {
     config.xslEngine match  {
 
-      case "Xalan" => TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl", null)
-      case "XalanC" => TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", null)
+      case "Xalan" => TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl", this.getClass.getClassLoader)
+      case "XalanC" => TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", this.getClass.getClassLoader)
       case _ => transformFactoryXSL2
     }
   }
@@ -208,7 +224,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //  used to capture inline schema and inline XSL.
   //
   private[this] val saxTransformerFactory : SAXTransformerFactory =
-    TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null).asInstanceOf[SAXTransformerFactory]
+    TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader).asInstanceOf[SAXTransformerFactory]
 
   private[this] var currentSchemaHandler : TransformerHandler = null
   private[this] var currentSchemaResult  : DOMResult = null
