@@ -23,11 +23,11 @@ import javax.servlet.FilterChain
 class ReqType(id : String, label : String, val rtype : Regex, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = rtype.toString
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    var ret = -1
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+    var ret : Option[StepContext] = None
     req.getContentType() match {
-      case rtype(_,_) => ret = uriLevel
-      case _ => ret= -1
+      case rtype(_,_) => ret = Some(context)
+      case _ => ret= None
     }
     ret
   }

@@ -520,6 +520,48 @@
           2. [X] Configs
        3. [X] Rework meta tests to automate the checking of configs in metadata
 ** DONE Fix issue where dependecies may be listed more than once in metadata
+** TODO Add support for rax:copyToHeader extension [4/11]
+   1. [X] Create concept of StepContext to hold request headers and
+      current URI Index.
+   2. [X] Refactor to use StepContext in all steps
+   3. [X] Refactor results to use StepContext
+   4. [X] Refactor param steps to set request header [8/8]
+      1. [X] URI
+      2. [X] URIXSD
+      3. [X] Header
+      4. [X] HeaderXSD
+      5. [X] HeaderAny
+      6. [X] HeaderAnyXSD
+      7. [X] XPath
+      8. [X] Accept (to set request headers to origin)
+   5. [ ] New config option copyToHeader
+   6. [ ] Add copyToHeader option to CLI utils
+   7. [ ] Add concept of copyToHeader to checker XSD
+   8. [ ] Change builder.xsl to support copyToHeader extension
+   9. [ ] Update optimizations to support copyToHeader extension
+   10. [ ] Add support to copyToHeader in step builder
+   11. [-] Tests [2/5]
+       1. [X] HeaderMap tests
+       2. [X] State Tests [8/8]
+          1. [X] URI
+          2. [X] URIXSD
+          3. [X] Header
+          4. [X] HeaderXSD
+          5. [X] HeaderAny
+          6. [X] HeaderAnyXSD
+          7. [X] XPath
+          8. [X] Accept
+       3. [ ] Checker Tests [0/5]
+          1. [ ] URI
+          2. [ ] URIXSD
+          3. [ ] Header
+          4. [ ] HeaderXSD
+          5. [ ] XPath
+       4. [ ] WADL Tests
+          1. [ ] rax:copyToHeader on template
+          2. [ ] rax:copyToHeader on header
+          3. [ ] rax:copyToHeader on plan
+       5. [ ] Performance test
 ** TODO Cache checker format on load [0/3]
    1. [ ] New config option...enable cache...defualt to true
    2. [ ] Check for cache on load XML, if cache exists [0/4]

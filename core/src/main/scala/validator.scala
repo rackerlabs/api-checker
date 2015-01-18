@@ -41,6 +41,7 @@ import scala.xml._
 import com.rackspace.com.papi.components.checker.wadl.StepBuilder
 import com.rackspace.com.papi.components.checker.wadl.WADLDotBuilder
 
+import com.rackspace.com.papi.components.checker.step.StepContext
 import com.rackspace.com.papi.components.checker.step.Step
 import com.rackspace.com.papi.components.checker.step.Result
 
@@ -212,7 +213,7 @@ class Validator private (private val _name : String, val startStep : Step, val c
     try {
       val creq = new CheckerServletRequest (req)
       val cres = new CheckerServletResponse(res)
-      val result = startStep.check (creq, cres, chain, 0).get
+      val result = startStep.check (creq, cres, chain, StepContext()).get
       resultHandler.handle(creq, cres, chain, result)
       if (!result.valid) failMeter.mark()
       result

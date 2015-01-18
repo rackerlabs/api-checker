@@ -27,10 +27,10 @@ import com.rackspace.com.papi.components.checker.servlet._
 class JSONSchema(id : String, label : String, schema : JsonSchema, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The JSON does not validate against the schema."
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     try {
       schema.validate(req.parsedJSON)
-      uriLevel
+      Some(context)
     } catch {
       case pe : ProcessingException => {
         val message = {
@@ -40,12 +40,12 @@ class JSONSchema(id : String, label : String, schema : JsonSchema, val priority 
 
         req.contentError = new Exception(message, pe)
         req.contentErrorPriority = priority
-        -1
+        None
       }
       case e : Exception => {
         req.contentError = e
         req.contentErrorPriority = priority
-        -1
+        None
       }
     }
   }

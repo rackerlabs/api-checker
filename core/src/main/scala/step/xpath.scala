@@ -17,6 +17,7 @@ package com.rackspace.com.papi.components.checker.step
 
 import javax.xml.xpath.XPathExpression
 import javax.xml.xpath.XPathConstants.BOOLEAN
+import javax.xml.xpath.XPathConstants.STRING
 import javax.xml.namespace.NamespaceContext
 
 import javax.servlet.FilterChain
@@ -28,7 +29,13 @@ import org.xml.sax.SAXParseException
 
 class XPath(id : String, label : String, val expression : String, val message : Option[String],
             val code : Option[Int], val nc : NamespaceContext, val version : Int,
-            val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
+            val captureHeader : Option[String], val priority : Long,
+            next : Array[Step]) extends ConnectedStep(id, label, next) {
+
+  def this(id : String, label : String,  expression : String,  message : Option[String],
+           code : Option[Int],  nc : NamespaceContext,  version : Int,
+           priority : Long, next : Array[Step]) =
+             this (id, label, expression, message, code, nc, version, None, priority, next)
 
   override val mismatchMessage : String = {
     if (message == None) {
@@ -46,16 +53,21 @@ class XPath(id : String, label : String, val expression : String, val message : 
     }
   }
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    var ret = -1
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+    var ret : Option[StepContext] = None
     var xpath : XPathExpression = null
+    val xml = req.parsedXML
 
     try {
       xpath = borrowExpression (expression, nc, version)
-      if (!xpath.evaluate (req.parsedXML, BOOLEAN).asInstanceOf[Boolean]) {
+      if (!xpath.evaluate (xml, BOOLEAN).asInstanceOf[Boolean]) {
         req.contentError(new SAXParseException (mismatchMessage, null), mismatchCode, priority)
       } else {
-        ret = uriLevel
+        ret = captureHeader match {
+          case None => Some(context)
+          case Some(h) => Some(context.copy (requestHeaders =
+            context.requestHeaders.addHeader(h, xpath.evaluate (xml, STRING).asInstanceOf[String])))
+        }
       }
     } catch {
       case e : Exception => req.contentError = e
