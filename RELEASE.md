@@ -1,5 +1,10 @@
 # Releases #
 
+## Release 1.0.21 (2015-01-19) ##
+
+1. We now explicitly select a class loader when loading XML factories.
+2. Updated wadl-tools: 1.0.28 → 1.0.29.
+
 ## Release 1.0.20 (2014-12-18) ##
 
 1. Checker format can now be loaded directly by a validator. The
