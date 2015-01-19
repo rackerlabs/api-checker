@@ -36,6 +36,7 @@ import javax.xml.namespace.NamespaceContext
 import javax.xml.namespace.QName
 
 import com.saxonica.config.EnterpriseTransformerFactory
+import net.sf.saxon.TransformerFactoryImpl
 import org.xml.sax.ContentHandler
 import org.xml.sax.Locator
 import org.xml.sax.Attributes
@@ -144,8 +145,18 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //  XSL 2.0 schema factory
   //
   private[this] val transformFactoryXSL2 : TransformerFactory = {
-
+    /**
+     * Packages up a saxon factory, but also specifies the classloader for the DynamicLoader within saxon
+     * @return
+     */
+    def saxonFactory() = {
+      val factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
+      val cast = factory.asInstanceOf[TransformerFactoryImpl]
+      cast.getConfiguration.getDynamicLoader.setClassLoader(this.getClass.getClassLoader)
+      factory
+    }
     config.xslEngine match  {
+
 
       case "SaxonEE" => {
         val factory = TransformerFactory.newInstance("com.saxonica.config.EnterpriseTransformerFactory", this.getClass.getClassLoader)
@@ -163,10 +174,10 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         cast.getConfiguration.getDynamicLoader.setClassLoader(this.getClass.getClassLoader)
         factory
       }
-      case "SaxonHE" => TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
+      case "SaxonHE" => saxonFactory()
       // TODO:  if the wadl every explicitly calls out for  XSLT2 , we need to give them a SAXON transformer,
       // Xalan doesn't support 2
-      case _ =>  TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
+      case _ =>  saxonFactory()
     }
   }
 
