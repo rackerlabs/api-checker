@@ -569,7 +569,7 @@
       9. [X] Join XPATH
       10. [X] Funky regex check
    5. [X] Cleanup / Optimize
-** TODO Add support for rax:copyToHeader extension [4/11]
+** DONE Add support for rax:copyToHeader extension [12/12]
    1. [X] Create concept of StepContext to hold request headers and
       current URI Index.
    2. [X] Refactor to use StepContext in all steps
@@ -583,13 +583,43 @@
       6. [X] HeaderAnyXSD
       7. [X] XPath
       8. [X] Accept (to set request headers to origin)
-   5. [ ] New config option copyToHeader
-   6. [ ] Add copyToHeader option to CLI utils
-   7. [ ] Add concept of copyToHeader to checker XSD
-   8. [ ] Change builder.xsl to support copyToHeader extension
-   9. [ ] Update optimizations to support copyToHeader extension
-   10. [ ] Add support to copyToHeader in step builder
-   11. [-] Tests [2/5]
+   5. [X] New config option copyToHeader
+   6. [X] Add copyToHeader option to CLI utils
+   7. [X] Add concept of copyToHeader to checker XSD
+   8. [X] Change builder.xsl to support copyToHeader extension[6/6]
+      1. [X] URI
+      2. [X] URIXSD
+      3. [X] Header
+      4. [X] HeaderXSD
+      5. [X] HeaderAny
+      6. [X] XPath
+   9. [X] Update optimizations to support copyToHeader extension[4/4]
+      1. [X] Remove Dups [5/5]
+         1. [X] Create removeDups rules
+         2. [X] XSL to generate rules based on removeDups
+         3. [X] Update removeDups to include driver
+         4. [X] Test!
+         5. [X] Build process to generate rules
+      2. [X] Heather Join [4/4]
+         1. [X] XSL to generate matching template
+         2. [X] Update headerJoin to include driver
+         3. [X] Test!
+         4. [X] Build process to generate rules
+      3. [X] XPath Join (Don't optimize if captureHeader is present)
+      4. [X] Common Join [4/4]
+         1. [X] XSL to generate matching template
+         2. [X] Update commonJoin to include driver
+         3. [X] Test!
+         4. [X] Build process to generate rules
+   10. [X] Add support to copyToHeader in step builder [7/7]
+       1. [X] URI
+       2. [X] URIXSD
+       3. [X] Header
+       4. [X] HeaderXSD
+       5. [X] HeaderAny
+       6. [X] HeaderAnyXSD
+       7. [X] XPath
+   11. [X] Tests [4/4]
        1. [X] HeaderMap tests
        2. [X] State Tests [8/8]
           1. [X] URI
@@ -600,17 +630,16 @@
           6. [X] HeaderAnyXSD
           7. [X] XPath
           8. [X] Accept
-       3. [ ] Checker Tests [0/5]
-          1. [ ] URI
-          2. [ ] URIXSD
-          3. [ ] Header
-          4. [ ] HeaderXSD
-          5. [ ] XPath
-       4. [ ] WADL Tests
-          1. [ ] rax:copyToHeader on template
-          2. [ ] rax:copyToHeader on header
-          3. [ ] rax:copyToHeader on plan
-       5. [ ] Performance test
+       3. [X] WADL Tests (with opts) [4/4]
+          1. [X] rax:captureHeader on template
+          2. [X] rax:captureHeader on header
+          3. [X] rax:captureHeader on plan
+          4. [X] Test along side of rax:roles masked and not-masked.
+       4. [X] Checker Tests [3/3]
+          1. [X] Headers
+          2. [X] URIs
+          3. [X] XPaths
+   12. [X] Clean up!
 ** TODO Compile Performance improvements
 ** TODO Assign CONTENT_FAIL to XSL steps in builder
 ** TODO Investigate whether there is an issue with rax:roles with other headers

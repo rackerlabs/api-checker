@@ -15,6 +15,15 @@
     <description>API Checker core functionality</description>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <targetPath>xsl/opt</targetPath>
+                <directory>target/generated-resources/xml/xslt</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
@@ -74,6 +83,65 @@
                     <enableAssertions>false</enableAssertions>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <transformationSets>
+                        <transformationSet>
+                            <dir>src/main/resources/xsl/opt</dir>
+                            <includes>
+                                <include>removeDups-rules.xml</include>
+                            </includes>
+                            <stylesheet>src/main/resources/xsl/opt/removeDupsTemplate.xsl</stylesheet>
+                            <fileMappers>
+                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                    <targetExtension>.xsl</targetExtension>
+                                </fileMapper>
+                            </fileMappers>
+                        </transformationSet>
+                        <transformationSet>
+                            <dir>src/main/resources/xsl/opt</dir>
+                            <includes>
+                                <include>removeDups-rules.xml</include>
+                            </includes>
+                            <stylesheet>src/main/resources/xsl/opt/headerJoinTemplate.xsl</stylesheet>
+                            <fileMappers>
+                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                    <targetExtension>.header.xsl</targetExtension>
+                                </fileMapper>
+                            </fileMappers>
+                        </transformationSet>
+                        <transformationSet>
+                            <dir>src/main/resources/xsl/opt</dir>
+                            <includes>
+                                <include>removeDups-rules.xml</include>
+                            </includes>
+                            <stylesheet>src/main/resources/xsl/opt/commonJoinTemplate.xsl</stylesheet>
+                            <fileMappers>
+                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                    <targetExtension>.common.xsl</targetExtension>
+                                </fileMapper>
+                            </fileMappers>
+                        </transformationSet>
+                    </transformationSets>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.saxon</groupId>
+                        <artifactId>Saxon-HE</artifactId>
+                        <version>9.4.0-9</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

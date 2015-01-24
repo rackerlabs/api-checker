@@ -39,6 +39,12 @@
     <xsl:key name="checker-by-ref" match="chk:step" use="tokenize(@next,' ')"/>
 
     <!--
+       The following key is useful for retriving a list of checker steps
+       by their type.
+    -->
+    <xsl:key name="checker-by-type" match="chk:step" use="@type"/>
+
+    <!--
         Sink types return an message error or accept.
     -->
     <xsl:variable name="sink-types" as="xs:string*" select="('URL_FAIL', 'METHOD_FAIL', 'CONTENT_FAIL',

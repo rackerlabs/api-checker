@@ -65,82 +65,9 @@
     <xsl:import href="../util/join.xsl"/>
 
     <!--
-        Select join candidates.
+        Select join candidates with auto-generated code.
     -->
-    <xsl:template match="check:step[@next]" mode="getJoins">
-        <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts]"/>
-
-        <xsl:for-each-group select="$nextStep[@type = ('HEADER','HEADER_ANY') and not(@code) and not(@message)]" group-by="@type">
-            <xsl:for-each-group select="current-group()" group-by="@name">
-                <xsl:for-each-group select="current-group()" group-by="@next">
-                    <xsl:if test="count(current-group()) &gt; 1">
-                        <join type="{current-group()[1]/@type}" name="{current-group()[1]/@name}">
-                            <xsl:attribute name="steps">
-                                <xsl:value-of separator=" ">
-                                    <xsl:sequence select="current-group()/@id"/>
-                                </xsl:value-of>
-                            </xsl:attribute>
-                        </join>
-                    </xsl:if>
-                </xsl:for-each-group>
-            </xsl:for-each-group>
-        </xsl:for-each-group>
-        <xsl:for-each-group select="$nextStep[@type = ('HEADER','HEADER_ANY') and @code and not(@message)]" group-by="@type">
-            <xsl:for-each-group select="current-group()" group-by="@name">
-                <xsl:for-each-group select="current-group()" group-by="@code">
-                    <xsl:for-each-group select="current-group()" group-by="@next">
-                        <xsl:if test="count(current-group()) &gt; 1">
-                            <join type="{current-group()[1]/@type}" name="{current-group()[1]/@name}">
-                                <xsl:attribute name="steps">
-                                    <xsl:value-of separator=" ">
-                                        <xsl:sequence select="current-group()/@id"/>
-                                    </xsl:value-of>
-                                </xsl:attribute>
-                            </join>
-                        </xsl:if>
-                    </xsl:for-each-group>
-                </xsl:for-each-group>
-            </xsl:for-each-group>
-        </xsl:for-each-group>
-        <xsl:for-each-group select="$nextStep[@type = ('HEADER','HEADER_ANY') and not(@code) and @message]" group-by="@type">
-            <xsl:for-each-group select="current-group()" group-by="@name">
-                <xsl:for-each-group select="current-group()" group-by="@message">
-                    <xsl:for-each-group select="current-group()" group-by="@next">
-                        <xsl:if test="count(current-group()) &gt; 1">
-                            <join type="{current-group()[1]/@type}" name="{current-group()[1]/@name}">
-                                <xsl:attribute name="steps">
-                                    <xsl:value-of separator=" ">
-                                        <xsl:sequence select="current-group()/@id"/>
-                                    </xsl:value-of>
-                                </xsl:attribute>
-                            </join>
-                        </xsl:if>
-                    </xsl:for-each-group>
-                </xsl:for-each-group>
-            </xsl:for-each-group>
-        </xsl:for-each-group>
-        <xsl:for-each-group select="$nextStep[@type = ('HEADER','HEADER_ANY') and @code and @message]" group-by="@type">
-            <xsl:for-each-group select="current-group()" group-by="@name">
-                <xsl:for-each-group select="current-group()" group-by="@code">
-                    <xsl:for-each-group select="current-group()" group-by="@message">
-                        <xsl:for-each-group select="current-group()" group-by="@next">
-                            <xsl:if test="count(current-group()) &gt; 1">
-                                <join type="{current-group()[1]/@type}" name="{current-group()[1]/@name}">
-                                    <xsl:attribute name="steps">
-                                        <xsl:value-of separator=" ">
-                                            <xsl:sequence select="current-group()/@id"/>
-                                        </xsl:value-of>
-                                    </xsl:attribute>
-                                </join>
-                            </xsl:if>
-                        </xsl:for-each-group>
-                    </xsl:for-each-group>
-                </xsl:for-each-group>
-            </xsl:for-each-group>
-        </xsl:for-each-group>
-    </xsl:template>
+    <xsl:include href="removeDups-rules.header.xsl"/>
 
     <!--
         Convert joins into a checker step.
@@ -149,7 +76,7 @@
         <xsl:param name="checker" as="node()"/>
         <xsl:param name="joins" as="node()*"/>
         <xsl:variable name="steps" select="@steps"/>
-        <xsl:variable name="joinSteps" as="node()*" select="$checker//check:step[@id = tokenize($steps,' ')]"/>
+        <xsl:variable name="joinSteps" as="node()*" select="check:stepsByIds($checker, tokenize($steps,' '))"/>
         <xsl:variable name="distinctMatches" as="xsd:string*" select="distinct-values($joinSteps/@match)"/>
 
         <step id="{generate-id(.)}" type="{@type}" name="{@name}">
@@ -165,6 +92,9 @@
             </xsl:if>
             <xsl:if test="$joinSteps[1]/@message">
                 <xsl:attribute name="message" select="$joinSteps[1]/@message"/>
+            </xsl:if>
+            <xsl:if test="$joinSteps[1]/@captureHeader">
+                <xsl:attribute name="captureHeader" select="$joinSteps[1]/@captureHeader"/>
             </xsl:if>
         </step>
     </xsl:template>

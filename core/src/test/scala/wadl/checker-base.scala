@@ -95,12 +95,24 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithMatch (checker, urlMatch).filter(n => (n \ "@type").text == "URL")
   }
 
+  def stepsWithURLMatchCapture (checker : NodeSeq, urlMatch  : String, captureHeader : String) : NodeSeq = {
+    stepsWithURLMatch (checker, urlMatch).filter(n => (n \ "@captureHeader").text == captureHeader)
+  }
+
   def stepsWithURLXSDMatch (checker : NodeSeq, urlMatch  : String) : NodeSeq = {
     stepsWithMatch (checker, urlMatch).filter(n => (n \ "@type").text == "URLXSD")
   }
 
+  def stepsWithURLXSDMatchCapture (checker : NodeSeq, urlMatch  : String, captureHeader : String) : NodeSeq = {
+    stepsWithURLXSDMatch (checker, urlMatch).filter(n => (n \ "@captureHeader").text == captureHeader)
+  }
+
   def stepsWithXPathMatch (checker : NodeSeq, xpathMatch : String) : NodeSeq = {
     stepsWithMatch (checker, xpathMatch).filter(n => (n \ "@type").text == "XPATH")
+  }
+
+  def stepsWithXPathMatchCapture (checker : NodeSeq, xpathMatch : String, captureHeader : String) : NodeSeq = {
+    stepsWithXPathMatch (checker, xpathMatch).filter(n => (n \ "@captureHeader").text == captureHeader)
   }
 
   def stepsWithXPathMessageMatch (checker : NodeSeq, xpathMatch : String, message : String) : NodeSeq = {
@@ -127,6 +139,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADER")
   }
 
+  def stepsWithHeaderMatchCapture (checker : NodeSeq, name : String, headerMatch : String, captureHeader : String) : NodeSeq = {
+    stepsWithHeaderMatch(checker, name, headerMatch).filter (n => (n \ "@captureHeader").text == captureHeader)
+  }
+
   def stepsWithHeaderCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
     stepsWithHeaderMatch(checker, name, headerMatch).filter(n => (n \ "@code").text == code.toString)
   }
@@ -141,6 +157,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
 
   def stepsWithHeaderXSDMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADERXSD")
+  }
+
+  def stepsWithHeaderXSDMatchCapture (checker : NodeSeq, name : String, headerMatch : String, captureHeader : String) : NodeSeq = {
+    stepsWithHeaderXSDMatch(checker, name, headerMatch).filter (n => (n \ "@captureHeader").text == captureHeader)
   }
 
   def stepsWithHeaderXSDCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
@@ -159,6 +179,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADER_ANY")
   }
 
+  def stepsWithHeaderAnyMatchCapture (checker : NodeSeq, name : String, headerMatch : String, captureHeader : String) : NodeSeq = {
+    stepsWithHeaderAnyMatch(checker, name, headerMatch).filter (n => (n \ "@captureHeader").text == captureHeader)
+  }
+
   def stepsWithHeaderAnyCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
     stepsWithHeaderAnyMatch (checker, name, headerMatch).filter (n => (n \ "@code").text == code.toString)
   }
@@ -174,6 +198,11 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def stepsWithHeaderXSDAnyMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
     stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADERXSD_ANY")
   }
+
+  def stepsWithHeaderXSDAnyMatchCapture (checker : NodeSeq, name : String, headerMatch : String, captureHeader : String) : NodeSeq = {
+    stepsWithHeaderXSDAnyMatch(checker, name, headerMatch).filter (n => (n \ "@captureHeader").text == captureHeader)
+  }
+
 
   def stepsWithHeaderXSDAnyCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
     stepsWithHeaderXSDAnyMatch (checker, name, headerMatch).filter (n => (n \ "@code").text == code.toString)
@@ -202,27 +231,34 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def JSONSchema : (NodeSeq) => NodeSeq = stepsWithType(_, "JSON_SCHEMA")
   def ContentFail : (NodeSeq) => NodeSeq = stepsWithType(_, "CONTENT_FAIL")
   def URL(url : String) : (NodeSeq) => NodeSeq = stepsWithURLMatch(_, url)
+  def URLWithCapture(url : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithURLMatchCapture(_, url, captureHeader)
   def URLXSD(url : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatch(_, url)
+  def URLXSDWithCapture(url : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatchCapture(_, url, captureHeader)
   def Label(label : String) : (NodeSeq) => NodeSeq = stepsWithLabel(_, label)
   def Method(method : String) : (NodeSeq) => NodeSeq = stepsWithMethodMatch(_, method)
   def XPath(expression : String) : (NodeSeq) => NodeSeq = stepsWithXPathMatch (_, expression)
+  def XPathWithCapture(expression : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithXPathMatchCapture (_, expression, captureHeader)
   def XPath(expression: String, message : String) : (NodeSeq) => NodeSeq = stepsWithXPathMessageMatch(_, expression, message)
   def XPath(expression: String, code : Int) : (NodeSeq) => NodeSeq = stepsWithXPathCodeMatch(_, expression, code)
   def XPath(expression: String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithXPathMessageCodeMatch(_, expression, message, code)
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
   def AnyReqType : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(.*)()")
+  def HeaderWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatchCapture(_, name, headerMatch, captureHeader)
   def Header(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatch(_, name, headerMatch)
   def Header(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMessageMatch(_, name, headerMatch, message)
   def Header(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderCodeMatch(_, name, headerMatch, code)
   def Header(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderMessageCodeMatch(_, name, headerMatch, message, code)
+  def HeaderXSDWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMatchCapture(_, name, headerMatch, captureHeader)
   def HeaderXSD(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMatch (_, name, headerMatch)
   def HeaderXSD(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMessageMatch (_, name, headerMatch, message)
   def HeaderXSD(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDCodeMatch (_, name, headerMatch, code)
   def HeaderXSD(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDMessageCodeMatch (_, name, headerMatch, message, code)
+  def HeaderAnyWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyMatchCapture(_, name, headerMatch, captureHeader)
   def HeaderAny(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyMatch(_, name, headerMatch)
   def HeaderAny(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyMessageMatch(_, name, headerMatch, message)
   def HeaderAny(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyCodeMatch(_, name, headerMatch, code)
   def HeaderAny(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderAnyMessageCodeMatch(_, name, headerMatch, message, code)
+  def HeaderXSDAnyWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMatchCapture(_, name, headerMatch, captureHeader)
   def HeaderXSDAny(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMatch (_, name, headerMatch)
   def HeaderXSDAny(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMessageMatch (_, name, headerMatch, message)
   def HeaderXSDAny(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyCodeMatch (_, name, headerMatch, code)

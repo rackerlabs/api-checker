@@ -77,6 +77,26 @@ class AssertResultHandler extends ResultHandler {
 }
 
 /**
+ * The RunAssertionsHandler allows running assertions associated with a
+ * particular request.
+ *
+ */
+object RunAssertionsHandler {
+  val ASSERT_FUNCTION = "com.rackspace.com.papi.components.checker.test.assertion.function"
+}
+class RunAssertionsHandler extends ResultHandler {
+  type AssertFunction = (CheckerServletRequest, CheckerServletResponse, Result) => Unit
+
+  def init(validator : Validator, checker : Option[Document]) : Unit = {}
+  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit =
+    req.getAttribute(RunAssertionsHandler.ASSERT_FUNCTION) match {
+      case f : AssertFunction => f(req,resp,result)
+      case null => {}
+      case _ => throw new ResultFailedException("Expecting an AssertFunction for ASSERT_ATTRIBUTE", req,resp,chain,result)
+    }
+}
+
+/**
  * A Byte Array Servlet input stream
  *
  */
@@ -138,8 +158,9 @@ class ResultFailedException(val msg : String, val req : CheckerServletRequest,
    extends Exception(msg){}
 
 object TestConfig {
-  val assertHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(), 
+  val assertHandler = new DispatchResultHandler(List[ResultHandler](new ConsoleResultHandler(),
                                                                     new AssertResultHandler(),
+                                                                    new RunAssertionsHandler(),
                                                                     new ServletResultHandler()))
 
 
@@ -464,7 +485,7 @@ class BaseValidatorSuite extends FunSuite {
 
       override def answer(invocation : InvocationOnMock) : Object  = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
-        attribs(key)
+        attribs.getOrElse(key, null)
       }
     })
     doAnswer(new Answer[Object] {
@@ -546,7 +567,7 @@ class BaseValidatorSuite extends FunSuite {
     when(req.getHeader(anyString())).thenAnswer(new Answer[String] {
       override def answer(invocation : InvocationOnMock) : String = {
         val key = invocation.getArguments()(0).asInstanceOf[String]
-        caseInSensitiveHeaders.getOrElse(key, null)(0)
+        caseInSensitiveHeaders.getOrElse(key, List(null))(0)
       }
     })
 

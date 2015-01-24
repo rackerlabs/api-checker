@@ -716,11 +716,17 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     (message, code)
   }
 
+  private[this] def getCaptureHeader(atts : Attributes) = atts.getValue("captureHeader") match {
+    case s : String => Some(s)
+    case null => None
+  }
+
   private[this] def addXPath(atts : Attributes) : Unit = {
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
+    val captureHeader = getCaptureHeader(atts)
     val mc = getMessageCode(atts)
     val message = mc._1
     val code = mc._2
@@ -751,7 +757,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
 
     next += (id -> nexts)
-    steps += (id -> new XPath(id, label, _match, message, code, context, version, priority, new Array[Step](nexts.length)))
+    steps += (id -> new XPath(id, label, _match, message, code, context, version, captureHeader, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {
@@ -759,9 +765,10 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
+    val captureHeader = getCaptureHeader(atts)
 
     next  += (id -> nexts)
-    steps += (id -> new URI(id, label, _match.r, new Array[Step](nexts.length)))
+    steps += (id -> new URI(id, label, _match.r, captureHeader, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeader(atts : Attributes) : Unit = {
@@ -774,10 +781,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val message = mc._1
     val code = mc._2
     val priority = getPriority (atts)
+    val captureHeader = getCaptureHeader(atts)
 
     next += (id -> nexts)
     steps += (id -> new Header(id, label, name, _match.r,
-                               message, code, priority, new Array[Step](nexts.length)))
+                               message, code, captureHeader, priority,
+                               new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderAny(atts : Attributes) : Unit = {
@@ -790,10 +799,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val message = mc._1
     val code = mc._2
     val priority = getPriority (atts)
+    val captureHeader = getCaptureHeader(atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderAny(id, label, name, _match.r,
-                                  message, code, priority, new Array[Step](nexts.length)))
+                                  message, code, captureHeader,
+                                  priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderXSD(atts : Attributes) : Unit = {
@@ -807,10 +818,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val message = mc._1
     val code = mc._2
     val priority = getPriority (atts)
+    val captureHeader = getCaptureHeader(atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderXSD(id, label, name, qn, schema(qn),
-                                  message, code, priority, new Array[Step](nexts.length)))
+                                  message, code, captureHeader,
+                                  priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeaderXSDAny(atts : Attributes) : Unit = {
@@ -824,10 +837,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val message = mc._1
     val code = mc._2
     val priority = getPriority (atts)
+    val captureHeader = getCaptureHeader(atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderXSDAny(id, label, name, qn, schema(qn),
-                                     message, code, priority, new Array[Step](nexts.length)))
+                                     message, code, captureHeader,
+                                     priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addMethod(atts : Attributes) : Unit = {
@@ -846,9 +861,10 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val label : String = atts.getValue("label")
     val _match : String = atts.getValue("match")
     val qn : QName = qname(_match)
+    val captureHeader = getCaptureHeader(atts)
 
     next  += (id -> nexts)
-    steps += (id -> new URIXSD(id, label, qn, schema(qn), new Array[Step](nexts.length)))
+    steps += (id -> new URIXSD(id, label, qn, schema(qn), captureHeader, new Array[Step](nexts.length)))
   }
 
   private[this] def qname(_match : String)  : QName = {
