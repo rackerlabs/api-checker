@@ -18,7 +18,14 @@ package com.rackspace.com.papi.components.checker.step
 import scala.collection.mutable.ListBuffer
 
 import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.util.HeaderMap
 import javax.servlet.FilterChain
+
+//
+//  Used to keep context about the current request
+//
+case class StepContext(uriLevel : Int = 0, requestHeaders : HeaderMap = new HeaderMap)
+
 
 //
 //  Base class for all other steps
@@ -26,12 +33,25 @@ import javax.servlet.FilterChain
 abstract class Step(val id : String, val label : String) {
 
   //
-  //  Checks the step at the given URI level.
+  //  Checks the step at the given context
   //
   def check(req : CheckerServletRequest,
             resp : CheckerServletResponse,
             chain : FilterChain,
-            uriLevel : Int) : Option[Result]
+            context : StepContext) : Option[Result]
+
+  //
+  //  Checks the step at the given URI level. This method is written
+  //  for compatibility reasons, there was a time where the only
+  //  context was the URI level -- and for most of the existing code
+  //  that's all the context that matters.
+  //
+  final def check(req : CheckerServletRequest,
+            resp : CheckerServletResponse,
+            chain : FilterChain,
+            uriLevel : Int) : Option[Result] = {
+    check(req, resp, chain, StepContext(uriLevel))
+  }
 
 }
 
@@ -41,10 +61,23 @@ abstract class Step(val id : String, val label : String) {
 abstract class ConnectedStep(id : String, label : String, val next : Array[Step]) extends Step (id, label) {
 
   //
-  //  Check the currest step.  If the step is a match return the next
-  //  uriLevel.  If not return -1.
+  //  Check the currest step.  If the step is a match return a new
+  //  updated context, if not then return None
   //
-  def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = -1
+  def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = None
+
+  //
+  //  Check the currest step.  If the step is a match return the next
+  //  URI level if not then return -1.  This method is written for
+  //  compatability reasons, there was a time where the only context
+  //  was the URI level.
+  //
+  final def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
+    checkStep(req, resp, chain, StepContext(uriLevel)) match {
+      case Some(context) => context.uriLevel
+      case None => -1
+    }
+  }
 
   //
   //  The error message when there is a step mismatch.
@@ -57,11 +90,11 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   def nextStep (req : CheckerServletRequest,
                 resp : CheckerServletResponse,
                 chain : FilterChain,
-                uriLevel : Int) : Array[Result] = {
+                context : StepContext) : Array[Result] = {
 
     val resultBuffer = new ListBuffer[Result]
     for (i <- 0 to next.length-1) {
-      val oresult = next(i).check(req, resp, chain, uriLevel)
+      val oresult = next(i).check(req, resp, chain, context)
       if (oresult.isDefined) {
         val result = oresult.get
         if (result.valid) {
@@ -80,13 +113,13 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
 
     var result : Option[Result] = None
-    val nextURILevel = checkStep(req, resp, chain, uriLevel)
+    val nextContext = checkStep(req, resp, chain, context)
 
-    if (nextURILevel != -1) {
-      val results : Array[Result] = nextStep (req, resp, chain, nextURILevel)
+    if (nextContext != None) {
+      val results : Array[Result] = nextStep (req, resp, chain, nextContext.get)
       if (results.size == 1) {
         results(0).addStepId(id)
         result = Some(results(0))
@@ -95,7 +128,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
       }
 
     } else {
-      result = Some( new MismatchResult( mismatchMessage, uriLevel, id) )
+      result = Some( new MismatchResult( mismatchMessage, context, id) )
     }
 
     return result

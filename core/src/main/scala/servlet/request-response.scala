@@ -43,10 +43,10 @@ import com.netaporter.uri.encoding.PercentEncoder
 import com.rackspace.com.papi.components.checker.util.DateUtils
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
+import com.rackspace.com.papi.components.checker.util.HeaderMap
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import scala.collection.immutable.TreeMap
 
 //
 //  Request Keys
@@ -70,16 +70,12 @@ object CherkerServletRequest {
 
 import CherkerServletRequest._
 
-object CaseInsensitiveStringOrdering extends Ordering[String] {
-  override def compare(x: String, y: String): Int = x compareToIgnoreCase y
-}
-
 //
 //  An HTTP Request with some additional helper functions
 //
 class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) with LazyLogging {
 
-  private var auxiliaryHeaders = new TreeMap[String, List[String]]()(CaseInsensitiveStringOrdering)
+  private var auxiliaryHeaders = new HeaderMap
 
   val parsedRequestURI : (Option[URI], Option[URISyntaxException]) = {
     try {
@@ -130,7 +126,9 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
   def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
 
-  def addHeader(name: String, value: String): Unit = auxiliaryHeaders = auxiliaryHeaders + (name -> (auxiliaryHeaders.getOrElse(name, List()) :+ value))
+  def addHeader(name: String, value: String): Unit = auxiliaryHeaders = auxiliaryHeaders.addHeader(name, value)
+
+  def addHeaders(hm : HeaderMap) : Unit = auxiliaryHeaders = auxiliaryHeaders.addHeaders(hm)
 
   override def getDateHeader(name: String): Long = {
     Option(getHeader(name)) match {

@@ -24,11 +24,16 @@ import com.rackspace.com.papi.components.checker.util.HeaderUtil._
 import scala.collection.JavaConversions._
 
 class Header(id : String, label : String, val name : String, val value : Regex,
-             val message : Option[String], val code : Option[Int], val priority : Long,
+             val message : Option[String], val code : Option[Int],
+             val captureHeader : Option[String], val priority : Long,
              next : Array[Step]) extends ConnectedStep(id, label, next) {
 
   def this(id : String, label : String, name : String, value : Regex, priority : Long,
-           next : Array[Step]) = this(id, label, name, value, None, None, priority, next)
+           next : Array[Step]) = this(id, label, name, value, None, None, None, priority, next)
+
+  def this (id : String, label : String, name : String, value : Regex,
+            message : Option[String], code : Option[Int], priority : Long,
+            next : Array[Step]) = this(id, label, name, value, message, code, None, priority, next)
 
   override val mismatchMessage : String = {
     if (message == None) {
@@ -46,19 +51,22 @@ class Header(id : String, label : String, val name : String, val value : Regex,
     }
   }
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    val headers : Iterator[String] = getHeaders(req, name)
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+    val headers : List[String] = getHeaders(req, name).toList
 
     //
     //  If there exists at least one header matching the the name AND
     //  all of the headers with the name match the value regex, then
-    //  return the uriLevel otherwise set an error and return -1
+    //  return a valid context otherwise set an error and return None
     //
     if (!headers.isEmpty && headers.filterNot(v => v match { case value() => true ; case _ => false } ).isEmpty) {
-      uriLevel
+      captureHeader match {
+         case None => Some(context)
+         case Some(h) => Some(context.copy(requestHeaders = context.requestHeaders.addHeaders(h, headers)))
+      }
     } else {
       req.contentError(new Exception(mismatchMessage), mismatchCode, priority)
-      -1
+      None
     }
   }
 }

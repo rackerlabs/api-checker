@@ -20,15 +20,24 @@ import scala.util.matching.Regex
 import com.rackspace.com.papi.components.checker.servlet._
 import javax.servlet.FilterChain
 
-class URI(id : String, label : String, val uri : Regex, next : Array[Step]) extends ConnectedStep(id, label, next) {
+class URI(id : String, label : String, val uri : Regex, val captureHeader : Option[String], next : Array[Step]) extends ConnectedStep(id, label, next) {
+
+  def this (id : String, label : String, uri : Regex, next : Array[Step]) =
+    this(id, label, uri, None, next)
+
   override val mismatchMessage : String = uri.toString;
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    var ret = -1
-    if (uriLevel < req.URISegment.size) {
-      req.URISegment(uriLevel) match {
-        case uri() => ret= uriLevel+1
-        case _ => ret= -1
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+    var ret : Option[StepContext] = None
+    if (context.uriLevel < req.URISegment.size) {
+      val v = req.URISegment(context.uriLevel)
+      v match {
+        case uri() => captureHeader match {
+          case None => ret= Some(context.copy(uriLevel = context.uriLevel+1))
+          case Some(h) => ret = Some(context.copy(uriLevel = context.uriLevel+1,
+                                     requestHeaders = context.requestHeaders.addHeader(h, v)))
+        }
+        case _ => ret= None
       }
     }
     ret

@@ -21,7 +21,11 @@ import javax.xml.validation.Schema
 import com.rackspace.com.papi.components.checker.servlet._
 import javax.servlet.FilterChain
 
-class URIXSD(id : String, label : String, simpleType : QName, schema : Schema, next : Array[Step])  extends ConnectedStep(id, label, next) {
+class URIXSD(id : String, label : String, val simpleType : QName, val schema : Schema, val captureHeader : Option[String], next : Array[Step])
+      extends ConnectedStep(id, label, next) {
+
+     def this(id : String, label : String, simpleType : QName, schema : Schema, next : Array[Step]) =
+       this(id, label, simpleType, schema, None, next)
 
      override val mismatchMessage : String = simpleType.toString
      val xsd = new XSDStringValidator(simpleType, schema, id)
@@ -29,14 +33,20 @@ class URIXSD(id : String, label : String, simpleType : QName, schema : Schema, n
      override def check(req : CheckerServletRequest,
                         resp : CheckerServletResponse,
                         chain : FilterChain,
-                        uriLevel : Int) : Option[Result] = {
+                        context : StepContext) : Option[Result] = {
        var result : Option[Result] = None
-       if (uriLevel < req.URISegment.size) {
-         val error = xsd.validate(req.URISegment(uriLevel))
+       if (context.uriLevel < req.URISegment.size) {
+         val v = req.URISegment(context.uriLevel)
+         val error = xsd.validate(v)
          if (error != None) {
-           result = Some(new MismatchResult(error.get.getMessage(), uriLevel, id))
+           result = Some(new MismatchResult(error.get.getMessage(), context, id))
          } else {
-           val results : Array[Result] = nextStep (req, resp, chain, uriLevel + 1)
+           val newContext = captureHeader match {
+             case None => context.copy(uriLevel = context.uriLevel + 1)
+             case Some(h) => context.copy(uriLevel = context.uriLevel + 1,
+                                         requestHeaders = context.requestHeaders.addHeader(h, v))
+           }
+           val results : Array[Result] = nextStep (req, resp, chain, newContext)
            results.size match {
              case 0 =>
                result = None
@@ -48,7 +58,7 @@ class URIXSD(id : String, label : String, simpleType : QName, schema : Schema, n
            }
          }
        } else {
-         result = Some( new MismatchResult( mismatchMessage, uriLevel, id) )
+         result = Some( new MismatchResult( mismatchMessage, context, id) )
        }
        result
      }

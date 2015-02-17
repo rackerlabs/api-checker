@@ -28,11 +28,15 @@ import org.xml.sax.SAXParseException
 import scala.collection.JavaConversions._
 
 class HeaderXSDAny(id : String, label : String, val name : String, val value : QName, schema : Schema,
-                   val message : Option[String], val code : Option[Int], val priority : Long,
-                   next : Array[Step]) extends ConnectedStep(id, label, next) {
+                   val message : Option[String], val code : Option[Int], val captureHeader : Option[String],
+                   val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
 
   def this(id : String, label : String, name : String, value : QName, schema : Schema, priority : Long,
-           next : Array[Step]) = this(id, label, name, value, schema, None, None, priority, next)
+           next : Array[Step]) = this(id, label, name, value, schema, None, None, None, priority, next)
+
+  def this(id : String, label : String, name : String, value : QName, schema : Schema, message : Option[String],
+           code : Option[Int], priority : Long,
+           next : Array[Step]) = this(id, label, name, value, schema, message, code, None, priority, next)
 
   override val mismatchMessage : String = {
     if (message == None) {
@@ -52,23 +56,27 @@ class HeaderXSDAny(id : String, label : String, val name : String, val value : Q
 
   val xsd = new XSDStringValidator(value, schema, id)
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    val headers : Iterator[String] = getHeaders(req, name)
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+    val headers : List[String] = getHeaders(req, name).toList
     var last_err : Option[SAXParseException] = None
 
     //
     //  If there exists at least one header matching the the name AND
-    //  the value type in the XSD, then return the uriLevel otherwise
-    //  set an error and return -1
+    //  the value type in the XSD, then return a valid context
+    //  otherwise set an error and None
     //
     if (headers.exists(v => { last_err = xsd.validate(v);  last_err match { case None => true ; case Some(_) => false } })) {
-      uriLevel
+      captureHeader match {
+        case None => Some(context)
+        case Some(h) => Some(context.copy (requestHeaders =
+          context.requestHeaders.addHeaders(h, headers.filter(v => xsd.validate(v) == None).toList)))
+      }
     } else {
      last_err match {
         case Some(_) => req.contentError(new Exception(mismatchMessage+value+" "+last_err.get.getMessage(), last_err.get), mismatchCode, priority)
         case None => req.contentError(new Exception(mismatchMessage), mismatchCode, priority)
       }
-      -1
+      None
     }
   }
 }

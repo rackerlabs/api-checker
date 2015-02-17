@@ -19,7 +19,7 @@ import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker.BaseValidatorSuite
 import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
-import com.rackspace.com.papi.components.checker.step.{AcceptResult, ErrorResult}
+import com.rackspace.com.papi.components.checker.step.{AcceptResult, ErrorResult, StepContext}
 import org.junit.runner.RunWith
 import org.mockito.Mockito.{mock, never, verify}
 import org.scalatest.junit.JUnitRunner
@@ -30,7 +30,7 @@ class DelegationHandlerTest extends BaseValidatorSuite {
   val delegationHandler = new DelegationHandler(.5)
 
   test("Delegation header should be added to request on error result") {
-    val res = new ErrorResult("forbidden", 403, -1, "-1", -1)
+    val res = new ErrorResult("forbidden", 403, StepContext(-1), "-1", -1)
 
     val req = mock(classOf[CheckerServletRequest])
     val resp = mock(classOf[CheckerServletResponse])
@@ -41,7 +41,7 @@ class DelegationHandlerTest extends BaseValidatorSuite {
   }
 
   test("Request should be forwarded on an error result") {
-    val res = new ErrorResult("forbidden", 403, -1, "-1", -1)
+    val res = new ErrorResult("forbidden", 403, StepContext(-1), "-1", -1)
 
     val req = mock(classOf[CheckerServletRequest])
     val resp = mock(classOf[CheckerServletResponse])
@@ -53,7 +53,7 @@ class DelegationHandlerTest extends BaseValidatorSuite {
   }
 
   test("Request should not be forwarded on accept result") {
-    val res = new AcceptResult("ok", -1, "-1", -1)
+    val res = new AcceptResult("ok", StepContext(-1), "-1", -1)
 
     val req = mock(classOf[CheckerServletRequest])
     val resp = mock(classOf[CheckerServletResponse])

@@ -27,7 +27,7 @@ import com.typesafe.scalalogging.slf4j.LazyLogging
 abstract class Result(private val messageP : String,   // A message describing the result
                       private val validP : Boolean,    // Was the http req/res valid?
                       private val terminalP : Boolean, // Are we at a terminal node in the machine
-                      private val uriLevelP : Int,     // The URI level at the error
+                      private val contextP : StepContext,     // The context at the error
                       val stepId : String, // The ID of the machine at the error
                       private val priorityP : Long = 1) extends Ordered[Result] {
 
@@ -49,7 +49,7 @@ abstract class Result(private val messageP : String,   // A message describing t
   def message = messageP
   def valid = validP
   def terminal = terminalP
-  def uriLevel = uriLevelP
+  def context = contextP
   def priority = priorityP
   def stepIDs = stepIDsP
 
@@ -64,7 +64,7 @@ abstract class Result(private val messageP : String,   // A message describing t
   protected val endPath = "]"
 
   def path : String = startPath+stepIDs.reduceLeft(_+" "+_)+endPath
-  def cmpString : String = message+" "+path+" "+terminal+" "+uriLevel
+  def cmpString : String = message+" "+path+" "+terminal+" "+context.uriLevel
   override def toString : String = path
   override def hashCode : Int = cmpString.hashCode
   override def equals (any : Any) : Boolean = {
@@ -77,10 +77,10 @@ abstract class Result(private val messageP : String,   // A message describing t
 
 class ErrorResult(private val messageP : String,
                   private val codeP : Int,
-                  uriLevel : Int,
+                  context : StepContext,
                   stepId : String,
                   priority : Long,
-                  private val headersP : Map[String,String] = new HashMap()) extends Result(messageP, false, true, uriLevel,
+                  private val headersP : Map[String,String] = new HashMap()) extends Result(messageP, false, true, context,
                                                                                    stepId, priority) {
 
   //
@@ -97,36 +97,36 @@ class ErrorResult(private val messageP : String,
 }
 
 class AcceptResult(message: String,
-                   uriLevel : Int,
+                   context : StepContext,
                    stepId : String,
-                   priority : Long)  extends Result(message, true, true, uriLevel, stepId, priority)
+                   priority : Long)  extends Result(message, true, true, context, stepId, priority)
 
 class BadContentResult(message : String,
                        codeP : Int = 400,
-                       uriLevel : Int,
+                       context : StepContext,
                        stepId : String,
-                       priority : Long) extends ErrorResult(message, codeP, uriLevel, stepId, priority)
+                       priority : Long) extends ErrorResult(message, codeP, context, stepId, priority)
 
 class URLFailResult(message : String,
-                    uriLevel : Int,
+                    context : StepContext,
                     stepId : String,
-                    priority: Long) extends ErrorResult(message, 404, uriLevel, stepId, priority)
+                    priority: Long) extends ErrorResult(message, 404, context, stepId, priority)
 
 class MethodFailResult(message: String,
-                       uriLevel : Int,
+                       context : StepContext,
                        stepId : String,
                        priority : Long,
-                       headers : Map[String,String]) extends ErrorResult(message, 405, uriLevel, stepId,
+                       headers : Map[String,String]) extends ErrorResult(message, 405, context, stepId,
                                                                          priority, headers )
 
 class BadMediaTypeResult(message: String,
-                         uriLevel : Int,
+                         context : StepContext,
                          stepId : String,
-                         priority : Long) extends ErrorResult(message, 415, uriLevel, stepId, priority)
+                         priority : Long) extends ErrorResult(message, 415, context, stepId, priority)
 
 class MismatchResult(message: String,
-                     uriLevel : Int,
-                     stepId : String) extends Result(message, false, false, uriLevel, stepId) {
+                     context : StepContext,
+                     stepId : String) extends Result(message, false, false, context, stepId) {
   override protected val startPath = "("
   override protected val endPath = ")"
 }
@@ -138,7 +138,7 @@ class NoResultsException( val message : String ) extends Exception( message )
 // This class is a wrapper around priorityqueue of several results, delegating the Result methods to the Result
 // at the head of the data structure.
 //
-class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorResult ( "Multiple possible errors", -1, -1, stepId, -1 ) with LazyLogging {
+class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorResult ( "Multiple possible errors", -1, StepContext(-1), stepId, -1 ) with LazyLogging {
 
   if ( fails.isEmpty ) throw new NoResultsException( "Input array must be non-empty." )
 
@@ -150,7 +150,7 @@ class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorR
   // delegate all method calls to the Result with the highest priority
   //
   override def message = results.head.message
-  override def uriLevel = results.head.uriLevel
+  override def context = results.head.context
   override def valid = results.head.valid
   override def terminal = results.head.terminal
   override def priority = results.head.priority

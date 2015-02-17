@@ -617,7 +617,7 @@ class BaseValidatorSuite extends FunSuite {
     assert(list.size == size, "Bad list size")
     assert(result.code == head.code, "First item in allResults list did not match main Result" )
     assert(result.message == head.message, "First item in allResults list did not match main Result" )
-    assert(result.uriLevel == head.uriLevel, "First item in allResults list did not match main Result" )
+    assert(result.context == head.context, "First item in allResults list did not match main Result" )
   }
 
   def assertResultFailed(f : => Any, code : Int) : Unit = {

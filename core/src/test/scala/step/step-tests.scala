@@ -36,6 +36,11 @@ import scala.xml._
 import com.rackspace.com.papi.components.checker.util.XMLParserPool
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
 import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
+import com.rackspace.com.papi.components.checker.util.HeaderMap
+
+import scala.language.implicitConversions
+import scala.collection.JavaConversions._
+
 
 @RunWith(classOf[JUnitRunner])
 class StepSuite extends BaseStepSuite {
@@ -48,9 +53,28 @@ class StepSuite extends BaseStepSuite {
     val res3 = accept.check(request("XGET", "/a/b"), response,chain, 0)
     assert(res3.isDefined)
     assert(res3.get.isInstanceOf[AcceptResult])
-    val res = accept.check (null, null, chain, -1)
+    val res = accept.check (request("DELETE", "/a/a/a/a/a/a"), response, chain, -1)
     assert(res.isDefined)
     assert(res.get.isInstanceOf[AcceptResult])
+  }
+
+  test ("Accept step should set step context request headers") {
+    val accept = new Accept("a", "a", 10)
+    val req1 = request("GET", "/a/b", "", "", false, Map().asInstanceOf[Map[String,List[String]]])
+    val req2 = request("GET", "/b/c", "", "", false, Map().asInstanceOf[Map[String,List[String]]])
+    val req3 = request("GET", "/c/d", "", "", false, Map().asInstanceOf[Map[String,List[String]]])
+    val req4 = request("GET", "/e/e", "", "", false, Map().asInstanceOf[Map[String,List[String]]])
+
+    accept.check (req1, response, chain, StepContext(1, (new HeaderMap()).addHeader("Foo", "Bar")))
+    accept.check (req2, response, chain, StepContext(2, (new HeaderMap()).addHeaders("Foo", List("Bar", "Baz", "Biz"))))
+    accept.check (req3, response, chain, StepContext(3, (new HeaderMap()).addHeader("Foo", "Baz").addHeaders("Bar",List("Fe","Fi","Fo")))) 
+    accept.check (req4, response, chain, StepContext(1, (new HeaderMap()).addHeader("Foo", "Bar,Baz,Biz")))
+
+    assert (req1.getHeaders("Foo").toList == List("Bar"))
+    assert (req2.getHeaders("Foo").toList == List("Bar", "Baz", "Biz"))
+    assert (req3.getHeaders("Foo").toList == List("Baz"))
+    assert (req3.getHeaders("Bar").toList == List("Fe", "Fi", "Fo"))
+    assert (req4.getHeaders("Foo").toList == List("Bar,Baz,Biz"))
   }
 
   test("Start should not change URI level") {
@@ -332,9 +356,15 @@ class StepSuite extends BaseStepSuite {
     assert (urixsd.check (request("GET", "/84/b"), response,chain, 0) == None)
   }
 
-  //
-  //  Pending bug fix on xerces-j
-  //
+  test("In a URIXSD step, if there is a URI match, and a captureHeader, the header should be set") {
+    val accept = new Accept("accept", "Accept", 1000)
+    val urixsd = new URIXSD("uxd", "uxd", evenIntType, testSchema, Some("foo"), Array[Step](accept))
+    val req = request("GET", "/54/b")
+    assert (urixsd.check (req, response,chain, 0) != None)
+    assert (req.getHeader("FOO") == "54")
+  }
+
+
   test("In a URIXSD step, if there is a mismatch, a MismatchResult should be returned: EvenInt100, assert") {
     val urixsd = new URIXSD("uxd", "uxd", evenIntType, testSchema, Array[Step]())
     assertMismatchResult (urixsd.check (request("GET", "/55/b"), response,chain, 0))
@@ -389,6 +419,25 @@ class StepSuite extends BaseStepSuite {
     val uri2 = new URI("ab", "a or b", "[a-b]".r, Array[Step]())
     assert (uri2.checkStep (request("GET", "/c/d"), response,chain, 0) == -1)
     assert (uri2.checkStep (request("GET", "/c/d"), response,chain, 1) == -1)
+  }
+
+  test("In a URI step, if there is a URI match, the context should have a uriLevel increase by 1"){
+    val uri = new URI("a", "a", "a".r, Array[Step]())
+    val ctx1 = StepContext()
+    assert (uri.checkStep (request("GET", "/a/b"), response,chain, ctx1).get.uriLevel == 1)
+  }
+
+  test("In a URI step, if there is a URI match, the context should have a uriLevel increase by 1, if a captureHeader is set it should contain the header"){
+    val uri = new URI("a", "a", "a".r, Some("URI"), Array[Step]())
+    val nctx = uri.checkStep (request("GET", "/a/b"), response,chain, StepContext())
+    assert(nctx.get.uriLevel == 1)
+    assert(nctx.get.requestHeaders("URI") == List("a"))
+  }
+
+  test("In a URI step, if there is a URI mismatch, the returned context should be None") {
+    val uri = new URI("a", "a", "a".r, Array[Step]())
+    val ctx1 = StepContext()
+    assert (uri.checkStep (request("GET", "/c/b"), response,chain, ctx1) == None)
   }
 
   test("In a URI step, if there is a URI match, but the URI level has been exceeded the new URI level should be -1") {
@@ -1066,6 +1115,121 @@ class StepSuite extends BaseStepSuite {
     assert (xpath.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same in the context") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 1, 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <root xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </root>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:root xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:root>, true)
+    assert (xpath.checkStep (req1, response, chain, StepContext()).get.uriLevel == 0)
+    assert (xpath.checkStep (req2, response, chain, StepContext(1)).get.uriLevel == 1)
+  }
+
+
+  test("In an XPath test, if the XPath resolves to true and there is a capture header, the capture header should be set") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 1, Some("Foo"), 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <root xmlns="http://test.org/test" bar="yum">
+                         <child attribute="value"/>
+                       </root>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:root xmlns:tst="http://test.org/test" bar="jaz">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:root>, true)
+    val ctx1 = xpath.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = xpath.checkStep (req2, response, chain, StepContext(1)).get
+
+    assert (ctx1.requestHeaders("Foo") == List("yum"))
+    assert (ctx2.requestHeaders("Foo") == List("jaz"))
+  }
+
+  test("In an XPath test, if the XPath resolves to true and there is a capture header, the capture header should be set (multi-value)") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "//@bar", None, None, context, 1, Some("Foo"), 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <root xmlns="http://test.org/test" bar="yum">
+                         <child attribute="value" bar="yum2"/>
+                       </root>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:root xmlns:tst="http://test.org/test" bar="jaz">
+                         <tst:child attribute="value" bar="jaz2"/>
+                         <tst:child attribute="value2" bar="jaz3"/>
+                       </tst:root>, true)
+    val ctx1 = xpath.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = xpath.checkStep (req2, response, chain, StepContext(1)).get
+
+    //
+    //  Since we are coercing into a string, we should just get the
+    //  first value.
+    //
+    assert (ctx1.requestHeaders("Foo") == List("yum"))
+    assert (ctx2.requestHeaders("Foo") == List("jaz"))
+  }
+
+  test("In an XPath test, if the XPath resolves to true and there is a capture header, the capture header should be set (multi-value, version 2)") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "string-join((//@bar), ', ')", None, None, context, 2, Some("Foo"), 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <root xmlns="http://test.org/test" bar="yum">
+                         <child attribute="value" bar="yum2"/>
+                       </root>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:root xmlns:tst="http://test.org/test" bar="jaz">
+                         <tst:child attribute="value" bar="jaz2"/>
+                         <tst:child attribute="value2" bar="jaz3"/>
+                       </tst:root>, true)
+    val ctx1 = xpath.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = xpath.checkStep (req2, response, chain, StepContext(1)).get
+
+    //
+    //  With XPath2 we can actually get separate values -- within a single header.
+    //
+    assert (ctx1.requestHeaders("Foo") == List("yum, yum2"))
+    assert (ctx2.requestHeaders("Foo") == List("jaz, jaz2, jaz3"))
+  }
+
+  test("In an XPath test, if the XPath resolves to true and there is a capture header, the capture header should be set (version 2)") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 2, Some("Foo"), 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <root xmlns="http://test.org/test" bar="yum">
+                         <child attribute="value"/>
+                       </root>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:root xmlns:tst="http://test.org/test" bar="jaz">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:root>, true)
+    val ctx1 = xpath.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = xpath.checkStep (req2, response, chain, StepContext(1)).get
+
+    assert (ctx1.requestHeaders("Foo") == List("yum"))
+    assert (ctx2.requestHeaders("Foo") == List("jaz"))
+  }
+
+  test("In an XPath test, if the XPath does not resolve context should be None.") {
+    val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
+    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 1, 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+                       <root xmlns="http://test.org/test">
+                         <child attribute="value"/>
+                       </root>, true)
+    val req2 = request("PUT", "/a/b", "application/xml",
+                       <tst:root xmlns:tst="http://test.org/test">
+                         <tst:child attribute="value"/>
+                         <tst:child attribute="value2"/>
+                       </tst:root>, true)
+    assert (xpath.checkStep (req1, response, chain, StepContext()) == None)
+    assert (xpath.checkStep (req2, response, chain, StepContext(1)) == None)
+  }
 
   test("In an XPath test, if the XPath resolves to true the contentErrorPriority should be -1") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
@@ -1526,6 +1690,48 @@ class StepSuite extends BaseStepSuite {
 
     assert (header.checkStep (req1, response, chain, 0) == 0)
     assert (header.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In a header step, if the header is available then the uri level should stay the same in the context.") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()).get.uriLevel == 0)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).get.uriLevel == 1)
+  }
+
+  test ("In a header step, if the header is available and a captureHeader is set the value should be caught in the captureheader") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set")))
+
+    val ctx = header.checkStep (req1, response, chain, StepContext())
+    assert(ctx.get.requestHeaders("Foo") == List("Set"))
+  }
+
+  test ("In a header step, if the header is available and a captureHeader is set the value should be caught in the captureheader (multiple values)") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Sam", "Sat")))
+
+    val ctx = header.checkStep (req1, response, chain, StepContext())
+    assert(ctx.get.requestHeaders("Foo") == List("Set", "Sam", "Sat"))
+  }
+
+
+  test ("In a header step, if the header is not available the context should be set to None.") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Sat")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()) == None)
+    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+  }
+
+  test ("In a header step, if the header is available, but does not match the value...context should be set to None") {
+    val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Bar")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()) == None)
   }
 
   test ("In a header step, if the header is available then the contentErrorPriority should be -1.") {
@@ -2003,6 +2209,58 @@ class StepSuite extends BaseStepSuite {
     assert (header.checkStep (req2, response, chain, 1) == 1)
   }
 
+  test ("In an XSD header step, if the header is available then the uri level should stay the same in the context.") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()).get.uriLevel == 0)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).get.uriLevel == 1)
+  }
+
+  test ("In an XSD header step, if the header is available and a capture header is set, the value should be set in the capture header.") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    val ctx1 = header.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = header.checkStep (req2, response, chain, StepContext(1)).get
+
+    assert (ctx1.requestHeaders("Foo") == List("28d42e00-e25a-11e1-9897-efbf2fa68353"))
+    assert (ctx2.requestHeaders("Foo") == List("2fbf4592-e25a-11e1-bae1-93374682bd20"))
+  }
+
+  test ("In an XSD header step, if the header is available and a capture header is set, the value should be set in the capture header (multiple values).") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353", "716ab810-b61e-11e4-bee7-28cfe92134e7")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20", "729a6aa0-b61e-11e4-a8e2-28cfe92134e7", "74272958-b61e-11e4-9e31-28cfe92134e7")))
+
+    val ctx1 = header.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = header.checkStep (req2, response, chain, StepContext(1)).get
+
+    assert (ctx1.requestHeaders("Foo") == List("28d42e00-e25a-11e1-9897-efbf2fa68353", "716ab810-b61e-11e4-bee7-28cfe92134e7"))
+    assert (ctx2.requestHeaders("Foo") == List("2fbf4592-e25a-11e1-bae1-93374682bd20", "729a6aa0-b61e-11e4-a8e2-28cfe92134e7", "74272958-b61e-11e4-9e31-28cfe92134e7"))
+  }
+
+
+  test ("In an XSD header step, if the header is not available then the context should be set to None") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-I"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-I"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    assert (header.checkStep (req1, response, chain, StepContext())  == None)
+    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+  }
+
+  test ("In an XSD header step, if the header is available but does not match the XSD the context should be set to None") {
+    val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-FOOO-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20-998373-FFF")))
+
+    assert(header.checkStep (req1, response, chain, StepContext()) == None)
+    assert(header.checkStep (req2, response, chain, StepContext(1)) == None)
+  }
+
   test ("In an XSD header step, if the header is available then the contentErrorPriority should be -1.") {
     val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
@@ -2474,6 +2732,45 @@ class StepSuite extends BaseStepSuite {
 
     assert (header.checkStep (req1, response, chain, 0) == 0)
     assert (header.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In a header any step, if the header is available then the uri level should stay the same in the context.") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Sat")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()).get.uriLevel == 0)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).get.uriLevel == 1)
+  }
+
+  test ("In a header any step, if the header is available and a capture header is set, the matching values should be caught in the capture header") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Set", "Sam", "Foo", "Bar")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Baz", "Bar", "Sat")))
+
+    val ctx1 = header.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = header.checkStep (req2, response, chain, StepContext(1)).get
+
+    assert (ctx1.requestHeaders("Foo")  ==  List("Set", "Sam"))
+    assert (ctx2.requestHeaders("Foo") ==  List("Sat"))
+  }
+
+  test ("In a header any step, if the header is available but values do not match the capture header should be set to None.") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Foo", "Bar")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Baz", "Bar")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()) == None)
+    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+  }
+
+  test ("In a header any step, if the header is not available the capture header should be set to None.") {
+    val header = new HeaderAny("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Foo", "Bar")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Baz", "Bar")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()) == None)
+    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
   }
 
   test ("In a header any step, if the header is available then the contentErrorPriority should be -1.") {
@@ -2967,6 +3264,45 @@ class StepSuite extends BaseStepSuite {
 
     assert (header.checkStep (req1, response, chain, 0) == 0)
     assert (header.checkStep (req2, response, chain, 1) == 1)
+  }
+
+  test ("In an XSD any header step, if the header is available then the uri level should stay the same in the context.") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()).get.uriLevel == 0)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).get.uriLevel == 1)
+  }
+
+  test ("In an XSD any header step, if the header is available and a capture header is set, the matching values should be caught in the capture header.") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-9897-efbf2fa68353", "FOO", "eab81b2c-b623-11e4-b090-28cfe92134e7")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("BAR", "2fbf4592-e25a-11e1-bae1-93374682bd20", "BAZ", "eab81b2c-b623-11e4-b090-28cfe9213zzz")))
+
+    val ctx1 = header.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = header.checkStep (req2, response, chain, StepContext(1)).get
+
+    assert (ctx1.requestHeaders("Foo")  ==  List("28d42e00-e25a-11e1-9897-efbf2fa68353", "eab81b2c-b623-11e4-b090-28cfe92134e7"))
+    assert (ctx2.requestHeaders("Foo")  ==  List("2fbf4592-e25a-11e1-bae1-93374682bd20"))
+  }
+
+ test ("In an XSD any header step, if the header is not available then the context should be set to None.") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-I"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-I"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()) == None)
+    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+  }
+
+  test ("In an XSD any header step, if the header is available but values do not match then the context should be set to None.") {
+    val header = new HeaderXSDAny("HEADER", "HEADER", "X-ID", uuidType, testSchema, None, None, Some("Foo"), 10, Array[Step]())
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("BAR", "BAZ")))
+
+    assert (header.checkStep (req1, response, chain, StepContext()) == None)
+    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
   }
 
   test ("In an XSD any header step, if the header is available then the contentErrorPriority should be -1.") {

@@ -28,8 +28,8 @@ import javax.servlet.FilterChain
 class WellFormedXML(id : String, label : String, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The XML is not well formed!"
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    var ret = -1
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+    var ret : Option[StepContext] = None
     var parser : DocumentBuilder = null
     val capture = new ErrorCapture
 
@@ -39,7 +39,7 @@ class WellFormedXML(id : String, label : String, val priority : Long, next : Arr
         parser.setErrorHandler(capture)
         req.parsedXML = parser.parse(req.getInputStream)
       }
-      ret = uriLevel
+      ret = Some(context)
     }catch {
       case e : Exception => req.contentError = e
                             req.contentErrorPriority = priority

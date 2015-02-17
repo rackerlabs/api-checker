@@ -23,12 +23,12 @@ import javax.servlet.FilterChain
 class Method(id : String, label : String, val method : Regex, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = method.toString;
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    var ret = -1
-    if (uriLevel >= req.URISegment.size) {
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+    var ret : Option[StepContext] = None
+    if (context.uriLevel >= req.URISegment.size) {
       req.getMethod() match {
-        case method() => ret= uriLevel
-        case _ => ret= -1
+        case method() => ret= Some(context)
+        case _ => ret= None
       }
     }
     ret

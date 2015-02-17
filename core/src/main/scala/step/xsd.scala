@@ -37,8 +37,8 @@ import com.rackspace.com.papi.components.checker.util.XMLParserPool.returnParser
 class XSD(id : String, label : String, schema : Schema, transform : Boolean, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The XML does not validate against the schema."
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
-    var ret = -1
+  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+    var ret : Option[StepContext] = None
     var validator : Validator = null
     var parser : DocumentBuilder = null
     val capture = new ErrorCapture //Used to capture parse errors
@@ -63,7 +63,7 @@ class XSD(id : String, label : String, schema : Schema, transform : Boolean, val
       } else {
         validator.validate (new DOMSource (req.parsedXML))
       }
-      ret = uriLevel
+      ret = Some(context)
     } catch {
       case e : Exception => error = e
     } finally {
@@ -77,11 +77,11 @@ class XSD(id : String, label : String, schema : Schema, transform : Boolean, val
     if (capture.error != None) {
       req.contentError = capture.error.get
       req.contentErrorPriority = priority
-      ret = -1
+      ret = None
     } else if (error != null) {
       req.contentError = error
       req.contentErrorPriority = priority
-      ret = -1
+      ret = None
     }
 
     ret

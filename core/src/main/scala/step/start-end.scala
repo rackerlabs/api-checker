@@ -34,19 +34,19 @@ class Start(id : String, label : String, next : Array[Step]) extends ConnectedSt
   override def checkStep(req : CheckerServletRequest,
                          resp : CheckerServletResponse,
                          chain : FilterChain,
-                         uriLevel : Int ) : Int = uriLevel
+                         context : StepContext ) : Option[StepContext] = Some(context)
 
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
     //
     // If we have a malformed URI, then we can't even start the
     // machine, so return a 400 result.
     //
     req.parsedRequestURI match {
-      case (_, Some(e)) => Some(new ErrorResult(e.getMessage(), 400, uriLevel, id, Long.MaxValue))
-      case _ => super.check(req, resp, chain, uriLevel)
+      case (_, Some(e)) => Some(new ErrorResult(e.getMessage(), 400, context, id, Long.MaxValue))
+      case _ => super.check(req, resp, chain, context)
     }
   }
 
@@ -60,7 +60,12 @@ class Accept(id : String, label : String, val priority : Long) extends Step(id, 
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
+    //
+    //  Send any request headers in the current context
+    //
+    req.addHeaders(context.requestHeaders)
+
     //
     //  For now, accept always send out to the chain
     //
@@ -69,7 +74,7 @@ class Accept(id : String, label : String, val priority : Long) extends Step(id, 
     //
     //  Send request...
     //
-    return Some( new AcceptResult( "", uriLevel, id, priority ) )
+    return Some( new AcceptResult( "", context, id, priority ) )
   }
 }
 
@@ -80,7 +85,7 @@ class URLFail(id : String, label : String, val priority : Long) extends Step(id,
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
     //
     //  If there is stuff in the path, then this error is
     //  applicable. Generate the error, commit the message. No URI
@@ -88,9 +93,9 @@ class URLFail(id : String, label : String, val priority : Long) extends Step(id,
     //
     var result : Option[URLFailResult] = None
 
-    if (uriLevel < req.URISegment.size) {
-      val path = (for (i <- 0 until (uriLevel)) yield req.URISegment(i)).foldLeft("")(_ + "/" + _)+"/{"+req.URISegment(uriLevel)+"}"
-      val ufr = new URLFailResult("Resource not found: "+path, uriLevel, id, priority)
+    if (context.uriLevel < req.URISegment.size) {
+      val path = (for (i <- 0 until (context.uriLevel)) yield req.URISegment(i)).foldLeft("")(_ + "/" + _)+"/{"+req.URISegment(context.uriLevel)+"}"
+      val ufr = new URLFailResult("Resource not found: "+path, context, id, priority)
       result = Some(ufr)
     }
 
@@ -106,13 +111,13 @@ class URLFailMatch(id : String, label : String, val uri : Regex, priority : Long
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
 
-    var result : Option[Result] = super.check (req, resp, chain, uriLevel)
+    var result : Option[Result] = super.check (req, resp, chain, context)
     if (result != None) {
-      req.URISegment(uriLevel) match {
+      req.URISegment(context.uriLevel) match {
         case uri() => result = None
-        case _ => result = Some(new URLFailResult (result.get.message+". The URI segment does not match the pattern: '"+uri+"'", uriLevel, id, priority)) // Augment our parents result with match info
+        case _ => result = Some(new URLFailResult (result.get.message+". The URI segment does not match the pattern: '"+uri+"'", context, id, priority)) // Augment our parents result with match info
       }
     }
     result
@@ -132,11 +137,11 @@ class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QN
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
 
-    var result : Option[Result] = super.check (req, resp, chain, uriLevel)
+    var result : Option[Result] = super.check (req, resp, chain, context)
     if (result != None) {
-      val in = req.URISegment(uriLevel)
+      val in = req.URISegment(context.uriLevel)
       val errors = for (validator <- validators) yield {
         val e = validator.validate(in)
         if (e == None) return None
@@ -144,7 +149,7 @@ class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QN
       }
 
       val message = errors.foldLeft(result.get.message)(_ + " and "+_)
-      result = Some(new URLFailResult (message, uriLevel, id, priority))
+      result = Some(new URLFailResult (message, context, id, priority))
     }
     result
   }
@@ -159,11 +164,11 @@ class ReqTypeFail(id : String, label : String, val types : Regex, val priority :
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
     var result : Option[BadMediaTypeResult] = None
     req.getContentType() match {
       case types() => result = None
-      case _ => result = Some(new BadMediaTypeResult("The content type did not match the pattern: '"+types.toString.replaceAll("\\(\\?i\\)","")+"'", uriLevel, id, priority))
+      case _ => result = Some(new BadMediaTypeResult("The content type did not match the pattern: '"+types.toString.replaceAll("\\(\\?i\\)","")+"'", context, id, priority))
     }
     result
   }
@@ -183,11 +188,11 @@ class URLFailXSD(id : String, label : String, types : Array[QName], schema : Sch
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
 
-    var result : Option[Result] = super.check (req, resp, chain, uriLevel)
+    var result : Option[Result] = super.check (req, resp, chain, context)
     if (result != None) {
-      val in = req.URISegment(uriLevel)
+      val in = req.URISegment(context.uriLevel)
       val errors = for (validator <- validators) yield {
         val e = validator.validate(in)
         if (e == None) return None
@@ -195,7 +200,7 @@ class URLFailXSD(id : String, label : String, types : Array[QName], schema : Sch
       }
 
       val message = errors.foldLeft(result.get.message)(_ + " "+_)
-      result = Some(new URLFailResult (message, uriLevel, id, priority))
+      result = Some(new URLFailResult (message, context, id, priority))
     }
     result
   }
@@ -211,15 +216,15 @@ class MethodFail(id : String, label : String, val priority : Long) extends Step(
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
     //
     //  If there is URL stuff return NONE.  Otherwise generate an
     //  error, commit the message.
     //
     var result : Option[MethodFailResult] = None
 
-    if (uriLevel >= req.URISegment.size) {
-      val mfr = new MethodFailResult("Bad method: "+req.getMethod(), uriLevel, id, priority, allowHeaders.clone().asInstanceOf[java.util.Map[String,String]] )
+    if (context.uriLevel >= req.URISegment.size) {
+      val mfr = new MethodFailResult("Bad method: "+req.getMethod(), context, id, priority, allowHeaders.clone().asInstanceOf[java.util.Map[String,String]] )
       result = Some(mfr)
     }
 
@@ -238,13 +243,13 @@ class MethodFailMatch(id : String, label : String, val method : Regex, priority 
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
-    var result : Option[Result] = super.check(req, resp, chain, uriLevel)
+                     context : StepContext) : Option[Result] = {
+    var result : Option[Result] = super.check(req, resp, chain, context)
     if (result != None) {
       req.getMethod() match {
         case method() => result = None
         case _ => result = Some(new MethodFailResult (result.get.message+". The Method does not match the pattern: '"+method+"'",
-                                                      uriLevel,
+                                                      context,
                                                       id,
                                                       priority,
                                                       allowHeaders.clone.asInstanceOf[java.util.Map[String,String]])) // Augment our parents result with match info
@@ -261,7 +266,7 @@ class ContentFail(id : String, label : String, val priority : Long) extends Step
   override def check(req : CheckerServletRequest,
                      resp : CheckerServletResponse,
                      chain : FilterChain,
-                     uriLevel : Int) : Option[Result] = {
+                     context : StepContext) : Option[Result] = {
     //
     //  If there is a contentError in the request, return it,
     //  otherwise return NONE.
@@ -288,7 +293,7 @@ class ContentFail(id : String, label : String, val priority : Long) extends Step
       }
 
       // I'm assuming everything generated within this step is a content error
-      val bcr = new BadContentResult ( prepend + msg, req.contentErrorCode, uriLevel, id, actualPriority)
+      val bcr = new BadContentResult ( prepend + msg, req.contentErrorCode, context, id, actualPriority)
 
       result = Some(bcr)
     }

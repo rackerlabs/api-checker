@@ -22,18 +22,18 @@ import scala.collection.JavaConversions._
 
 @RunWith(classOf[JUnitRunner])
 class ResultSuite extends BaseStepSuite {
-  val e12 = new MismatchResult("Mismatch", -1, "12")
-  val e13 = new MismatchResult("Mismatch", -1, "13")
-  val e14 = new BadMediaTypeResult("Bad Media Type", -1, "14", 8)
-  val e15 = new MethodFailResult("Bad Method", -1, "15", 8, Map("Foo"->"Bar"))
-  val e16 = new BadMediaTypeResult("Bad MT", -1, "16", 9)
+  val e12 = new MismatchResult("Mismatch", StepContext(-1), "12")
+  val e13 = new MismatchResult("Mismatch", StepContext(-1), "13")
+  val e14 = new BadMediaTypeResult("Bad Media Type", StepContext(-1), "14", 8)
+  val e15 = new MethodFailResult("Bad Method", StepContext(-1), "15", 8, Map("Foo"->"Bar"))
+  val e16 = new BadMediaTypeResult("Bad MT", StepContext(-1), "16", 9)
 
   val e10 = new MultiFailResult(Array(e12, e13, e14, e15), "10")
 
   e10.addStepId("9")
   e10.addStepId("8")
 
-  val e7 = new MethodFailResult("Bad Method", -1, "7", 8, Map("Foo"->"Bar"))
+  val e7 = new MethodFailResult("Bad Method", StepContext(-1), "7", 8, Map("Foo"->"Bar"))
 
   e7.addStepId("6")
   e7.addStepId("5")
