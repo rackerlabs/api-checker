@@ -213,7 +213,7 @@ class Validator private (private val _name : String, val startStep : Step, val c
     try {
       val creq = new CheckerServletRequest (req)
       val cres = new CheckerServletResponse(res)
-      val result = startStep.check (creq, cres, chain, StepContext()).get
+      val result = startStep.check (creq, cres, chain, StepContext(handler = Option(resultHandler))).get
       resultHandler.handle(creq, cres, chain, result)
       if (!result.valid) failMeter.mark()
       result

@@ -557,6 +557,12 @@ class BaseValidatorSuite extends FunSuite {
       }
     })
 
+    when(req.getHeaderNames).thenAnswer(new Answer[Enumeration[String]] {
+      override def answer(invocation : InvocationOnMock) : Enumeration[String] = {
+        caseInSensitiveHeaders.keySet.iterator
+      }
+    })
+
     return req
   }
 
