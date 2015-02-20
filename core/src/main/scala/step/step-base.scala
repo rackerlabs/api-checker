@@ -15,6 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
+import com.rackspace.com.papi.components.checker.handler.ResultHandler
+
 import scala.collection.mutable.ListBuffer
 
 import com.rackspace.com.papi.components.checker.servlet._
@@ -24,7 +26,7 @@ import javax.servlet.FilterChain
 //
 //  Used to keep context about the current request
 //
-case class StepContext(uriLevel : Int = 0, requestHeaders : HeaderMap = new HeaderMap)
+case class StepContext(uriLevel : Int = 0, requestHeaders : HeaderMap = new HeaderMap, handler: Option[ResultHandler] = None)
 
 
 //
@@ -119,7 +121,8 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
     val nextContext = checkStep(req, resp, chain, context)
 
     if (nextContext != None) {
-      val results : Array[Result] = nextStep (req, resp, chain, nextContext.get)
+      val results : Array[Result] =
+          nextStep (req, resp, chain, nextContext.get.handler.map{ handler => handler.inStep(this, req, resp, nextContext.get) }.getOrElse(nextContext.get))
       if (results.size == 1) {
         results(0).addStepId(id)
         result = Some(results(0))

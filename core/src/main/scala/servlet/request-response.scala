@@ -149,27 +149,19 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
 
   override def getHeaders(name: String): util.Enumeration[String] = {
-    auxiliaryHeaders.get(name) match {
-      case Some(auxiliaryHeaderValues) =>
-        Option(super.getHeaders(name)) match {
-          case Some(primaryHeaderValues) =>
-            // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
-            // being a Java Enumeration).
-            val headerValuesSet = primaryHeaderValues.asScala.toList
-            (auxiliaryHeaderValues ++ headerValuesSet).toIterator.asJavaEnumeration
-          case None => null
-        }
-      case None => super.getHeaders(name)
+    // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
+    // being a Java Enumeration).
+    Option(super.getHeaders(name)) match {
+      case Some(originalHeaders) => (auxiliaryHeaders.get(name).getOrElse(List()) ++ originalHeaders.asScala.toList).toIterator.asJavaEnumeration
+      case None => null
     }
   }
 
   override def getHeaderNames: util.Enumeration[String] = {
+//    Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
+//            being a Java Enumeration).
     Option(super.getHeaderNames) match {
-      case Some(primaryHeaderNames) =>
-        // Note: We store a Scala set to prevent inconsistent unions (probably due to primaryHeaderNames
-        // being a Java Enumeration).
-        val headerNamesSet = primaryHeaderNames.asScala.toList
-        (auxiliaryHeaders.keySet ++ headerNamesSet).toIterator.asJavaEnumeration
+      case Some(originalHeaderNames) => (auxiliaryHeaders.keySet ++ originalHeaderNames.asScala.toList).toIterator.asJavaEnumeration
       case None => null
     }
   }

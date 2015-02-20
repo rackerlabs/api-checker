@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.handler
 import scala.collection.immutable.List
 
 import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.step.Result
+import com.rackspace.com.papi.components.checker.step.{StepContext, Step, Result}
 
 import javax.servlet.FilterChain
 
@@ -37,6 +37,9 @@ class DispatchResultHandler(private[this] var handlers : List[ResultHandler] = L
   }
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
     handlers.foreach(h => h.handle(req,resp,chain,result))
+  }
+  override def inStep (currentStep: Step, req: CheckerServletRequest, resp : CheckerServletResponse, context: StepContext) : StepContext = {
+    handlers.foldLeft(context)((context : StepContext, handler : ResultHandler) => handler.inStep(currentStep, req, resp, context))
   }
   override def destroy : Unit = {
     handlers.foreach(h => h.destroy)
