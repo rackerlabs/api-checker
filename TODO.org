@@ -520,6 +520,55 @@
           2. [X] Configs
        3. [X] Rework meta tests to automate the checking of configs in metadata
 ** DONE Fix issue where dependecies may be listed more than once in metadata
+** DONE Add assertions to checker format to test [5/5]
+   1. [X] Add assertions [9/9]
+      1. [X] URL/METHOD Steps [4/4]
+         1. [X] Simple match
+         2. [X] No Match errors
+         3. [X] All Match .*
+         4. [X] Match strings
+      2. [X] URLXSD
+      3. [X] Mixed URLXSD and URL
+      4. [X] REQ_TYPE Steps
+      5. [X] Content Steps [10/10]
+         1. [X] WELL_XML
+         2. [X] WELL_JSON
+         3. [X] XPATH
+         4. [X] HEADER
+         5. [X] HEADERXSD
+         6. [X] HEADER_ANY
+         7. [X] HEADERXSD_ANY (NOT USED :-()
+         8. [X] XSL
+         9. [X] XSD
+         10. [X] JSON_SCHEMA
+      6. [X] Remove DUPS
+      7. [X] Join XPATH
+      8. [X] XML/JSON State order?
+      9. [X] Mask Rax:roles
+   2. [X] Integration
+   3. [X] Fix errors
+   4. [X] TESTS [10/10]
+      1. [X] URL / METHOD
+      2. [X] URLXSD
+      3. [X] Mixed URL / URL XSD
+      4. [X] REQ_TYPE
+      5. [X] Content Steps[10/10]
+         1. [X] WELL_XML
+         2. [X] WELL_JSON
+         3. [X] XPATH
+         4. [X] HEADER
+         5. [X] HEADERXSD
+         6. [X] HEADER_ANY
+         7. [X] HEADERXSD_ANY (NOT USED :-()
+         8. [X] XSL
+         9. [X] XSD
+         10. [X] JSON_SCHEMA
+      6. [X] XML/JSON State order?
+      7. [X] Mask Rax:roles
+      8. [X] Remove DUPS
+      9. [X] Join XPATH
+      10. [X] Funky regex check
+   5. [X] Cleanup / Optimize
 ** TODO Add support for rax:copyToHeader extension [4/11]
    1. [X] Create concept of StepContext to hold request headers and
       current URI Index.
@@ -562,6 +611,9 @@
           2. [ ] rax:copyToHeader on header
           3. [ ] rax:copyToHeader on plan
        5. [ ] Performance test
+** TODO Compile Performance improvements
+** TODO Assign CONTENT_FAIL to XSL steps in builder
+** TODO Investigate whether there is an issue with rax:roles with other headers
 ** TODO Cache checker format on load [0/3]
    1. [ ] New config option...enable cache...defualt to true
    2. [ ] Check for cache on load XML, if cache exists [0/4]
