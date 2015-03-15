@@ -33,6 +33,12 @@
     <xsl:key name="checker-by-id" match="chk:step" use="@id"/>
 
     <!--
+        The following key is useful for retriving a list of checker steps that
+        refernce a particular step ID.
+    -->
+    <xsl:key name="checker-by-ref" match="chk:step" use="tokenize(@next,' ')"/>
+
+    <!--
         Sink types return an message error or accept.
     -->
     <xsl:variable name="sink-types" as="xs:string*" select="('URL_FAIL', 'METHOD_FAIL', 'CONTENT_FAIL',
@@ -54,6 +60,26 @@
     <xsl:function as="xs:string*" name="chk:next">
         <xsl:param name="step" as="node()"/>
         <xsl:sequence select="tokenize($step/@next, ' ')"/>
+    </xsl:function>
+
+    <!--
+        Given a step, returns ids a the step's siblings:
+        Steps that have the same parent step.
+     -->
+    <xsl:function name="chk:siblings" as="xs:string*">
+        <xsl:param name="checker" as="node()"/>
+        <xsl:param name="step" as="node()"/>
+        <xsl:sequence select="for $parent in key('checker-by-ref',$step/@id, $checker)
+                              return chk:next($parent)"/>
+    </xsl:function>
+
+    <!--
+        Returns a copy of steps given a list of ids
+     -->
+    <xsl:function name="chk:stepsByIds" as="node()*">
+        <xsl:param name="checker" as="node()"/>
+        <xsl:param name="ids" as="xs:string*"/>
+        <xsl:sequence select="for $id in $ids return key('checker-by-id', $id, $checker)"/>
     </xsl:function>
 
     <!--

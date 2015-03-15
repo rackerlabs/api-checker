@@ -71,10 +71,14 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
                                   config.checkerMetaMap.map(c => <config option={c._1} value={c._2.toString} />)
                                 }
                              </meta>
-                             <step id="S0" type="START" next="F1"/>
-                             <step id="F1" type="URL" match="foo" next="G1"/>
+                             <step id="S0" type="START" next="F1 notFoo noMETHOD"/>
+                             <step id="F1" type="URL" match="foo" next="G1 noURL notGET"/>
                              <step id="G1" type="METHOD" match="GET" label="GET Foo" next="A"/>
                              <step id="A" type="ACCEPT" priority="19999"/>
+                             <step id="notFoo" type="URL_FAIL" notMatch="foo" />
+                             <step id="notGET" type="METHOD_FAIL" notMatch="GET" />
+                             <step id="noMETHOD" type="METHOD_FAIL" />
+                             <step id="noURL" type="URL_FAIL" />
                          </checker>
 
      scenario ("Load a plain checker document that ends with .checker extension") {
@@ -83,8 +87,16 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
        When("the document is loaded...")
        val goodCheckerLog = log (Level.WARN) {
          val checker = builder.build (in,config)
-         Then ("The checker should be loaded unchanged")
-         canon(checker) should equal (canon(fooGETChecker))
+         assert(checker, "/chk:checker/chk:step[@type='START']/@next = 'F1 notFoo noMETHOD'")
+         assert(checker, "/chk:checker/chk:step[@type='URL']/@match = 'foo'")
+         assert(checker, "/chk:checker/chk:step[@type='URL']/@next = 'G1 noURL notGET'")
+         assert(checker, "/chk:checker/chk:step[@type='METHOD']/@next = 'A'")
+         assert(checker, "/chk:checker/chk:step[@type='METHOD']/@match = 'GET'")
+         assert(checker, "/chk:checker/chk:step[@type='ACCEPT']")
+         assert(checker, "/chk:checker/chk:step[@type='URL_FAIL']/@notMatch='foo'")
+         assert(checker, "/chk:checker/chk:step[@type='URL_FAIL' and not(@notMatch)]")
+         assert(checker, "/chk:checker/chk:step[@type='METHOD_FAIL']/@notMatch='GET'")
+         assert(checker, "/chk:checker/chk:step[@type='METHOD_FAIL' and not(@notMatch)]")
        }
        And ("No WARN messages should be emmited.")
        assertEmpty(goodCheckerLog)
@@ -111,10 +123,14 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
                                   config.checkerMetaMap.map(c => <config option={c._1} value={c._2.toString} />)
                                 }
                              </meta>
-                             <step id="S0" type="START" next="F1"/>
-                             <step id="F1" type="URL" match="foo" next="G1"/>
+                             <step id="S0" type="START" next="F1 notFoo noMETHOD"/>
+                             <step id="F1" type="URL" match="foo" next="G1 noURL notGET"/>
                              <step id="G1" type="METHOD" match="GET" label="GET Foo" next="A"/>
                              <step id="A" type="ACCEPT" priority="19999"/>
+                             <step id="notFoo" type="URL_FAIL" notMatch="foo" />
+                             <step id="notGET" type="METHOD_FAIL" notMatch="GET" />
+                             <step id="noMETHOD" type="METHOD_FAIL" />
+                             <step id="noURL" type="URL_FAIL" />
                          </checker>)
        When("the document is loaded...")
        val wrongVersionLog = log (Level.WARN) {
@@ -137,10 +153,14 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
                                   config.checkerMetaMap.map(c => <config option={c._1} value={c._2.toString} />)
                                 }
                              </meta>
-                             <step id="S0" type="START" next="F1"/>
-                             <step id="F1" type="URL" match="foo" next="G1"/>
+                             <step id="S0" type="START" next="F1 notFoo noMETHOD"/>
+                             <step id="F1" type="URL" match="foo" next="G1 noURL notGET"/>
                              <step id="G1" type="METHOD" match="GET" label="GET Foo" next="A"/>
                              <step id="A" type="ACCEPT" priority="19999"/>
+                             <step id="notFoo" type="URL_FAIL" notMatch="foo" />
+                             <step id="notGET" type="METHOD_FAIL" notMatch="GET" />
+                             <step id="noMETHOD" type="METHOD_FAIL" />
+                             <step id="noURL" type="URL_FAIL" />
                          </checker>)
        When("the document is loaded...")
        val badVersionLog = log (Level.WARN) {
@@ -163,10 +183,14 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
                                   config.checkerMetaMap.map(c => <config option={c._1} value={c._2.toString} />)
                                 }
                              </meta>
-                             <step id="S0" type="START" next="F1"/>
-                             <step id="F1" type="URL" match="foo" next="G1"/>
+                             <step id="S0" type="START" next="F1 notFoo noMETHOD"/>
+                             <step id="F1" type="URL" match="foo" next="G1 noURL notGET"/>
                              <step id="G1" type="METHOD" match="GET" label="GET Foo" next="A"/>
                              <step id="A" type="ACCEPT" priority="19999"/>
+                             <step id="notFoo" type="URL_FAIL" notMatch="foo" />
+                             <step id="notGET" type="METHOD_FAIL" notMatch="GET" />
+                             <step id="noMETHOD" type="METHOD_FAIL" />
+                             <step id="noURL" type="URL_FAIL" />
                          </checker>)
        When("the document is loaded...")
        val missingVersionLog = log (Level.WARN) {
@@ -190,10 +214,14 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
                                 }
                                 <config option="foo" value="bar"/>
                              </meta>
-                             <step id="S0" type="START" next="F1"/>
-                             <step id="F1" type="URL" match="foo" next="G1"/>
+                             <step id="S0" type="START" next="F1 notFoo noMETHOD"/>
+                             <step id="F1" type="URL" match="foo" next="G1 noURL notGET"/>
                              <step id="G1" type="METHOD" match="GET" label="GET Foo" next="A"/>
                              <step id="A" type="ACCEPT" priority="19999"/>
+                             <step id="notFoo" type="URL_FAIL" notMatch="foo" />
+                             <step id="notGET" type="METHOD_FAIL" notMatch="GET" />
+                             <step id="noMETHOD" type="METHOD_FAIL" />
+                             <step id="noURL" type="URL_FAIL" />
                          </checker>)
        When("the document is loaded...")
        val configUnkonwnLog = log (Level.WARN) {
@@ -215,10 +243,14 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
                                   config.checkerMetaMap.filter(f => f._1 != "joinXPathChecks").map(c => <config option={c._1} value={c._2.toString} />)
                                 }
                              </meta>
-                             <step id="S0" type="START" next="F1"/>
-                             <step id="F1" type="URL" match="foo" next="G1"/>
+                             <step id="S0" type="START" next="F1 notFoo noMETHOD"/>
+                             <step id="F1" type="URL" match="foo" next="G1 noURL notGET"/>
                              <step id="G1" type="METHOD" match="GET" label="GET Foo" next="A"/>
                              <step id="A" type="ACCEPT" priority="19999"/>
+                             <step id="notFoo" type="URL_FAIL" notMatch="foo" />
+                             <step id="notGET" type="METHOD_FAIL" notMatch="GET" />
+                             <step id="noMETHOD" type="METHOD_FAIL" />
+                             <step id="noURL" type="URL_FAIL" />
                          </checker>)
        When("the document is loaded...")
        val missingConfigLog = log (Level.WARN) {
@@ -241,10 +273,14 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
                                 }
                                 <config option="joinXPathChecks" value="true"/>
                              </meta>
-                             <step id="S0" type="START" next="F1"/>
-                             <step id="F1" type="URL" match="foo" next="G1"/>
+                             <step id="S0" type="START" next="F1 notFoo noMETHOD"/>
+                             <step id="F1" type="URL" match="foo" next="G1 noURL notGET"/>
                              <step id="G1" type="METHOD" match="GET" label="GET Foo" next="A"/>
                              <step id="A" type="ACCEPT" priority="19999"/>
+                             <step id="notFoo" type="URL_FAIL" notMatch="foo" />
+                             <step id="notGET" type="METHOD_FAIL" notMatch="GET" />
+                             <step id="noMETHOD" type="METHOD_FAIL" />
+                             <step id="noURL" type="URL_FAIL" />
                          </checker>)
        When("the document is loaded...")
        val mismatchConfigLog = log (Level.WARN) {

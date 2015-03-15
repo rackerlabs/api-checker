@@ -105,6 +105,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   val priorityTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/priority.xsl").toString))
   val adjustNextTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/adjust-next-cont-error.xsl").toString))
   val metaCheckTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/meta-check.xsl").toString))
+  val checkerAssertsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/checker-asserts.xsl").toString))
 
   //
   //  We purposly do the identity transform using xalan instead of
@@ -141,8 +142,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
           val outHandler = wadl.saxTransformerFactory.newTransformerHandler();
           outHandler.setResult(out)
 
+          val assertHandler = wadl.saxTransformerFactory.newTransformerHandler(checkerAssertsTemplates)
+          assertHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
+          assertHandler.setResult(new SAXResult (outHandler))
+
           val schemaHandler = checkerSchema.newValidatorHandler()
-          schemaHandler.setContentHandler(outHandler)
+          schemaHandler.setContentHandler(assertHandler)
 
           adjustNextHandler.setResult(new SAXResult(schemaHandler))
         } else {
@@ -215,8 +220,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         val outHandler = wadl.saxTransformerFactory.newTransformerHandler()
         outHandler.setResult(out)
 
+        val assertHandler = wadl.saxTransformerFactory.newTransformerHandler(checkerAssertsTemplates)
+        assertHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
+        assertHandler.setResult(new SAXResult (outHandler))
+
         val schemaHandler = checkerSchema.newValidatorHandler()
-        schemaHandler.setContentHandler(outHandler)
+        schemaHandler.setContentHandler(assertHandler)
 
         new SAXResult(schemaHandler)
       } else {
@@ -231,7 +240,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
 
     metaHandler.setResult(vout)
 
-    idTransform.transform (in, new SAXResult(metaHandler))
+    try {
+      idTransform.transform (in, new SAXResult(metaHandler))
+    } catch {
+      case e : Exception => logger.error(e.getMessage())
+                            throw new WADLException ("WADL Processing Error: "+e.getMessage(), e)
+    }
   }
 
   /*
