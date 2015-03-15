@@ -361,7 +361,7 @@
     </xsl:template>
 
     <!-- Only the following methods need error states added -->
-    <xsl:template match="check:step[@type=('URL','URLXSD','START','HEADER','HEADERXSD') and not(@inRequest)]" mode="addErrorStates">
+    <xsl:template match="check:step[@type=('URL','URLXSD','START','HEADER','HEADERXSD','HEADER_ANY','HEADERXSD_ANY') and not(@inRequest)]" mode="addErrorStates">
         <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
         <xsl:variable name="doConnect" as="xsd:boolean"
                       select="not((for $n in $nexts return
