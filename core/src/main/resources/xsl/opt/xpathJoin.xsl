@@ -37,7 +37,6 @@
         their replacement steps.
     -->
     <xsl:import href="../util/join.xsl"/>
-    <xsl:include href="../util/funs.xsl"/>
 
     <xsl:param name="configMetadata" as="node()">
         <meta>
@@ -56,8 +55,7 @@
     -->
     <xsl:template match="check:step[@next]" mode="getJoins">
         <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts]"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))"/>
         <xsl:apply-templates select="$nextStep" mode="targetJoins">
             <xsl:with-param name="checker" select="$checker"/>
         </xsl:apply-templates>
@@ -65,8 +63,7 @@
 
     <xsl:template match="check:step[@type='WELL_XML']" mode="targetJoins">
         <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts and @type='XPATH']"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[@type='XPATH']"/>
         <xsl:if test="count($nextStep) = 1">
             <join type="{@type}" steps="{@id}">
                 <xsl:attribute name="mergeSteps">
@@ -79,8 +76,7 @@
     <xsl:template match="check:step[@type='XSL' and xsl:transform/@check:mergable]" mode="targetJoins">
         <xsl:param name="checker" as="node()"/>
         <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts and
-                                                           (@type='XPATH' or (@type='XSL' and xsl:transform/@check:mergable))]"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[@type='XPATH' or (@type='XSL' and xsl:transform/@check:mergable)]"/>
 
         <xsl:if test="count($nextStep) = 1">
             <join type="{@type}" steps="{@id}">
@@ -100,10 +96,9 @@
 
         <xsl:variable name="rootID" as="xsd:string" select="@steps"/>
         <xsl:variable name="mergeSteps" as="xsd:string*" select="tokenize(@mergeSteps,' ')"/>
-        <xsl:variable name="steps" as="node()*" select="$checker//check:step[@id = $mergeSteps]"/>
-        <xsl:variable name="root" as="node()" select="$checker//check:step[@id = $rootID]"/>
-        <xsl:variable name="rootNextSteps" as="xsd:string*" select="tokenize($root/@next, ' ')"/>
-        <xsl:variable name="rootNext" as="node()*" select="$checker//check:step[@id = $rootNextSteps]"/>
+        <xsl:variable name="steps" as="node()*" select="check:stepsByIds($checker,$mergeSteps)"/>
+        <xsl:variable name="root" as="node()" select="check:stepsByIds($checker, $rootID)"/>
+        <xsl:variable name="rootNext" as="node()*" select="check:stepsByIds($checker, check:next($root))"/>
         <xsl:variable name="version" as="xsd:integer">
             <xsl:choose>
                 <xsl:when test="$root/@type = 'XSL' and $root/@version='2'">2</xsl:when>
@@ -220,7 +215,7 @@
         <xsl:param name="checker" as="node()*"/>
         <xsl:param name="joins" as="node()*"/>
         <xsl:param name="join" as="node()" select="."/>
-        <xsl:param name="steps" as="node()*" select="$checker//check:step[@id = tokenize($join/@steps,' ')]"/>
+        <xsl:param name="steps" as="node()*" select="check:stepsByIds($checker, tokenize($join/@steps,' '))"/>
         <xsl:param name="nexts" as="xsd:string*" select="()"/>
 
         <xsl:variable name="mergeSteps" as="node()*">
@@ -230,8 +225,7 @@
             -->
             <xsl:choose>
                 <xsl:when test="empty($nexts)">
-                    <xsl:variable name="MSteps" as="xsd:string*" select="tokenize(@mergeSteps,' ')"/>
-                    <xsl:variable name="stepNodes" as="node()*" select="$checker//check:step[@id = $MSteps]"/>
+                    <xsl:variable name="stepNodes" as="node()*" select="check:stepsByIds($checker, tokenize(@mergeSteps,' '))"/>
                     <xsl:copy-of select="$stepNodes"/>
                 </xsl:when>
                 <xsl:otherwise>

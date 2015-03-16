@@ -140,7 +140,7 @@
         <xsl:param name="checker" as="node()*"/>
         <xsl:param name="joins" as="node()*"/>
         <xsl:param name="join" as="node()" select="."/>
-        <xsl:param name="steps" as="node()*" select="$checker//check:step[@id = tokenize($join/@steps,' ')]"/>
+        <xsl:param name="steps" as="node()*" select="check:stepsByIds($checker, tokenize($join/@steps,' '))"/>
         <xsl:param name="nexts" as="xsd:string*" select="()"/>
         <xsl:choose>
             <xsl:when test="empty($steps)">
@@ -198,23 +198,15 @@
                 <xsl:variable name="next_out" as="xsd:string*">
                     <xsl:choose>
                         <xsl:when test="every $s in $steps satisfies $s=$nexts">
-                            <xsl:for-each-group select="$nexts" group-by=". = $steps">
-                                <xsl:choose>
-                                    <xsl:when test=". = $steps">
-                                        <xsl:value-of select="generate-id($join)"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:sequence select="current-group()"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:for-each-group>
+                            <xsl:sequence select="(generate-id($join), for $n in $nexts return
+                                  if (not($n = $steps)) then $n else ())"/>
                         </xsl:when>
                         <xsl:otherwise>
                            <xsl:sequence select="$nexts"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <xsl:sequence select="check:getNexts($joins[position() != 1],$next_out)"/>
+                <xsl:sequence select="check:getNexts(subsequence($joins, 2),$next_out)"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>

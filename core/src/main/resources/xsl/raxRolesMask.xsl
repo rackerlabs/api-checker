@@ -74,7 +74,6 @@
     version="2.0">
 
     <xsl:import href="util/pruneSteps.xsl"/>
-    <xsl:import href="util/funs.xsl"/>
 
     <xsl:variable name="checker" select="/chk:checker" as="node()"/>
     <xsl:variable name="roles" select="distinct-values(/chk:checker/chk:step[@type='HEADER_ANY' and
@@ -87,7 +86,7 @@
                 <xsl:apply-templates mode="copy"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="pass1" as="node()">
+                <xsl:variable name="pass1">
                     <xsl:apply-templates mode="processRoles"/>
                 </xsl:variable>
                 <xsl:copy-of select="util:pruneSteps($pass1)"/>
