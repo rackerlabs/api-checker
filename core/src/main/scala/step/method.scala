@@ -21,16 +21,12 @@ import com.rackspace.com.papi.components.checker.servlet._
 import javax.servlet.FilterChain
 
 class Method(id : String, label : String, val method : Regex, next : Array[Step]) extends ConnectedStep(id, label, next) {
-  override val mismatchMessage : String = method.toString;
+  override val mismatchMessage : String = method.toString
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
-    var ret : Option[StepContext] = None
-    if (context.uriLevel >= req.URISegment.size) {
-      req.getMethod() match {
-        case method() => ret= Some(context)
-        case _ => ret= None
-      }
+    req.getMethod match {
+      case method() if context.uriLevel >= req.URISegment.size => Some(context)
+      case _ => None
     }
-    ret
   }
 }

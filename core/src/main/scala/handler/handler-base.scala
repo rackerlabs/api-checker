@@ -15,7 +15,7 @@
  */
 package com.rackspace.com.papi.components.checker.handler
 
-import com.rackspace.com.papi.components.checker.step.Result
+import com.rackspace.com.papi.components.checker.step.{Step, StepContext, Result}
 import com.rackspace.com.papi.components.checker.servlet._
 
 import com.rackspace.com.papi.components.checker.Validator
@@ -27,6 +27,7 @@ import org.w3c.dom.Document
 abstract class ResultHandler {
   def init(validator : Validator, checker : Option[Document]) : Unit
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result) : Unit
+  def inStep (currentStep: Step, req: CheckerServletRequest, resp : CheckerServletResponse, context: StepContext) : StepContext = { context }
   def destroy : Unit = {}
 }
 
