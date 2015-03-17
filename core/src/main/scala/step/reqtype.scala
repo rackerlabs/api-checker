@@ -21,14 +21,12 @@ import com.rackspace.com.papi.components.checker.servlet._
 import javax.servlet.FilterChain
 
 class ReqType(id : String, label : String, val rtype : Regex, next : Array[Step]) extends ConnectedStep(id, label, next) {
-  override val mismatchMessage : String = rtype.toString
+  override val mismatchMessage : String = rtype.toString()
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
-    var ret : Option[StepContext] = None
-    req.getContentType() match {
-      case rtype(_,_) => ret = Some(context)
-      case _ => ret= None
+    req.getContentType match {
+      case rtype(_,_) => Some(context)
+      case _ => None
     }
-    ret
   }
 }

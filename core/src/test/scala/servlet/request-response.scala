@@ -15,11 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker
 
+import org.junit.runner.RunWith
 import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
 import org.mockito.Mockito.when
 
 import scala.collection.JavaConverters._
 
+import org.scalatest.junit.JUnitRunner
+
+@RunWith(classOf[JUnitRunner])
 class RequestResponseSuite extends BaseValidatorSuite {
 
   test ("Ensure wrapper does not parse commas on getHeader") {
@@ -100,5 +104,47 @@ class RequestResponseSuite extends BaseValidatorSuite {
     intercept[IllegalArgumentException] {
       wrap.getDateHeader("Last-Modified")
     }
+  }
+
+  test("Ensure getHeaders retrieves the new headers if the original request does not have any") {
+    val emptyMap: Map[String, List[String]] = Map()
+    val req = request("GET","/foo","application/XML","",false,emptyMap)
+    val wrapper = new CheckerServletRequest(req)
+    wrapper.addHeader("Foo", "Bar")
+    wrapper.addHeader("Foo", "Baz")
+    val headers = wrapper.getHeaders("Foo")
+    assert(headers.nextElement() == "Bar")
+    assert(headers.nextElement() == "Baz")
+  }
+
+  test("Ensure getHeaders continues to send null if the original request sends null because of security") {
+    val req = request("GET","/foo")
+    val wrapper = new CheckerServletRequest(req)
+    wrapper.addHeader("Foo", "Bar")
+    wrapper.addHeader("Foo", "Baz")
+    val headers = wrapper.getHeaders("Foo")
+    assert(headers == null)
+  }
+
+  test("Ensure getHeaderNames retrieves the header names if the original request does not have any") {
+    val emptyMap: Map[String, List[String]] = Map()
+    val req = request("GET","/foo","application/XML","",false,emptyMap)
+    val wrapper = new CheckerServletRequest(req)
+    wrapper.addHeader("Foo", "Bar")
+    wrapper.addHeader("Foo", "Baz")
+    wrapper.addHeader("Moo", "Baz")
+    val headers = wrapper.getHeaderNames()
+    assert(headers.nextElement() == "Foo")
+    assert(headers.nextElement() == "Moo")
+  }
+
+  test("Ensure getHeaderNames continues to send null if the original request sends null because of security") {
+    val req = request("GET","/foo")
+    val wrapper = new CheckerServletRequest(req)
+    wrapper.addHeader("Foo", "Bar")
+    wrapper.addHeader("Foo", "Baz")
+    wrapper.addHeader("Moo", "Baz")
+    val headers = wrapper.getHeaderNames()
+    assert(headers == null)
   }
 }
