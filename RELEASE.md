@@ -1,5 +1,13 @@
 # Releases #
 
+## Release 1.0.22 (2015-03-17) ##
+
+1. Added step context for adding headers via the context.
+1. Added inStep method to handlers to take an action to the step context between steps.
+1. Added MethodLabelHandler that will check the step and apply the label if its a method to a header in the step context.
+1. Enhancements to validation of checker XML to check that error states are correctly assigned.
+1. Fixed an issue where HEADER_ANY and HEADERXSD_ANY did not have error states correctly assigned.
+
 ## Release 1.0.21 (2015-01-19) ##
 
 1. We now explicitly select a class loader when loading XML factories.
