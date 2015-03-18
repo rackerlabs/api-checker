@@ -64,8 +64,7 @@
     -->
     <xsl:template match="check:step[@next]" mode="getJoins">
         <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="nextStep" as="node()*" select="$checker//check:step[@id = $nexts]"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))"/>
         <!-- Steps with the same @match, not versioned -->
         <xsl:for-each-group select="$nextStep[not(@version) and not(@name) and @match]" group-by="@type">
             <xsl:for-each-group select="current-group()" group-by="@match">
@@ -229,7 +228,7 @@
         <xsl:param name="checker" as="node()"/>
         <xsl:param name="joins" as="node()*"/>
         <xsl:variable name="steps" select="@steps"/>
-        <xsl:variable name="joinSteps" as="node()*" select="$checker//check:step[@id = tokenize($steps,' ')]"/>
+        <xsl:variable name="joinSteps" as="node()*" select="check:stepsByIds($checker, tokenize($steps, ' '))"/>
 
         <step id="{generate-id(.)}">
             <!--

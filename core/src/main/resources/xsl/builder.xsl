@@ -46,7 +46,6 @@
 
     <!-- Add prune steps template -->
     <xsl:import href="util/pruneSteps.xsl"/>
-    <xsl:include href="util/funs.xsl"/>
 
     <xsl:output indent="yes" method="xml"/>
 
@@ -320,13 +319,17 @@
         -->
         <xsl:if test="$usePlainParamCheck">
             <xsl:variable name="this" as="node()" select="."/>
-            <xsl:for-each select="in-scope-prefixes($this)">
-                <xsl:call-template name="check:printns">
-                    <xsl:with-param name="pfix" select="."/>
-                    <xsl:with-param name="uri" select="namespace-uri-for-prefix(.,$this)"/>
-                    <xsl:with-param name="node" select="$this"/>
-                </xsl:call-template>
-            </xsl:for-each>
+            <xsl:variable name="path" as="xsd:string" select="$this/@path"/>
+            <xsl:if test="contains($path,':')">
+                <xsl:for-each select="in-scope-prefixes($this)">
+                    <xsl:if test="contains($path,concat(.,':'))">
+                        <xsl:call-template name="check:printns">
+                            <xsl:with-param name="pfix" select="."/>
+                            <xsl:with-param name="uri" select="namespace-uri-for-prefix(.,$this)"/>
+                        </xsl:call-template>
+                    </xsl:if>
+                </xsl:for-each>
+            </xsl:if>
             <dont_prune/>
         </xsl:if>
     </xsl:template>
@@ -334,7 +337,6 @@
     <xsl:template name="check:printns">
         <xsl:param name="pfix" as="xsd:string" />
         <xsl:param name="uri" as="xsd:string"/>
-        <xsl:param name="node" as="node()" select="."/>
         <ns>
             <xsl:attribute name="prefix">
                 <xsl:variable name="prefix" select="$pfix"/>
@@ -362,23 +364,19 @@
 
     <!-- Only the following methods need error states added -->
     <xsl:template match="check:step[@type=('URL','URLXSD','START','HEADER','HEADERXSD','HEADER_ANY','HEADERXSD_ANY') and not(@inRequest)]" mode="addErrorStates">
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="doConnect" as="xsd:boolean"
-                      select="not((for $n in $nexts return
-                              if (..//check:step[@id = $n and @match=$matchAll])
-                              then false() else true()) = false())"/>
+        <xsl:variable name="myId" as="xsd:string" select="generate-id()"/>
+        <xsl:variable name="nexts" as="xsd:string*" select="check:next(.)"/>
+        <xsl:variable name="nextSteps" as="node()*" select="check:stepsByIds(..,$nexts)"/>
+        <xsl:variable name="doConnect" as="xsd:boolean" select="empty($nextSteps[@match=$matchAll])"/>
         <!-- Vars for processing method fail -->
-        <xsl:variable name="nextMethodMatch" as="xsd:string*"
-                      select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='METHOD']/@match)"/>
+        <xsl:variable name="nextMethodMatch" as="xsd:string*" select="check:sort($nextSteps[@type='METHOD']/@match)"/>
         <xsl:variable name="haveMethodMatch" as="xsd:boolean" select="count($nextMethodMatch) &gt; 0"/>
-        <xsl:variable name="MethodMatchID" as="xsd:string" select="concat(generate-id(),'m')"/>
+        <xsl:variable name="MethodMatchID" as="xsd:string" select="concat($myId,'m')"/>
         <!-- Vars for processing url fail -->
-        <xsl:variable name="nextURLMatch" as="xsd:string*"
-                      select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='URL']/@match)"/>
-        <xsl:variable name="nextURLXSDMatch" as="xsd:string*"
-                      select="check:sort(for $n in $nexts return ..//check:step[@id=$n and @type='URLXSD']/@match)"/>
+        <xsl:variable name="nextURLMatch" as="xsd:string*" select="check:sort($nextSteps[@type='URL']/@match)"/>
+        <xsl:variable name="nextURLXSDMatch" as="xsd:string*" select="check:sort($nextSteps[@type='URLXSD']/@match)"/>
         <xsl:variable name="haveURLMatch" as="xsd:boolean" select="(count($nextURLMatch) &gt; 0) or (count($nextURLXSDMatch) &gt; 0)"/>
-        <xsl:variable name="URLMatchID" as="xsd:string" select="concat(generate-id(),'u')"/>
+        <xsl:variable name="URLMatchID" as="xsd:string" select="concat($myId,'u')"/>
         <!-- Next variables -->
         <xsl:variable name="newNexts" as="xsd:string*">
             <xsl:sequence select="$nexts"/>
