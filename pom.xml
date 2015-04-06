@@ -9,6 +9,7 @@
     <description>
         A repose component that ensures that HTTP requests are valid
         according to a WADL.
+
     </description>
 
     <modules>
