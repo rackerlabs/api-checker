@@ -15,12 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
+import javax.servlet.FilterChain
+
+import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 
 import scala.util.matching.Regex
-
-import com.rackspace.com.papi.components.checker.servlet._
-import javax.servlet.FilterChain
 
 class URI(id : String, label : String, val uri : Regex, val captureHeader : Option[String], next : Array[Step]) extends ConnectedStep(id, label, next) {
 

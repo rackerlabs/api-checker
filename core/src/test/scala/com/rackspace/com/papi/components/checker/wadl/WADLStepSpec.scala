@@ -15,18 +15,13 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import com.rackspace.com.papi.components.checker.step.startend.{MethodFail, URLFail, Start}
+import javax.xml.namespace.QName
 
-import scala.xml._
+import com.rackspace.com.papi.components.checker.TestConfig
+import com.rackspace.com.papi.components.checker.step.startend.{MethodFail, Start, URLFail}
 import org.junit.runner.RunWith
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers._
-
-import javax.xml.namespace.QName
-
-import com.rackspace.com.papi.components.checker.step._
-import com.rackspace.com.papi.components.checker.TestConfig
 
 @RunWith(classOf[JUnitRunner])
 class WADLStepSpec extends BaseStepSpec {

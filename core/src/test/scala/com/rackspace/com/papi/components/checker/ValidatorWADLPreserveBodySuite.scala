@@ -15,18 +15,10 @@
  */
 package com.rackspace.com.papi.components.checker
 
+import com.rackspace.cloud.api.wadl.Converters._
+import com.rackspace.com.papi.components.checker.servlet.RequestAttributes.PARSED_XML
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-
-import scala.xml._
-
-import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
-import com.rackspace.cloud.api.wadl.Converters._
-import Converters._
-
-import com.rackspace.com.papi.components.checker.servlet.RequestAttributes.PARSED_XML
-
-import org.w3c.dom.Document
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorWADLPreserveBodySuite extends BaseValidatorSuite {

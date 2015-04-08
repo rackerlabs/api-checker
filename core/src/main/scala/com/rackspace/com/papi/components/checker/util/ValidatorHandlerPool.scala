@@ -15,21 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
+import javax.xml.validation.{Schema, ValidatorHandler}
+
+import com.saxonica.jaxp.SchemaReference
+import com.yammer.metrics.core.Gauge
+import com.yammer.metrics.scala.Instrumented
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.Map
-import scala.collection.mutable.LinkedList
-
-import javax.xml.validation.Schema
-import javax.xml.validation.Validator
-import javax.xml.validation.ValidatorHandler
-
-import com.saxonica.jaxp.SchemaReference
-
-import com.yammer.metrics.core.Gauge
-import com.yammer.metrics.scala.Instrumented
+import scala.collection.mutable.{HashMap, LinkedList, Map}
 
 object ValidatorHandlerPool extends Instrumented {
   private val validatorHandlerPools : Map[Schema, SoftReferenceObjectPool[ValidatorHandler]] = new HashMap[Schema, SoftReferenceObjectPool[ValidatorHandler]]

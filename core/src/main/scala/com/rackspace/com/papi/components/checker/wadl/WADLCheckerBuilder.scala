@@ -15,38 +15,25 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.language.reflectiveCalls
-
-import scala.xml._
-
-import java.net.URI
-import java.net.URISyntaxException
-
-import java.io.InputStream
-import java.io.ByteArrayOutputStream
-import java.io.Reader
-
+import java.io.{ByteArrayOutputStream, InputStream, Reader}
+import java.net.{URI, URISyntaxException}
 import javax.xml.transform._
 import javax.xml.transform.sax._
 import javax.xml.transform.stream._
 import javax.xml.validation._
 
-import org.xml.sax.XMLReader
-import org.xml.sax.InputSource
-
-import com.rackspace.cloud.api.wadl.WADLNormalizer
-import com.rackspace.cloud.api.wadl.WADLFormat._
-import com.rackspace.cloud.api.wadl.RType._
-import com.rackspace.cloud.api.wadl.XSDVersion._
 import com.rackspace.cloud.api.wadl.Converters._
+import com.rackspace.cloud.api.wadl.RType._
+import com.rackspace.cloud.api.wadl.WADLFormat._
+import com.rackspace.cloud.api.wadl.WADLNormalizer
+import com.rackspace.cloud.api.wadl.XSDVersion._
 import com.rackspace.cloud.api.wadl.util.LogErrorListener
-
-
 import com.rackspace.com.papi.components.checker.Config
-
 import com.typesafe.scalalogging.slf4j.LazyLogging
-
 import net.sf.saxon.Controller
+
+import scala.language.reflectiveCalls
+import scala.xml._
 
 class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends LazyLogging {
 

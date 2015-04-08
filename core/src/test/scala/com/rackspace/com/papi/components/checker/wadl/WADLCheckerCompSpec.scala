@@ -15,15 +15,10 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.xml._
+import com.rackspace.com.papi.components.checker.{LogAssertions, TestConfig}
+import org.apache.logging.log4j.Level
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.Matchers._
-
-import org.apache.logging.log4j.Level
-
-import com.rackspace.com.papi.components.checker.TestConfig
-import com.rackspace.com.papi.components.checker.LogAssertions
 
 //
 //  Test the direct loading of checker format

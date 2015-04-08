@@ -15,15 +15,13 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
+import javax.servlet.FilterChain
 import javax.xml.namespace.QName
 import javax.xml.validation.Schema
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.HeaderUtil._
-
-import javax.servlet.FilterChain
-
 import org.xml.sax.SAXParseException
 
 import scala.collection.JavaConversions._

@@ -15,15 +15,14 @@
  */
 package com.rackspace.com.papi.components.checker.handler
 
-import com.rackspace.com.papi.components.checker._
-import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.step.results.{MultiFailResult, ErrorResult, Result}
-
-import scala.collection.JavaConversions._
-
 import javax.servlet.FilterChain
 
+import com.rackspace.com.papi.components.checker._
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.results.{ErrorResult, Result}
 import org.w3c.dom.Document
+
+import scala.collection.JavaConversions._
 
 class ServletResultHandler extends ResultHandler {
   def init (validator : Validator, checker : Option[Document]) : Unit = {}

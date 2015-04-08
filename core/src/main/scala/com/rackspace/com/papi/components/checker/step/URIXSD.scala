@@ -15,14 +15,13 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
+import javax.servlet.FilterChain
 import javax.xml.namespace.QName
 import javax.xml.validation.Schema
 
 import com.rackspace.com.papi.components.checker.servlet._
-import javax.servlet.FilterChain
-
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
-import com.rackspace.com.papi.components.checker.step.results.{MultiFailResult, MismatchResult, Result}
+import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, MultiFailResult, Result}
 
 class URIXSD(id : String, label : String, val simpleType : QName, val schema : Schema, val captureHeader : Option[String], next : Array[Step])
       extends ConnectedStep(id, label, next) {

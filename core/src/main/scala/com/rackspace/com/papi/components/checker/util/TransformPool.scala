@@ -15,22 +15,16 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.Map
-import scala.collection.mutable.LinkedList
-
-import org.apache.commons.pool.PoolableObjectFactory
-import org.apache.commons.pool.impl.SoftReferenceObjectPool
-
-import javax.xml.transform.Templates
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.Transformer
-
-import net.sf.saxon.Controller
-import net.sf.saxon.serialize.MessageWarner
+import javax.xml.transform.{Templates, Transformer}
 
 import com.yammer.metrics.core.Gauge
 import com.yammer.metrics.scala.Instrumented
+import net.sf.saxon.Controller
+import net.sf.saxon.serialize.MessageWarner
+import org.apache.commons.pool.PoolableObjectFactory
+import org.apache.commons.pool.impl.SoftReferenceObjectPool
+
+import scala.collection.mutable.{HashMap, LinkedList, Map}
 
 object TransformPool extends Instrumented {
   private val transformPools : Map[Templates, SoftReferenceObjectPool[Transformer]] = new HashMap[Templates, SoftReferenceObjectPool[Transformer]]

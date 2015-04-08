@@ -15,13 +15,11 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
+import javax.xml.xpath.{XPathExpression, XPathExpressionException}
+
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-
 import org.scalatest.FunSuite
-
-import javax.xml.xpath.XPathExpression
-import javax.xml.xpath.XPathExpressionException
+import org.scalatest.junit.JUnitRunner
 
 import scala.collection.mutable.Map
 

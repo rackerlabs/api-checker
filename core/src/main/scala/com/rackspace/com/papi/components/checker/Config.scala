@@ -15,15 +15,11 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import scala.xml._
+import com.rackspace.com.papi.components.checker.handler.{ResultHandler, ServletResultHandler}
 
-import scala.annotation.StaticAnnotation
 import scala.reflect.BeanProperty
-
 import scala.reflect.runtime.universe
-
-import com.rackspace.com.papi.components.checker.handler.ResultHandler
-import com.rackspace.com.papi.components.checker.handler.ServletResultHandler
+import scala.xml._
 
 object Config {
   private val checkerConfigTypes = {

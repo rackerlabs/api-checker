@@ -17,9 +17,8 @@ package com.rackspace.com.papi.components.checker.util
 
 import java.util.Enumeration
 import javax.servlet.http.HttpServletRequest
-import scala.collection.JavaConversions._
 
-import scala.collection.immutable.TreeMap
+import scala.collection.JavaConversions._
 
 object HeaderUtil {
 

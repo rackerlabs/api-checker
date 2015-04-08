@@ -15,21 +15,9 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import java.util.Date
-import java.util.UUID
-import java.math.BigInteger
-import scala.util.Random
-
+import com.rackspace.cloud.api.wadl.Converters._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-
-import scala.xml._
-
-import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
-import com.rackspace.cloud.api.wadl.Converters._
-import Converters._
-
-import org.w3c.dom.Document
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorWADLHeaderSuite extends BaseValidatorSuite {

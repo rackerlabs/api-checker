@@ -16,13 +16,11 @@
 package com.rackspace.com.papi.components.checker.util
 
 import javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.parsers.DocumentBuilder
-
-import org.apache.commons.pool.PoolableObjectFactory
-import org.apache.commons.pool.impl.SoftReferenceObjectPool
+import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
 
 import com.yammer.metrics.scala.Instrumented
+import org.apache.commons.pool.PoolableObjectFactory
+import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
 object XMLParserPool extends Instrumented {
   private val pool = new SoftReferenceObjectPool[DocumentBuilder](new XMLParserFactory)

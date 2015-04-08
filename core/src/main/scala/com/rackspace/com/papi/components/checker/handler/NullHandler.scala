@@ -15,14 +15,11 @@
  */
 package com.rackspace.com.papi.components.checker.handler
 
-import com.rackspace.com.papi.components.checker.step.results.Result
-import com.rackspace.com.papi.components.checker.step.base.Step
-import com.rackspace.com.papi.components.checker.servlet._
-
-import com.rackspace.com.papi.components.checker.Validator
-
 import javax.servlet.FilterChain
 
+import com.rackspace.com.papi.components.checker.Validator
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.results.Result
 import org.w3c.dom.Document
 
 class NullHandler extends ResultHandler {

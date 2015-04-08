@@ -15,21 +15,14 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import org.apache.logging.log4j.Logger
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Level
-import org.apache.logging.log4j.core.appender.AbstractAppender
-import org.apache.logging.log4j.core.config.LoggerConfig.RootLogger
-import org.apache.logging.log4j.core.LogEvent
-import org.apache.logging.log4j.core.LoggerContext
-import org.scalatest.exceptions.TestFailedException
-
 import java.util.UUID
 
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.Queue
-import scala.collection.mutable.SynchronizedMap
-import scala.collection.mutable.SynchronizedQueue
+import org.apache.logging.log4j.{Level, LogManager}
+import org.apache.logging.log4j.core.{LogEvent, LoggerContext}
+import org.apache.logging.log4j.core.appender.AbstractAppender
+import org.scalatest.exceptions.TestFailedException
+
+import scala.collection.mutable.{HashMap, Queue, SynchronizedMap, SynchronizedQueue}
 
 trait LogAssertions {
 

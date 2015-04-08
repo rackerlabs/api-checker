@@ -15,22 +15,11 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.Map
-import scala.collection.mutable.LinkedList
+import javax.xml.transform.{Transformer, TransformerFactory}
 
+import com.yammer.metrics.scala.Instrumented
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
-
-import javax.xml.transform.Templates
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.Transformer
-
-import net.sf.saxon.Controller
-import net.sf.saxon.serialize.MessageWarner
-
-import com.yammer.metrics.core.Gauge
-import com.yammer.metrics.scala.Instrumented
 
 object IdentityTransformPool extends Instrumented  {
   //

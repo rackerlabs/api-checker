@@ -15,23 +15,16 @@
  */
 package com.rackspace.papi.components.checker.filter
 
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-
+import java.io.{BufferedInputStream, BufferedOutputStream, InputStream, OutputStream}
 import javax.servlet.ServletException
-
-import javax.servlet.http.HttpServlet
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
 object OkayServlet {
   private val BUFFER_SIZE : Int = 1024
   private val ECHO_CONTENT : String = "echoContent"
 }
 
-import OkayServlet._
+import com.rackspace.papi.components.checker.filter.OkayServlet._
 
 class OkayServlet extends HttpServlet {
 

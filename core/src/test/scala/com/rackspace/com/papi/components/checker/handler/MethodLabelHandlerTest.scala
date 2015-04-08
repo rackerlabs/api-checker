@@ -17,27 +17,27 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import javax.servlet.FilterChain
-import javax.servlet.http.HttpServletRequest
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
 
+import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.com.papi.components.checker.Converters._
 import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
 import com.rackspace.com.papi.components.checker.step._
 import com.rackspace.com.papi.components.checker.step.base.StepContext
 import com.rackspace.com.papi.components.checker.step.results.Result
 import com.rackspace.com.papi.components.checker.step.startend.Accept
-import com.rackspace.com.papi.components.checker.util.{IdentityTransformPool, HeaderMap}
-import com.rackspace.com.papi.components.checker.{AssertResultHandler, TestConfig, BaseValidatorSuite, Validator}
+import com.rackspace.com.papi.components.checker.util.{HeaderMap, IdentityTransformPool}
+import com.rackspace.com.papi.components.checker.{AssertResultHandler, BaseValidatorSuite, TestConfig, Validator}
 import org.junit.runner.RunWith
 import org.mockito.Matchers.anyString
-import org.mockito.{Matchers, ArgumentCaptor, Mockito}
 import org.mockito.Mockito._
+import org.mockito.{ArgumentCaptor, Matchers, Mockito}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
-import com.rackspace.cloud.api.wadl.Converters._
+
 import scala.collection.JavaConverters._
 
 

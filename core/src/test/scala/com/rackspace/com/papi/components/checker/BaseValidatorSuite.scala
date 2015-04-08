@@ -15,55 +15,28 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import com.rackspace.com.papi.components.checker.step.results.ErrorResult
-
-import scala.xml._
-
-import java.io.File
-import java.io.ByteArrayInputStream
-import java.io.StringWriter
-
+import java.io.{ByteArrayInputStream, File}
 import java.util.Enumeration
-
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import javax.servlet.ServletInputStream
 import javax.servlet.FilterChain
-
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.xml.parsers.DocumentBuilder
-import javax.xml.transform.Transformer
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.dom.DOMResult
-import javax.xml.transform.stream.StreamResult
-import javax.xml.transform.stream.StreamSource
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.JsonNode
-
-import scala.collection.mutable.HashMap
-import scala.collection.immutable.TreeMap
-
-import com.rackspace.com.papi.components.checker.step._
-import com.rackspace.com.papi.components.checker.handler._
-import com.rackspace.com.papi.components.checker.servlet._
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
-
-import com.rackspace.com.papi.components.checker.util.XMLParserPool
-import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
-import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
-
+import com.rackspace.com.papi.components.checker.step.results.ErrorResult
+import com.rackspace.com.papi.components.checker.util.{ObjectMapperPool, XMLParserPool}
+import org.mockito.Matchers._
+import org.mockito.Mockito._
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.scalatest.FunSuite
 import org.scalatest.exceptions.TestFailedException
 
-import org.mockito.Mockito._
-import org.mockito.Matchers._
-import org.mockito.stubbing.Answer
-import org.mockito.invocation.InvocationOnMock
-
-import scala.language.implicitConversions
 import scala.collection.JavaConversions._
-
-import org.w3c.dom.Document
+import scala.collection.immutable.TreeMap
+import scala.collection.mutable.HashMap
+import scala.language.implicitConversions
+import scala.xml._
 
 class BaseValidatorSuite extends FunSuite {
 

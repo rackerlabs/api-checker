@@ -15,31 +15,16 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
-import javax.xml.transform.Templates
-import javax.xml.transform.Transformer
-import javax.xml.transform.TransformerException
-import javax.xml.transform.ErrorListener
-
-import javax.xml.transform.Source
-
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.dom.DOMResult
-
+import javax.servlet.FilterChain
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.transform.{ErrorListener, Source, Templates, Transformer, TransformerException}
+import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.stream.StreamSource
 
-import javax.xml.parsers.DocumentBuilder
-
-import javax.servlet.FilterChain
-
-import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
-import org.w3c.dom.Document
-
 import com.rackspace.com.papi.components.checker.servlet._
-
-import com.rackspace.com.papi.components.checker.util.TransformPool.borrowTransformer
-import com.rackspace.com.papi.components.checker.util.TransformPool.returnTransformer
-import com.rackspace.com.papi.components.checker.util.XMLParserPool.borrowParser
-import com.rackspace.com.papi.components.checker.util.XMLParserPool.returnParser
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+import com.rackspace.com.papi.components.checker.util.TransformPool.{borrowTransformer, returnTransformer}
+import com.rackspace.com.papi.components.checker.util.XMLParserPool.{borrowParser, returnParser}
 
 
 class XSL(id : String, label : String, templates : Templates, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
@@ -115,7 +100,7 @@ object TransformErrorCapture {
   val DEFAULT_ERROR_CODE = 400
 }
 
-import TransformErrorCapture._
+import com.rackspace.com.papi.components.checker.step.TransformErrorCapture._
 
 private class TransformErrorCapture extends ErrorListener {
   var error : Option[TransformerException] = None

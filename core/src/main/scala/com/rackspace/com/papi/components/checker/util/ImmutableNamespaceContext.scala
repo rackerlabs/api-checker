@@ -16,14 +16,11 @@
 package com.rackspace.com.papi.components.checker.util
 
 import java.util.Iterator
-import java.util.ArrayList
-
-import javax.xml.namespace.NamespaceContext
 import javax.xml.XMLConstants._
-
-import scala.collection.mutable.Map
+import javax.xml.namespace.NamespaceContext
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable.Map
 
 object ImmutableNamespaceContext {
   def apply (inputNS : Map[String, String]) : ImmutableNamespaceContext = {

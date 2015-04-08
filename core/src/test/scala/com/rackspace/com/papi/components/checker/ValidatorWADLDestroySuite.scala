@@ -15,20 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-
-import scala.xml._
-
 import javax.management.InstanceAlreadyExistsException
 
-import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import com.rackspace.cloud.api.wadl.Converters._
-import Converters._
-
 import com.rackspace.com.papi.components.checker.handler.InstrumentedHandler
-
-import org.w3c.dom.Document
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorWADLDestroySuite extends BaseValidatorSuite {

@@ -15,15 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.Templates
-import javax.xml.transform.Transformer
+import javax.xml.transform.{Transformer, TransformerFactory}
 import javax.xml.transform.stream.StreamSource
 
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-
 import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class TransformPoolSuite extends FunSuite {

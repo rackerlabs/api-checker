@@ -15,15 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
-import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
-import com.rackspace.com.papi.components.checker.util.XMLParserPool.borrowParser
-import com.rackspace.com.papi.components.checker.util.XMLParserPool.returnParser
-
-import com.rackspace.com.papi.components.checker.servlet._
-
+import javax.servlet.FilterChain
 import javax.xml.parsers.DocumentBuilder
 
-import javax.servlet.FilterChain
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+import com.rackspace.com.papi.components.checker.util.XMLParserPool.{borrowParser, returnParser}
 
 
 class WellFormedXML(id : String, label : String, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {

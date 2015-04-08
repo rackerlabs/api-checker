@@ -15,14 +15,9 @@
  */
 package com.rackspace.com.papi.components.checker
 
+import com.rackspace.cloud.api.wadl.Converters._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-
-import scala.xml._
-
-import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
-import com.rackspace.cloud.api.wadl.Converters._
-import Converters._
 
 
 @RunWith(classOf[JUnitRunner])

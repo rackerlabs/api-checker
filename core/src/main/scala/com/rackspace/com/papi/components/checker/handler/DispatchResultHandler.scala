@@ -15,18 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker.handler
 
-import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
-import com.rackspace.com.papi.components.checker.step.results.Result
-
-import scala.collection.immutable.List
-
-import com.rackspace.com.papi.components.checker.servlet._
-
 import javax.servlet.FilterChain
 
+import com.rackspace.com.papi.components.checker.Validator
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
+import com.rackspace.com.papi.components.checker.step.results.Result
 import org.w3c.dom.Document
 
-import com.rackspace.com.papi.components.checker.Validator
+import scala.collection.immutable.List
 
 class DispatchResultHandler(private[this] var handlers : List[ResultHandler] = List[ResultHandler]())
       extends ResultHandler {

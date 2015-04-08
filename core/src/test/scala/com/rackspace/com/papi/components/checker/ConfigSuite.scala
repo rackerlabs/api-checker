@@ -15,15 +15,9 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import java.util.Date
-import java.util.UUID
-import java.math.BigInteger
-import scala.util.Random
-
-import com.rackspace.com.papi.components.checker.step._
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
 
 /**
  * Verifies that deprecated methods correctly set the new Config object.

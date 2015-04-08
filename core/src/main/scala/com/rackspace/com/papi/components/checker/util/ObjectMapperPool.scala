@@ -16,7 +16,6 @@
 package com.rackspace.com.papi.components.checker.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
-
 import com.yammer.metrics.scala.Instrumented
 
 /*

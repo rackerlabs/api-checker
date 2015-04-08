@@ -15,15 +15,14 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
+import javax.xml.XMLConstants._
+
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
-import org.scalatest.FunSuite
-
-import scala.collection.mutable.Map
-
 import scala.collection.JavaConversions._
-import javax.xml.XMLConstants._
+import scala.collection.mutable.Map
 
 @RunWith(classOf[JUnitRunner])
 class ImmutableNamespaceContextSuite extends FunSuite {

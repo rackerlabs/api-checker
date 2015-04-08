@@ -16,18 +16,11 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.xml.namespace.QName
-import javax.xml.validation.Schema
-import javax.xml.validation.ValidatorHandler
-
-import org.xml.sax.SAXParseException
-import org.xml.sax.SAXException
-import org.xml.sax.ErrorHandler
-import org.xml.sax.Attributes
-import org.xml.sax.Locator
-
-import org.xml.sax.helpers.AttributesImpl
+import javax.xml.validation.{Schema, ValidatorHandler}
 
 import com.rackspace.com.papi.components.checker.util.ValidatorHandlerPool._
+import org.xml.sax.{Attributes, ErrorHandler, Locator, SAXException, SAXParseException}
+import org.xml.sax.helpers.AttributesImpl
 
 class XSDStringValidator(val simpleType : QName, val schema : Schema, val elementName : String) extends Locator {
   lazy val attributes : Attributes = {

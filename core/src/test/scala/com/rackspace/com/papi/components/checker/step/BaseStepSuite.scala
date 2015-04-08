@@ -15,36 +15,20 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
-import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, BadMediaTypeResult, Result}
-
-import scala.xml._
-
+import javax.xml.namespace.QName
 import javax.xml.transform.TransformerFactory
-import javax.xml.transform.Templates
-import javax.xml.transform.Transformer
 import javax.xml.transform.stream.StreamSource
+import javax.xml.validation._
 
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.JsonNode
-
-import com.github.fge.jsonschema.report.LogLevel
-import com.github.fge.jsonschema.report.ListReportProvider
-
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.github.fge.jsonschema.main.JsonSchemaFactory
-
-import com.rackspace.com.papi.components.checker.servlet._
+import com.github.fge.jsonschema.report.{ListReportProvider, LogLevel}
 import com.rackspace.com.papi.components.checker.BaseValidatorSuite
-
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.results.{BadMediaTypeResult, MismatchResult, Result}
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
 
-import javax.xml.validation._
-import javax.xml.transform.stream._
-import javax.xml.namespace.QName
-
-import org.mockito.Mockito._
+import scala.xml._
 
 class BaseStepSuite extends BaseValidatorSuite {
   private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1",

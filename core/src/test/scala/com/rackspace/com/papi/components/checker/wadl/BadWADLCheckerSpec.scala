@@ -15,12 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.xml._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers._
-
-import com.rackspace.com.papi.components.checker.TestConfig
 
 @RunWith(classOf[JUnitRunner])
 class BadWADLCheckerSpec extends BaseCheckerSpec {

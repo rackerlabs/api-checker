@@ -15,20 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-
-import scala.xml._
-
-import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
-import com.rackspace.cloud.api.wadl.Converters._
-import Converters._
-
-import org.scalatest.FlatSpec
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
-import javax.servlet.FilterChain
 import java.io.File
+import javax.servlet.FilterChain
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+
 import org.mockito.Mockito._
+import org.scalatest.FlatSpec
 
 trait RaxRolesBehaviors {
   this: FlatSpec =>

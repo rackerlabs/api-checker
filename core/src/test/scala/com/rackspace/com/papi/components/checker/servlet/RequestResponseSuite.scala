@@ -15,13 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import org.junit.runner.RunWith
 import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
+import org.junit.runner.RunWith
 import org.mockito.Mockito.when
+import org.scalatest.junit.JUnitRunner
 
 import scala.collection.JavaConverters._
-
-import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class RequestResponseSuite extends BaseValidatorSuite {

@@ -15,25 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
-import javax.xml.validation.Schema
-import javax.xml.validation.Validator
-
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.dom.DOMResult
-
-import javax.xml.parsers.DocumentBuilder
-
 import javax.servlet.FilterChain
-
-import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
-import org.w3c.dom.Document
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.transform.dom.{DOMResult, DOMSource}
+import javax.xml.validation.{Schema, Validator}
 
 import com.rackspace.com.papi.components.checker.servlet._
-
-import com.rackspace.com.papi.components.checker.util.ValidatorPool.borrowValidator
-import com.rackspace.com.papi.components.checker.util.ValidatorPool.returnValidator
-import com.rackspace.com.papi.components.checker.util.XMLParserPool.borrowParser
-import com.rackspace.com.papi.components.checker.util.XMLParserPool.returnParser
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+import com.rackspace.com.papi.components.checker.util.ValidatorPool.{borrowValidator, returnValidator}
+import com.rackspace.com.papi.components.checker.util.XMLParserPool.{borrowParser, returnParser}
 
 class XSD(id : String, label : String, schema : Schema, transform : Boolean, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The XML does not validate against the schema."

@@ -15,50 +15,26 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import javax.servlet.FilterChain
-
+import java.io.{InputStream, StringWriter}
 import java.lang.management._
 import javax.management._
-
+import javax.servlet.FilterChain
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.xml.transform._
+import javax.xml.transform.dom._
 import javax.xml.transform.sax._
 import javax.xml.transform.stream._
-import javax.xml.transform.dom._
-import javax.xml.validation._
-
-import javax.xml.parsers.SAXParser
-import javax.xml.parsers.SAXParserFactory
-
-import java.io.InputStream
-import java.io.ByteArrayOutputStream
-import java.io.Reader
-import java.io.StringWriter
-
-import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
-import com.rackspace.com.papi.components.checker.step.results.Result
-
-import scala.xml._
-
-import com.rackspace.com.papi.components.checker.wadl.StepBuilder
-import com.rackspace.com.papi.components.checker.wadl.WADLDotBuilder
 
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
-
 import com.rackspace.com.papi.components.checker.servlet._
-
+import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
+import com.rackspace.com.papi.components.checker.step.results.Result
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
-
-import org.w3c.dom.Document
-
-import org.apache.commons.codec.digest.DigestUtils.sha1Hex
-
-import com.yammer.metrics.scala.Instrumented
-import com.yammer.metrics.scala.Meter
-import com.yammer.metrics.scala.Timer
-import com.yammer.metrics.scala.MetricsGroup
+import com.rackspace.com.papi.components.checker.wadl.{StepBuilder, WADLDotBuilder}
+import com.yammer.metrics.scala.{Instrumented, Meter, Timer}
 import com.yammer.metrics.util.PercentGauge
+import org.apache.commons.codec.digest.DigestUtils.sha1Hex
+import org.w3c.dom.Document
 
 object Validator {
   def apply (name : String, startStep : Step, config : Config) : Validator = {

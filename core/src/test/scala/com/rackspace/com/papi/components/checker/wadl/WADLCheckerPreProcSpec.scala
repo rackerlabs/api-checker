@@ -15,12 +15,9 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.xml._
+import com.rackspace.com.papi.components.checker.TestConfig
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers._
-
-import com.rackspace.com.papi.components.checker.TestConfig
 
 //
 //  Test for bug fix where preproc was turning on WellForm check in

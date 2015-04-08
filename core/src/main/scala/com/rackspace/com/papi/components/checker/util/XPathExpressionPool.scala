@@ -15,21 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
-import org.apache.commons.pool.PoolableObjectFactory
-import org.apache.commons.pool.impl.SoftReferenceObjectPool
-
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.Map
-import scala.collection.mutable.LinkedList
-
 import javax.xml.namespace.NamespaceContext
-
 import javax.xml.xpath.XPathExpression
-import javax.xml.xpath.XPathFactory
-import javax.xml.xpath.XPathFactory._
 
 import com.yammer.metrics.core.Gauge
 import com.yammer.metrics.scala.Instrumented
+import org.apache.commons.pool.PoolableObjectFactory
+import org.apache.commons.pool.impl.SoftReferenceObjectPool
+
+import scala.collection.mutable.{HashMap, LinkedList, Map}
 
 object XPathExpressionPool extends Instrumented {
   private val xpathExpressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext), 

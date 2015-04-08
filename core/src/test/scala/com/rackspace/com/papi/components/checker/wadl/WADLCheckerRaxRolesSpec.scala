@@ -15,12 +15,11 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.xml._
+import com.rackspace.com.papi.components.checker.TestConfig
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers._
 
-import com.rackspace.com.papi.components.checker.TestConfig
+import scala.xml._
 
 @RunWith(classOf[JUnitRunner])
 class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {

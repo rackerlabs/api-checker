@@ -29,7 +29,6 @@ import com.rackspace.com.papi.components.checker.step.results._
 import com.rackspace.com.papi.components.checker.step.startend._
 import com.rackspace.com.papi.components.checker.util.{HeaderMap, ImmutableNamespaceContext, ObjectMapperPool, XMLParserPool}
 import org.junit.runner.RunWith
-import org.mockito.Matchers.eq
 import org.mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer

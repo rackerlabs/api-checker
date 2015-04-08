@@ -17,15 +17,10 @@ package com.rackspace.com.papi.components.checker.step.startend
 
 import java.util.HashMap
 import javax.servlet.FilterChain
-import javax.xml.namespace.QName
-import javax.xml.validation.Schema
 
 import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.step.XSDStringValidator
-import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
 import com.rackspace.com.papi.components.checker.step.results._
-
-import scala.util.matching.Regex
 
 //
 // Method fail state

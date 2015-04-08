@@ -15,17 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import java.util.Date
-import java.util.UUID
 import java.math.BigInteger
-import com.rackspace.com.papi.components.checker.step.startend._
-
-import scala.util.Random
+import java.util.{Date, UUID}
 
 import com.rackspace.com.papi.components.checker.step._
+import com.rackspace.com.papi.components.checker.step.startend._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.FunSuite
+
+import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorSuite extends BaseValidatorSuite {

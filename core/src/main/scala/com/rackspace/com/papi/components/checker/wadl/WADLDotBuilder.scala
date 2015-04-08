@@ -15,26 +15,18 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.language.reflectiveCalls
-
-import scala.xml._
-
-import java.io.InputStream
-import java.io.ByteArrayOutputStream
-import java.io.Reader
-
+import java.io.{ByteArrayOutputStream, InputStream, Reader}
 import javax.xml.transform._
 import javax.xml.transform.sax._
 import javax.xml.transform.stream._
 
-import org.xml.sax.InputSource
-
-import com.rackspace.cloud.api.wadl.WADLNormalizer
 import com.rackspace.cloud.api.wadl.Converters._
-
+import com.rackspace.cloud.api.wadl.WADLNormalizer
 import com.rackspace.com.papi.components.checker.Config
-
 import net.sf.saxon.Controller
+
+import scala.language.reflectiveCalls
+import scala.xml._
 
 
 class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {

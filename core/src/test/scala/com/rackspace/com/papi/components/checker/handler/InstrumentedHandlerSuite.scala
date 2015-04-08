@@ -16,26 +16,18 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import java.lang.management.ManagementFactory
-import javax.management.MBeanServer
 import javax.management.ObjectName
-
 import javax.xml.transform.Transformer
-import javax.xml.transform.stream.StreamSource
 import javax.xml.transform.sax.SAXResult
+import javax.xml.transform.stream.StreamSource
 
+import com.rackspace.cloud.api.wadl.Converters._
+import com.rackspace.com.papi.components.checker.Converters._
+import com.rackspace.com.papi.components.checker.{AssertResultHandler, BaseValidatorSuite, TestConfig, Validator}
 import com.rackspace.com.papi.components.checker.step.StepHandler
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
-
-import com.rackspace.com.papi.components.checker.Validator
-import com.rackspace.com.papi.components.checker.BaseValidatorSuite
-import com.rackspace.com.papi.components.checker.TestConfig
-import com.rackspace.com.papi.components.checker.AssertResultHandler
-import com.rackspace.com.papi.components.checker.step._
-import com.rackspace.com.papi.components.checker.Converters._
-import com.rackspace.cloud.api.wadl.Converters._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.FunSuite
 
 
 @RunWith(classOf[JUnitRunner])

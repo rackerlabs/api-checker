@@ -15,16 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
-import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
-import com.rackspace.com.papi.components.checker.util.ObjectMapperPool.borrowParser
-import com.rackspace.com.papi.components.checker.util.ObjectMapperPool.returnParser
-
-import com.rackspace.com.papi.components.checker.servlet._
-
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.JsonNode
-
 import javax.servlet.FilterChain
+
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+import com.rackspace.com.papi.components.checker.util.ObjectMapperPool.{borrowParser, returnParser}
 
 class WellFormedJSON(id : String, label : String, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The JSON is not well formed!"

@@ -15,15 +15,14 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
-import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
-
-import scala.util.matching.Regex
-
-import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.util.HeaderUtil._
 import javax.servlet.FilterChain
 
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+import com.rackspace.com.papi.components.checker.util.HeaderUtil._
+
 import scala.collection.JavaConversions._
+import scala.util.matching.Regex
 
 class HeaderAny(id : String, label : String, val name : String, val value : Regex,
                 val message : Option[String], val code : Option[Int], val captureHeader : Option[String],

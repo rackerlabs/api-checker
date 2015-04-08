@@ -15,8 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
-import javax.xml.validation._
 import javax.xml.transform.stream._
+import javax.xml.validation._
 
 class BaseStepSuiteSaxonEE extends BaseStepSuite {
   private val schemaFactorySaxon = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema", "com.saxonica.jaxp.SchemaFactoryImpl", this.getClass.getClassLoader)

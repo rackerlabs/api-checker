@@ -15,21 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.xml._
-
-import java.io.File
-import java.io.ByteArrayOutputStream
-
-import javax.xml.transform._
-import javax.xml.transform.sax._
+import java.io.{ByteArrayOutputStream, File}
 import javax.xml.transform.stream._
-
-import org.scalatest.exceptions.TestFailedException
 
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
-
 import com.rackspace.com.papi.components.checker.Config
+import org.scalatest.exceptions.TestFailedException
+
+import scala.xml._
 
 class BaseCheckerSpec extends BaseWADLSpec {
   val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString

@@ -16,11 +16,8 @@
 package com.rackspace.com.papi.components.checker.step.results
 
 import java.util.{HashMap, Map}
-import com.rackspace.com.papi.components.checker.step.base.StepContext
-import com.typesafe.scalalogging.slf4j.LazyLogging
 
-import scala.collection.immutable.List
-import scala.collection.mutable.PriorityQueue
+import com.rackspace.com.papi.components.checker.step.base.StepContext
 
 class ErrorResult(private val messageP : String,
                   private val codeP : Int,

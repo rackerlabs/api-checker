@@ -17,13 +17,11 @@ package com.rackspace.com.papi.components.checker.handler
 
 import java.io.PrintStream
 import java.net.URI
+import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker._
 import com.rackspace.com.papi.components.checker.servlet._
-
-import javax.servlet.FilterChain
-
-import com.rackspace.com.papi.components.checker.step.results.{MultiFailResult, MismatchResult, Result}
+import com.rackspace.com.papi.components.checker.step.results.Result
 import org.w3c.dom.Document
 
 class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandler {

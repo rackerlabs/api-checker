@@ -15,27 +15,18 @@
  */
 package com.rackspace.com.papi.components.checker.handler
 
-import java.net.URLDecoder
-
-import java.util.LinkedHashMap
-import java.util.Collections
-import java.util.concurrent.atomic.AtomicLong
-
 import java.lang.management._
+import java.net.URLDecoder
+import java.util.{Collections, LinkedHashMap}
+import java.util.concurrent.atomic.AtomicLong
 import javax.management._
-
-import com.rackspace.com.papi.components.checker.servlet._
-
-import com.rackspace.com.papi.components.checker.Validator
-
 import javax.servlet.FilterChain
 
-import com.rackspace.com.papi.components.checker.step.results.{MultiFailResult, MismatchResult, Result}
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-
-import com.yammer.metrics.scala.Instrumented
-import com.yammer.metrics.scala.Meter
+import com.rackspace.com.papi.components.checker.Validator
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, MultiFailResult, Result}
+import com.yammer.metrics.scala.{Instrumented, Meter}
+import org.w3c.dom.{Document, Element}
 
 class InstrumentedHandler extends ResultHandler with Instrumented with InstrumentedHandlerMBean {
 

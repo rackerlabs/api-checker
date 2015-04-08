@@ -17,11 +17,9 @@ package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
 
-import com.github.fge.jsonschema.main.JsonSchema
-import com.github.fge.jsonschema.exceptions.ProcessingException
-
 import com.fasterxml.jackson.databind.JsonNode
-
+import com.github.fge.jsonschema.exceptions.ProcessingException
+import com.github.fge.jsonschema.main.JsonSchema
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 

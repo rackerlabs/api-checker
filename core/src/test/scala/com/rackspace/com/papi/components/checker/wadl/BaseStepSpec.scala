@@ -15,19 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step}
-import com.rackspace.com.papi.components.checker.step.startend._
-
-import scala.collection.mutable.LinkedList
-
-import org.scalatest.exceptions.TestFailedException
-
-import com.rackspace.cloud.api.wadl.Converters._
-import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
-
 import javax.xml.namespace.QName
 
+import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
 import com.rackspace.com.papi.components.checker.step._
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step}
+import com.rackspace.com.papi.components.checker.step.startend._
+import org.scalatest.exceptions.TestFailedException
+
+import scala.collection.mutable.LinkedList
 
 class BaseStepSpec extends BaseWADLSpec {
   var builder = new StepBuilder(wadl)

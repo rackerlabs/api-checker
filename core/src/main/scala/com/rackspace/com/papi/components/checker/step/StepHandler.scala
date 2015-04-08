@@ -16,53 +16,27 @@
 package com.rackspace.com.papi.components.checker.step
 
 import java.net.URL
-
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.Source
-import javax.xml.transform.Templates
-import javax.xml.transform.sax.SAXTransformerFactory
-import javax.xml.transform.sax.SAXSource
-import javax.xml.transform.sax.TransformerHandler
+import javax.xml.namespace.{NamespaceContext, QName}
+import javax.xml.transform.{Source, Templates, TransformerFactory}
+import javax.xml.transform.dom.{DOMResult, DOMSource}
+import javax.xml.transform.sax.{SAXSource, SAXTransformerFactory, TransformerHandler}
 import javax.xml.transform.stream.StreamSource
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.dom.DOMResult
-
+import javax.xml.validation.{Schema, SchemaFactory}
 import javax.xml.xpath.XPathExpression
 
-import javax.xml.validation.Schema
-import javax.xml.validation.SchemaFactory
-
-import javax.xml.namespace.NamespaceContext
-import javax.xml.namespace.QName
-
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.github.fge.jsonschema.main.JsonSchemaFactory
+import com.github.fge.jsonschema.report.{ListReportProvider, LogLevel}
+import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step}
 import com.rackspace.com.papi.components.checker.step.startend._
+import com.rackspace.com.papi.components.checker.util.{ImmutableNamespaceContext, ObjectMapperPool, XPathExpressionPool}
 import com.saxonica.config.EnterpriseTransformerFactory
 import net.sf.saxon.TransformerFactoryImpl
-import org.xml.sax.ContentHandler
-import org.xml.sax.Locator
-import org.xml.sax.Attributes
-import org.xml.sax.InputSource
-import org.xml.sax.SAXParseException
-
 import org.w3c.dom.Document
+import org.xml.sax.{Attributes, ContentHandler, InputSource, Locator, SAXParseException}
 
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.Map
-import scala.collection.mutable.ArrayBuffer
-
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.JsonNode
-
-import com.github.fge.jsonschema.report.LogLevel
-import com.github.fge.jsonschema.report.ListReportProvider
-
-import com.github.fge.jsonschema.main.JsonSchemaFactory
-
-import com.rackspace.com.papi.components.checker.Config
-import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
-import com.rackspace.com.papi.components.checker.util.XPathExpressionPool
-import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
+import scala.collection.mutable.{ArrayBuffer, HashMap, Map}
 
 
 /**

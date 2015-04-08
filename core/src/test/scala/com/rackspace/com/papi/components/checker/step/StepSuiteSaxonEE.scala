@@ -22,10 +22,9 @@ import com.rackspace.com.papi.components.checker.step.results.URLFailResult
 import com.rackspace.com.papi.components.checker.step.startend.{URLFailXSD, URLFailXSDMatch}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.xml.sax.SAXParseException
 
 import scala.xml._
-
-import org.xml.sax.SAXParseException
 
 @RunWith(classOf[JUnitRunner])
 class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {

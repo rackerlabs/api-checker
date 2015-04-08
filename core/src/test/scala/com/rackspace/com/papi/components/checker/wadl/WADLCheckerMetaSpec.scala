@@ -15,21 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.xml._
-
-import java.io.File
-import java.io.ByteArrayOutputStream
-
-import javax.xml.transform.stream.StreamSource
-import javax.xml.transform.stream.StreamResult
-
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers._
-
-import scala.reflect.runtime.universe
+import java.io.{ByteArrayOutputStream, File}
+import javax.xml.transform.stream.{StreamResult, StreamSource}
 
 import com.rackspace.com.papi.components.checker.Config
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+
+import scala.reflect.runtime.universe
+import scala.xml._
 
 @RunWith(classOf[JUnitRunner])
 class WADLCheckerMetaSpec extends BaseCheckerSpec {

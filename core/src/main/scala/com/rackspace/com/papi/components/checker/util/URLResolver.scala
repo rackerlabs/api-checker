@@ -15,8 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
-import java.net.URI
 import java.io.File
+import java.net.URI
 
 //
 //  Transform requires absolute URL as input, the url resolver tries

@@ -16,24 +16,13 @@
 package com.rackspace.papi.components.checker.filter
 
 import java.io.File
-
-import javax.servlet.Filter
-import javax.servlet.FilterChain
-import javax.servlet.FilterConfig
-import javax.servlet.ServletRequest
-import javax.servlet.ServletResponse
-import javax.servlet.ServletException
-
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-
+import javax.servlet.{Filter, FilterChain, FilterConfig, ServletException, ServletRequest, ServletResponse}
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.xml.transform.sax.SAXSource
-import org.xml.sax.InputSource
 
-import com.rackspace.com.papi.components.checker.Validator
-import com.rackspace.com.papi.components.checker.Config
-import com.rackspace.com.papi.components.checker.ValidatorException
+import com.rackspace.com.papi.components.checker.{Config, Validator, ValidatorException}
 import com.rackspace.com.papi.components.checker.handler._
+import org.xml.sax.InputSource
 
 /**
  * A filter which can be used to test api-checker.

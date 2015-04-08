@@ -15,11 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.xml._
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers._
 
 //
 //   Very simple tests here.  The assertions here suck, basically

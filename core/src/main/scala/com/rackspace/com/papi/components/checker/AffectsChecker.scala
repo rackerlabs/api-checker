@@ -15,15 +15,7 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import scala.xml._
-
 import scala.annotation.StaticAnnotation
-import scala.reflect.BeanProperty
-
-import scala.reflect.runtime.universe
-
-import com.rackspace.com.papi.components.checker.handler.ResultHandler
-import com.rackspace.com.papi.components.checker.handler.ServletResultHandler
 
 /**
  * If set the annotation states that the configuration option

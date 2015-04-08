@@ -15,38 +15,7 @@
  */
 package com.rackspace.com.papi.components.checker.servlet
 
-import java.io.IOException
-import java.io.ByteArrayOutputStream
-import java.net.{URI, URISyntaxException}
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.util
-
-import javax.servlet.ServletInputStream
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletRequestWrapper
-import javax.servlet.http.HttpServletResponse
-import javax.servlet.http.HttpServletResponseWrapper
-
-import javax.xml.transform.Transformer
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
-
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.JsonNode
-import org.w3c.dom.Document
-
-import com.typesafe.scalalogging.slf4j.LazyLogging
-
-import com.netaporter.uri.encoding.PercentEncoder
-
-import com.rackspace.com.papi.components.checker.util.DateUtils
-import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
-import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
-import com.rackspace.com.papi.components.checker.util.HeaderMap
-
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
+import javax.servlet.http.{HttpServletResponse, HttpServletResponseWrapper}
 
 //
 //  An HTTP Response with some additional helper functions

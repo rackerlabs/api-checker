@@ -15,16 +15,14 @@
  */
 package com.rackspace.com.papi.components.checker.cli
 
-import com.rackspace.com.papi.components.checker.wadl.WADLCheckerBuilder
-import com.rackspace.com.papi.components.checker.util.URLResolver
-import org.clapper.argot.ArgotConverters._
-import org.clapper.argot.ArgotParser
-import org.clapper.argot.ArgotUsageException
-
 import javax.xml.transform._
 import javax.xml.transform.stream._
 
 import com.rackspace.com.papi.components.checker.Config
+import com.rackspace.com.papi.components.checker.util.URLResolver
+import com.rackspace.com.papi.components.checker.wadl.WADLCheckerBuilder
+import org.clapper.argot.ArgotConverters._
+import org.clapper.argot.{ArgotParser, ArgotUsageException}
 
 object Wadl2Checker {
   val parser = new ArgotParser("wadl2checker", preUsage=Some("wadl2checker: Version 1.0.0-SNAPSHOT"))

@@ -15,17 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
-import javax.xml.validation.Schema
-import javax.xml.validation.Validator
-import javax.xml.validation.ValidatorHandler
+import javax.xml.transform.stream._
+import javax.xml.validation.{Validator, ValidatorHandler, _}
 
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-
 import org.scalatest.FunSuite
-
-import javax.xml.validation._
-import javax.xml.transform.stream._
+import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class XMLSchemaPoolSuite extends FunSuite {

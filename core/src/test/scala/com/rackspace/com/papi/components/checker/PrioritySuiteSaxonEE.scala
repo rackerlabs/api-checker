@@ -16,13 +16,11 @@
 package com.rackspace.com.papi.components.checker
 
 import com.rackspace.cloud.api.wadl.test.SchemaAsserter
-
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import scala.xml._
-
-import org.scalatest.FunSuite
 
 @RunWith(classOf[JUnitRunner])
 class PrioritySuiteSaxonEE extends FunSuite {
