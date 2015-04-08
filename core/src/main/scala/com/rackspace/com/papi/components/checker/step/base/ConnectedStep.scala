@@ -25,40 +25,6 @@ import com.rackspace.com.papi.components.checker.util.HeaderMap
 import scala.collection.mutable.ListBuffer
 
 //
-//  Used to keep context about the current request
-//
-case class StepContext(uriLevel : Int = 0, requestHeaders : HeaderMap = new HeaderMap, handler: Option[ResultHandler] = None)
-
-
-//
-//  Base class for all other steps
-//
-abstract class Step(val id : String, val label : String) {
-
-  //
-  //  Checks the step at the given context
-  //
-  def check(req : CheckerServletRequest,
-            resp : CheckerServletResponse,
-            chain : FilterChain,
-            context : StepContext) : Option[Result]
-
-  //
-  //  Checks the step at the given URI level. This method is written
-  //  for compatibility reasons, there was a time where the only
-  //  context was the URI level -- and for most of the existing code
-  //  that's all the context that matters.
-  //
-  final def check(req : CheckerServletRequest,
-            resp : CheckerServletResponse,
-            chain : FilterChain,
-            uriLevel : Int) : Option[Result] = {
-    check(req, resp, chain, StepContext(uriLevel))
-  }
-
-}
-
-//
 //  Steps that ore connected to other steps
 //
 abstract class ConnectedStep(id : String, label : String, val next : Array[Step]) extends Step (id, label) {
