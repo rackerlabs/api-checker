@@ -15,11 +15,16 @@
  */
 package com.rackspace.com.papi.components.checker.cli
 
+import javax.xml.transform.{Result, Source}
+
+import com.rackspace.com.papi.components.checker.Config
+import com.rackspace.com.papi.components.checker.util.URLResolver
+import com.rackspace.com.papi.components.checker.wadl.WADLCheckerBuilder
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
-import org.clapper.argot.ArgotUsageException
+import org.clapper.argot.{ArgotParser, ArgotUsageException}
 
 import javax.xml.transform.stream._
 
