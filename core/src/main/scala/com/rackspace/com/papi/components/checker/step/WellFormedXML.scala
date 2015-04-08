@@ -15,6 +15,7 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.XMLParserPool.borrowParser
 import com.rackspace.com.papi.components.checker.util.XMLParserPool.returnParser
 

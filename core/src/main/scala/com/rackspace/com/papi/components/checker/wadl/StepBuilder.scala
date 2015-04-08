@@ -15,6 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
+import com.rackspace.com.papi.components.checker.step.base.Step
+
 import scala.xml._
 
 import java.io.InputStream
@@ -30,7 +32,6 @@ import com.rackspace.cloud.api.wadl.Converters._
 import org.xml.sax.InputSource
 
 import com.rackspace.com.papi.components.checker.Config
-import com.rackspace.com.papi.components.checker.step.Step
 import com.rackspace.com.papi.components.checker.step.StepHandler
 
 class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {

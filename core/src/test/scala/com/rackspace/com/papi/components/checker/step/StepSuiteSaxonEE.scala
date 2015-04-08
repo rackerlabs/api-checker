@@ -17,6 +17,9 @@ package com.rackspace.com.papi.components.checker.step
 
 import javax.xml.namespace.QName
 
+import com.rackspace.com.papi.components.checker.step.base.Step
+import com.rackspace.com.papi.components.checker.step.results.URLFailResult
+import com.rackspace.com.papi.components.checker.step.startend.{URLFailXSD, URLFailXSDMatch}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 

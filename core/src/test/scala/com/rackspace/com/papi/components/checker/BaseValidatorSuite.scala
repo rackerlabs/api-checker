@@ -15,6 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker
 
+import com.rackspace.com.papi.components.checker.step.results.ErrorResult
+
 import scala.xml._
 
 import java.io.File

@@ -36,14 +36,13 @@ import java.io.ByteArrayOutputStream
 import java.io.Reader
 import java.io.StringWriter
 
+import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
+import com.rackspace.com.papi.components.checker.step.results.Result
+
 import scala.xml._
 
 import com.rackspace.com.papi.components.checker.wadl.StepBuilder
 import com.rackspace.com.papi.components.checker.wadl.WADLDotBuilder
-
-import com.rackspace.com.papi.components.checker.step.StepContext
-import com.rackspace.com.papi.components.checker.step.Step
-import com.rackspace.com.papi.components.checker.step.Result
 
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
 

@@ -24,6 +24,9 @@ import com.github.fge.jsonschema.exceptions.ProcessingException
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
 import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+import com.rackspace.com.papi.components.checker.step.results._
+import com.rackspace.com.papi.components.checker.step.startend._
 import com.rackspace.com.papi.components.checker.util.{HeaderMap, ImmutableNamespaceContext, ObjectMapperPool, XMLParserPool}
 import org.junit.runner.RunWith
 import org.mockito.Matchers.eq

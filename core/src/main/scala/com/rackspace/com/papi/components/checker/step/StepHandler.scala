@@ -35,6 +35,8 @@ import javax.xml.validation.SchemaFactory
 import javax.xml.namespace.NamespaceContext
 import javax.xml.namespace.QName
 
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step}
+import com.rackspace.com.papi.components.checker.step.startend._
 import com.saxonica.config.EnterpriseTransformerFactory
 import net.sf.saxon.TransformerFactoryImpl
 import org.xml.sax.ContentHandler

@@ -24,16 +24,13 @@ import java.util.concurrent.atomic.AtomicLong
 import java.lang.management._
 import javax.management._
 
-import com.rackspace.com.papi.components.checker.step.Result
-import com.rackspace.com.papi.components.checker.step.MultiFailResult
-import com.rackspace.com.papi.components.checker.step.MismatchResult
-
 import com.rackspace.com.papi.components.checker.servlet._
 
 import com.rackspace.com.papi.components.checker.Validator
 
 import javax.servlet.FilterChain
 
+import com.rackspace.com.papi.components.checker.step.results.{MultiFailResult, MismatchResult, Result}
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 

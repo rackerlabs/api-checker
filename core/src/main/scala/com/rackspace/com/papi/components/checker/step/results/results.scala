@@ -13,13 +13,14 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.rackspace.com.papi.components.checker.step
-import java.util.Map
-import java.util.HashMap
+package com.rackspace.com.papi.components.checker.step.results
+
+import java.util.{HashMap, Map}
+import com.rackspace.com.papi.components.checker.step.base.StepContext
+import com.typesafe.scalalogging.slf4j.LazyLogging
+
 import scala.collection.immutable.List
 import scala.collection.mutable.PriorityQueue
-
-import com.typesafe.scalalogging.slf4j.LazyLogging
 
 //
 //  Base class for all checker results

@@ -15,10 +15,12 @@
  */
 package com.rackspace.com.papi.components.checker.handler
 
+import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
+import com.rackspace.com.papi.components.checker.step.results.Result
+
 import scala.collection.immutable.List
 
 import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.step.{StepContext, Step, Result}
 
 import javax.servlet.FilterChain
 

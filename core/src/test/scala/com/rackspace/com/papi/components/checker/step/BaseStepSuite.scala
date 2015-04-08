@@ -15,6 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
+import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, BadMediaTypeResult, Result}
+
 import scala.xml._
 
 import javax.xml.transform.TransformerFactory

@@ -23,6 +23,7 @@ import javax.xml.namespace.NamespaceContext
 import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.XPathExpressionPool._
 
 import org.xml.sax.SAXParseException

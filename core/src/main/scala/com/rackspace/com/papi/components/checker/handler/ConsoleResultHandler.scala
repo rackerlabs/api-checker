@@ -20,12 +20,10 @@ import java.net.URI
 
 import com.rackspace.com.papi.components.checker._
 import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.step.Result
-import com.rackspace.com.papi.components.checker.step.MultiFailResult
-import com.rackspace.com.papi.components.checker.step.MismatchResult
 
 import javax.servlet.FilterChain
 
+import com.rackspace.com.papi.components.checker.step.results.{MultiFailResult, MismatchResult, Result}
 import org.w3c.dom.Document
 
 class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandler {

@@ -13,15 +13,16 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.rackspace.com.papi.components.checker.step
+package com.rackspace.com.papi.components.checker.step.base
+
+import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, MultiFailResult, Result}
+import com.rackspace.com.papi.components.checker.util.HeaderMap
 
 import scala.collection.mutable.ListBuffer
-
-import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.util.HeaderMap
-import javax.servlet.FilterChain
 
 //
 //  Used to keep context about the current request

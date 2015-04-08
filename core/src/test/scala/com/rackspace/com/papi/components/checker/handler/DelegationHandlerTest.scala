@@ -19,7 +19,8 @@ import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker.BaseValidatorSuite
 import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
-import com.rackspace.com.papi.components.checker.step.{AcceptResult, ErrorResult, StepContext}
+import com.rackspace.com.papi.components.checker.step.base.StepContext
+import com.rackspace.com.papi.components.checker.step.results.{AcceptResult, ErrorResult}
 import org.junit.runner.RunWith
 import org.mockito.Mockito.{mock, never, verify}
 import org.scalatest.junit.JUnitRunner

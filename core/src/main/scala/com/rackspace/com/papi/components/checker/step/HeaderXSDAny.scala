@@ -19,6 +19,7 @@ import javax.xml.namespace.QName
 import javax.xml.validation.Schema
 
 import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.HeaderUtil._
 
 import javax.servlet.FilterChain

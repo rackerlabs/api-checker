@@ -15,6 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.step
 
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+
 import scala.util.matching.Regex
 
 import com.rackspace.com.papi.components.checker.servlet._

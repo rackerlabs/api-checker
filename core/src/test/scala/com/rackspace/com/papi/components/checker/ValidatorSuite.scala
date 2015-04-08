@@ -18,6 +18,8 @@ package com.rackspace.com.papi.components.checker
 import java.util.Date
 import java.util.UUID
 import java.math.BigInteger
+import com.rackspace.com.papi.components.checker.step.startend._
+
 import scala.util.Random
 
 import com.rackspace.com.papi.components.checker.step._

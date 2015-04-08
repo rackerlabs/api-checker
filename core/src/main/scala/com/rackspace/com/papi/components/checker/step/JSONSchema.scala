@@ -23,6 +23,7 @@ import com.github.fge.jsonschema.exceptions.ProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 
 import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 
 class JSONSchema(id : String, label : String, schema : JsonSchema, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The JSON does not validate against the schema."

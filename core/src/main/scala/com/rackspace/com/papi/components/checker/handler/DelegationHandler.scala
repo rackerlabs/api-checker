@@ -19,7 +19,7 @@ import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
-import com.rackspace.com.papi.components.checker.step.{ErrorResult, Result}
+import com.rackspace.com.papi.components.checker.step.results.{ErrorResult, Result}
 import com.rackspace.httpdelegation.HttpDelegationManager
 import org.w3c.dom.Document
 

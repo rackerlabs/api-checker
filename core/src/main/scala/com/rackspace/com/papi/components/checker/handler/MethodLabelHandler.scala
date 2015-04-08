@@ -20,7 +20,8 @@ import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
-import com.rackspace.com.papi.components.checker.step.{StepContext, Step, Result}
+import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
+import com.rackspace.com.papi.components.checker.step.results.Result
 import org.w3c.dom.{Document, NodeList}
 
 class MethodLabelHandler extends ResultHandler  {

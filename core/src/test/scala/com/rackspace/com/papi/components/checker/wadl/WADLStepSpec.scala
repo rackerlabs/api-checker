@@ -15,6 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
+import com.rackspace.com.papi.components.checker.step.startend.{MethodFail, URLFail, Start}
+
 import scala.xml._
 import org.junit.runner.RunWith
 import org.scalatest.exceptions.TestFailedException

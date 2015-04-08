@@ -25,6 +25,7 @@ import javax.xml.parsers.DocumentBuilder
 
 import javax.servlet.FilterChain
 
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import org.w3c.dom.Document
 
 import com.rackspace.com.papi.components.checker.servlet._
