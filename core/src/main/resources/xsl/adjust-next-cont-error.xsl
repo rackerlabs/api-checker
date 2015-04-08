@@ -21,12 +21,11 @@
   limitations under the License.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
-    xmlns="http://www.rackspace.com/repose/wadl/checker"
-    xmlns:chkp="http://www.rackspace.com/repose/wadl/checker/priority"
-    exclude-result-prefixes="xs"
-    version="2.0">
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
+                xmlns="http://www.rackspace.com/repose/wadl/checker"
+                exclude-result-prefixes="xs"
+                version="2.0">
 
     <xsl:import href="util/funs.xsl"/>
 

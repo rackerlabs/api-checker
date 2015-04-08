@@ -49,13 +49,12 @@
    limitations under the License.
 -->
 <xsl:stylesheet
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:check="http://www.rackspace.com/repose/wadl/checker"
-    xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
-    xmlns="http://www.rackspace.com/repose/wadl/checker"
-    exclude-result-prefixes="xsd check"
-    version="2.0">
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:check="http://www.rackspace.com/repose/wadl/checker"
+        xmlns="http://www.rackspace.com/repose/wadl/checker"
+        exclude-result-prefixes="xsd check"
+        version="2.0">
 
     <!--
         Most of the work of joining is done by the following util. The
