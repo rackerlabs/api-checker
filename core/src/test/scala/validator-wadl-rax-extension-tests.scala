@@ -132,14 +132,18 @@ trait RaxRolesBehaviors {
   }
 
   def accessIsAllowedWithHeader(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config") {
-    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles, "X-Auth-Token" -> List("some-token"), "some-generic-header" -> List("something")))
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false,
+                                                   Map("X-ROLES" -> roles, "X-Auth-Token" -> List("some-token"), "some-generic-header" -> List("something"),
+                                                       "X-INT" -> List("52")))
     it should "succeed when " + method + " on " + path + " has an extra header and X-Roles has " + roles + " for " + conf in {
       validator.validate(request, response, chain)
     }
   }
 
   def accessIsForbiddenWithHeader(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config") {
-    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles, "X-Auth-Token" -> List("some-token")))
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles,
+                                                                                                    "X-Auth-Token" -> List("some-token"),
+                                                                                                    "X-INT" -> List("52")))
     it should "fail with a 403 when " + method + " on " + path + " and X-Roles has " + roles + " for " + conf in {
       base.assertResultFailed(validator.validate(request, response, chain), 403, "You are forbidden to perform the operation")
     }
@@ -147,7 +151,9 @@ trait RaxRolesBehaviors {
 
   def resourceNotFoundWithHeader(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config",
                        matchStrings : List[String] = List()) {
-    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles, "X-Auth-Token" -> List("some-token")))
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles,
+                                                                                                    "X-Auth-Token" -> List("some-token"),
+                                                                                                    "X-INT" -> List("52")))
     it should "fail with a 404 when " + method + " on " + path + " has an extra header and X-Roles has " + roles + " for  " + conf in {
       base.assertResultFailed(validator.validate(request, response, chain), 404, matchStrings)
     }
@@ -155,21 +161,25 @@ trait RaxRolesBehaviors {
 
   def methodNotAllowedWithHeader(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config",
                        matchStrings : List[String] = List()) {
-    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles, "X-Auth-Token" -> List("some-token")))
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles,
+                                                                                                    "X-Auth-Token" -> List("some-token"),
+                                                                                                    "X-INT" -> List("52")))
     it should "fail with a 405 when " + method + " on " + path + " has an extra header and X-Roles has " + roles + " for  " + conf in {
       base.assertResultFailed(validator.validate(request, response, chain), 405, matchStrings)
     }
   }
 
   def badRequestWhenHeaderIsMissing(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config") {
-    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles))
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles, "X-INT" -> List("52")))
     it should "fail with a 400 when " + method + " on " + path + " and no X-Auth-Token header" + " for " + conf in {
       base.assertResultFailed(validator.validate(request, response, chain), 400, "Bad Content: Expecting an HTTP header X-Auth-Token to have a value matching .*")
     }
   }
 
   def badRequestWhenOneHeaderIsMissing(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config") {
-    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles, "X-Auth-Token" -> List("something")))
+    def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles,
+                                                                                                    "X-Auth-Token" -> List("something"),
+                                                                                                    "X-INT" -> List("52")))
     it should "fail with a 400 when " + method + " on " + path + " and no one X-Auth-Token header" + " for " + conf in {
       base.assertResultFailed(validator.validate(request, response, chain), 400, "Bad Content: Expecting an HTTP header some-generic-header to have a value matching .*")
     }
@@ -182,7 +192,9 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
   val description = "Wadl With Roles At Method Level"
 
   val validator = Validator((localWADLURI,
-    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+                 xmlns:rax="http://docs.rackspace.com/api"
+                 xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <resources base="https://test.api.openstack.com">
         <resource path="/a">
           <method name="POST" rax:roles="a:admin">
@@ -208,6 +220,7 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
         </resource>
         <resource path="/c">
           <param name="X-Auth-Token" style="header" required="true" />
+          <param name="X-INT" style="header" type="xs:int" required="true"/>
           <method name="GET" rax:roles="a:admin">
             <request>
               <representation mediaType="application/xml"/>
@@ -233,6 +246,7 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
           <method name="GET" rax:roles="a:admin">
             <request>
               <param name="X-Auth-Token" style="header" required="true" />
+              <param name="X-INT" style="header" type="xs:int" required="true"/>
               <representation mediaType="application/xml"/>
             </request>
           </method>
@@ -309,7 +323,9 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
   val description = "Wadl With Roles At Method Level"
 
   val validator = Validator((localWADLURI,
-    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+                 xmlns:rax="http://docs.rackspace.com/api"
+                 xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <resources base="https://test.api.openstack.com">
         <resource path="/a">
           <method name="POST" rax:roles="a:admin">
@@ -347,6 +363,7 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
         </resource>
         <resource path="/c">
           <param name="X-Auth-Token" style="header" required="true" />
+          <param name="X-INT" style="header" type="xs:int" required="true"/>
           <method name="GET" rax:roles="a:admin">
             <request>
             <representation mediaType="application/xml"/>
@@ -372,6 +389,7 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
           <method name="GET" rax:roles="a:admin">
             <request>
               <param name="X-Auth-Token" style="header" required="true" />
+              <param name="X-INT" style="header" type="xs:int" required="true"/>
               <representation mediaType="application/xml"/>
             </request>
           </method>

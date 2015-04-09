@@ -79,6 +79,15 @@
     <xsl:variable name="roles" select="distinct-values(/chk:checker/chk:step[@type='HEADER_ANY' and
                                                              @name='X-ROLES' and @code='403']/@match)"
                                as="xs:string*"/>
+    <!--
+        searchStates:
+
+        We continue the search for roles checks along a path so long
+        as we are traversing one of these states...
+    -->
+    <xsl:variable name="searchStates"
+                  select="('URL', 'URLXSD','METHOD','HEADER','HEADER_ANY', 'HEADERXSD','HEADERXSD_ANY')"
+                  as="xs:string*"/>
 
     <xsl:template match="/">
         <xsl:choose>
@@ -131,7 +140,7 @@
         <xsl:param name="role" as="xs:string"/>
         <xsl:variable name="nexts" as="node()*" select="for $n in chk:next(.) return key('checker-by-id',$n,$checker)"/>
         <xsl:variable name="nextPathSteps" as="node()*"
-            select="for $n in $nexts[@type=('URL','URLXSD','METHOD','HEADER','HEADER_ANY')] return if (rol:stepInRole($n, $role)) then $n else ()"/>
+            select="for $n in $nexts[@type=$searchStates] return if (rol:stepInRole($n, $role)) then $n else ()"/>
         <xsl:variable name="URLFailId" as="xs:string" select="rol:id(concat(@id,'UF'),$role)"/>
         <xsl:variable name="MethodFailId" as="xs:string" select="rol:id(concat(@id,'MF'),$role)"/>
         <xsl:variable name="finalCheck" as="node()?" select="$nexts[@type='HEADER_ANY' and @name='X-ROLES'
@@ -146,7 +155,7 @@
                     <xsl:otherwise>
                         <xsl:variable name="next" as="xs:string*">
                             <xsl:sequence select="for $n in $nextPathSteps return rol:id($n/@id, $role)"/>
-                            <xsl:sequence select="$nexts[not(@type=('URL_FAIL','METHOD_FAIL','URL','METHOD','URLXSD','HEADER','HEADER_ANY'))]/@id"/>
+                            <xsl:sequence select="$nexts[not(@type=('URL_FAIL','METHOD_FAIL', $searchStates))]/@id"/>
                             <xsl:sequence select="($URLFailId, $MethodFailId)"/>
                         </xsl:variable>
                         <xsl:value-of select="$next" separator=" "/>
@@ -223,7 +232,7 @@
                             $step/@code='403' and not($step/@match = $role)">
                 <xsl:sequence select="false()"/>
             </xsl:when>
-            <xsl:when test="$step/@type = ('URL', 'URLXSD','METHOD','HEADER','HEADER_ANY')">
+            <xsl:when test="$step/@type = $searchStates">
                 <xsl:sequence select="true() = (for $n in chk:next($step) return rol:stepInRole(key('checker-by-id',$n,$checker),$role))"/>
             </xsl:when>
             <xsl:when test="contains($step/@type,'_FAIL')">
