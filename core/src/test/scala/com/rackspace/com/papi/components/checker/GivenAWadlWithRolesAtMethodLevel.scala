@@ -26,7 +26,9 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
   val description = "Wadl With Roles At Method Level"
 
   val validator = Validator((localWADLURI,
-    <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+                 xmlns:rax="http://docs.rackspace.com/api"
+                 xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <resources base="https://test.api.openstack.com">
         <resource path="/a">
           <method name="POST" rax:roles="a:admin">
@@ -51,7 +53,8 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
           </method>
         </resource>
         <resource path="/c">
-          <param name="X-Auth-Token" style="header" required="true" />
+          <param name="X-Auth-Token" style="header" required="true"/>
+          <param name="X-INT" style="header" type="xs:int" required="true"/>
           <method name="GET" rax:roles="a:admin">
             <request>
               <representation mediaType="application/xml"/>
@@ -69,14 +72,15 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
           </method>
           <method name="DELETE" rax:roles="a:admin">
             <request>
-              <param name="some-generic-header" style="header" required="true" />
+              <param name="some-generic-header" style="header" required="true"/>
             </request>
           </method>
         </resource>
         <resource path="/d">
           <method name="GET" rax:roles="a:admin">
             <request>
-              <param name="X-Auth-Token" style="header" required="true" />
+              <param name="X-Auth-Token" style="header" required="true"/>
+              <param name="X-INT" style="header" type="xs:int" required="true"/>
               <representation mediaType="application/xml"/>
             </request>
           </method>
@@ -144,5 +148,5 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
   it should behave like accessIsAllowedWithHeader(validator, "GET", "/d", List("a:admin"), description)
   it should behave like accessIsAllowed(validator, "POST", "/d", List("a:bar"), description)
   it should behave like badRequestWhenHeaderIsMissing(validator, "GET", "/d", List("a:admin"), description)
-  it should behave like accessIsForbiddenWithHeader(validator, "GET", "/d", List("a:bar"),description)
+  it should behave like accessIsForbiddenWithHeader(validator, "GET", "/d", List("a:bar"), description)
 }
