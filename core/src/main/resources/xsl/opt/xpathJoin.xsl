@@ -63,7 +63,7 @@
 
     <xsl:template match="check:step[@type='WELL_XML']" mode="targetJoins">
         <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[@type='XPATH']"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[@type='XPATH' and not(@captureHeader)]"/>
         <xsl:if test="count($nextStep) = 1">
             <join type="{@type}" steps="{@id}">
                 <xsl:attribute name="mergeSteps">
@@ -76,7 +76,7 @@
     <xsl:template match="check:step[@type='XSL' and xsl:transform/@check:mergable]" mode="targetJoins">
         <xsl:param name="checker" as="node()"/>
         <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[@type='XPATH' or (@type='XSL' and xsl:transform/@check:mergable)]"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[(@type='XPATH' and not(@captureHeader)) or (@type='XSL' and xsl:transform/@check:mergable)]"/>
 
         <xsl:if test="count($nextStep) = 1">
             <join type="{@type}" steps="{@id}">

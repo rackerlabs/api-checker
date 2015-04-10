@@ -41,6 +41,32 @@
     <!-- The Checker Element -->
     <element name="checker" type="chk:Checker"/>
 
+    <!-- Common Attributes -->
+    <attributeGroup name="MessageAttributes">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Attributes used by steps that support the message
+                    extension.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="message" type="xsd:string" use="optional"/>
+        <attribute name="code" type="xsd:int" use="optional"/>
+    </attributeGroup>
+
+    <attributeGroup name="ToRequestHeaderAttributes">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Attributes used by steps that support the
+                    toRequestHeader extension.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="captureHeader" type="xsd:string" use="optional"/>
+    </attributeGroup>
+
     <!-- Complex Types -->
     <complexType name="Step" abstract="true">
         <annotation>
@@ -258,8 +284,8 @@
             <extension base="chk:GenContentFailStep">
                 <attribute name="match" type="xsd:string" use="required"/>
                 <attribute name="version" type="chk:XPathVersion" use="optional"/>
-                <attribute name="message" type="xsd:string" use="optional"/>
-                <attribute name="code" type="xsd:int" use="optional"/>
+                <attributeGroup ref="chk:MessageAttributes"/>
+                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
             </extension>
         </complexContent>
     </complexType>
@@ -291,6 +317,7 @@
         <complexContent>
             <extension base="chk:ConnectedStep">
                 <attribute name="match" type="xsd:string" use="required"/>
+                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
             </extension>
         </complexContent>
     </complexType>
@@ -314,6 +341,7 @@
         <complexContent>
             <extension base="chk:ConnectedStep">
                 <attribute name="match" type="xsd:QName" use="required"/>
+                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
             </extension>
         </complexContent>
     </complexType>
@@ -331,8 +359,8 @@
             <extension base="chk:GenContentFailStep">
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:string" use="required"/>
-                <attribute name="message" type="xsd:string" use="optional"/>
-                <attribute name="code" type="xsd:int" use="optional"/>
+                <attributeGroup ref="chk:MessageAttributes"/>
+                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
             </extension>
         </complexContent>
     </complexType>
@@ -366,8 +394,8 @@
             <extension base="chk:GenContentFailStep">
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:QName" use="required"/>
-                <attribute name="message" type="xsd:string" use="optional"/>
-                <attribute name="code" type="xsd:int" use="optional"/>
+                <attributeGroup ref="chk:MessageAttributes"/>
+                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
             </extension>
         </complexContent>
     </complexType>

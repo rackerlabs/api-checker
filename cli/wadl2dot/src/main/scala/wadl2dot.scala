@@ -75,6 +75,9 @@ object Wadl2Dot {
   val message  = parser.flag[Boolean] (List("m", "disable-message-ext"),
                                          "Disable Message extension : false")
 
+  val captureHeader = parser.flag[Boolean] (List("c", "disable-capture-header-ext"),
+                                            "Disable capture header extension : false")
+
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
                                           "Show error nodes. Default: false")
 
@@ -140,6 +143,7 @@ object Wadl2Dot {
       c.enableIgnoreXSDExtension = !(ignoreXSD.value.getOrElse(false))
       c.enableIgnoreJSONSchemaExtension = !(ignoreJSON.value.getOrElse(false))
       c.enableMessageExtension = !(message.value.getOrElse(false))
+      c.enableCaptureHeaderExtension = !(captureHeader.value.getOrElse(false))
       c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
       c.validateChecker = true
 

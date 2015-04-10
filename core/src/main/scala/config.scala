@@ -237,6 +237,15 @@ class Config {
   var maskRaxRoles403 : Boolean = false
 
   //
+  //  Enable capture header extension.  This extension allows
+  //  capturing the contents of a WADL parameter to a request
+  //  header. Currently works with template, header, and XML plain
+  //  parameters.
+  @BeanProperty
+  @AffectsChecker
+  var enableCaptureHeaderExtension : Boolean = true
+
+  //
   //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,
   //  and Saxon. Note that Saxon is an XSL 2.0 engine, but most 1.0
   //  XSLs should work fine.

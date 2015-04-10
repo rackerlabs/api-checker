@@ -66,6 +66,7 @@
             <config option="enableIgnoreJSONSchemaExtension" value="false"/>
             <config option="enableMessageExtension" value="false"/>
             <config option="enableRaxRolesExtension" value="false"/>
+            <config option="enableCaptureHeaderExtension" value="false"/>
         </meta>
     </xsl:param>
 
@@ -81,6 +82,7 @@
     <xsl:variable name="enableIgnoreJSONSchemaExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableIgnoreJSONSchemaExtension'))"/>
     <xsl:variable name="enableMessageExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableMessageExtension'))"/>
     <xsl:variable name="enableRaxRolesExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRolesExtension'))"/>
+    <xsl:variable name="enableCaptureHeaderExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableCaptureHeaderExtension'))"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -124,6 +126,8 @@
                   select="$checkHeaders or $useRaxRoles"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
                   select="$enableMessageExtension or $useRaxRoles"/>
+    <xsl:variable name="useCaptureHeaderExtension" as="xsd:boolean"
+                  select="$enableCaptureHeaderExtension"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -472,9 +476,13 @@
             </xsl:attribute>
             <xsl:attribute name="next" select="$links" separator=" "/>
             <xsl:if test="$templatePath">
+                <xsl:variable name="templateParam" as="node()" select="check:paramForTemplatePath(.)"/>
                 <xsl:attribute name="label">
-                    <xsl:value-of select="check:paramForTemplatePath(.)/@name"/>
+                    <xsl:value-of select="$templateParam/@name"/>
                 </xsl:attribute>
+                <xsl:call-template name="check:addCaptureHeaderExtension">
+                    <xsl:with-param name="context" select="$templateParam"/>
+                </xsl:call-template>
             </xsl:if>
         </step>
         <xsl:if test="$haveHeaders">
@@ -571,6 +579,7 @@
             <xsl:variable name="pos" select="position()"/>
             <step id="{check:HeaderID(.)}" name="{@name}">
                 <xsl:call-template name="check:addMessageExtension"/>
+                <xsl:call-template name="check:addCaptureHeaderExtension"/>
                 <xsl:attribute name="type">
                     <xsl:choose>
                         <xsl:when test="$isXSD">HEADERXSD</xsl:when>
@@ -605,6 +614,7 @@
                 <step id="{check:HeaderID(.)}" name="{@name}"
                       type="HEADER_ANY" match="{check:toRegExEscaped(@fixed)}">
                     <xsl:call-template name="check:addMessageExtension"/>
+                    <xsl:call-template name="check:addCaptureHeaderExtension"/>
                     <xsl:attribute name="next">
                         <xsl:choose>
                             <xsl:when test="$pos = $last">
@@ -925,6 +935,7 @@
             <xsl:for-each select="$defaultPlainParams">
                 <step type="XPATH" id="{check:XPathID($this,position())}" match="{@path}">
                     <xsl:call-template name="check:addMessageExtension"/>
+                    <xsl:call-template name="check:addCaptureHeaderExtension"/>
                     <xsl:choose>
                         <xsl:when test="position() = last()">
                             <xsl:choose>
@@ -1053,6 +1064,23 @@
         </xsl:if>
         <xsl:if test="@rax:code and $useMessageExtension">
             <xsl:attribute name="code" select="@rax:code"/>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="check:addCaptureHeaderExtension">
+        <!--
+            This should be called from a state that supports capture
+            header attributes.
+
+            The context should be the appropriate wadl:paramater, this
+            may be passed as a param.
+
+            The attributes are added if the useCaptureHeaderExtension
+            is enabled AND the extension is used for this step.
+        -->
+        <xsl:param name="context" as="node()" select="."/>
+        <xsl:if test="$context/@rax:captureHeader and $useCaptureHeaderExtension">
+            <xsl:attribute name="captureHeader" select="$context/@rax:captureHeader"/>
         </xsl:if>
     </xsl:template>
 

@@ -75,6 +75,9 @@ object Wadl2Checker {
   val message  = parser.flag[Boolean] (List("m", "disable-message-ext"),
                                          "Disable Message extension : false")
 
+  val captureHeader = parser.flag[Boolean] (List("c", "disable-capture-header-ext"),
+                                            "Disable capture header extension : false")
+
   val validate = parser.flag[Boolean] (List("v", "validate"),
                                        "Validate produced checker Default: false")
 
@@ -141,6 +144,7 @@ object Wadl2Checker {
       c.enableIgnoreXSDExtension = !(ignoreXSD.value.getOrElse(false))
       c.enableIgnoreJSONSchemaExtension = !(ignoreJSON.value.getOrElse(false))
       c.enableMessageExtension = !(message.value.getOrElse(false))
+      c.enableCaptureHeaderExtension = !(captureHeader.value.getOrElse(false))
       c.xpathVersion = xpathVersion.value.getOrElse(1)
       c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
 

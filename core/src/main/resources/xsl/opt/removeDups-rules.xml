@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   removeDups-rules.xml
+
+   This basically contains rules for how various states may be merged
+   together.  Essentially, we simply need to understand which
+   attributes are optional and which are required. It should be
+   possible to generate these rules from the XSD, but we'll leave
+   that as an exercise :-)
+
+   Before that, we need to make sure that all states are represented,
+   perhaps via an assertion that checks the XSD.
+
+   As part of the build process we generate an XSL template that's
+   used by the removeDup optimization.
+
+   Copyright 2015 Rackspace US, Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<rules xmlns="http://www.rackspace.com/repose/wadl/checker/opt/removeDups/rules">
+    <rule types="URL URLXSD" required="next match" optional="captureHeader">
+        Rule for URI and URIXSDs.  These may optionally have a
+        captureHeader.
+    </rule>
+    <rule types="XPATH" required="next match" optional="captureHeader version code message">
+        Rule for XPath states.
+    </rule>
+    <rule types="HEADER HEADERXSD HEADER_ANY HEADERXSD_ANY" required="next name match" optional="captureHeader code message">
+        Rule for Header, HeaderXSD, HeaderAny.
+    </rule>
+    <rule types="METHOD REQ_TYPE" required="next match">
+        Steps that simply contain a match.
+    </rule>
+    <rule types="XSD" contians="next" optional="transform">
+        Rule for XSD types.
+    </rule>
+    <rule types="URL_FAIL" optional="notTypes notMatch">
+        URL_Fail states.
+    </rule>
+    <rule types="METHOD_FAIL REQ_TYPE_FAIL" optional="notMatch">
+        Fail steps with not match
+    </rule>
+    <rule types="XSL" required="next href version" match="@href">
+        We only merge XSLs with href.
+    </rule>
+    <rule types="WELL_XML WELL_JSON JSON_SCHEMA" required="next">
+        Connected nodes with no match.
+    </rule>
+    <rule types="CONTENT_FAIL">
+        Non connected nodes with no match.
+    </rule>
+</rules>
