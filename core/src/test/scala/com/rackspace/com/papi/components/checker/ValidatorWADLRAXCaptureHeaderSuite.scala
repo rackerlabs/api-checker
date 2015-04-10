@@ -15,22 +15,14 @@
  */
 package com.rackspace.com.papi.components.checker
 
+import com.rackspace.cloud.api.wadl.Converters._
+import com.rackspace.com.papi.components.checker.RunAssertionsHandler._
+import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.step.results.Result
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-import scala.xml._
-
-import com.rackspace.com.papi.components.checker.step._
-import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
-import com.rackspace.cloud.api.wadl.Converters._
-import Converters._
-import RunAssertionsHandler._
-
-import org.w3c.dom.Document
-
 import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {

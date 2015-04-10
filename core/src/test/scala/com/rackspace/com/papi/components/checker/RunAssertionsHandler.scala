@@ -19,7 +19,7 @@ import javax.servlet.FilterChain
 
 import com.rackspace.com.papi.components.checker.handler._
 import com.rackspace.com.papi.components.checker.servlet._
-import com.rackspace.com.papi.components.checker.step._
+import com.rackspace.com.papi.components.checker.step.results.Result
 import org.w3c.dom.Document
 
 import scala.language.implicitConversions
