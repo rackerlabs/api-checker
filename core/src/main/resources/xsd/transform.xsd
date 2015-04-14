@@ -21,12 +21,11 @@
     limitations under the License.
 -->
 <schema
-    elementFormDefault="qualified"
-    attributeFormDefault="unqualified"
-    xmlns="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    targetNamespace="http://www.w3.org/1999/XSL/Transform">
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        targetNamespace="http://www.w3.org/1999/XSL/Transform">
 
     <element name="stylesheet" type="xsl:Transform" />
     <element name="transform" type="xsl:Transform" />
