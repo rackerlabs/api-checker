@@ -17,9 +17,17 @@ package com.rackspace.com.papi.components.checker
 
 import com.rackspace.com.papi.components.checker.handler.{ResultHandler, ServletResultHandler}
 
+import scala.annotation.StaticAnnotation
 import scala.reflect.BeanProperty
 import scala.reflect.runtime.universe
 import scala.xml._
+
+/**
+ * If set the annotation states that the configuration option
+ * affects the state machine in checker format, if not set the
+ * config option only affects runtime.
+ */
+private final class AffectsChecker extends StaticAnnotation
 
 object Config {
   private val checkerConfigTypes = {
