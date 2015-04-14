@@ -22,6 +22,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.xml.parsers.DocumentBuilder
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.rackspace.com.papi.components.checker.servlet.ByteArrayServletInputStream
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import com.rackspace.com.papi.components.checker.step.results.ErrorResult
 import com.rackspace.com.papi.components.checker.util.{ObjectMapperPool, XMLParserPool}

@@ -26,7 +26,6 @@ import javax.xml.transform.stream.StreamResult
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.netaporter.uri.encoding.PercentEncoder
-import com.rackspace.com.papi.components.checker.ByteArrayServletInputStream
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 import com.rackspace.com.papi.components.checker.util.{DateUtils, HeaderMap, ObjectMapperPool}

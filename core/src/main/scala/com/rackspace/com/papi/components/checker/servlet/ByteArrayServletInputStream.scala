@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.rackspace.com.papi.components.checker
+package com.rackspace.com.papi.components.checker.servlet
 
 import java.io.ByteArrayInputStream
 import javax.servlet.ServletInputStream
