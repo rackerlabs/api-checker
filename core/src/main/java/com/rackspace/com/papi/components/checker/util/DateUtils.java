@@ -41,12 +41,7 @@ package com.rackspace.com.papi.components.checker.util;
 import java.lang.ref.SoftReference;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * A utility class for parsing and formatting HTTP dates as used in cookies and
