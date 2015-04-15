@@ -1,12 +1,13 @@
 # Releases #
 
 ## Release 1.1.0 (2015-04-15) ##
-1. Classes have been repackaged into different packages.  This breaks backwards compatibility for classes related to
-Result and Step
-2. Added support for rax:captureHeader extension.  If added to a template param, it will put the value
+1. Classes have been repackaged into different packages.
+This breaks backwards compatibility for classes related to Result and Step
+2. Added support for rax:captureHeader extension.  If added to a wadl param, it will put the value
 into the header specified by the rax:captureHeader value.
-3. Fixed a bug where rax:roles were not masked on non-string header checks
-4. Performance improvements to XSL stages of the checker builder
+3. Added an alias for rax:captureHeader="X-Device-Id" called rax:device=true
+4. Fixed a bug where rax:roles were not masked on non-string header checks
+5. Performance improvements to XSL stages of the checker builder
 
 ## Release 1.0.22 (2015-03-17) ##
 
