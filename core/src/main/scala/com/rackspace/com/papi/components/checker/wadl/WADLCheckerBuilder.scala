@@ -78,6 +78,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
 
 
   val raxRolesTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxRoles.xsl").toString))
+  val raxDeviceTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxDevice.xsl").toString))
   val raxRolesMaskTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxRolesMask.xsl").toString))
   val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/builder.xsl").toString))
   val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/opt/removeDups.xsl").toString))
@@ -176,13 +177,16 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
       } else {
         optInputHandler.setResult (output)
       }
+      val deviceHandler = wadl.saxTransformerFactory.newTransformerHandler(raxDeviceTemplates)
+      deviceHandler.setResult(new SAXResult(buildHandler))
+      deviceHandler.getTransformer.asInstanceOf[Controller].addLogErrorListener
       if(c.enableRaxRolesExtension){
         val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
-        raxRolesHandler.setResult(new SAXResult(buildHandler))
+        raxRolesHandler.setResult(new SAXResult(deviceHandler))
         raxRolesHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
         wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP, true)
       }else{
-        wadl.normalize (in, new SAXResult(buildHandler), TREE, XSD11, false, KEEP, true)
+        wadl.normalize (in, new SAXResult(deviceHandler), TREE, XSD11, false, KEEP, true)
       }
     } catch {
       case e : Exception => logger.error(e.getMessage())
