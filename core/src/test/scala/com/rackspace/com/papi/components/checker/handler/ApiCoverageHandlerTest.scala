@@ -40,19 +40,31 @@ class ApiCoverageHandlerTest extends BaseValidatorSuite with MockitoSugar with B
   val apiCoverageHandler = new ApiCoverageHandler
   val checkerXml =
     <checker xmlns="http://www.rackspace.com/repose/wadl/checker" xmlns:json="http://json-schema.org/schema#"
-             xmlns:util="http://www.rackspace.com/repose/wadl/checker/util">
-      <step id="S0" type="START" next="d57e4 SE1 d65e2u"/>
-      <step id="SA" type="ACCEPT" priority="100004"/>
-      <step type="REQ_TYPE_FAIL" id="d57e5rqt" notMatch="(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?"
-            priority="30003"/>
-      <step type="METHOD_FAIL" id="d65e3m" notMatch="GET" priority="20052"/>
-      <step id="SE0" type="URL_FAIL" priority="10002"/>
-      <step id="SE1" type="METHOD_FAIL" priority="20001"/>
-      <step type="URL_FAIL" id="d65e2u" notMatch="path" priority="10051"/>
-      <step type="URL" id="d57e4" match="path" next="d57e5 d65e3m SE0"/>
-      <step type="METHOD" id="d57e5" match="GET" next="d57e9 d57e11 d57e5rqt"/>
-      <step type="REQ_TYPE" id="d57e9" match="(?i)(application/xml)(;.*)?" next="SA"/>
-      <step type="REQ_TYPE" id="d57e11" match="(?i)(application/json)(;.*)?" next="SA"/>
+             xmlns:util="http://www.rackspace.com/repose/wadl/checker/util" xmlns:atom="http://www.w3.org/2005/Atom">
+      <step id="S0" type="START" next="d59e4 d59e54 SE1 d67e2u"/>
+      <step id="SA" type="ACCEPT" priority="100006"/>
+      <step type="REQ_TYPE_FAIL" id="d59e133rqt" notMatch="(?i)(application/atom\+xml)(;.*)?" priority="30005"/>
+      <step type="REQ_TYPE_FAIL" id="d59e107rqt" notMatch="(?i)(application/atom\+xml)(;.*)?" priority="30005"/>
+      <step type="METHOD_FAIL" id="d67e4m" notMatch="POST" priority="20053"/>
+      <step id="SE0" type="URL_FAIL" priority="10003"/>
+      <step id="SE1" type="METHOD_FAIL" priority="20002"/>
+      <step type="URL_FAIL" id="d67e3u" notMatch="entries" priority="10052"/>
+      <step type="REQ_TYPE_FAIL" id="d59e163rqt" notMatch="(?i)(application/atom\+xml)(;.*)?" priority="30005"/>
+      <step type="METHOD_FAIL" id="d67e9m" notMatch="POST" priority="20053"/>
+      <step type="URL_FAIL" id="d67e8u" notMatch="entries" priority="10052"/>
+      <step type="URL_FAIL" id="d67e2u" notMatch="nova|servers" priority="10101"/>
+      <step type="URL" id="d59e4" match="nova" next="d59e5 SE1 d67e3u"/>
+      <step type="URL" id="d59e5" match="entries" next="POST_d59e5 d67e4m SE0"/>
+      <step type="METHOD" id="POST_d59e5" match="POST" label="ε" next="d59e133 d59e107"/>
+      <step type="METHOD" id="d59e133" match="POST" label="addCloudServersOpenStackEntry" next="d59e137 d59e133rqt"/>
+      <step type="REQ_TYPE" id="d59e137" match="(?i)(application/atom\+xml)(;.*)?" next="SA"/>
+      <step type="METHOD" id="d59e107" match="POST" label="addRHELEntry" next="d59e111 d59e107rqt"/>
+      <step type="REQ_TYPE" id="d59e111" match="(?i)(application/atom\+xml)(;.*)?" next="SA"/>
+      <step type="URL" id="d59e54" match="servers" next="d59e55 SE1 d67e8u"/>
+      <step type="URL" id="d59e55" match="entries" next="POST_d59e55 d67e9m SE0"/>
+      <step type="METHOD" id="POST_d59e55" match="POST" label="ε" next="d59e163 d59e107"/>
+      <step type="METHOD" id="d59e163" match="POST" label="addCloudServersEntry" next="d59e167 d59e163rqt"/>
+      <step type="REQ_TYPE" id="d59e167" match="(?i)(application/atom\+xml)(;.*)?" next="SA"/>
     </checker>
 
   val handlerConfig = {
@@ -98,13 +110,9 @@ class ApiCoverageHandlerTest extends BaseValidatorSuite with MockitoSugar with B
     reset(req, resp, chn, res)
   }
 
-  List(("GET", "/path", "application/xml", """{"steps":["S0","d57e4","d57e5","d57e9","SA"]}"""),
-       ("GET", "/path", "application/json", """{"steps":["S0","d57e4","d57e5","d57e11","SA"]}"""),
-       ("GET", "/path", "text/plain", """{"steps":["S0","d57e4","d57e5","d57e5rqt"]}"""),
-       ("POST", "/path", "application/xml", """{"steps":["S0","d57e4","d65e3m"]}"""),
-       ("GET", "/notapath", "application/xml", """{"steps":["S0","d65e2u"]}"""),
-       ("POST", "/", "application/xml", """{"steps":["S0","SE1"]}"""),
-       ("GET", "/", "application/xml", """{"steps":["S0","SE1"]}""")).foreach { case (method, path, content, result) =>
+  List(("POST", "/nova/entries", "application/atom+xml", """{"steps":["S0","d59e4","d59e5","POST_d59e5","d59e133","d59e137","SA"]}"""),
+       ("POST", "/nova/entries", "application/json", """{"steps":["S0","d59e4","d59e5","POST_d59e5","d59e133","d59e133rqt"]}""")
+    ).foreach { case (method, path, content, result) =>
     test(s"For method: $method, path: $path, and context type: $content the result: $result is logged to api-coverage-logger") {
       val request = Mockito.mock(classOf[CheckerServletRequest])
       when(request.getMethod).thenReturn(method)
