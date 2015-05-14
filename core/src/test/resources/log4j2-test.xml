@@ -4,10 +4,14 @@
         <Console name="STDOUT">
             <PatternLayout pattern="[%p] [%t] %m%n"/>
         </Console>
+        <List name="api-coverage-listAppender"/>
     </Appenders>
     <Loggers>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
         </Root>
+        <Logger name="api-coverage-logger" level="info">
+            <AppenderRef ref="api-coverage-listAppender"/>
+        </Logger>
     </Loggers>
 </Configuration>
