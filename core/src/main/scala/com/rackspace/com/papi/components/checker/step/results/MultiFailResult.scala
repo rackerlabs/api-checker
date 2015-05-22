@@ -36,10 +36,11 @@ class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorR
   // delegate all method calls to the Result with the highest priority
   //
   override def message = results.head.message
-  override def context = results.head.context
   override def valid = results.head.valid
   override def terminal = results.head.terminal
+  override def context = results.head.context
   override def priority = results.head.priority
+  override def stepIDs = super.stepIDs ++ results.head.stepIDs
 
   override def code = asErrorResult(results.head).code
   override def headers = asErrorResult(results.head).headers
@@ -87,5 +88,5 @@ class MultiFailResult(val fails : Array[Result], stepId : String) extends ErrorR
     }
   }
 
-  override def path : String = startPath+stepIDs.reduceLeft(_+" "+_)+" " + fails.map( _.path ).reduceLeft( _ + " " + _ ) + endPath+"*"+selectId(this)+"*"
+  override def path : String = startPath+super.stepIDs.reduceLeft(_+" "+_)+" " + fails.map( _.path ).reduceLeft( _ + " " + _ ) + endPath+"*"+selectId(this)+"*"
 }

@@ -1,0 +1,82 @@
+<checker xmlns="http://www.rackspace.com/repose/wadl/checker"
+         xmlns:json="http://json-schema.org/schema#"
+         xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
+         xmlns:atom="http://www.w3.org/2005/Atom"
+         xmlns:d59e1="http://wadl.dev.java.net/2009/02"
+         xmlns:w_ns16="http://docs.rackspace.com/usage/nova/ips"
+         xmlns:w_ns18="http://docs.rackspace.com/event/RHEL"
+         xmlns:w_ns17="http://docs.rackspace.com/event/nova/host">
+    <meta>
+        <built-by>builder</built-by>
+        <created-by>API Checker CLI WADL2Checker (1.1.1-SNAPSHOT)</created-by>
+        <created-on>2015-05-19T10:07:06.688-05:00</created-on>
+        <created-from>
+            file:/api-checker/core/src/test/resources/wadl/sharedXPath.wadl
+        </created-from>
+        <config option="enableIgnoreJSONSchemaExtension" value="true"/>
+        <config option="enableMessageExtension" value="true"/>
+        <config option="joinXPathChecks" value="false"/>
+        <config option="doXSDGrammarTransform" value="false"/>
+        <config option="enablePreProcessExtension" value="true"/>
+        <config option="removeDups" value="false"/>
+        <config option="checkXSDGrammar" value="false"/>
+        <config option="enableCaptureHeaderExtension" value="true"/>
+        <config option="xpathVersion" value="1"/>
+        <config option="checkPlainParams" value="true"/>
+        <config option="checkWellFormed" value="false"/>
+        <config option="enableIgnoreXSDExtension" value="true"/>
+        <config option="checkJSONGrammar" value="false"/>
+        <config option="checkElements" value="false"/>
+        <config option="preserveRequestBody" value="false"/>
+        <config option="checkHeaders" value="false"/>
+        <config option="enableRaxRolesExtension" value="false"/>
+        <config option="maskRaxRoles403" value="false"/>
+    </meta>
+    <step id="S0" type="START" next="d59e4 d59e54 SE1 d67e2u"/>
+    <step type="WELL_XML" id="d59e137W" priority="41006" next="d59e1371XPTH d59e137WF"/>
+    <step type="XPATH" id="d59e1371XPTH" match="/atom:entry/w_ns16:usage" priority="41007"
+          next="d59e1372XPTH d59e137WF"/>
+    <step type="XPATH" id="d59e1372XPTH" match="/atom:entry/w_ns16:usage/w_ns16:up" priority="41008"
+          next="d59e1373XPTH d59e137WF"/>
+    <step type="XPATH" id="d59e1373XPTH" match="/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down" priority="41009"
+          next="d59e1374XPTH d59e137WF"/>
+    <step type="XPATH" id="d59e1374XPTH" match="/atom:entry/@only_usage_up_down" priority="41010" next="SA"/>
+    <step id="SA" type="ACCEPT" priority="100011"/>
+    <step type="CONTENT_FAIL" id="d59e137WF" priority="40010"/>
+    <step type="REQ_TYPE_FAIL" id="d59e133rqt" notMatch="(?i)(application/atom\+xml)(;.*)?" priority="30005"/>
+    <step type="WELL_XML" id="d59e111W" priority="41006" next="d59e1111XPTH d59e111WF"/>
+    <step type="XPATH" id="d59e1111XPTH" match="/atom:entry/w_ns18:usage" priority="41007"
+          next="d59e1112XPTH d59e111WF"/>
+    <step type="XPATH" id="d59e1112XPTH" match="/atom:entry/@only_usage" priority="41008" next="SA"/>
+    <step type="CONTENT_FAIL" id="d59e111WF" priority="40008"/>
+    <step type="REQ_TYPE_FAIL" id="d59e107rqt" notMatch="(?i)(application/atom\+xml)(;.*)?" priority="30005"/>
+    <step type="METHOD_FAIL" id="d67e4m" notMatch="POST" priority="20053"/>
+    <step id="SE0" type="URL_FAIL" priority="10003"/>
+    <step id="SE1" type="METHOD_FAIL" priority="20002"/>
+    <step type="URL_FAIL" id="d67e3u" notMatch="entries" priority="10052"/>
+    <step type="WELL_XML" id="d59e167W" priority="41006" next="d59e1671XPTH d59e167WF"/>
+    <step type="XPATH" id="d59e1671XPTH" match="/atom:entry/w_ns17:usage" priority="41007"
+          next="d59e1672XPTH d59e167WF"/>
+    <step type="XPATH" id="d59e1672XPTH" match="/atom:entry/w_ns17:usage/w_ns17:up" priority="41008"
+          next="d59e1673XPTH d59e167WF"/>
+    <step type="XPATH" id="d59e1673XPTH" match="/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down" priority="41009"
+          next="d59e1674XPTH d59e167WF"/>
+    <step type="XPATH" id="d59e1674XPTH" match="/atom:entry/@only_usage_up_down" priority="41010" next="SA"/>
+    <step type="CONTENT_FAIL" id="d59e167WF" priority="40010"/>
+    <step type="REQ_TYPE_FAIL" id="d59e163rqt" notMatch="(?i)(application/atom\+xml)(;.*)?" priority="30005"/>
+    <step type="METHOD_FAIL" id="d67e20m" notMatch="POST" priority="20053"/>
+    <step type="URL_FAIL" id="d67e19u" notMatch="entries" priority="10052"/>
+    <step type="URL_FAIL" id="d67e2u" notMatch="nova|servers" priority="10101"/>
+    <step type="URL" id="d59e4" match="nova" next="d59e5 SE1 d67e3u"/>
+    <step type="URL" id="d59e5" match="entries" next="POST_d59e5 d67e4m SE0"/>
+    <step type="METHOD" id="POST_d59e5" match="POST" label="ε" next="d59e133 d59e107"/>
+    <step type="METHOD" id="d59e133" match="POST" label="addCloudServersOpenStackEntry" next="d59e137 d59e133rqt"/>
+    <step type="REQ_TYPE" id="d59e137" match="(?i)(application/atom\+xml)(;.*)?" next="d59e137W d59e137WF"/>
+    <step type="METHOD" id="d59e107" match="POST" label="addRHELEntry" next="d59e111 d59e107rqt"/>
+    <step type="REQ_TYPE" id="d59e111" match="(?i)(application/atom\+xml)(;.*)?" next="d59e111W d59e111WF"/>
+    <step type="URL" id="d59e54" match="servers" next="d59e55 SE1 d67e19u"/>
+    <step type="URL" id="d59e55" match="entries" next="POST_d59e55 d67e20m SE0"/>
+    <step type="METHOD" id="POST_d59e55" match="POST" label="ε" next="d59e163 d59e107"/>
+    <step type="METHOD" id="d59e163" match="POST" label="addCloudServersEntry" next="d59e167 d59e163rqt"/>
+    <step type="REQ_TYPE" id="d59e167" match="(?i)(application/atom\+xml)(;.*)?" next="d59e167W d59e167WF"/>
+</checker>

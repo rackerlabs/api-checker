@@ -19,6 +19,9 @@ import com.rackspace.com.papi.components.checker.TestConfig
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+import scala.io.Source
+import scala.xml.Elem
+
 //
 //  Test optimizations in complex setups.
 //
@@ -50,72 +53,7 @@ class WADLCheckerOptSpec extends BaseCheckerSpec {
     //
     //  WADL with resources that have shared XPath checks.
     //
-    val sharedXPathWADL =
-<application xmlns="http://wadl.dev.java.net/2009/02"
-xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rax="http://docs.rackspace.com/api"
-xmlns:w_ns16="http://docs.rackspace.com/usage/nova/ips"
-xmlns:w_ns17="http://docs.rackspace.com/event/nova/host"
-xmlns:w_ns18="http://docs.rackspace.com/event/RHEL"
-xmlns:atom="http://www.w3.org/2005/Atom">
-  <resources base="http://localhost">
-    <resource path="servers/entries" type="#CloudServers #RHEL" />
-    <resource path="nova/entries" type="#CloudServersOpenStack #RHEL" />
-  </resources>
-  <resource_type id="RHEL">
-    <method id="addRHELEntry" name="POST">
-      <request>
-        <representation mediaType="application/atom+xml" element="atom:entry">
-          <param name="usage" style="plain" required="true" path="/atom:entry/w_ns18:usage" />
-          <param name="cross_check" style="plain" required="true" path="/atom:entry/@only_usage" />
-        </representation>
-      </request>
-      <response status="201">
-        <representation mediaType="application/atom+xml" />
-      </response>
-      <response status="400 401 409 500 503">
-        <representation mediaType="application/xml" />
-      </response>
-    </method>
-  </resource_type>
-  <resource_type id="CloudServersOpenStack">
-    <method id="addCloudServersOpenStackEntry" name="POST">
-      <request>
-        <representation mediaType="application/atom+xml" element="atom:entry">
-          <param name="usage" style="plain" required="true" path="/atom:entry/w_ns16:usage" />
-          <param name="up" style="plain" required="true" path="/atom:entry/w_ns16:usage/w_ns16:up" />
-          <param name="down" style="plain" required="true" path="/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down" />
-          <param name="cross_check" style="plain" required="true"
-          path="/atom:entry/@only_usage_up_down" />
-        </representation>
-      </request>
-      <response status="201">
-        <representation mediaType="application/atom+xml" />
-      </response>
-      <response status="400 401 409 500 503">
-        <representation mediaType="application/xml" />
-      </response>
-    </method>
-  </resource_type>
-  <resource_type id="CloudServers">
-    <method id="addCloudServersEntry" name="POST">
-      <request>
-        <representation mediaType="application/atom+xml" element="atom:entry">
-          <param name="usage" style="plain" required="true" path="/atom:entry/w_ns17:usage" />
-          <param name="up" style="plain" required="true" path="/atom:entry/w_ns17:usage/w_ns17:up" />
-          <param name="down" style="plain" required="true" path="/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down" />
-          <param name="cross_check" style="plain" required="true"
-          path="/atom:entry/@only_usage_up_down" />
-        </representation>
-      </request>
-      <response status="201">
-        <representation mediaType="application/atom+xml" />
-      </response>
-      <response status="400 401 409 500 503">
-        <representation mediaType="application/xml" />
-      </response>
-    </method>
-  </resource_type>
-</application>
+    val sharedXPathWADL = scala.xml.XML.loadString(Source.fromInputStream(this.getClass.getResourceAsStream("/wadl/sharedXPath.wadl")).mkString)
 
     scenario ("The sharedXPathWADL is processed checking wellformness, XSD, elemnts, and plain parameters, but without optimizations") {
       Given("the sharedXPathWADL")
