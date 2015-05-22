@@ -1,5 +1,9 @@
 # Releases #
 
+## Release 1.1.1 (2015-05-22) ##
+1. Added the new ApiCoverageHandler to log the path taken by a request to a logger named ```api-coverage-logger```.
+1. Fixed a bug where the Wadl2Checker and Wadl2Dot CLI utilities were accidentally placed in the test source tree. 
+
 ## Release 1.1.0 (2015-04-15) ##
 1. Classes have been repackaged into different packages.
 This breaks backwards compatibility for classes related to Result and Step
