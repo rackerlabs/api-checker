@@ -23,7 +23,8 @@ import com.rackspace.com.papi.components.checker.step.results.{ErrorResult, Resu
 import com.rackspace.httpdelegation.HttpDelegationManager
 import org.w3c.dom.Document
 
-class DelegationHandler(delegationQuality: Double) extends ResultHandler with HttpDelegationManager {
+class DelegationHandler(delegationQuality: Double, component: String) extends ResultHandler with HttpDelegationManager {
+  def this(delegationQuality: Double) = this(delegationQuality, "api-checker")
 
   def init (validator : Validator, checker : Option[Document]) : Unit = {}
 
@@ -32,7 +33,7 @@ class DelegationHandler(delegationQuality: Double) extends ResultHandler with Ht
       result match {
         case errorResult : ErrorResult =>
           val delegationHeaders = buildDelegationHeaders(
-            errorResult.code, "api-checker", errorResult.message, delegationQuality
+            errorResult.code, component, errorResult.message, delegationQuality
           )
 
           delegationHeaders.foreach { case (headerName, headerValues) =>

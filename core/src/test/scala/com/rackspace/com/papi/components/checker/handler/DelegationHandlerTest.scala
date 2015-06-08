@@ -64,4 +64,16 @@ class DelegationHandlerTest extends BaseValidatorSuite {
 
     verify(chn, never()).doFilter(req, resp)
   }
+
+  test("Delegation header should contain the provided component name") {
+    val delegationHandler = new DelegationHandler(.7, "component-test")
+    val res = new ErrorResult("I'm A Teapot", 418, StepContext(-1), "-1", -1)
+
+    val req = mock(classOf[CheckerServletRequest])
+    val resp = mock(classOf[CheckerServletResponse])
+
+    delegationHandler.handle(req, resp, chain, res)
+
+    verify(req).addHeader("X-Delegated", "status_code=418`component=component-test`message=I'm A Teapot;q=0.7")
+  }
 }
