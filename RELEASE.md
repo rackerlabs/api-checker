@@ -1,5 +1,9 @@
 # Releases #
 
+## Release 1.1.2 (2015-07-20) ##
+1. Added the ability for the DelegationHandler to have the default component name of ```api-checker``` overridden.
+This will allow multiple API-Checker instances to be utilized in a single application and have them be differentiated in the logs.
+
 ## Release 1.1.1 (2015-05-22) ##
 1. Added the new ApiCoverageHandler to log the path taken by a request to a logger named ```api-coverage-logger```.
 1. Fixed a bug where the Wadl2Checker and Wadl2Dot CLI utilities were accidentally placed in the test source tree. 
