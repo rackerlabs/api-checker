@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.servlet._
@@ -34,10 +35,10 @@ class DispatchResultHandler(private[this] var handlers : List[ResultHandler] = L
   def init(validator : Validator, checker : Option[Document]) : Unit = {
     handlers.foreach(h => h.init(validator, checker))
   }
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
+  def handle (req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, result : Result)  : Unit = {
     handlers.foreach(h => h.handle(req,resp,chain,result))
   }
-  override def inStep (currentStep: Step, req: CheckerServletRequest, resp : CheckerServletResponse, context: StepContext) : StepContext = {
+  override def inStep (currentStep: Step, req: CheckerServletRequest, resp : HttpServletResponse, context: StepContext) : StepContext = {
     handlers.foldLeft(context)((context : StepContext, handler : ResultHandler) => handler.inStep(currentStep, req, resp, context))
   }
   override def destroy : Unit = {

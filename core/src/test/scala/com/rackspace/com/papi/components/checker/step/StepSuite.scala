@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.namespace.QName
 
 import com.fasterxml.jackson.core.JsonParseException
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.github.fge.jsonschema.exceptions.ProcessingException
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
-import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
+import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.step.results._
 import com.rackspace.com.papi.components.checker.step.startend._
@@ -45,7 +46,7 @@ import scala.xml._
 @RunWith(classOf[JUnitRunner])
 class StepSuite extends BaseStepSuite with MockitoSugar {
   class GenericStep(id: String, label: String, next: Array[Step], extraHeaders: Option[HeaderMap] = None) extends ConnectedStep(id, label, next) {
-    override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] =
+    override def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] =
       Some(extraHeaders.map({headers => context.copy(requestHeaders = context.requestHeaders.addHeaders(headers))}).getOrElse(context))
   }
 
@@ -56,7 +57,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val request: CheckerServletRequest = Mockito.mock(classOf[CheckerServletRequest])
     Mockito.when(request.getMethod).thenReturn("GET")
     Mockito.when(request.URISegment).thenReturn(Array[String]())
-    val response: CheckerServletResponse = Mockito.mock(classOf[CheckerServletResponse])
+    val response: HttpServletResponse = Mockito.mock(classOf[HttpServletResponse])
 
     val headerMap = new HeaderMap().addHeaders("foo", List("bar", "baz"))
     Mockito.when(handler.inStep(Matchers.any(), Matchers.any(), Matchers.any(), Matchers.any())).thenAnswer(new Answer[StepContext](){
@@ -80,7 +81,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val step = new GenericStep("newGenericStep", "newGenericLabel", Array(new Accept("Accept", "Test Accept", 1)), Some(headerMap))
     val request: CheckerServletRequest = Mockito.mock(classOf[CheckerServletRequest])
 
-    val response: CheckerServletResponse = Mockito.mock(classOf[CheckerServletResponse])
+    val response: HttpServletResponse = Mockito.mock(classOf[HttpServletResponse])
     val result = step.check(request, response, chain, stepContext)
     result.get.stepIDs == List("newGenericStep")
     Mockito.verify(request).addHeaders(Matchers.eq(headerMap))
@@ -89,7 +90,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
   test("handlers should pass through the context if there isnt an inStep method defined") {
     class GenericHandler extends ResultHandler {
       def init(validator : Validator, checker : Option[Document]) : Unit = {}
-      def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result) : Unit = {}
+      def handle (req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, result : Result) : Unit = {}
     }
 
     val stepContext = new StepContext(handler = Some(new GenericHandler()))
@@ -97,7 +98,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val step = new GenericStep("newGenericStep", "newGenericLabel", Array(new Accept("Accept", "Test Accept", 1)), Some(headerMap))
     val request: CheckerServletRequest = Mockito.mock(classOf[CheckerServletRequest])
 
-    val response: CheckerServletResponse = Mockito.mock(classOf[CheckerServletResponse])
+    val response: HttpServletResponse = Mockito.mock(classOf[HttpServletResponse])
     val result = step.check(request, response, chain, stepContext)
     result.get.stepIDs == List("newGenericStep")
     Mockito.verify(request).addHeaders(Matchers.eq(headerMap))

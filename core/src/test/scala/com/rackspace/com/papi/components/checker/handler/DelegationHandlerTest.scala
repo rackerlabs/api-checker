@@ -16,9 +16,10 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.BaseValidatorSuite
-import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
+import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
 import com.rackspace.com.papi.components.checker.step.base.StepContext
 import com.rackspace.com.papi.components.checker.step.results.{AcceptResult, ErrorResult}
 import org.junit.runner.RunWith
@@ -34,7 +35,7 @@ class DelegationHandlerTest extends BaseValidatorSuite {
     val res = new ErrorResult("forbidden", 403, StepContext(-1), "-1", -1)
 
     val req = mock(classOf[CheckerServletRequest])
-    val resp = mock(classOf[CheckerServletResponse])
+    val resp = mock(classOf[HttpServletResponse])
 
     delegationHandler.handle(req, resp, chain, res)
 
@@ -45,7 +46,7 @@ class DelegationHandlerTest extends BaseValidatorSuite {
     val res = new ErrorResult("forbidden", 403, StepContext(-1), "-1", -1)
 
     val req = mock(classOf[CheckerServletRequest])
-    val resp = mock(classOf[CheckerServletResponse])
+    val resp = mock(classOf[HttpServletResponse])
     val chn = mock(classOf[FilterChain])
 
     delegationHandler.handle(req, resp, chn, res)
@@ -57,7 +58,7 @@ class DelegationHandlerTest extends BaseValidatorSuite {
     val res = new AcceptResult("ok", StepContext(-1), "-1", -1)
 
     val req = mock(classOf[CheckerServletRequest])
-    val resp = mock(classOf[CheckerServletResponse])
+    val resp = mock(classOf[HttpServletResponse])
     val chn = mock(classOf[FilterChain])
 
     delegationHandler.handle(req, resp, chn, res)
@@ -70,7 +71,7 @@ class DelegationHandlerTest extends BaseValidatorSuite {
     val res = new ErrorResult("I'm A Teapot", 418, StepContext(-1), "-1", -1)
 
     val req = mock(classOf[CheckerServletRequest])
-    val resp = mock(classOf[CheckerServletResponse])
+    val resp = mock(classOf[HttpServletResponse])
 
     delegationHandler.handle(req, resp, chain, res)
 

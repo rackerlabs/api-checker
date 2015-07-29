@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step.startend
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
@@ -26,12 +27,12 @@ import com.rackspace.com.papi.components.checker.step.results._
 //
 class Start(id : String, label : String, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override def checkStep(req : CheckerServletRequest,
-                         resp : CheckerServletResponse,
+                         resp : HttpServletResponse,
                          chain : FilterChain,
                          context : StepContext ) : Option[StepContext] = Some(context)
 
   override def check(req : CheckerServletRequest,
-                     resp : CheckerServletResponse,
+                     resp : HttpServletResponse,
                      chain : FilterChain,
                      context : StepContext) : Option[Result] = {
     //

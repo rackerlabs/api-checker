@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker._
 import com.rackspace.com.papi.components.checker.servlet._
@@ -27,7 +28,7 @@ import scala.collection.JavaConversions._
 class ServletResultHandler extends ResultHandler {
   def init (validator : Validator, checker : Option[Document]) : Unit = {}
 
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
+  def handle (req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, result : Result)  : Unit = {
     if (!result.valid) {
       result match {
         case errorResult : ErrorResult =>
@@ -36,7 +37,7 @@ class ServletResultHandler extends ResultHandler {
     }
   }
 
-  private def sendError (er : ErrorResult, resp : CheckerServletResponse) : Unit = {
+  private def sendError (er : ErrorResult, resp : HttpServletResponse) : Unit = {
     er.headers.keySet.iterator.foreach(h => resp.addHeader(h, er.headers.get(h)))
     resp.sendError(er.code, er.message)
   }

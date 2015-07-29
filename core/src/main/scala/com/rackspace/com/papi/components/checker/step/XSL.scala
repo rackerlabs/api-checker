@@ -16,10 +16,11 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.parsers.DocumentBuilder
-import javax.xml.transform.{ErrorListener, Source, Templates, Transformer, TransformerException}
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.stream.StreamSource
+import javax.xml.transform.{ErrorListener, Source, Templates, Transformer, TransformerException}
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
@@ -30,7 +31,7 @@ import com.rackspace.com.papi.components.checker.util.XMLParserPool.{borrowParse
 class XSL(id : String, label : String, templates : Templates, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "Error while performing translation"
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+  override def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     var ret : Option[StepContext] = Some(context)
     var parser : DocumentBuilder = null
     var transform : Transformer = null

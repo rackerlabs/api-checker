@@ -15,6 +15,8 @@
   */
 package com.rackspace.com.papi.components.checker
 
+import javax.servlet.http.HttpServletResponse
+
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.com.papi.components.checker.RunAssertionsHandler._
 import com.rackspace.com.papi.components.checker.servlet._
@@ -460,7 +462,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("GET", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("Foo"), "OtherHeader" -> List("2")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("Foo"))
 
@@ -484,7 +486,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (FOO) with " + desc + attr) {
         val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FOO")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("FOO"))
 
@@ -498,7 +500,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (FAR) with " + desc + attr) {
         val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FAR")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("FAR"))
 
@@ -512,7 +514,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (OUT) with " + desc + attr) {
         val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("OUT")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("OUT"))
 
@@ -536,7 +538,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PUT on path/to/resource1 of FOO should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FOO")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("FOO"))
 
@@ -550,7 +552,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PUT on path/to/resource1 of FAR should *not* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FAR")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // X-DEVICE-ID should *not* be set
           assert(csReq.getHeader("X-DEVICE-ID") == null)
 
@@ -564,7 +566,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PUT on path/to/resource1 of OUT should *not* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("OUT")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // X-DEVICE-ID should *not* be set
           assert(csReq.getHeader("X-DEVICE-ID") == null)
 
@@ -583,7 +585,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A DELETE on path/to/resource1 of 1 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("1")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("1"))
 
@@ -597,7 +599,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A DELETE on path/to/resource1 of 2 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("2"))
 
@@ -611,7 +613,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A DELETE on path/to/resource1 of 3 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("3"))
 
@@ -635,7 +637,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PATCH on path/to/resource1 of 1 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("1")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("1"))
 
@@ -649,7 +651,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PATCH on path/to/resource1 of 2 should *NOT* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeader("X-DEVICE-ID") == null)
 
@@ -663,7 +665,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PATCH on path/to/resource1 of 3 should *NOT* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeader("X-DEVICE-ID") == null)
 
@@ -687,7 +689,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource2/foo should set X-SUB-RESOURCE to foo with " + desc + attr) {
         val req = request("GET", "/path/to/resource2/foo", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("foo"))
 
@@ -701,7 +703,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource2/bar should set X-SUB-RESOURCE to bar with " + desc + attr) {
         val req = request("GET", "/path/to/resource2/bar", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("bar"))
 
@@ -715,7 +717,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource2/foo/2 should set X-SUB-RESOURCE to foo and X-SUB-RESOURCE2 to bar with " + desc + attr) {
         val req = request("GET", "/path/to/resource2/foo/2", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("foo"))
           assert(csReq.getHeaders("X-SUB-RESOURCE2").toList == List("2"))
@@ -729,7 +731,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource2/bar/2000 should set X-SUB-RESOURCE to bar and X-SUB-RESOURCE2 to 2000 with " + desc + attr) {
         val req = request("GET", "/path/to/resource2/bar/2000", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("bar"))
           assert(csReq.getHeaders("X-SUB-RESOURCE2").toList == List("2000"))
@@ -753,7 +755,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource3/bar should set X-SUB-RESOURCE to bar with " + desc + attr) {
         val req = request("GET", "/path/to/resource3/bar", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("bar"))
 
@@ -767,7 +769,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource3/bar/none should set X-SUB-RESOURCE to bar and none with " + desc + attr) {
         val req = request("GET", "/path/to/resource3/bar/none", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("bar", "none"))
 
@@ -789,7 +791,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='bar' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("bar"))
 
@@ -806,7 +808,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='foo' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("foo"))
 
@@ -847,7 +849,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='bar' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("bar"))
 
@@ -864,7 +866,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='foo' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("foo"))
 
@@ -905,7 +907,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='bar' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("bar"))
 
@@ -922,7 +924,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='foo' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("foo"))
 
@@ -975,7 +977,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("GET", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("Foo"), "OtherHeader" -> List("2"), "X-ROLES" -> List("headerRole")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("Foo"))
 
@@ -999,7 +1001,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (FOO) with " + desc + attr) {
         val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FOO")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("FOO"))
 
@@ -1013,7 +1015,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (FAR) with " + desc + attr) {
         val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FAR")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("FAR"))
 
@@ -1027,7 +1029,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (OUT) with " + desc + attr) {
         val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("OUT")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("OUT"))
 
@@ -1051,7 +1053,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PUT on path/to/resource1 of FOO should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FOO")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("FOO"))
 
@@ -1065,7 +1067,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PUT on path/to/resource1 of FAR should *not* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FAR")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // X-DEVICE-ID should *not* be set
           assert(csReq.getHeader("X-DEVICE-ID") == null)
 
@@ -1079,7 +1081,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PUT on path/to/resource1 of OUT should *not* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("OUT")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // X-DEVICE-ID should *not* be set
           assert(csReq.getHeader("X-DEVICE-ID") == null)
 
@@ -1098,7 +1100,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A DELETE on path/to/resource1 of 1 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("1")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("1"))
 
@@ -1112,7 +1114,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A DELETE on path/to/resource1 of 2 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("2"))
 
@@ -1126,7 +1128,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A DELETE on path/to/resource1 of 3 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("3"))
 
@@ -1150,7 +1152,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PATCH on path/to/resource1 of 1 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("1")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-DEVICE-ID").toList == List("1"))
 
@@ -1164,7 +1166,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PATCH on path/to/resource1 of 2 should *NOT* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeader("X-DEVICE-ID") == null)
 
@@ -1178,7 +1180,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A PATCH on path/to/resource1 of 3 should *NOT* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeader("X-DEVICE-ID") == null)
 
@@ -1202,7 +1204,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource2/foo should set X-SUB-RESOURCE to foo with " + desc + attr) {
         val req = request("GET", "/path/to/resource2/foo", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("foo"))
 
@@ -1216,7 +1218,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource2/bar should set X-SUB-RESOURCE to bar with " + desc + attr) {
         val req = request("GET", "/path/to/resource2/bar", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("bar"))
 
@@ -1230,7 +1232,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource2/foo/2 should set X-SUB-RESOURCE to foo and X-SUB-RESOURCE2 to bar with " + desc + attr) {
         val req = request("GET", "/path/to/resource2/foo/2", "", "", false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("subresourceRole")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("foo"))
           assert(csReq.getHeaders("X-SUB-RESOURCE2").toList == List("2"))
@@ -1244,7 +1246,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource2/bar/2000 should set X-SUB-RESOURCE to bar and X-SUB-RESOURCE2 to 2000 with " + desc + attr) {
         val req = request("GET", "/path/to/resource2/bar/2000", "", "", false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("subresourceRole")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct header should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("bar"))
           assert(csReq.getHeaders("X-SUB-RESOURCE2").toList == List("2000"))
@@ -1268,7 +1270,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource3/bar should set X-SUB-RESOURCE to bar with " + desc + attr) {
         val req = request("GET", "/path/to/resource3/bar", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("bar"))
 
@@ -1282,7 +1284,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
 
       test("A GET on path/to/resource3/bar/none should set X-SUB-RESOURCE to bar and none with " + desc + attr) {
         val req = request("GET", "/path/to/resource3/bar/none", "", "", false, Map("MyHeader" -> List("3")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-SUB-RESOURCE").toList == List("bar", "none"))
 
@@ -1304,7 +1306,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='bar' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("bar"))
 
@@ -1321,7 +1323,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='foo' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("foo"))
 
@@ -1362,7 +1364,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='bar' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("bar"))
 
@@ -1379,7 +1381,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='bar' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("put:admin")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("bar"))
 
@@ -1396,7 +1398,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='foo' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("foo"))
 
@@ -1413,7 +1415,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='foo' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("put:admin")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("foo"))
 
@@ -1454,7 +1456,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='bar' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("bar"))
 
@@ -1471,7 +1473,7 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='foo' foo2='hop' foo3='yes'/>,
           false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
-        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: HttpServletResponse, res: Result) => {
           // Correct headers should be set...
           assert(csReq.getHeaders("X-FOO").toList == List("foo"))
 

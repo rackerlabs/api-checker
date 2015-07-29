@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step.base
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, MultiFailResult, Result}
@@ -31,7 +32,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //  Check the currest step.  If the step is a match return a new
   //  updated context, if not then return None
   //
-  def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = None
+  def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = None
 
   //
   //  Check the currest step.  If the step is a match return the next
@@ -39,7 +40,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //  compatability reasons, there was a time where the only context
   //  was the URI level.
   //
-  final def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
+  final def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, uriLevel : Int) : Int = {
     checkStep(req, resp, chain, StepContext(uriLevel)) match {
       case Some(context) => context.uriLevel
       case None => -1
@@ -55,7 +56,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //  Go to the next step.
   //
   def nextStep (req : CheckerServletRequest,
-                resp : CheckerServletResponse,
+                resp : HttpServletResponse,
                 chain : FilterChain,
                 context : StepContext) : Array[Result] = {
 
@@ -78,7 +79,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
   //  Check this step, if successful, check next relevant steps.
   //
   override def check(req : CheckerServletRequest,
-                     resp : CheckerServletResponse,
+                     resp : HttpServletResponse,
                      chain : FilterChain,
                      context : StepContext) : Option[Result] = {
 

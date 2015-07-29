@@ -17,9 +17,10 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.Validator
-import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
+import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
 import com.rackspace.com.papi.components.checker.step.results.Result
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.slf4j.LoggerFactory
@@ -30,7 +31,7 @@ class ApiCoverageHandler extends ResultHandler with LazyLogging {
 
   override def init(validator: Validator, checker: Option[Document]): Unit = {}
 
-  override def handle(req: CheckerServletRequest, resp: CheckerServletResponse, chain: FilterChain, result: Result): Unit = {
+  override def handle(req: CheckerServletRequest, resp: HttpServletResponse, chain: FilterChain, result: Result): Unit = {
     coverageLogger.info("{\"steps\":[" +
       result.stepIDs.foldLeft("")({ (b, a) => b + "\"" + a + "\"," }).dropRight(1) +
       "]}")

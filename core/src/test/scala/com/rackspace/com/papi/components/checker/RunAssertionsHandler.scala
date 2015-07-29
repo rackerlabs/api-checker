@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.handler._
 import com.rackspace.com.papi.components.checker.servlet._
@@ -33,10 +34,10 @@ object RunAssertionsHandler {
   val ASSERT_FUNCTION = "com.rackspace.com.papi.components.checker.test.assertion.function"
 }
 class RunAssertionsHandler extends ResultHandler {
-  type AssertFunction = (CheckerServletRequest, CheckerServletResponse, Result) => Unit
+  type AssertFunction = (CheckerServletRequest, HttpServletResponse, Result) => Unit
 
   def init(validator : Validator, checker : Option[Document]) : Unit = {}
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit =
+  def handle (req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, result : Result)  : Unit =
     req.getAttribute(RunAssertionsHandler.ASSERT_FUNCTION) match {
       case f : AssertFunction => f(req,resp,result)
       case null => {}

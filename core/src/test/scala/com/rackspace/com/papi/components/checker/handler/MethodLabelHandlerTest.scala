@@ -17,13 +17,14 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
 
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.com.papi.components.checker.Converters._
-import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
+import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
 import com.rackspace.com.papi.components.checker.step._
 import com.rackspace.com.papi.components.checker.step.base.StepContext
 import com.rackspace.com.papi.components.checker.step.results.Result
@@ -102,7 +103,7 @@ class MethodLabelHandlerTest extends BaseValidatorSuite with BeforeAndAfter with
   handlerConfig.resultHandler.init(validator, Some(xmlChecker))
 
   val req = Mockito.mock(classOf[CheckerServletRequest])
-  val resp = Mockito.mock(classOf[CheckerServletResponse])
+  val resp = Mockito.mock(classOf[HttpServletResponse])
   val chn = Mockito.mock(classOf[FilterChain])
   val res = Mockito.mock(classOf[Result])
 
@@ -121,7 +122,7 @@ class MethodLabelHandlerTest extends BaseValidatorSuite with BeforeAndAfter with
     validator.validate(request, resp, chn)
 
     val newRequest: ArgumentCaptor[CheckerServletRequest] = ArgumentCaptor.forClass(classOf[CheckerServletRequest])
-    verify(chn).doFilter(newRequest.capture(), Matchers.any(classOf[CheckerServletResponse]))
+    verify(chn).doFilter(newRequest.capture(), Matchers.any(classOf[HttpServletResponse]))
     assert(newRequest.getValue.getHeaders("X-METHOD-LABEL").nextElement() == "post-xml-method")
   }
 
@@ -135,7 +136,7 @@ class MethodLabelHandlerTest extends BaseValidatorSuite with BeforeAndAfter with
     validator.validate(request, resp, chn)
 
     val newRequest: ArgumentCaptor[CheckerServletRequest] = ArgumentCaptor.forClass(classOf[CheckerServletRequest])
-    verify(chn).doFilter(newRequest.capture(), Matchers.any(classOf[CheckerServletResponse]))
+    verify(chn).doFilter(newRequest.capture(), Matchers.any(classOf[HttpServletResponse]))
     assert(!newRequest.getValue.getHeaders("X-METHOD-LABEL").hasMoreElements)
   }
 

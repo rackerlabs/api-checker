@@ -17,10 +17,11 @@ package com.rackspace.com.papi.components.checker.handler
 
 import java.lang.management._
 import java.net.URLDecoder
-import java.util.{Collections, LinkedHashMap}
 import java.util.concurrent.atomic.AtomicLong
+import java.util.{Collections, LinkedHashMap}
 import javax.management._
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.servlet._
@@ -92,7 +93,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
     fail.count.incrementAndGet()
   }
 
-  override def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
+  override def handle (req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, result : Result)  : Unit = {
     markResult(result)
     if (!result.valid) {
       markFail(result, req)

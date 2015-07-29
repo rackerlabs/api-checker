@@ -177,9 +177,8 @@ class Validator private (private val _name : String, val startStep : Step, val c
     val context = timer.timerContext()
     try {
       val creq = new CheckerServletRequest (req)
-      val cres = new CheckerServletResponse(res)
-      val result = startStep.check (creq, cres, chain, StepContext(handler = Option(resultHandler))).get
-      resultHandler.handle(creq, cres, chain, result)
+      val result = startStep.check (creq, res, chain, StepContext(handler = Option(resultHandler))).get
+      resultHandler.handle(creq, res, chain, result)
       if (!result.valid) failMeter.mark()
       result
     } catch {
