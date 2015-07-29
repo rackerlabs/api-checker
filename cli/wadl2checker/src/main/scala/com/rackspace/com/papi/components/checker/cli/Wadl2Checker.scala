@@ -25,7 +25,7 @@ import org.clapper.argot.ArgotConverters._
 import org.clapper.argot.{ArgotParser, ArgotUsageException}
 
 object Wadl2Checker {
-  val parser = new ArgotParser("wadl2checker", preUsage=Some("wadl2checker: Version 1.0.0-SNAPSHOT"))
+  val parser = new ArgotParser("wadl2checker", preUsage=Some("wadl2checker: Version 1.1.2-SNAPSHOT"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
@@ -37,8 +37,10 @@ object Wadl2Checker {
                                               "When Rax-Roles is enable mask 403 errors with 404 or 405s. Default: false")
 
   val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
-                                         "Join multiple XPath and XML well-formed checks into a single check: false")
+                                         "Join multiple XPath and XML well-formed checks into a single check. Default: false")
 
+  val xsdGrammarTransform = parser.flag[Boolean] (List("g", "xsd-grammar-transform"),
+                                                       "Transform the XML after validation, to fill in things like default values etc. Default: false")
 
   val preserveRequestBody = parser.flag[Boolean] (List("b", "preserve-req-body"),
                                               "Ensure that the request body is preserved after validating the request.")
@@ -145,6 +147,7 @@ object Wadl2Checker {
       c.enableCaptureHeaderExtension = !(captureHeader.value.getOrElse(false))
       c.xpathVersion = xpathVersion.value.getOrElse(1)
       c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
+      c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
 
       new WADLCheckerBuilder().build (getSource, getResult, c)
     } catch {
