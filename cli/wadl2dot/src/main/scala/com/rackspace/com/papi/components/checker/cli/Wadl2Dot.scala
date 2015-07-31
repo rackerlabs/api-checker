@@ -25,7 +25,11 @@ import org.clapper.argot.ArgotConverters._
 import org.clapper.argot.{ArgotParser, ArgotUsageException}
 
 object Wadl2Dot {
-  val parser = new ArgotParser("wadl2dot", preUsage=Some("wadl2dot: Version 1.0.0-SNAPSHOT"))
+  val title = getClass.getPackage.getImplementationTitle
+
+  val version = getClass.getPackage.getImplementationVersion
+
+  val parser = new ArgotParser("java -jar wadl2dot.jar", preUsage=Some(s"$title v$version"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
@@ -40,7 +44,10 @@ object Wadl2Dot {
                                          "Add checks to ensure that XML and JSON are well formed. Default: false")
 
   val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
-                                         "Join multiple XPath and XML well-formed checks into a single check: false")
+                                         "Join multiple XPath and XML well-formed checks into a single check. Default: false")
+
+  val xsdGrammarTransform = parser.flag[Boolean] (List("g", "xsd-grammar-transform"),
+                                                  "Transform the XML after validation, to fill in things like default values etc. Default: false")
 
   val preserveRequestBody = parser.flag[Boolean] (List("b", "preserve-req-body"),
                                               "Ensure that the request body is preserved after validating the request.")
@@ -56,7 +63,6 @@ object Wadl2Dot {
 
   val header = parser.flag[Boolean] (List("H", "header"),
                                          "Add checks to ensure that required headers are passed in: false")
-
 
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
@@ -86,16 +92,19 @@ object Wadl2Dot {
                                    "Display usage.")
 
   val input = parser.parameter[String]("wadl",
-                                       "WADL file/uri to read.  If not specified, "+
-                                       " stdin will be used.", true)
+                                       "WADL file/uri to read.  If not specified, stdin will be used.",
+                                       true)
 
   val output = parser.parameter[String]("output",
                                         "Output file. If not specified, stdout will be used.",
                                         true)
 
-  def getSource : Source = {
-    var source : Source = null
-    if (input.value == None) {
+  val printVersion = parser.flag[Boolean] (List("version"),
+                                            "Display version.")
+
+  def getSource: Source = {
+    var source: Source = null
+    if (input.value.isEmpty) {
       source = new StreamSource(System.in)
     } else {
       source = new StreamSource(URLResolver.toAbsoluteSystemId(input.value.get))
@@ -103,9 +112,9 @@ object Wadl2Dot {
     source
   }
 
-  def getResult : Result = {
-    var result : Result = null
-    if (output.value == None) {
+  def getResult: Result = {
+    var result: Result = null
+    if (output.value.isEmpty) {
       result = new StreamResult(System.out)
     } else {
       result = new StreamResult(URLResolver.toAbsoluteSystemId(output.value.get))
@@ -113,42 +122,47 @@ object Wadl2Dot {
     result
   }
 
-  def handleArgs(args: Array[String]) : Unit = {
+  def handleArgs(args: Array[String]): Unit = {
     parser.parse(args)
 
     if (help.value.getOrElse(false)) {
-      parser.usage
+      parser.usage()
     }
   }
 
-  def main (args: Array[String]) = {
+  def main(args: Array[String]) = {
     try {
-      handleArgs (args)
+      handleArgs(args)
 
-      val c = new Config
+      if (printVersion.value.getOrElse(false)) {
+        println(s"$title v$version")
+      } else {
+        val c = new Config
 
-      c.removeDups = removeDups.value.getOrElse(false)
-      c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
-      c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
-      c.checkWellFormed = wellFormed.value.getOrElse(false)
-      c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
-      c.checkJSONGrammar = jsonCheck.value.getOrElse(false)
-      c.checkElements   = element.value.getOrElse(false)
-      c.checkPlainParams = plainParam.value.getOrElse(false)
-      c.enablePreProcessExtension = !(preProc.value.getOrElse(false))
-      c.joinXPathChecks = joinXPaths.value.getOrElse(false)
-      c.checkHeaders = header.value.getOrElse(false)
-      c.enableIgnoreXSDExtension = !(ignoreXSD.value.getOrElse(false))
-      c.enableIgnoreJSONSchemaExtension = !(ignoreJSON.value.getOrElse(false))
-      c.enableMessageExtension = !(message.value.getOrElse(false))
-      c.enableCaptureHeaderExtension = !(captureHeader.value.getOrElse(false))
-      c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
-      c.validateChecker = true
+        c.removeDups = removeDups.value.getOrElse(false)
+        c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
+        c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
+        c.checkWellFormed = wellFormed.value.getOrElse(false)
+        c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
+        c.checkJSONGrammar = jsonCheck.value.getOrElse(false)
+        c.checkElements = element.value.getOrElse(false)
+        c.checkPlainParams = plainParam.value.getOrElse(false)
+        c.enablePreProcessExtension = !preProc.value.getOrElse(false)
+        c.joinXPathChecks = joinXPaths.value.getOrElse(false)
+        c.checkHeaders = header.value.getOrElse(false)
+        c.enableIgnoreXSDExtension = !ignoreXSD.value.getOrElse(false)
+        c.enableIgnoreJSONSchemaExtension = !ignoreJSON.value.getOrElse(false)
+        c.enableMessageExtension = !message.value.getOrElse(false)
+        c.enableCaptureHeaderExtension = !captureHeader.value.getOrElse(false)
+        c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
+        c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
+        c.validateChecker = true
 
-      new WADLDotBuilder().build (getSource, getResult,
-                                  c,
-                                  !showErrors.value.getOrElse(false),
-                                  nfaMode.value.getOrElse(false))
+        new WADLDotBuilder().build(getSource, getResult,
+          c,
+          !showErrors.value.getOrElse(false),
+          nfaMode.value.getOrElse(false))
+      }
     } catch {
       case e: ArgotUsageException => println(e.message)
     }
