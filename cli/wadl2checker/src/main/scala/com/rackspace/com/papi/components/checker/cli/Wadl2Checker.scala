@@ -25,7 +25,11 @@ import org.clapper.argot.ArgotConverters._
 import org.clapper.argot.{ArgotParser, ArgotUsageException}
 
 object Wadl2Checker {
-  val parser = new ArgotParser("wadl2checker", preUsage=Some("wadl2checker: Version 1.0.0-SNAPSHOT"))
+  val title = getClass.getPackage.getImplementationTitle
+
+  val version = getClass.getPackage.getImplementationVersion
+
+  val parser = new ArgotParser("java -jar wadl2checker.jar", preUsage=Some(s"$title v$version"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
@@ -88,16 +92,19 @@ object Wadl2Checker {
                                            "XPath version to use. Can be 1 or 2. Default: 1")
 
   val input = parser.parameter[String]("wadl",
-                                       "WADL file/uri to read.  If not specified, "+
-                                       " stdin will be used.", true)
+                                       "WADL file/uri to read.  If not specified, stdin will be used.",
+                                        true)
 
   val output = parser.parameter[String]("output",
                                         "Output file. If not specified, stdout will be used.",
                                         true)
 
-  def getSource : Source = {
-    var source : Source = null
-    if (input.value == None) {
+  val printVersion = parser.flag[Boolean] (List("version"),
+                                      "Display version.")
+
+  def getSource: Source = {
+    var source: Source = null
+    if (input.value.isEmpty) {
       source = new StreamSource(System.in)
     } else {
       source = new StreamSource(URLResolver.toAbsoluteSystemId(input.value.get))
@@ -105,9 +112,9 @@ object Wadl2Checker {
     source
   }
 
-  def getResult : Result = {
-    var result : Result = null
-    if (output.value == None) {
+  def getResult: Result = {
+    var result: Result = null
+    if (output.value.isEmpty) {
       result = new StreamResult(System.out)
     } else {
       result = new StreamResult(URLResolver.toAbsoluteSystemId(output.value.get))
@@ -115,41 +122,45 @@ object Wadl2Checker {
     result
   }
 
-  def handleArgs(args: Array[String]) : Unit = {
+  def handleArgs(args: Array[String]): Unit = {
     parser.parse(args)
 
     if (help.value.getOrElse(false)) {
-      parser.usage
+      parser.usage()
     }
   }
 
-  def main (args: Array[String]) = {
+  def main(args: Array[String]) = {
     try {
-      handleArgs (args)
+      handleArgs(args)
 
-      val c = new Config
+      if (printVersion.value.getOrElse(false)) {
+        println(s"$title v$version")
+      } else {
+        val c = new Config
 
-      c.removeDups = removeDups.value.getOrElse(false)
-      c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
-      c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
-      c.validateChecker = validate.value.getOrElse(false)
-      c.checkWellFormed = wellFormed.value.getOrElse(false)
-      c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
-      c.checkJSONGrammar = jsonCheck.value.getOrElse(false)
-      c.checkElements = element.value.getOrElse(false)
-      c.checkPlainParams = plainParam.value.getOrElse(false)
-      c.enablePreProcessExtension = !(preProc.value.getOrElse(false))
-      c.joinXPathChecks = joinXPaths.value.getOrElse(false)
-      c.checkHeaders = header.value.getOrElse(false)
-      c.enableIgnoreXSDExtension = !(ignoreXSD.value.getOrElse(false))
-      c.enableIgnoreJSONSchemaExtension = !(ignoreJSON.value.getOrElse(false))
-      c.enableMessageExtension = !(message.value.getOrElse(false))
-      c.enableCaptureHeaderExtension = !(captureHeader.value.getOrElse(false))
-      c.xpathVersion = xpathVersion.value.getOrElse(1)
-      c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
-      c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
+        c.removeDups = removeDups.value.getOrElse(false)
+        c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
+        c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
+        c.validateChecker = validate.value.getOrElse(false)
+        c.checkWellFormed = wellFormed.value.getOrElse(false)
+        c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
+        c.checkJSONGrammar = jsonCheck.value.getOrElse(false)
+        c.checkElements = element.value.getOrElse(false)
+        c.checkPlainParams = plainParam.value.getOrElse(false)
+        c.enablePreProcessExtension = !preProc.value.getOrElse(false)
+        c.joinXPathChecks = joinXPaths.value.getOrElse(false)
+        c.checkHeaders = header.value.getOrElse(false)
+        c.enableIgnoreXSDExtension = !ignoreXSD.value.getOrElse(false)
+        c.enableIgnoreJSONSchemaExtension = !ignoreJSON.value.getOrElse(false)
+        c.enableMessageExtension = !message.value.getOrElse(false)
+        c.enableCaptureHeaderExtension = !captureHeader.value.getOrElse(false)
+        c.xpathVersion = xpathVersion.value.getOrElse(1)
+        c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
+        c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
 
-      new WADLCheckerBuilder().build (getSource, getResult, c)
+        new WADLCheckerBuilder().build(getSource, getResult, c)
+      }
     } catch {
       case e: ArgotUsageException => println(e.message)
     }
