@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step.startend
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.namespace.QName
 import javax.xml.validation.Schema
 
@@ -36,7 +37,7 @@ class URLFailXSD(id : String, label : String, types : Array[QName], schema : Sch
 
 
   override def check(req : CheckerServletRequest,
-                     resp : CheckerServletResponse,
+                     resp : HttpServletResponse,
                      chain : FilterChain,
                      context : StepContext) : Option[Result] = {
 

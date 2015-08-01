@@ -1,6 +1,9 @@
 # Releases #
 
-## Release 1.1.2 (2015-07-20) ##
+## Release ?.?.? (2015-07-31) ##
+1. Removed unneeded response wrapper.
+
+## Release 1.1.2 (2015-07-31) ##
 1. Added the ability for the DelegationHandler to have the default component name of ```api-checker``` overridden.
 This will allow multiple API-Checker instances to be utilized in a single application and have them be differentiated in the logs.
 

@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.results.Result
@@ -27,5 +28,5 @@ import scala.language.implicitConversions
  * if a request fails to validate
  */
 class ResultFailedException(val msg : String, val req : CheckerServletRequest,
-                            val resp : CheckerServletResponse, val chain : FilterChain, val result : Result)
+                            val resp : HttpServletResponse, val chain : FilterChain, val result : Result)
    extends Exception(msg){}

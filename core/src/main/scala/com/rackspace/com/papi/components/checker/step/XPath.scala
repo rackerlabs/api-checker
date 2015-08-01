@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.namespace.NamespaceContext
 import javax.xml.xpath.XPathConstants.{BOOLEAN, STRING}
 import javax.xml.xpath.XPathExpression
@@ -51,7 +52,7 @@ class XPath(id : String, label : String, val expression : String, val message : 
     }
   }
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+  override def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     var ret : Option[StepContext] = None
     var xpath : XPathExpression = null
     val xml = req.parsedXML

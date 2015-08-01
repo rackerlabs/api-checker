@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.namespace.QName
 import javax.xml.validation.Schema
 
@@ -33,7 +34,7 @@ class URIXSD(id : String, label : String, val simpleType : QName, val schema : S
      val xsd = new XSDStringValidator(simpleType, schema, id)
 
      override def check(req : CheckerServletRequest,
-                        resp : CheckerServletResponse,
+                        resp : HttpServletResponse,
                         chain : FilterChain,
                         context : StepContext) : Option[Result] = {
        var result : Option[Result] = None

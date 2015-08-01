@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.servlet._
@@ -25,7 +26,7 @@ import org.w3c.dom.Document
 
 abstract class ResultHandler {
   def init(validator : Validator, checker : Option[Document]) : Unit
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result) : Unit
-  def inStep (currentStep: Step, req: CheckerServletRequest, resp : CheckerServletResponse, context: StepContext) : StepContext = { context }
+  def handle (req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, result : Result) : Unit
+  def inStep (currentStep: Step, req: CheckerServletRequest, resp : HttpServletResponse, context: StepContext) : StepContext = { context }
   def destroy : Unit = {}
 }

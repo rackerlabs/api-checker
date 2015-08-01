@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.validation.{Schema, Validator}
@@ -28,7 +29,7 @@ import com.rackspace.com.papi.components.checker.util.XMLParserPool.{borrowParse
 class XSD(id : String, label : String, schema : Schema, transform : Boolean, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The XML does not validate against the schema."
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+  override def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     var ret : Option[StepContext] = None
     var validator : Validator = null
     var parser : DocumentBuilder = null

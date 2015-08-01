@@ -18,6 +18,7 @@ package com.rackspace.com.papi.components.checker.handler
 import java.io.PrintStream
 import java.net.URI
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker._
 import com.rackspace.com.papi.components.checker.servlet._
@@ -27,7 +28,7 @@ import org.w3c.dom.Document
 class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandler {
   def init (validator : Validator, checker : Option[Document]) : Unit = {}
 
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
+  def handle (req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, result : Result)  : Unit = {
     Console.withOut(out) {
       def valid(v : Boolean) = {
         var vout = "["

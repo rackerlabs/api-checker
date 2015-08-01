@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.handler._
 import com.rackspace.com.papi.components.checker.servlet._
@@ -30,7 +31,7 @@ import scala.language.implicitConversions
  */
 class AssertResultHandler extends ResultHandler {
   def init(validator : Validator, checker : Option[Document]) : Unit = {}
-  def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit = {
+  def handle (req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, result : Result)  : Unit = {
     if (!result.valid) {
       throw new ResultFailedException("Validation failed",req,resp,chain,result)
     }

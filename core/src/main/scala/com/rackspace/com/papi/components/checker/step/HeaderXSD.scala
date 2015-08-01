@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.namespace.QName
 import javax.xml.validation.Schema
 
@@ -55,7 +56,7 @@ class HeaderXSD(id : String, label : String, val name : String, val value : QNam
 
   val xsd = new XSDStringValidator(value, schema, id)
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+  override def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     val headers : List[String] = getHeaders(req, name).toList
     var last_err : Option[SAXParseException] = None
 

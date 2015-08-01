@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
@@ -25,7 +26,7 @@ import scala.util.matching.Regex
 class ReqType(id : String, label : String, val rtype : Regex, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = rtype.toString()
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+  override def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     req.getContentType match {
       case rtype(_,_) => Some(context)
       case _ => None

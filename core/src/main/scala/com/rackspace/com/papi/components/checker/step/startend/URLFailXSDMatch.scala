@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step.startend
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 import javax.xml.namespace.QName
 import javax.xml.validation.Schema
 
@@ -37,7 +38,7 @@ class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QN
   val validators : Array[XSDStringValidator] = types.map (t => new XSDStringValidator(t, schema, id))
 
   override def check(req : CheckerServletRequest,
-                     resp : CheckerServletResponse,
+                     resp : HttpServletResponse,
                      chain : FilterChain,
                      context : StepContext) : Option[Result] = {
 

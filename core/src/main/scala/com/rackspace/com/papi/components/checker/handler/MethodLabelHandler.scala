@@ -17,9 +17,10 @@
 package com.rackspace.com.papi.components.checker.handler
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.rackspace.com.papi.components.checker.Validator
-import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
+import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
 import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
 import com.rackspace.com.papi.components.checker.step.results.Result
 import org.w3c.dom.{Document, NodeList}
@@ -47,7 +48,7 @@ class MethodLabelHandler extends ResultHandler  {
     }
   }
 
-  override def handle(req: CheckerServletRequest, resp: CheckerServletResponse, chain: FilterChain, result: Result): Unit = {
+  override def handle(req: CheckerServletRequest, resp: HttpServletResponse, chain: FilterChain, result: Result): Unit = {
     for  {
       id <- result.stepIDs if methodMap.contains(id)
       m <- methodMap.get(id)
@@ -56,7 +57,7 @@ class MethodLabelHandler extends ResultHandler  {
     }
   }
 
-  override def inStep (currentStep: Step, req: CheckerServletRequest, resp : CheckerServletResponse, context: StepContext) : StepContext = {
+  override def inStep (currentStep: Step, req: CheckerServletRequest, resp : HttpServletResponse, context: StepContext) : StepContext = {
       methodMap.get(currentStep.id).map(context.requestHeaders.addHeader(MethodLabelHeaderName,_)).map(headers => context.copy(requestHeaders = headers)).getOrElse(context)
   }
 }

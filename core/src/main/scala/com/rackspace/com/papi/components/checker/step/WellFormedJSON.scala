@@ -16,6 +16,7 @@
 package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletResponse
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.rackspace.com.papi.components.checker.servlet._
@@ -25,7 +26,7 @@ import com.rackspace.com.papi.components.checker.util.ObjectMapperPool.{borrowPa
 class WellFormedJSON(id : String, label : String, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
   override val mismatchMessage : String = "The JSON is not well formed!"
 
-  override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
+  override def checkStep(req : CheckerServletRequest, resp : HttpServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     var ret : Option[StepContext] = None
     var parser : ObjectMapper = null
 
