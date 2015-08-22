@@ -1,5 +1,5 @@
 /***
- *   Copyright 2014 Rackspace US, Inc.
+ *   Copyright 2015 Rackspace US, Inc.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class GivenAWadlWithNestedResources extends FlatSpec with RaxRolesBehaviors {
+class GivenAWadlWithNestedResourcesInPathFormat extends FlatSpec with RaxRolesBehaviors {
 
   val configs = Map[String, Config]("Config With Roles Enabled" -> configWithRolesEnabled,
     "Config With Roles Enabled and Messsage Extensions Disabled" -> configWithRolesEnabledMessageExtDisabled,
@@ -50,20 +50,21 @@ class GivenAWadlWithNestedResources extends FlatSpec with RaxRolesBehaviors {
            </schema>
         </grammars>
         <resources base="https://test.api.openstack.com">
-          <resource path="/a" rax:roles="a:admin another:admin">
+          <resource path="/a" rax:roles="a:admin">
             <method name="PUT" rax:roles="a:observer"/>
-            <resource path="/b" rax:roles="b:creator">
-              <method name="POST"/>
-              <method name="PUT" rax:roles="b:observer"/>
-              <method name="DELETE" rax:roles="b:observer b:admin"/>
-	      <resource path="c" rax:roles="c:creator">
-		<method name="POST"/>
-              </resource>
-            </resource>
-            <resource path="{yn}" rax:roles="a:admin">
-              <param name="yn" style="template" type="tst:yesno"/>
-              <method name="GET"/>
-            </resource>
+          </resource>
+	  <resource path="/a" rax:roles="another:admin"/>
+	  <resource path="/a/b" rax:roles="b:creator">
+            <method name="POST"/>
+            <method name="PUT" rax:roles="b:observer"/>
+            <method name="DELETE" rax:roles="b:observer b:admin"/>
+	  </resource>
+	  <resource path="/a/b/c" rax:roles="c:creator">
+            <method name="POST"/>
+	  </resource>
+	  <resource path="/a/{yn}" rax:roles="a:admin">
+            <param name="yn" style="template" type="tst:yesno"/>
+            <method name="GET"/>
           </resource>
         </resources>
       </application>)
