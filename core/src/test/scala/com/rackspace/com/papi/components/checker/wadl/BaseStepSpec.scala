@@ -23,7 +23,7 @@ import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step}
 import com.rackspace.com.papi.components.checker.step.startend._
 import org.scalatest.exceptions.TestFailedException
 
-import scala.collection.mutable.LinkedList
+import scala.collection.mutable.MutableList
 
 class BaseStepSpec extends BaseWADLSpec {
   var builder = new StepBuilder(wadl)
@@ -73,7 +73,7 @@ class BaseStepSpec extends BaseWADLSpec {
   def XPath(m : String) : (Array[Step]) => Array[Step] = withXPath(_, m)
 
   def assert(s : Step, step_funs : ((Array[Step]) => Array[Step])*) : Unit = {
-    if (step_funs.length == 0) throw new TestFailedException("Path assertion should contain at least one step!",4)
+    if (step_funs.isEmpty) throw new TestFailedException("Path assertion should contain at least one step!",4)
 
     var next : Array[Step] = Array(s)
     for (a <- 0 to step_funs.length - 1) {
@@ -81,7 +81,7 @@ class BaseStepSpec extends BaseWADLSpec {
       if (result.length == 0) {
         throw new TestFailedException("Could not complete path",4)
       }
-      var list : LinkedList[Step] = new LinkedList[Step]
+      var list : MutableList[Step] = new MutableList[Step]
       result.filter(f => f.isInstanceOf[ConnectedStep]).foreach(r => list ++= r.asInstanceOf[ConnectedStep].next)
       next = list.toArray
     }

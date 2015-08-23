@@ -27,7 +27,13 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class WADLCheckerAssertSpec extends BaseCheckerSpec with LogAssertions {
 
-    val validIn = ("in.checker", <checker xmlns="http://www.rackspace.com/repose/wadl/checker"
+  val creatorString = {
+    val title = getClass.getPackage.getImplementationTitle
+    val version = getClass.getPackage.getImplementationVersion
+    s"$title ($version)"
+  }
+
+  val validIn = ("in.checker", <checker xmlns="http://www.rackspace.com/repose/wadl/checker"
                   xmlns:json="http://json-schema.org/schema#"
                   xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -72,12 +78,6 @@ class WADLCheckerAssertSpec extends BaseCheckerSpec with LogAssertions {
     <step type="METHOD" id="d47e9" match="GET" next="SA"/>
     <step type="METHOD" id="d47e10" match="POST" next="SA"/>
     </checker>)
-
-  val creatorString = {
-    val title = getClass.getPackage.getImplementationTitle
-    val version = getClass.getPackage.getImplementationVersion
-    s"$title ($version)"
-  }
 
   val config = {
     val c = TestConfig()
