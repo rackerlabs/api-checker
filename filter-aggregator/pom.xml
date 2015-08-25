@@ -9,17 +9,18 @@
     </parent>
 
     <groupId>com.rackspace.papi.components.api-checker</groupId>
-    <artifactId>test-app-aggregator</artifactId>
+    <artifactId>filter-aggregator</artifactId>
+    <version>1.1.3-SNAPSHOT</version>
     <packaging>pom</packaging>
-
-    <name>API Checker Test App Aggregator</name>
-    <description>API Checker Test App Aggregator for scala 2.10 and 2.11</description>
 
     <modules>
         <module>2.10</module>
         <module>2.11</module>
     </modules>
 
+
+    <name>API Checker Servlet Filter Aggregator</name>
+    <description>API Checker Servlet Filter aggregator for scala 2.10 and 2.11</description>
     <build>
         <pluginManagement>
             <plugins>
@@ -55,11 +56,6 @@
                         <enableAssertions>false</enableAssertions>
                         <argLine>-Dfile.encoding=UTF-8</argLine>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>jetty-maven-plugin</artifactId>
-                    <version>8.1.1.v20120215</version>
                 </plugin>
             </plugins>
         </pluginManagement>
