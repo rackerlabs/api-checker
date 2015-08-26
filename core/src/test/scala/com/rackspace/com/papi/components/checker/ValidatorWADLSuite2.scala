@@ -93,4 +93,48 @@ class ValidatorWADLSuite2 extends BaseValidatorSuite {
     assertResultFailed(validator_SLASH.validate(request("GET","/element/element2/foo"),response,chain), 404)
   }
 
+  val validator_MultiGET = Validator(
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <grammars/>
+    <resources base="https://test.api.openstack.com">
+      <resource path="/foo">
+        <method href="#TestGET"/>
+	<method href="#Test2GET"/>
+        <resource path="bar">
+	      <method href="#Test2GET"/>
+          </resource>
+        </resource>
+       </resources>
+       <method name="GET" id="TestGET">
+         <doc title="TestGET"/>
+         <response status="200">
+             <representation mediaType="application/xml"/>
+         </response>
+       </method>
+       <method name="GET" id="Test2GET">
+         <doc title="Test2GET"/>
+         <response status="203">
+             <representation mediaType="application/xml"/>
+         </response>
+       </method>
+      </application>
+    , TestConfig(false, false, false))
+
+  test ("GET on /foo should succeed on validator_MultiGET") {
+    validator_MultiGET.validate(request("GET","/foo"),response,chain)
+  }
+
+  test ("GET on /foo/bar should succeed on validator_MultiGET") {
+    validator_MultiGET.validate(request("GET","/foo/bar"),response,chain)
+  }
+
+  test ("POST on /foo should fail on validator_MultiGET") {
+    assertResultFailed(validator_MultiGET.validate(request("POST","/foo"),response,chain), 405, Map("Allow"->"GET"))
+  }
+
+  test ("POST on /foo/bar should fail on validator_MultiGET") {
+    assertResultFailed(validator_MultiGET.validate(request("POST","/foo/bar"),response,chain), 405, Map("Allow"->"GET"))
+  }
+
 }
