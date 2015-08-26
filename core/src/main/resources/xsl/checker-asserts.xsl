@@ -317,24 +317,49 @@
      -->
     <xsl:template name="chk:TypeNotMatchRefErrorAssert">
         <xsl:variable name="errorStateType" as="xs:string" select="concat(@type,'_FAIL')"/>
-        <xsl:if test="not(every $t in
-            (: $n is a step that refrences this step :)
-            for $n in key('checker-by-ref',@id, $checker) return
-            (:
-            $n must also reference a step that an URL_FAIL and contains
-            a @notMatch
-            :)
-            some $s in chk:stepsByIds($checker, chk:next($n)) satisfies $s/@type=$errorStateType and $s/@notMatch
-            (:
-            This must be satisfied for every reference!
-            :)
-            satisfies $t = true())">
-            <xsl:message terminate="yes">
-                Checker error:  There are steps which reference <xsl:value-of select="@id"/>
-                but do not also reference an <xsl:value-of select="$errorStateType"/> state with a
-                @notMatch attribute.
-            </xsl:message>
-        </xsl:if>
+        <xsl:variable name="errorMessage" as="node()*">
+            Checker error:  There are steps which reference <xsl:value-of select="@id"/>
+            but do not also reference an <xsl:value-of select="$errorStateType"/> state with a
+            @notMatch attribute<xsl:if test="@type='METHOD'"> or a METHOD state</xsl:if>.
+        </xsl:variable>
+        <xsl:choose>
+            <!--
+                METHOD is a special case because it's legit for a method to have a parent
+                which is also a METHOD.
+            -->
+            <xsl:when test="@type = 'METHOD'">
+                <xsl:if test="not(every $t in
+                    (: $n is a step that refrences this step :)
+                    for $n in key('checker-by-ref',@id, $checker) return
+                    (:
+                    $n must also reference a step that an METHOD_FAIL and contains
+                    a @notMatch or $n should be of type METHOD
+                    :)
+                    (some $s in chk:stepsByIds($checker, chk:next($n)) satisfies ($s/@type=$errorStateType and $s/@notMatch)) or $n/@type='METHOD'
+                    (:
+                    This must be satisfied for every reference!
+                    :)
+                    satisfies $t = true())">
+                    <xsl:message terminate="yes" select="$errorMessage"/>
+                </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:if test="not(every $t in
+                    (: $n is a step that refrences this step :)
+                    for $n in key('checker-by-ref',@id, $checker) return
+                    (:
+                    $n must also reference a step that an URL_FAIL and contains
+                    a @notMatch
+                    :)
+                    some $s in chk:stepsByIds($checker, chk:next($n)) satisfies $s/@type=$errorStateType and $s/@notMatch
+                    (:
+                    This must be satisfied for every reference!
+                    :)
+                    satisfies $t = true())">
+                    <xsl:message terminate="yes" select="$errorMessage"/>
+                </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <!--
