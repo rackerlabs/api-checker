@@ -56,7 +56,7 @@ class Wadl2CheckerSuite extends FunSuite {
 
   test ("-d should set removeDups") {
     Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.removeDups.value == None)
+    assert (Wadl2Checker.removeDups.value.isEmpty)
     Wadl2Checker.handleArgs(Array("-d"))
     assert (Wadl2Checker.removeDups.value.get == true)
   }
@@ -64,28 +64,28 @@ class Wadl2CheckerSuite extends FunSuite {
 
   test ("-r should set raxRoles") {
     Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.raxRoles.value == None)
+    assert (Wadl2Checker.raxRoles.value.isEmpty)
     Wadl2Checker.handleArgs(Array("-r"))
     assert (Wadl2Checker.raxRoles.value.get == true)
   }
 
   test ("--remove-dups should set removeDups") {
     Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.removeDups.value == None)
+    assert (Wadl2Checker.removeDups.value.isEmpty)
     Wadl2Checker.handleArgs(Array("--remove-dups"))
     assert (Wadl2Checker.removeDups.value.get == true)
   }
 
   test ("-v should set validate") {
     Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.validate.value == None)
+    assert (Wadl2Checker.validate.value.isEmpty)
     Wadl2Checker.handleArgs(Array("-v"))
     assert (Wadl2Checker.validate.value.get == true)
   }
 
   test ("--validate should set validate") {
     Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.validate.value == None)
+    assert (Wadl2Checker.validate.value.isEmpty)
     Wadl2Checker.handleArgs(Array("--validate"))
     assert (Wadl2Checker.validate.value.get == true)
   }

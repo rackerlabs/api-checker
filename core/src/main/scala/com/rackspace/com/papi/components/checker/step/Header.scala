@@ -37,7 +37,7 @@ class Header(id : String, label : String, val name : String, val value : Regex,
             next : Array[Step]) = this(id, label, name, value, message, code, None, priority, next)
 
   override val mismatchMessage : String = {
-    if (message == None) {
+    if (message.isEmpty) {
       "Expecting an HTTP header "+name+" to have a value matching "+value.toString()
     } else {
       message.get
@@ -45,7 +45,7 @@ class Header(id : String, label : String, val name : String, val value : Regex,
   }
 
   val mismatchCode : Int = {
-    if (code == None) {
+    if (code.isEmpty) {
       400
     } else {
       code.get

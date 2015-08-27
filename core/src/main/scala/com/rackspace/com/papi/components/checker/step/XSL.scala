@@ -67,7 +67,7 @@ class XSL(id : String, label : String, templates : Templates, val priority : Lon
       if (parser != null) returnParser(parser)
     }
 
-    if (capture.error != None) {
+    if (capture.error.isDefined) {
       req.contentError(capture.error.get, capture.code.get, priority)
       ret = None
     } else if (error != null) {
@@ -108,11 +108,11 @@ private class TransformErrorCapture extends ErrorListener {
   var code : Option[Int] = None
 
   def error (exception : TransformerException) : Unit = {
-    if (error == None) {
+    if (error.isEmpty) {
       error = Some(exception)
 
       val message = exception.getMessage()
-      if (message.contains("xsl:message") && msg != None) {
+      if (message.contains("xsl:message") && msg.isDefined) {
         error = Some(new TransformerException(msg.get, error.get))
       }
 
@@ -122,11 +122,11 @@ private class TransformErrorCapture extends ErrorListener {
   }
 
   def fatalError (exception : TransformerException) : Unit = {
-    if (error == None) {
+    if (error.isEmpty) {
       error = Some(exception)
 
       val message = exception.getMessage()
-      if (message.contains("termination") && msg != None) {
+      if (message.contains("termination") && msg.isDefined) {
         error = Some(new TransformerException(msg.get, error.get))
       }
 

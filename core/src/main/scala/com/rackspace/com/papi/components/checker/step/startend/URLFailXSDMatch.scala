@@ -42,11 +42,11 @@ class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QN
                      context : StepContext) : Option[Result] = {
 
     var result : Option[Result] = super.check (req, resp, chain, context)
-    if (result != None) {
+    if (result.isDefined) {
       val in = req.URISegment(context.uriLevel)
       val errors = for (validator <- validators) yield {
         val e = validator.validate(in)
-        if (e == None) return None
+        if (e.isEmpty) return None
         e.get.getMessage()
       }
 

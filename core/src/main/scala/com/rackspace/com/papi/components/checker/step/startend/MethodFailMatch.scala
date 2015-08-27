@@ -37,7 +37,7 @@ class MethodFailMatch(id : String, label : String, val method : Regex, priority 
                      chain : FilterChain,
                      context : StepContext) : Option[Result] = {
     var result : Option[Result] = super.check(req, resp, chain, context)
-    if (result != None) {
+    if (result.isDefined) {
       req.getMethod() match {
         case method() => result = None
         case _ => result = Some(new MethodFailResult (result.get.message+". The Method does not match the pattern: '"+method+"'",

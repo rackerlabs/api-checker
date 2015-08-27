@@ -252,7 +252,7 @@ class BaseValidatorSuite extends FunSuite {
       case t : Throwable =>
         throw new TestFailedException(Some(expectMsg+" but got "+t), Some(t), 4)
     }
-    if (result == None) {
+    if (result.isEmpty) {
       throw new TestFailedException(Some(expectMsg+" but got no exception."), None, 4)
     }
     result

@@ -55,49 +55,49 @@ class Wadl2DotSuite extends FunSuite {
 
   test ("-d should set removeDups") {
     Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.removeDups.value == None)
+    assert (Wadl2Dot.removeDups.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-d"))
     assert (Wadl2Dot.removeDups.value.get == true)
   }
 
   test ("-r should set rax-roles") {
     Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.raxRoles.value == None)
+    assert (Wadl2Dot.raxRoles.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-r"))
     assert (Wadl2Dot.raxRoles.value.get == true)
   }
 
   test ("--remove-dups should set removeDups") {
     Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.removeDups.value == None)
+    assert (Wadl2Dot.removeDups.value.isEmpty)
     Wadl2Dot.handleArgs(Array("--remove-dups"))
     assert (Wadl2Dot.removeDups.value.get == true)
   }
 
   test ("-e should show errors") {
     Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.showErrors.value == None)
+    assert (Wadl2Dot.showErrors.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-e"))
     assert (Wadl2Dot.showErrors.value.get == true)
   }
 
   test ("--show-errors should set validate") {
     Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.showErrors.value == None)
+    assert (Wadl2Dot.showErrors.value.isEmpty)
     Wadl2Dot.handleArgs(Array("--show-errors"))
     assert (Wadl2Dot.showErrors.value.get == true)
   }
 
   test ("-n should enable nfaMode") {
     Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.nfaMode.value == None)
+    assert (Wadl2Dot.nfaMode.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-n"))
     assert (Wadl2Dot.nfaMode.value.get == true)
   }
 
   test ("--nfa-mode should enable nfaMode") {
     Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.nfaMode.value == None)
+    assert (Wadl2Dot.nfaMode.value.isEmpty)
     Wadl2Dot.handleArgs(Array("--nfa-mode"))
     assert (Wadl2Dot.nfaMode.value.get == true)
   }

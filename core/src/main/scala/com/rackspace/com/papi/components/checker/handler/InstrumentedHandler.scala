@@ -49,7 +49,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
 
     this.validator = Some(validator)
 
-    if (checker != None) {
+    if (checker.isDefined) {
       val elms = checker.get.getElementsByTagNameNS("http://www.rackspace.com/repose/wadl/checker",
                                                     "step")
       for (i <- 0 to (elms.getLength-1)) {
@@ -105,12 +105,12 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
   }
 
   override def destroy : Unit = {
-    if (latestFailMBeanName != None) {
+    if (latestFailMBeanName.isDefined) {
       platformMBeanServer.unregisterMBean(latestFailMBeanName.get)
       latestFailMBeanName = None
     }
 
-    if (validator != None) {
+    if (validator.isDefined) {
       stepMeters.keys.foreach ( k => metricsRegistry.removeMetric(getClass, k, validator.get.name))
       validator = None
       stepMeters = Map.empty

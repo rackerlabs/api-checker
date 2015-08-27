@@ -36,7 +36,7 @@ class XPath(id : String, label : String, val expression : String, val message : 
              this (id, label, expression, message, code, nc, version, None, priority, next)
 
   override val mismatchMessage : String = {
-    if (message == None) {
+    if (message.isEmpty) {
       "Expecting "+expression
     } else {
       message.get
@@ -44,7 +44,7 @@ class XPath(id : String, label : String, val expression : String, val message : 
   }
 
   val mismatchCode : Int = {
-    if (code == None) {
+    if (code.isEmpty) {
       400
     } else {
       code.get
