@@ -169,9 +169,9 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
   test("MethodFail should return None when URI level is not exceeded") {
     val mf  = new MethodFail("mf", "mf", 10)
     val res = mf.check (request("GET", "/a/b"), response,chain, 0)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = mf.check (request("GET", "/a/b"), response,chain, 1)
-    assert (res2 == None)
+    assert (res2.isEmpty)
   }
 
   test("MethodFailMatch should return method fail result if the URI level has been exceeded and the method regex does not match") {
@@ -215,17 +215,17 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
   test("MethodFailMatch should return None if the URI level has been exceeded and the method regex matches") {
     val mf  = new MethodFailMatch("mf", "mf", "GET".r, 10)
     val res = mf.check (request("GET", "/a/b"), response,chain, 2)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = mf.check (request("GET", "/a/b"), response,chain, 3)
-    assert (res2 == None)
+    assert (res2.isEmpty)
   }
 
   test("MethodFailMatch should return None when URI level is not exceeded") {
     val mf  = new MethodFailMatch("mf", "mf", "GET".r, 10)
     val res = mf.check (request("GET", "/a/b"), response,chain, 0)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = mf.check (request("GET", "/a/b"), response,chain, 1)
-    assert (res2 == None)
+    assert (res2.isEmpty)
   }
 
   test("URLFail should return URL fail result if URI level has not been exceeded") {
@@ -242,9 +242,9 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
   test("URLFailXSD should return None if URI level has been exceeded : StepType, uuid, evenIntType") {
     val ufx = new URLFailXSD("ufx", "ufx", Array[QName](stepType, uuidType, evenIntType), testSchema, 10)
     val res = ufx.check (request("GET", "/START/b"), response,chain, 2)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = ufx.check (request("GET", "/ACCEPT/b"), response,chain, 3)
-    assert (res2 == None)
+    assert (res2.isEmpty)
   }
 
   test("URLFailXSD should return URL fail result if URI level has not been exceeded and the uri type does not match : StepType, uuid, evenIntType") {
@@ -261,21 +261,21 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
   test("URLFailXSD should return URL None if URI level has not been exceeded and the uri type matches : StepType, uuid, evenIntType") {
     val ufx = new URLFailXSD ("ufmx", "ufmx", Array[QName](stepType, uuidType, evenIntType), testSchema, 10)
     val res = ufx.check (request("GET", "/START/b"), response,chain, 0)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = ufx.check (request("GET", "/eb507026-6463-11e1-b7aa-8b7b918a1623/b"), response,chain, 0)
-    assert (res2 == None)
+    assert (res2.isEmpty)
     val res3 = ufx.check (request("GET", "/90/b"), response,chain, 0)
-    assert (res3 == None)
+    assert (res3.isEmpty)
   }
 
   test("URLFailXSDMatch should return None if URI level has been exceeded : StepType, uuid, evenIntType") {
     val ufx = new URLFailXSDMatch("ufx", "ufx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchema, 10)
     val res = ufx.check (request("GET", "/START/b"), response,chain, 2)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = ufx.check (request("GET", "/ACCEPT/b"), response,chain, 3)
-    assert (res2 == None)
+    assert (res2.isEmpty)
     val res3 = ufx.check (request("GET", "/c/b"), response,chain, 4)
-    assert (res3 == None)
+    assert (res3.isEmpty)
   }
 
   test("URLFailXSDMatch should return URL fail result if URI level has not been exceeded and the uri type does not match : StepType, uuid, evenIntType") {
@@ -291,21 +291,21 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
   test("URLFailXSDMatch should return URL None if URI level has not been exceeded and the uri type matches : StepType, uuid, evenIntType") {
     val ufx = new URLFailXSDMatch ("ufmx", "ufmx", "c".r, Array[QName](stepType, uuidType, evenIntType), testSchema, 10)
     val res = ufx.check (request("GET", "/START/b"), response,chain, 0)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = ufx.check (request("GET", "/eb507026-6463-11e1-b7aa-8b7b918a1623/b"), response,chain, 0)
-    assert (res2 == None)
+    assert (res2.isEmpty)
     val res3 = ufx.check (request("GET", "/90/b"), response,chain, 0)
-    assert (res3 == None)
+    assert (res3.isEmpty)
     val res4 = ufx.check (request("GET", "/c/b"), response,chain, 0)
-    assert (res4 == None)
+    assert (res4.isEmpty)
   }
 
   test("URLFail should return None if URI level has been exceeded") {
     val uf = new URLFail("uf", "uf", 10)
     val res = uf.check (request("GET", "/a/b"), response,chain, 2)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = uf.check (request("GET", "/a/b"), response,chain, 3)
-    assert (res2 == None)
+    assert (res2.isEmpty)
   }
 
   test("URLFailMatch should return URL fail result if URI level has not been exceeded and the uri regex does not match") {
@@ -321,15 +321,15 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
   test("URLFailMatch should return None if URI level has not been exceeded and the uri regex matches") {
     val uf = new URLFailMatch ("ufm", "ufm", "a".r, 10)
     val res = uf.check (request("GET", "/a/b"), response,chain, 0)
-    assert (res == None)
+    assert (res.isEmpty)
   }
 
   test("URLFailMatch should return None if URI level has been exceeded") {
     val uf = new URLFailMatch("uf", "uf", "a".r, 10)
     val res = uf.check (request("GET", "/a/b"), response,chain, 2)
-    assert (res == None)
+    assert (res.isEmpty)
     val res2 = uf.check (request("GET", "/a/b"), response,chain, 3)
-    assert (res2 == None)
+    assert (res2.isEmpty)
   }
 
   test("URIXSD mismatch message should be the same as the QName") {
@@ -339,13 +339,13 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In a URIXSD step, if there is a URI match, the step should proceed to the next step : StepType") {
     val urixsd = new URIXSD("uxd", "uxd", stepType, testSchema, Array[Step]())
-    assert (urixsd.check (request("GET", "/START/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/URL_FAIL/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/METHOD_FAIL/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/ACCEPT/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/URL/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/METHOD/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/URLXSD/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/START/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/URL_FAIL/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/METHOD_FAIL/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/ACCEPT/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/URL/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/METHOD/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/URLXSD/b"), response,chain, 0).isEmpty)
   }
 
   test("In a URIXSD step, if there is a mismatch, a MismatchResult should be returned: StepType") {
@@ -372,13 +372,13 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In a URIXSD step, if there is a URI match, the step should proceed to the next step : UUID") {
     val urixsd = new URIXSD("uxd", "uxd", uuidType, testSchema, Array[Step]())
-    assert (urixsd.check (request("GET", "/55b76e92-6450-11e1-9012-37afadb5ff61/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/56d7a1fc-6450-11e1-b360-8fe15f519bf2/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/5731bb7e-6450-11e1-9b88-6ff2691237cd/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/578952c6-6450-11e1-892b-8bae86031338/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/57e75268-6450-11e1-892e-abc2baf50960/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/58415556-6450-11e1-96f9-17b1db29daf7/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/55b76e92-6450-11e1-9012-37afadb5ff61/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/56d7a1fc-6450-11e1-b360-8fe15f519bf2/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/5731bb7e-6450-11e1-9b88-6ff2691237cd/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/578952c6-6450-11e1-892b-8bae86031338/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/57e75268-6450-11e1-892e-abc2baf50960/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/58415556-6450-11e1-96f9-17b1db29daf7/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/58a0ff60-6450-11e1-95bd-77590a8a0a53/b"), response,chain, 0).isEmpty)
   }
 
   test("In a URIXSD step, if there is a mismatch, a MismatchResult should be returned: UUID") {
@@ -405,20 +405,20 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In a URIXSD step, if there is a URI match, the step should proceed to the next step : EvenInt100") {
     val urixsd = new URIXSD("uxd", "uxd", evenIntType, testSchema, Array[Step]())
-    assert (urixsd.check (request("GET", "/54/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/0/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/32/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/2/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/12/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/100/b"), response,chain, 0) == None)
-    assert (urixsd.check (request("GET", "/84/b"), response,chain, 0) == None)
+    assert (urixsd.check (request("GET", "/54/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/0/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/32/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/2/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/12/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/100/b"), response,chain, 0).isEmpty)
+    assert (urixsd.check (request("GET", "/84/b"), response,chain, 0).isEmpty)
   }
 
   test("In a URIXSD step, if there is a URI match, and a captureHeader, the header should be set") {
     val accept = new Accept("accept", "Accept", 1000)
     val urixsd = new URIXSD("uxd", "uxd", evenIntType, testSchema, Some("foo"), Array[Step](accept))
     val req = request("GET", "/54/b")
-    assert (urixsd.check (req, response,chain, 0) != None)
+    assert (urixsd.check (req, response,chain, 0).isDefined)
     assert (req.getHeader("FOO") == "54")
   }
 
@@ -495,7 +495,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
   test("In a URI step, if there is a URI mismatch, the returned context should be None") {
     val uri = new URI("a", "a", "a".r, Array[Step]())
     val ctx1 = StepContext()
-    assert (uri.checkStep (request("GET", "/c/b"), response,chain, ctx1) == None)
+    assert (uri.checkStep (request("GET", "/c/b"), response,chain, ctx1).isEmpty)
   }
 
   test("In a URI step, if there is a URI match, but the URI level has been exceeded the new URI level should be -1") {
@@ -544,8 +544,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("A ReqTestFail step should return None if the content type matchs") {
     val rtf = new ReqTypeFail ("XML", "XML", "application/xml|application/json".r, 10)
-    assert (rtf.check (request("PUT", "/a/b", "application/json"), response, chain, 1) == None)
-    assert (rtf.check (request("POST", "/index.html", "application/xml"), response, chain, 0) == None)
+    assert (rtf.check (request("PUT", "/a/b", "application/json"), response, chain, 1).isEmpty)
+    assert (rtf.check (request("POST", "/index.html", "application/xml"), response, chain, 0).isEmpty)
   }
 
   test("ReqType mismatch message should be the same of the type regex") {
@@ -672,7 +672,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val wfx = new WellFormedXML("WFXML", "WFXML", 10, Array[Step](cf))
     val req1 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
     wfx.checkStep (req1, response, chain, 0)
-    assert (cf.check(req1, response, chain, 0) == None)
+    assert (cf.check(req1, response, chain, 0).isEmpty)
     assert (req1.contentErrorPriority == -1)
   }
 
@@ -1285,8 +1285,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
                          <tst:child attribute="value"/>
                          <tst:child attribute="value2"/>
                        </tst:root>, true)
-    assert (xpath.checkStep (req1, response, chain, StepContext()) == None)
-    assert (xpath.checkStep (req2, response, chain, StepContext(1)) == None)
+    assert (xpath.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert (xpath.checkStep (req2, response, chain, StepContext(1)).isEmpty)
   }
 
   test("In an XPath test, if the XPath resolves to true the contentErrorPriority should be -1") {
@@ -1781,15 +1781,15 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Set")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Sat")))
 
-    assert (header.checkStep (req1, response, chain, StepContext()) == None)
-    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+    assert (header.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).isEmpty)
   }
 
   test ("In a header step, if the header is available, but does not match the value...context should be set to None") {
     val header = new Header("HEADER", "HEADER", "X-TEST-HEADER", "S.*".r, None, None, Some("Foo"), 10, Array[Step]())
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Bar")))
 
-    assert (header.checkStep (req1, response, chain, StepContext()) == None)
+    assert (header.checkStep (req1, response, chain, StepContext()).isEmpty)
   }
 
   test ("In a header step, if the header is available then the contentErrorPriority should be -1.") {
@@ -2306,8 +2306,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-I"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-I"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
 
-    assert (header.checkStep (req1, response, chain, StepContext())  == None)
-    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+    assert (header.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).isEmpty)
   }
 
   test ("In an XSD header step, if the header is available but does not match the XSD the context should be set to None") {
@@ -2315,8 +2315,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("28d42e00-e25a-11e1-FOOO-efbf2fa68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("2fbf4592-e25a-11e1-bae1-93374682bd20-998373-FFF")))
 
-    assert(header.checkStep (req1, response, chain, StepContext()) == None)
-    assert(header.checkStep (req2, response, chain, StepContext(1)) == None)
+    assert(header.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert(header.checkStep (req2, response, chain, StepContext(1)).isEmpty)
   }
 
   test ("In an XSD header step, if the header is available then the contentErrorPriority should be -1.") {
@@ -2818,8 +2818,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Foo", "Bar")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("Baz", "Bar")))
 
-    assert (header.checkStep (req1, response, chain, StepContext()) == None)
-    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+    assert (header.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).isEmpty)
   }
 
   test ("In a header any step, if the header is not available the capture header should be set to None.") {
@@ -2827,8 +2827,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Foo", "Bar")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("Baz", "Bar")))
 
-    assert (header.checkStep (req1, response, chain, StepContext()) == None)
-    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+    assert (header.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).isEmpty)
   }
 
   test ("In a header any step, if the header is available then the contentErrorPriority should be -1.") {
@@ -3350,8 +3350,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-I"->List("28d42e00-e25a-11e1-9897-efbf2fa68353")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-I"->List("2fbf4592-e25a-11e1-bae1-93374682bd20")))
 
-    assert (header.checkStep (req1, response, chain, StepContext()) == None)
-    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+    assert (header.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).isEmpty)
   }
 
   test ("In an XSD any header step, if the header is available but values do not match then the context should be set to None.") {
@@ -3359,8 +3359,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("FOO")))
     val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-ID"->List("BAR", "BAZ")))
 
-    assert (header.checkStep (req1, response, chain, StepContext()) == None)
-    assert (header.checkStep (req2, response, chain, StepContext(1)) == None)
+    assert (header.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert (header.checkStep (req2, response, chain, StepContext(1)).isEmpty)
   }
 
   test ("In an XSD any header step, if the header is available then the contentErrorPriority should be -1.") {

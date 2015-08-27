@@ -40,7 +40,7 @@ class URIXSD(id : String, label : String, val simpleType : QName, val schema : S
        if (context.uriLevel < req.URISegment.size) {
          val v = req.URISegment(context.uriLevel)
          val error = xsd.validate(v)
-         if (error != None) {
+         if (error.isDefined) {
            result = Some(new MismatchResult(error.get.getMessage(), context, id))
          } else {
            val newContext = captureHeader match {

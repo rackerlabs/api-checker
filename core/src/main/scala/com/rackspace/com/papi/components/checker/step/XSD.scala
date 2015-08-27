@@ -65,7 +65,7 @@ class XSD(id : String, label : String, schema : Schema, transform : Boolean, val
     //
     //  Always give precedence to parse errors.
     //
-    if (capture.error != None) {
+    if (capture.error.isDefined) {
       req.contentError = capture.error.get
       req.contentErrorPriority = priority
       ret = None

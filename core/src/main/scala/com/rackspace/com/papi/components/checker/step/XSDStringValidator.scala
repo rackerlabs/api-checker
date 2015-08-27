@@ -78,7 +78,7 @@ private class ErrorCapture extends ErrorHandler {
   var error : Option[SAXParseException] = None
 
   def error(exception : SAXParseException) : Unit = {
-    if (error == None) {
+    if (error.isEmpty) {
       error = Some(exception)
 
       throw exception
@@ -86,7 +86,7 @@ private class ErrorCapture extends ErrorHandler {
   }
 
   def fatalError(exception : SAXParseException) : Unit = {
-    if (error == None) {
+    if (error.isEmpty) {
       error = Some(exception)
 
       throw exception

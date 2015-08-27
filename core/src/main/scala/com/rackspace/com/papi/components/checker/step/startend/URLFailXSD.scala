@@ -41,11 +41,11 @@ class URLFailXSD(id : String, label : String, types : Array[QName], schema : Sch
                      context : StepContext) : Option[Result] = {
 
     var result : Option[Result] = super.check (req, resp, chain, context)
-    if (result != None) {
+    if (result.isDefined) {
       val in = req.URISegment(context.uriLevel)
       val errors = for (validator <- validators) yield {
         val e = validator.validate(in)
-        if (e == None) return None
+        if (e.isEmpty) return None
         e.get.getMessage()
       }
 

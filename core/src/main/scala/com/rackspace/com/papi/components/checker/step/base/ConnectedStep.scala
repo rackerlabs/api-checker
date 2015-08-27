@@ -85,7 +85,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
     var result : Option[Result] = None
     val nextContext = checkStep(req, resp, chain, context)
 
-    if (nextContext != None) {
+    if (nextContext.isDefined) {
       val results : Array[Result] =
           nextStep (req, resp, chain, nextContext.get.handler.map{ handler => handler.inStep(this, req, resp, nextContext.get) }.getOrElse(nextContext.get))
       if (results.size == 1) {

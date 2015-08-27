@@ -38,7 +38,7 @@ class HeaderXSD(id : String, label : String, val name : String, val value : QNam
            next : Array[Step]) = this(id, label, name, value, schema, message, code, None, priority, next)
 
   override val mismatchMessage : String = {
-    if (message == None) {
+    if (message.isEmpty) {
       "Expecting an HTTP header "+name+" to match "+value
     } else {
       message.get
@@ -46,7 +46,7 @@ class HeaderXSD(id : String, label : String, val name : String, val value : QNam
   }
 
   val mismatchCode : Int = {
-    if (code == None) {
+    if (code.isEmpty) {
       400
     } else {
       code.get

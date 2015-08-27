@@ -34,7 +34,7 @@ class URLFailMatch(id : String, label : String, val uri : Regex, priority : Long
                      context : StepContext) : Option[Result] = {
 
     var result : Option[Result] = super.check (req, resp, chain, context)
-    if (result != None) {
+    if (result.isDefined) {
       req.URISegment(context.uriLevel) match {
         case uri() => result = None
         case _ => result = Some(new URLFailResult (result.get.message+". The URI segment does not match the pattern: '"+uri+"'", context, id, priority)) // Augment our parents result with match info

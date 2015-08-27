@@ -48,8 +48,8 @@ class HeaderMapSuite extends FunSuite {
     val map = new HeaderMap().addHeaders("foo", List("bar","Bar", "BAZ"))
 
     assert(map.get("foo").get == List("bar", "Bar", "BAZ"))
-    assert(map.get("bar") == None)
-    assert(map.get("baz") == None)
+    assert(map.get("bar").isEmpty)
+    assert(map.get("baz").isEmpty)
   }
 
   test("Headers may be combined [addHeaders]") {
