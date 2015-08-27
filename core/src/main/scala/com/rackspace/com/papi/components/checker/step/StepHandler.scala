@@ -365,7 +365,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val href = atts.getValue("href")
 
     atts.getValue("type") match {
-      case "W3C_XML" => {
+      //
+      // match null here for compatibility with older versions
+      // that didn't specify a type...
+      //
+      case "W3C_XML" | null => {
         if (href != null) {
           grammarSources += new SAXSource(new InputSource(href))
         }
