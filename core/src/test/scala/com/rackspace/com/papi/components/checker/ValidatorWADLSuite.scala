@@ -1611,6 +1611,41 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
 
   WADLSchemaAssertions(validator_UUID)
 
+
+  //
+  // validator_UUID_noCheckerValid allows:
+  //
+  // The validator is used in the following tests, it uses an external
+  // grammar. It disables checker validation.
+  //
+  val conf_noCheck = TestConfig()
+  conf_noCheck.validateChecker = false
+  val validator_UUID_noCheckerValid = Validator((localWADLURI,
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+                 xmlns:csapi="http://docs.openstack.org/compute/api/v1.1">
+           <grammars>
+              <include href="src/test/resources/xsd/common.xsd"/>
+           </grammars>
+           <resources base="https://test.api.openstack.com">
+              <resource id="uuid" path="path/to/my/resource/{uuid}">
+                   <param name="uuid" style="template" type="csapi:UUID"/>
+                   <method href="#getMethod" />
+              </resource>
+              <resource id="progress" path="path/to/{progress}">
+                   <param name="progress" style="template" type="csapi:Progress"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+        </application>)
+    , conf_noCheck)
+
+  WADLSchemaAssertions(validator_UUID_noCheckerValid)
+
+
+
   //
   // validator_UUID_inline allows:
   //

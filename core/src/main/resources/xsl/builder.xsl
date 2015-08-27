@@ -198,7 +198,7 @@
                 <xsl:variable name="ns" select="doc(@href)/xsd:schema/@targetNamespace"/>
                 <xsl:choose>
                     <xsl:when test="$ns">
-                        <grammar ns="{$ns}" href="{@href}"/>
+                        <grammar ns="{$ns}" href="{@href}" type="W3C_XML"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:message>[WARNING] Don't understand XML grammar of <xsl:value-of select="@href"/> ignoring...</xsl:message>
