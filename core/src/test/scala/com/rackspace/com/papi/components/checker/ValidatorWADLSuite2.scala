@@ -93,6 +93,10 @@ class ValidatorWADLSuite2 extends BaseValidatorSuite {
     assertResultFailed(validator_SLASH.validate(request("GET","/element/element2/foo"),response,chain), 404)
   }
 
+  //
+  //  validator_MultiGET tests a scenario where multiple GET methods
+  //  are assigned to a single resource.
+  //
   val validator_MultiGET = Validator(
     <application xmlns="http://wadl.dev.java.net/2009/02"
       xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -137,4 +141,62 @@ class ValidatorWADLSuite2 extends BaseValidatorSuite {
     assertResultFailed(validator_MultiGET.validate(request("POST","/foo/bar"),response,chain), 405, Map("Allow"->"GET"))
   }
 
+  //
+  //  validator_DifferentPOSTs tests a scenario where there is a mix
+  //  of request representations and removeDups is enabled.
+  //
+
+  val validator_DifferentPOSTs = Validator(
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <grammars/>
+    <resources base="https://test.api.openstack.com">
+      <resource path="/foo">
+        <method href="#POSTXMLJSON"/>
+        <method href="#POSTJSON"/>
+      </resource>
+       </resources>
+       <method name="POST" id="POSTXMLJSON">
+         <doc title="PostXMLAndJSON"/>
+         <request>
+             <representation mediaType="application/xml"/>
+             <representation mediaType="application/json"/>
+         </request>
+       </method>
+       <method name="POST" id="POSTJSON">
+         <doc title="POSTJSON"/>
+         <request>
+             <representation mediaType="application/json"/>
+         </request>
+       </method>
+      </application>
+    , TestConfig(true, false, false))
+
+  test ("POST on /foo with application/xml should succeed on validator_DifferentPOSTs") {
+    validator_DifferentPOSTs.validate(request("POST","/foo", "application/xml"),response,chain)
+  }
+
+  test ("POST on /foo with application/json should succeed on validator_DifferentPOSTs") {
+    validator_DifferentPOSTs.validate(request("POST","/foo", "application/json"),response,chain)
+  }
+
+  test ("POST on /foo with application/XML should succeed on validator_DifferentPOSTs") {
+    validator_DifferentPOSTs.validate(request("POST","/foo", "application/XML"),response,chain)
+  }
+
+  test ("POST on /foo with application/Json should succeed on validator_DifferentPOSTs") {
+    validator_DifferentPOSTs.validate(request("POST","/foo", "application/Json"),response,chain)
+  }
+
+  test ("POST on /foo with no media type should fail on validator_DifferentPOSTs with a 415, should list application/xml and application/json") {
+    assertResultFailed(validator_DifferentPOSTs.validate(request("POST","/foo"),response,chain), 415, List("application/json", "application/xml"))
+  }
+
+  test ("POST on /foo with text/plain should fail on validator_DifferentPOSTs with a 415, should list application/xml and application/json") {
+    assertResultFailed(validator_DifferentPOSTs.validate(request("POST","/foo","text/plain"),response,chain), 415, List("application/json", "application/xml"))
+  }
+
+  test ("POST on /foo with application/atom+xml should fail on validator_DifferentPOSTs with a 415, should list application/xml and application/json") {
+    assertResultFailed(validator_DifferentPOSTs.validate(request("POST","/foo","application/atom+xml"),response,chain), 415, List("application/json", "application/xml"))
+  }
 }

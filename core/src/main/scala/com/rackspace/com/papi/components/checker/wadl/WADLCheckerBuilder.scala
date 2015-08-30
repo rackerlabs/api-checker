@@ -160,9 +160,9 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         joinHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
         joinHeaderHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
 
-        optInputHandler.setResult (new SAXResult (dupsHandler))
-        dupsHandler.setResult(new SAXResult(joinHandler))
-        joinHandler.setResult(new SAXResult (joinHeaderHandler))
+        optInputHandler.setResult (new SAXResult (joinHandler))
+        joinHandler.setResult(new SAXResult(dupsHandler))
+        dupsHandler.setResult(new SAXResult (joinHeaderHandler))
 
         if (c.joinXPathChecks) {
           val xpathHandler = wadl.saxTransformerFactory.newTransformerHandler(joinXPathTemplates)
