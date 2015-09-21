@@ -77,6 +77,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
 
 
+  val raxMetaTransformTemplates: Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/meta-transform.xsl").toString))
   val raxRolesTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxRoles.xsl").toString))
   val raxDeviceTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxDevice.xsl").toString))
   val raxRolesMaskTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/raxRolesMask.xsl").toString))
@@ -182,9 +183,15 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
       deviceHandler.getTransformer.asInstanceOf[Controller].addLogErrorListener
       if(c.enableRaxRolesExtension){
         val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
+        val raxMetaTransformHandler = wadl.saxTransformerFactory.newTransformerHandler(raxMetaTransformTemplates)
+
+        raxRolesHandler.getTransformer.asInstanceOf[Controller].addLogErrorListener
+        raxMetaTransformHandler.getTransformer.asInstanceOf[Controller].addLogErrorListener
+
         raxRolesHandler.setResult(new SAXResult(deviceHandler))
-        raxRolesHandler.getTransformer().asInstanceOf[Controller].addLogErrorListener
-        wadl.normalize (in, new SAXResult(raxRolesHandler), TREE, XSD11, false, KEEP, true)
+        raxMetaTransformHandler.setResult(new SAXResult(raxRolesHandler))
+
+        wadl.normalize (in, new SAXResult(raxMetaTransformHandler), TREE, XSD11, false, KEEP, true)
       }else{
         wadl.normalize (in, new SAXResult(deviceHandler), TREE, XSD11, false, KEEP, true)
       }

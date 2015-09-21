@@ -1,5 +1,11 @@
 # Releases #
 
+## Release 1.1.3 (2015-09-??) ##
+1. Updated the version string on the Wadl2Checker and Wadl2Dot CLI tools.
+1. Added the new `xsd-grammar-transform` (`g`) option to the Wadl2Checker CLI tool in order to transform the XML after validation.
+1. Added support for the `rax:metadata` extension.
+The `rax:metadata` extension can be configured on a WADL as an attribute at the resource level.
+
 ## Release 1.1.2 (2015-07-20) ##
 1. Added the ability for the DelegationHandler to have the default component name of ```api-checker``` overridden.
 This will allow multiple API-Checker instances to be utilized in a single application and have them be differentiated in the logs.
