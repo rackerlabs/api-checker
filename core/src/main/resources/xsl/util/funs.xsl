@@ -23,7 +23,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
-    exclude-result-prefixes="xs"
+    exclude-result-prefixes="xs chk"
     version="2.0">
 
     <!--
@@ -129,6 +129,75 @@
                 <xsl:sequence select="false()"/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:function>
+
+    <!--
+        Given a unique id and a list of uri states (which may be empty)
+        returns an appropriate URI_FAIL step
+     -->
+    <xsl:function name="chk:createURIErrorStep" as="node()">
+        <xsl:param name="id" as="xs:string"/>
+        <xsl:param name="uriSteps" as="node()*"/>
+        <step id="{$id}" type="URL_FAIL">
+            <xsl:if test="not(empty($uriSteps))">
+                <xsl:variable name="notMatches" as="xs:string*">
+                    <xsl:perform-sort select="$uriSteps[@type='URL']/@match">
+                        <xsl:sort select="."/>
+                    </xsl:perform-sort>
+                </xsl:variable>
+                <xsl:variable name="notXSDMatches" as="xs:QName*">
+                    <xsl:perform-sort select="for $s in $uriSteps[@type='URLXSD'] return resolve-QName($s/@match, $s)">
+                        <xsl:sort select="concat(local-name-from-QName(.),'_',namespace-uri-from-QName(.))"/>
+                    </xsl:perform-sort>
+                </xsl:variable>
+                <xsl:if test="not(empty($notMatches))">
+                    <xsl:attribute name="notMatch">
+                        <xsl:value-of select="$notMatches" separator="|"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="not(empty($notXSDMatches))">
+                    <xsl:attribute name="notTypes">
+                        <xsl:value-of select="$notXSDMatches" separator=" "/>
+                    </xsl:attribute>
+                </xsl:if>
+            </xsl:if>
+        </step>
+    </xsl:function>
+
+    <!--
+        Given a unique id and a list of method states (which may be empty)
+        returns an appropriate METHOD_FAIL step
+     -->
+    <xsl:function name="chk:createMethodErrorStep" as="node()">
+        <xsl:param name="id" as="xs:string"/>
+        <xsl:param name="methodSteps" as="node()*"/>
+        <step id="{$id}" type="METHOD_FAIL">
+            <xsl:if test="not(empty($methodSteps))">
+                <xsl:variable name="notMatchValues" as="xs:string*">
+                    <xsl:perform-sort select="$methodSteps/@match">
+                        <xsl:sort select="."/>
+                    </xsl:perform-sort>
+                </xsl:variable>
+                <xsl:attribute name="notMatch">
+                    <xsl:value-of select="$notMatchValues" separator="|"/>
+                </xsl:attribute>
+            </xsl:if>
+        </step>
+    </xsl:function>
+
+    <!--
+        Given a unique ida and a list of reqtype states
+        returns an appropriate REQ_TYPE_FAIL step
+     -->
+    <xsl:function name="chk:createReqTypeErrorStep" as="node()">
+        <xsl:param name="id" as="xs:string"/>
+        <xsl:param name="reqTypeSteps" as="node()+"/>
+        <step id="{$id}" type="REQ_TYPE_FAIL">
+            <xsl:variable name="notMatchValues" as="xs:string*" select="$reqTypeSteps/@match"/>
+            <xsl:attribute name="notMatch">
+                <xsl:value-of select="$notMatchValues" separator="|"/>
+            </xsl:attribute>
+        </step>
     </xsl:function>
 
     <!--
