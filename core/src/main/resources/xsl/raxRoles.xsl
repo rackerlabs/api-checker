@@ -108,10 +108,14 @@
             <xsl:for-each select="$roles">
                 <wadl:param name="X-ROLES" style="header" rax:code="403"
                             rax:message="You are forbidden to perform the operation" type="xsd:string" required="true">
-                    <xsl:attribute name="fixed" select="."/>
+                    <xsl:attribute name="fixed" select="rax:transformNBSP(.)"/>
                 </wadl:param>
             </xsl:for-each>
         </xsl:if>
-
     </xsl:template>
+
+    <xsl:function name="rax:transformNBSP" as="xsd:string">
+      <xsl:param name="in" as="xsd:string"/>
+      <xsl:value-of select="replace($in,'&#xA0;',' ')"/>
+    </xsl:function>
 </xsl:stylesheet>

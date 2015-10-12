@@ -51,7 +51,7 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNames extends Fl
         </grammars>
         <resources base="https://test.api.openstack.com">
           <resource path="/a" rax:roles="a:admin-foo">
-            <method href="#putOnA" rax:roles="a:observer%"/>
+            <method href="#putOnA" rax:roles="a:observer% a:observer&#xA0;wsp"/>
             <resource path="/b" rax:roles="b:creator">
               <method href="#postOnB"/>
               <method href="#putOnB"/>
@@ -71,11 +71,14 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNames extends Fl
       </application>)
       , configuration)
 
-    // PUT /a has resource level a:admin-foo, method level a:observer%
+    // PUT /a has resource level a:admin-foo, method level a:observer% and 'a:observer '
     it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:admin-foo"), description)
     it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer%"), description)
     it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer%", "a:admin-foo"), description)
+    it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer wsp"), description)
+    it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer wsp", "a:admin-foo"), description)
     it should behave like accessIsForbidden(validator, "PUT", "/a", List("AR-Payments-Billing-Support"), description)
+    it should behave like accessIsForbidden(validator, "PUT", "/a", List("a:observer"), description)
     it should behave like accessIsForbiddenWhenNoXRoles(validator, "PUT", "/a", description)
 
     // DELETE /a has resource level a:admin-foo, method is not defined
@@ -86,6 +89,7 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNames extends Fl
     it should behave like accessIsAllowed(validator, "POST", "/a/b", List("a:admin-foo"), description)
     it should behave like accessIsAllowed(validator, "POST", "/a/b", List("b:creator"), description)
     it should behave like accessIsForbidden(validator, "POST", "/a/b", List("a:observer%"), description)
+    it should behave like accessIsForbidden(validator, "POST", "/a/b", List("a:observer wsp"), description)
     it should behave like accessIsForbiddenWhenNoXRoles(validator, "POST", "/a/b", description)
 
     // PUT /a/b has parent resource level a:admin-foo, resource level b:creator, method level AR-Payments-Billing-Support
@@ -104,6 +108,7 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNames extends Fl
     it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:admin"), description)
     it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List(), description)
     it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("a:observer%"), description)
+    it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("a:observer wsp"), description)
     it should behave like accessIsForbidden(validator, "DELETE", "/a/b", List("b:foo"), description)
     it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a/b", description)
 
@@ -113,9 +118,15 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNames extends Fl
     it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:admin-foo"), description, List("'b'","yes","no"))
     it should behave like accessIsAllowed(validator, "GET", "/a/yes", List("a:admin-foo", "a:observer%"), description)
     it should behave like accessIsAllowed(validator, "GET", "/a/no", List("a:admin-foo", "a:observer%"), description)
+    it should behave like accessIsAllowed(validator, "GET", "/a/yes", List("a:admin-foo", "a:observer wsp"), description)
+    it should behave like accessIsAllowed(validator, "GET", "/a/no", List("a:admin-foo", "a:observer wsp"), description)
     it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:admin-foo", "a:observer%"), description, List("'b'","yes","no"))
+    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:admin-foo", "a:observer wsp"), description, List("'b'","yes","no"))
     it should behave like accessIsForbidden(validator, "GET", "/a/yes", List("a:observer%"), description)
     it should behave like accessIsForbidden(validator, "GET", "/a/no", List("a:observer%"), description)
     it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:observer%"), description, List("'b'","yes","no"))
+    it should behave like accessIsForbidden(validator, "GET", "/a/yes", List("a:observer wsp"), description)
+    it should behave like accessIsForbidden(validator, "GET", "/a/no", List("a:observer wsp"), description)
+    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:observer wsp"), description, List("'b'","yes","no"))
   }
 }
