@@ -51,7 +51,7 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNamesMasked exte
         </grammars>
         <resources base="https://test.api.openstack.com">
           <resource path="/a" rax:roles="a:admin-foo">
-            <method href="#putOnA" rax:roles="a:observer%"/>
+            <method href="#putOnA" rax:roles="a:observer% a:observer&#xA0;wsp"/>
             <resource path="/b" rax:roles="b:creator">
               <method href="#postOnB"/>
               <method href="#putOnB"/>
@@ -75,18 +75,22 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNamesMasked exte
     it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:admin-foo"), description)
     it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer%"), description)
     it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer%", "a:admin-foo"), description)
+    it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer wsp"), description)
+    it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:observer wsp", "a:admin-foo"), description)
     it should behave like methodNotAllowed(validator, "PUT", "/a", List("AR-Payments-Billing-Support"), description)
     it should behave like resourceNotFoundWhenNoXRoles(validator, "PUT", "/a", description)
 
     // DELETE /a has resource level a:admin-foo, method is not defined
     it should behave like methodNotAllowed(validator, "DELETE", "/a", List("a:admin-foo"), description, List("does not match","'PUT'"))
     it should behave like methodNotAllowed(validator, "DELETE", "/a", List("a:observer%"), description, List("does not match","'PUT'"))
+    it should behave like methodNotAllowed(validator, "DELETE", "/a", List("a:observer wsp"), description, List("does not match","'PUT'"))
     it should behave like resourceNotFound(validator, "DELETE", "/a", List(), description)
 
     // POST /a/b has parent resource level a:admin-foo, resource level b:creator
     it should behave like accessIsAllowed(validator, "POST", "/a/b", List("a:admin-foo"), description)
     it should behave like accessIsAllowed(validator, "POST", "/a/b", List("b:creator"), description)
     it should behave like resourceNotFound(validator, "POST", "/a/b", List("a:observer%"), description)
+    it should behave like resourceNotFound(validator, "POST", "/a/b", List("a:observer wsp"), description)
     it should behave like methodNotAllowed(validator, "POST", "/a/b", List("AR-Payments-Billing-Support"), description, List("does not match","'DELETE|PUT'"))
     it should behave like resourceNotFoundWhenNoXRoles(validator, "POST", "/a/b", description)
 
@@ -107,6 +111,7 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNamesMasked exte
     it should behave like accessIsAllowed(validator, "DELETE", "/a/b", List("b:admin"), description)
     it should behave like resourceNotFound(validator, "DELETE", "/a/b", List(), description)
     it should behave like resourceNotFound(validator, "DELETE", "/a/b", List("a:observer%"), description)
+    it should behave like resourceNotFound(validator, "DELETE", "/a/b", List("a:observer wsp"), description)
     it should behave like resourceNotFound(validator, "DELETE", "/a/b", List("b:foo"), description)
     it should behave like resourceNotFoundWhenNoXRoles(validator, "DELETE", "/a/b", description)
 
@@ -120,5 +125,11 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNamesMasked exte
     it should behave like resourceNotFound(validator, "GET", "/a/yes", List("a:observer%"), description, List("{yes}"))
     it should behave like resourceNotFound(validator, "GET", "/a/no", List("a:observer%"), description, List("{no}"))
     it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:observer%"), description, List("{foo}"))
+    it should behave like accessIsAllowed(validator, "GET", "/a/yes", List("a:admin-foo", "a:observer wsp"), description)
+    it should behave like accessIsAllowed(validator, "GET", "/a/no", List("a:admin-foo", "a:observer wsp"), description)
+    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:admin-foo", "a:observer wsp"), description, List("'b'","yes","no"))
+    it should behave like resourceNotFound(validator, "GET", "/a/yes", List("a:observer wsp"), description, List("{yes}"))
+    it should behave like resourceNotFound(validator, "GET", "/a/no", List("a:observer wsp"), description, List("{no}"))
+    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:observer wsp"), description, List("{foo}"))
   }
 }

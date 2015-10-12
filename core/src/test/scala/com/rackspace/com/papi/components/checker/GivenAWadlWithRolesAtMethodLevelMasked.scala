@@ -36,7 +36,7 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
               <representation mediaType="application/xml"/>
             </request>
           </method>
-          <method name="GET" rax:roles="a:observer">
+          <method name="GET" rax:roles="a:observer b:test&#xA0;with&#xA0;space">
             <request>
               <representation mediaType="application/xml"/>
             </request>
@@ -46,7 +46,7 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
               <representation mediaType="application/xml"/>
             </request>
           </method>
-          <method name="DELETE" rax:roles="a:observer a:admin">
+          <method name="DELETE" rax:roles="a:observer a:admin b:test with space">
             <request>
               <representation mediaType="application/xml"/>
             </request>
@@ -114,6 +114,11 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
   it should behave like methodNotAllowed(validator, "GET", "/a", List("a:admin"), description, List("does not match", "'DELETE|POST|PUT'"))
   it should behave like methodNotAllowedWhenNoXRoles(validator, "GET", "/a", description, List("does not match", "'PUT'"))
 
+  // GET on /a requires 'b:test with space' role
+  it should behave like accessIsAllowed(validator, "GET", "/a", List("b:test with space"), description)
+  it should behave like accessIsAllowed(validator, "GET", "/a", List("b:test with space", "a:bar"), description)
+
+
   // POST on /b requires admin role
   it should behave like accessIsAllowed(validator, "POST", "/b", List("a:admin"), description)
   it should behave like accessIsAllowed(validator, "POST", "/b", List("a:observer", "a:admin"), description)
@@ -155,8 +160,13 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
   it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:admin", "a:bar"), description)
   it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:bar", "a:admin"), description)
   it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:observer", "a:admin"), description)
+  it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:bar", "b:test with space"), description)
+  it should behave like accessIsAllowed(validator, "DELETE", "/a", List("b:test with space","a:bar"), description)
+  it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:observer", "b:test with space"), description)
+  it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:observer", "b:test with space", "a:admin"), description)
   it should behave like methodNotAllowed(validator, "DELETE", "/a", List(), description, List("does not match", "'PUT'"))
   it should behave like methodNotAllowed(validator, "DELETE", "/a", List("a:bar"), description, List("does not match", "'PUT'"))
+  it should behave like methodNotAllowed(validator, "DELETE", "/a", List("b:test  with space"), description, List("does not match", "'PUT'")) //extra space!
   it should behave like methodNotAllowed(validator, "DELETE", "/a", List("a:bar", "a:jawsome"), description, List("does not match", "'PUT'"))
   it should behave like methodNotAllowed(validator, "DELETE", "/a", List("observer", "creator"), description, List("does not match", "'PUT'"))
   it should behave like methodNotAllowedWhenNoXRoles(validator, "DELETE", "/a", description, List("does not match", "'PUT'"))

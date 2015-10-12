@@ -36,7 +36,7 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
               <representation mediaType="application/xml"/>
             </request>
           </method>
-          <method name="GET" rax:roles="a:observer">
+          <method name="GET" rax:roles="a:observer b:test&#xA0;with&#xA0;space">
             <request>
               <representation mediaType="application/xml"/>
             </request>
@@ -46,7 +46,7 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
               <representation mediaType="application/xml"/>
             </request>
           </method>
-          <method name="DELETE" rax:roles="a:observer a:admin">
+          <method name="DELETE" rax:roles="a:observer a:admin b:test with space">
             <request>
               <representation mediaType="application/xml"/>
             </request>
@@ -102,6 +102,10 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
   it should behave like accessIsForbidden(validator, "GET", "/a", List("a:admin"), description)
   it should behave like accessIsForbiddenWhenNoXRoles(validator, "GET", "/a", description)
 
+  // GET on /a requires 'b:test with space' role
+  it should behave like accessIsAllowed(validator, "GET", "/a", List("b:test with space"), description)
+  it should behave like accessIsAllowed(validator, "GET", "/a", List("b:test with space", "a:bar"), description)
+
   // POST on /a requires a:admin role
   it should behave like accessIsAllowed(validator, "POST", "/a", List("a:admin"), description)
   it should behave like accessIsAllowed(validator, "POST", "/a", List("a:bar", "a:admin"), description)
@@ -117,15 +121,20 @@ class GivenAWadlWithRolesAtMethodLevel extends FlatSpec with RaxRolesBehaviors {
   it should behave like accessIsAllowed(validator, "PUT", "/a", List("a:bar", "a:jawsome"), description)
   it should behave like accessIsAllowedWhenNoXRoles(validator, "PUT", "/a", description)
 
-  // DELETE has a:observer and a:admin, treated as ORs, not ANDs
+  // DELETE has a:observer, a:admin, and 'b:test with space' treated as ORs, not ANDs
   it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:observer", "a:bar"), description)
   it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:admin", "a:bar"), description)
   it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:bar", "a:admin"), description)
+  it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:bar", "b:test with space"), description)
+  it should behave like accessIsAllowed(validator, "DELETE", "/a", List("b:test with space","a:bar"), description)
   it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:observer", "a:admin"), description)
+  it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:observer", "b:test with space"), description)
+  it should behave like accessIsAllowed(validator, "DELETE", "/a", List("a:observer", "b:test with space", "a:admin"), description)
   it should behave like accessIsForbidden(validator, "DELETE", "/a", List(), description)
   it should behave like accessIsForbidden(validator, "DELETE", "/a", List("a:bar"), description)
   it should behave like accessIsForbidden(validator, "DELETE", "/a", List("a:bar", "a:jawsome"), description)
   it should behave like accessIsForbidden(validator, "DELETE", "/a", List("observer", "creator"), description)
+  it should behave like accessIsForbidden(validator, "DELETE", "/a", List("b:test  with space"), description) //extra space!
   it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a", description)
 
   //GET on /c requires a header and a:admin role
