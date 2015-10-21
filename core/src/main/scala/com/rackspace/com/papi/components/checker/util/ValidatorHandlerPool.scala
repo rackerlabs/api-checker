@@ -23,14 +23,14 @@ import com.yammer.metrics.scala.Instrumented
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-import scala.collection.mutable.{HashMap, LinkedList, Map}
+import scala.collection.mutable.{HashMap, MutableList, Map}
 
 object ValidatorHandlerPool extends Instrumented {
   private val validatorHandlerPools : Map[Schema, SoftReferenceObjectPool[ValidatorHandler]] = new HashMap[Schema, SoftReferenceObjectPool[ValidatorHandler]]
   private def pool(schema : Schema) : SoftReferenceObjectPool[ValidatorHandler] = validatorHandlerPools.getOrElseUpdate(schema, addPool(schema))
 
-  private val activeGauges = new LinkedList[Gauge[Int]]
-  private val idleGauges = new LinkedList[Gauge[Int]]
+  private val activeGauges = new MutableList[Gauge[Int]]
+  private val idleGauges = new MutableList[Gauge[Int]]
 
   private def addPool(schema : Schema) : SoftReferenceObjectPool[ValidatorHandler] = {
     val pool = new SoftReferenceObjectPool[ValidatorHandler](new ValidatorHandlerFactory(schema))

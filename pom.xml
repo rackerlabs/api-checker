@@ -14,7 +14,7 @@
     <modules>
         <module>core</module>
         <module>cli</module>
-        <module>filter</module>
+        <module>filter-aggregator</module>
         <module>filter-test-app</module>
     </modules>
 
@@ -52,7 +52,7 @@
         <scala.test.version>2.0</scala.test.version>
         <scala.uri.version>0.4.2</scala.uri.version>
         <junit.version>4.10</junit.version>
-        <wadl-tools.version>1.0.29</wadl-tools.version>
+        <wadl-tools.version>1.0.30</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.1-rax</xerces.version>
         <servlet.version>3.1</servlet.version>
@@ -108,17 +108,17 @@
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.10</artifactId>
+            <artifactId>scalatest_${scala.dep.version}</artifactId>
             <version>${scala.test.version}</version>
         </dependency>
         <dependency>
             <groupId>com.netaporter</groupId>
-            <artifactId>scala-uri_2.10</artifactId>
+            <artifactId>scala-uri_${scala.dep.version}</artifactId>
             <version>${scala.uri.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
-            <artifactId>wadl-tools</artifactId>
+            <artifactId>wadl-tools_${scala.dep.version}</artifactId>
             <version>${wadl-tools.version}</version>
         </dependency>
         <dependency>
@@ -143,7 +143,7 @@
          </dependency>
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging-slf4j_2.10</artifactId>
+            <artifactId>scala-logging-slf4j_${scala.dep.version}</artifactId>
             <version>${scala-logging.version}</version>
         </dependency>
         <dependency>
@@ -184,7 +184,7 @@
         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
-            <artifactId>wadl-tools</artifactId>
+            <artifactId>wadl-tools_${scala.dep.version}</artifactId>
             <version>${wadl-tools.version}</version>
             <type>test-jar</type>
             <scope>test</scope>

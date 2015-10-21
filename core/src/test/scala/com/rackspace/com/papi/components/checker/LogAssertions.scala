@@ -16,20 +16,23 @@
 package com.rackspace.com.papi.components.checker
 
 import java.util.UUID
+import java.util.concurrent.{ConcurrentLinkedQueue, ConcurrentHashMap}
 
 import org.apache.logging.log4j.{Level, LogManager}
 import org.apache.logging.log4j.core.{LogEvent, LoggerContext}
 import org.apache.logging.log4j.core.appender.AbstractAppender
 import org.scalatest.exceptions.TestFailedException
 
-import scala.collection.mutable.{HashMap, Queue, SynchronizedMap, SynchronizedQueue}
+import scala.collection.mutable
 
 trait LogAssertions {
 
   type LogName = String
-  type Log = Queue[LogEvent]
 
-  private val logEntries = new HashMap[LogName, Log]() with SynchronizedMap[LogName, Log]
+  private val logEntries = {
+    import scala.collection.JavaConverters._
+    new ConcurrentHashMap[LogName, mutable.Buffer[LogEvent]]().asScala
+  }
 
   def log(logName: LogName, level: Level)(f : => Any) : Unit = {
     val loggerConfig = LogManager.getContext(false).asInstanceOf[LoggerContext].getConfiguration().getLoggerConfig("root")
@@ -40,7 +43,8 @@ trait LogAssertions {
       override def isStopped : Boolean = false
 
       override protected def append (event : LogEvent) : Unit = {
-        logEntries.getOrElseUpdate(logName, new SynchronizedQueue[LogEvent]()) += event
+        import scala.collection.JavaConverters._
+        logEntries.getOrElseUpdate(logName, new ConcurrentLinkedQueue[LogEvent]().asScala.toBuffer) += event
       }
     }, level, null)
     f
