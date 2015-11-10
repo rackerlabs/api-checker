@@ -2616,11 +2616,6 @@ class WADLCheckerSpec extends BaseCheckerSpec {
                      <method href="#res"/>
                    </resource>
                  </resource>
-                 <resource path="another">
-                   <resource path="resource">
-                     <method href="#res"/>
-                   </resource>
-                 </resource>
                 </resource>
               </resource>
            </resources>
