@@ -1,10 +1,23 @@
 # Releases #
 
-## Release 1.1.3 (2015-09-??) ##
-1. Updated the version string on the Wadl2Checker and Wadl2Dot CLI tools.
-1. Added the new `xsd-grammar-transform` (`g`) option to the Wadl2Checker CLI tool in order to transform the XML after validation.
-1. Added support for the `rax:metadata` extension.
-The `rax:metadata` extension can be configured on a WADL as an attribute at the resource level.
+## Release 1.1.3 (2015-11-10) ##
+1. Added missing xsd-grammar-transform (g) option to wadl2checker.
+1. Added the ability to disable checker validation in wadl2dot.
+1. Added support for the rax:metadata extension. The rax:metadata extension can be configured
+   on a WADL as an attribute at the resource level. It is always enabled when rax:roles is enabled.
+1. Added support for spaces in role names in the rax:roles extension by means of non-breaking space (NBSP) characters.
+1. Clean up: The DateUtils class was converted from Java to Scala.
+1. Clean up: Cleaner Scala code when handling optional values through out the project.
+1. Clean up: Removed outdated graphs from the project.
+1. Fixed a bug where CLI utilities were not displaying the correct version.
+1. Fixed a bug where an incorrect error message was given when a resource had multiple methods of the same type.
+1. Fixed a bug where default checker values were not correctly filled in where checker validation was turned off.
+1. Fixed a bug in checker validation where under certain circumstances an optional METHOD_FAIL state was marked as required.
+1. Updated wadl-tools: 1.0.29 → 1.0.31.  This addressed a number of bugs affecting this project
+   1. Fixed a bug where multiple slashes // in a resource path caused the creation of empty resources.
+   1. Fixed a bug where WADL extensions were not correctly propagated to child resources.
+   1. WADL-Tools is now aware of the rax:roles extension and can correctly merge multiple rax:roles attributes into one as part of the normalization process.
+
 
 ## Release 1.1.2 (2015-07-20) ##
 1. Added the ability for the DelegationHandler to have the default component name of ```api-checker``` overridden.
