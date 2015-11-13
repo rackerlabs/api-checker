@@ -17,6 +17,7 @@
     <modules>
         <module>wadl2checker</module>
         <module>wadl2dot</module>
+	<module>wadltest</module>
     </modules>
 
     <properties>
