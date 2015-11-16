@@ -1,5 +1,5 @@
 /***
- *   Copyright 2014 Rackspace US, Inc.
+ *   Copyright 2015 Rackspace US, Inc.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.rackspace.papi.components.checker.filter
+package com.rackspace.papi.components.checker.cli
 
 import java.io.File
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletException, ServletRequest, ServletResponse}
@@ -24,6 +24,13 @@ import com.rackspace.com.papi.components.checker.{Config, Validator, ValidatorEx
 import com.rackspace.com.papi.components.checker.handler._
 import org.xml.sax.InputSource
 
+
+object ValidatorFilter {
+  val VALIDATOR_ATTRIB = "com.rackspace.papi.components.checker.cli.wadltest.validator"
+}
+
+import ValidatorFilter._
+
 /**
  * A filter which can be used to test api-checker.
  *
@@ -33,39 +40,10 @@ class ValidatorFilter extends Filter {
   private[this] var validator : Validator = null;
 
   override def init(config : FilterConfig) : Unit = {
-    val wadlRef = config.getInitParameter("WADLRef")
-
-    if (wadlRef == null) {
-      throw new ServletException ("Missing required init paramater WADLRef")
+    validator = config.getServletContext().getAttribute(VALIDATOR_ATTRIB).asInstanceOf[Validator]
+    if (validator == null) {
+      throw new ServletException("Could not locate validator!")
     }
-
-    val dot : File = File.createTempFile("checker", ".dot")
-
-    System.out.println ("Dot file is at: "+dot)
-
-    val resultHandler = new DispatchResultHandler(List[ResultHandler](new SaveDotHandler(dot, true, true),
-                                                                      new ServletResultHandler(),
-                                                                      new InstrumentedHandler()))
-
-    val conf = new Config
-    conf.resultHandler = resultHandler
-    conf.xsdEngine = "SaxonEE"
-    conf.checkWellFormed = true
-    conf.checkXSDGrammar = true
-    conf.checkElements = true
-    conf.checkHeaders = true
-    conf.xpathVersion = 2
-    conf.checkPlainParams = true
-    conf.doXSDGrammarTransform = true
-    conf.enablePreProcessExtension = true
-    conf.enableMessageExtension = true
-    conf.joinXPathChecks = true
-    conf.enableIgnoreXSDExtension = true
-    conf.xslEngine = "XalanC"
-    conf.checkJSONGrammar = true
-    conf.enableIgnoreJSONSchemaExtension = true
-
-    validator = Validator("Test Validator",new SAXSource(new InputSource(wadlRef)), conf)
   }
 
   override def doFilter (req : ServletRequest, resp : ServletResponse, chain : FilterChain) : Unit = {

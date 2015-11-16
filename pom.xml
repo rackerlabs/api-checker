@@ -14,8 +14,6 @@
     <modules>
         <module>core</module>
         <module>cli</module>
-        <module>filter</module>
-        <module>filter-test-app</module>
     </modules>
 
     <scm>

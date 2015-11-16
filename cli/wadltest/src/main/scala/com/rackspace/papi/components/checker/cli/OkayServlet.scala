@@ -1,5 +1,5 @@
 /***
- *   Copyright 2014 Rackspace US, Inc.
+ *   Copyright 2015 Rackspace US, Inc.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.rackspace.papi.components.checker.filter
+package com.rackspace.papi.components.checker.cli
 
 import java.io.{BufferedInputStream, BufferedOutputStream, InputStream, OutputStream}
 import javax.servlet.ServletException
@@ -21,19 +21,19 @@ import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
 object OkayServlet {
   private val BUFFER_SIZE : Int = 1024
-  private val ECHO_CONTENT : String = "echoContent"
+  val ECHO_CONTENT_PARAM : String = "echoContent"
 }
 
-import com.rackspace.papi.components.checker.filter.OkayServlet._
+import com.rackspace.papi.components.checker.cli.OkayServlet._
 
 class OkayServlet extends HttpServlet {
 
   override def service(req : HttpServletRequest, resp : HttpServletResponse) {
     //
-    //  If the parameter ECHO_CONTENT is set, then we echo the content
+    //  If the parameter ECHO_CONTENT_PARAM is set, then we echo the content
     //  on response.
     //
-    if (req.getParameter(ECHO_CONTENT) != null) {
+    if (req.getParameter(ECHO_CONTENT_PARAM) != null) {
       try {
         copy(req.getInputStream(), resp.getOutputStream())
       }catch {
