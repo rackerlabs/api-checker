@@ -11,7 +11,7 @@
     <artifactId>wadl2dot</artifactId>
     <packaging>jar</packaging>
 
-    <name>API Checker CLI WADL2Dot</name>
+    <name>API Checker WADL2Dot</name>
     <description>
         A command line utility to convert a WADL to dot format.
     </description>

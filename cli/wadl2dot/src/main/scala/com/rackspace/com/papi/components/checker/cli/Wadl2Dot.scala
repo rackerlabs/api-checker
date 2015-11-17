@@ -29,7 +29,7 @@ object Wadl2Dot {
 
   val version = getClass.getPackage.getImplementationVersion
 
-  val parser = new ArgotParser("java -jar wadl2dot.jar", preUsage=Some(s"$title v$version"))
+  val parser = new ArgotParser("wadl2dot", preUsage=Some(s"$title v$version"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
