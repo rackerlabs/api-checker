@@ -35,7 +35,7 @@ class ValidatorFilter extends Filter {
   private[this] var validator: Validator = null
 
   override def init(config : FilterConfig) : Unit = {
-    validator = config.getServletContext().getAttribute(VALIDATOR_ATTRIB).asInstanceOf[Validator]
+    validator = config.getServletContext.getAttribute(VALIDATOR_ATTRIB).asInstanceOf[Validator]
     if (validator == null) {
       throw new ServletException("Could not locate validator!")
     }
