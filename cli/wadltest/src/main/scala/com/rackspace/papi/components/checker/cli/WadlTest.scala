@@ -45,7 +45,7 @@ object WadlTest {
 
   val version = getClass.getPackage.getImplementationVersion
 
-  val parser = new ArgotParser("java -jar wadltest.jar", preUsage=Some(s"$title v$version"))
+  val parser = new ArgotParser("wadltest", preUsage=Some(s"$title v$version"))
 
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")

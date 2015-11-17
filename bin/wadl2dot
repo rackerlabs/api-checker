@@ -1,0 +1,7 @@
+#!/bin/bash
+
+PROG=wadl2dot
+
+JAVA_OPTS=
+
+. runcli.sh

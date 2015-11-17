@@ -1,0 +1,7 @@
+#!/bin/bash
+
+PROG=wadl2checker
+
+JAVA_OPTS=
+
+. runcli.sh

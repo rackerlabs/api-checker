@@ -1,0 +1,8 @@
+#!/bin/bash
+
+PROG=wadltest
+
+JAVA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=true  -Dcom.sun.management.jmxremote.authenticate=false "
+JAVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9292 -Djava.rmi.server.hostname=localhost"
+
+. runcli.sh
