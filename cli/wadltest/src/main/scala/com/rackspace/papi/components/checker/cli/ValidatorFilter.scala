@@ -49,7 +49,7 @@ class ValidatorFilter extends Filter {
     }
   }
 
-  override def destroy: Unit = {
+  override def destroy(): Unit = {
     validator.destroy
     validator = null
   }
