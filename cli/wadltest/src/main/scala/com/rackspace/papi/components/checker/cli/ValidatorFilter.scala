@@ -15,21 +15,16 @@
  */
 package com.rackspace.papi.components.checker.cli
 
-import java.io.File
-import javax.servlet.{Filter, FilterChain, FilterConfig, ServletException, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import javax.xml.transform.sax.SAXSource
+import javax.servlet.{Filter, FilterChain, FilterConfig, ServletException, ServletRequest, ServletResponse}
 
-import com.rackspace.com.papi.components.checker.{Config, Validator, ValidatorException}
-import com.rackspace.com.papi.components.checker.handler._
-import org.xml.sax.InputSource
-
+import com.rackspace.com.papi.components.checker.{Validator, ValidatorException}
 
 object ValidatorFilter {
   val VALIDATOR_ATTRIB = "com.rackspace.papi.components.checker.cli.wadltest.validator"
 }
 
-import ValidatorFilter._
+import com.rackspace.papi.components.checker.cli.ValidatorFilter._
 
 /**
  * A filter which can be used to test api-checker.
@@ -37,7 +32,7 @@ import ValidatorFilter._
  * <b>This is not the Repose api-validator filter.</b>
  */
 class ValidatorFilter extends Filter {
-  private[this] var validator : Validator = null;
+  private[this] var validator: Validator = null
 
   override def init(config : FilterConfig) : Unit = {
     validator = config.getServletContext().getAttribute(VALIDATOR_ATTRIB).asInstanceOf[Validator]
@@ -54,7 +49,7 @@ class ValidatorFilter extends Filter {
     }
   }
 
-  override def destroy : Unit = {
+  override def destroy: Unit = {
     validator.destroy
     validator = null
   }
