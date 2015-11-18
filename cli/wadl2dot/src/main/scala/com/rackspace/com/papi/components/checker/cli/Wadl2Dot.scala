@@ -64,6 +64,9 @@ object Wadl2Dot {
   val header = parser.flag[Boolean] (List("H", "header"),
                                          "Add checks to ensure that required headers are passed in: false")
 
+  val setDefaults = parser.flag[Boolean] (List("s", "setParamDefaults"),
+                                          "Fill in required parameters if a default value is specified Default: false")
+
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
 
@@ -153,6 +156,7 @@ object Wadl2Dot {
         c.enablePreProcessExtension = !preProc.value.getOrElse(false)
         c.joinXPathChecks = joinXPaths.value.getOrElse(false)
         c.checkHeaders = header.value.getOrElse(false)
+        c.setParamDefaults = setDefaults.value.getOrElse(false)
         c.enableIgnoreXSDExtension = !ignoreXSD.value.getOrElse(false)
         c.enableIgnoreJSONSchemaExtension = !ignoreJSON.value.getOrElse(false)
         c.enableMessageExtension = !message.value.getOrElse(false)

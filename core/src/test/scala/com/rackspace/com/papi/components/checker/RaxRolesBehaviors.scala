@@ -62,6 +62,30 @@ trait RaxRolesBehaviors {
   def configWithRolesMaskedEnabledMessageExtDisabled =
     TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, false, false, false, true, false, true)
 
+  def configWithRaxRolesEnabledDefaultsEnabled = {
+    val cfg = configWithRolesEnabled
+    cfg.setParamDefaults = true
+    cfg
+  }
+
+  def configWithRaxRolesEnabledDupsRemovedDefaultsEnabled = {
+    val cfg = configWithRolesEnabledDupsRemoved
+    cfg.setParamDefaults = true
+    cfg
+  }
+
+  def configWithRolesMaskedEnabledDefaultsEnabled = {
+    val cfg = configWithRolesMaskedEnabled
+    cfg.setParamDefaults = true
+    cfg
+  }
+
+  def configWithRolesMaskedEnabledDupsRemovedDefaultsEnabled = {
+    val cfg = configWithRolesMaskedEnabledDupsRemoved
+    cfg.setParamDefaults = true
+    cfg
+  }
+
   def accessIsAllowed(validator: => Validator, method: => String, path: => String, roles: => List[String], conf: => String = "Valid Config") {
     def request: HttpServletRequest = base.request(method, path, "application/xml", xml, false, Map("X-ROLES" -> roles))
     it should "succeed when " + method + " on " + path + " and X-Roles has " + roles + " for " + conf in {

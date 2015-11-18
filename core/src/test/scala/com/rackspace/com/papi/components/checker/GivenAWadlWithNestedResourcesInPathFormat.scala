@@ -26,7 +26,9 @@ class GivenAWadlWithNestedResourcesInPathFormat extends FlatSpec with RaxRolesBe
   val configs = Map[String, Config]("Config With Roles Enabled" -> configWithRolesEnabled,
     "Config With Roles Enabled and Messsage Extensions Disabled" -> configWithRolesEnabledMessageExtDisabled,
     "Config With Roles Enabled and Duplications Removed" -> configWithRolesEnabledDupsRemoved,
-    "Config With Roles Enabled and Header Checks Disabled" -> configWithRolesEnabledHeaderCheckDisabled)
+    "Config With Roles Enabled and Header Checks Disabled" -> configWithRolesEnabledHeaderCheckDisabled,
+    "Config with Roles Enabled and Default Parameters Enabled" -> configWithRaxRolesEnabledDefaultsEnabled,
+    "Config with Roles Enabled, Default Parameters Enabled and Duplications Removed" -> configWithRaxRolesEnabledDupsRemovedDefaultsEnabled)
 
   for ((description, configuration) <- configs) {
 
@@ -53,16 +55,16 @@ class GivenAWadlWithNestedResourcesInPathFormat extends FlatSpec with RaxRolesBe
           <resource path="/a" rax:roles="a:admin">
             <method name="PUT" rax:roles="a:observer"/>
           </resource>
-	  <resource path="/a" rax:roles="another:admin"/>
-	  <resource path="/a/b" rax:roles="b:creator">
+          <resource path="/a" rax:roles="another:admin"/>
+          <resource path="/a/b" rax:roles="b:creator">
             <method name="POST"/>
             <method name="PUT" rax:roles="b:observer"/>
             <method name="DELETE" rax:roles="b:observer b:admin"/>
-	  </resource>
-	  <resource path="/a/b/c" rax:roles="c:creator">
+          </resource>
+          <resource path="/a/b/c" rax:roles="c:creator">
             <method name="POST"/>
-	  </resource>
-	  <resource path="/a/{yn}" rax:roles="a:admin">
+          </resource>
+          <resource path="/a/{yn}" rax:roles="a:admin">
             <param name="yn" style="template" type="tst:yesno"/>
             <method name="GET"/>
           </resource>

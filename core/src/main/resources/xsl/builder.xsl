@@ -60,6 +60,7 @@
             <config option="checkElements"    value="false"/>
             <config option="checkPlainParams" value="false"/>
             <config option="checkHeaders"     value="false"/>
+            <config option="setParamDefaults" value="false"/>
             <config option="doXSDGrammarTransform" value="false"/>
             <config option="enablePreProcessExtension" value="false"/>
             <config option="enableIgnoreXSDExtension" value="false"/>
@@ -76,6 +77,7 @@
     <xsl:variable name="checkElements"    as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkElements'))"/>
     <xsl:variable name="checkPlainParams" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkPlainParams'))"/>
     <xsl:variable name="checkHeaders"     as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkHeaders'))"/>
+    <xsl:variable name="setParamDefaults" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'setParamDefaults'))"/>
     <xsl:variable name="doXSDGrammarTransform" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'doXSDGrammarTransform'))"/>
     <xsl:variable name="enablePreProcessExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enablePreProcessExtension'))"/>
     <xsl:variable name="enableIgnoreXSDExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableIgnoreXSDExtension'))"/>
@@ -124,6 +126,8 @@
                   select="$enableRaxRolesExtension"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
                   select="$checkHeaders or $useRaxRoles"/>
+    <xsl:variable name="useParamDefaults" as="xsd:boolean"
+                  select="$setParamDefaults"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
                   select="$enableMessageExtension or $useRaxRoles"/>
     <xsl:variable name="useCaptureHeaderExtension" as="xsd:boolean"
@@ -563,6 +567,7 @@
         <xsl:variable name="unfixed_headers" select="check:getHeaders($from, false())" as="node()*"/>
         <xsl:variable name="fixed_headers" select="check:getHeaders($from, true())" as="node()*"/>
         <xsl:variable name="fixed_names" select="distinct-values(for $f in $fixed_headers return string($f/@name))"/>
+        <xsl:variable name="default_headers" select="($fixed_headers, $unfixed_headers)[@default]" as="node()*"/>
         <xsl:variable name="unfixed_next" as="xsd:string*">
             <xsl:choose>
                 <xsl:when test="$fixed_headers">
@@ -574,6 +579,39 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+        <xsl:variable name="header_next" as="xsd:string*">
+          <xsl:choose>
+            <xsl:when test="$unfixed_headers">
+              <xsl:value-of select="(check:HeaderID($unfixed_headers[1]), check:HeaderFailID($unfixed_headers[1]))"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$unfixed_next"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:if test="$useParamDefaults">
+          <xsl:for-each-group select="($fixed_headers, $unfixed_headers)" group-by="@name">
+            <xsl:if test="count(current-group()[@default]) gt 1">
+              <xsl:message terminate="yes">[ERROR] Multiple headers <xsl:value-of select="current-group()[1]/@name"/> have multiple @default vaules.
+              Only one default value is allowed.</xsl:message>
+            </xsl:if>
+          </xsl:for-each-group>
+          <xsl:for-each select="$default_headers">
+            <xsl:variable name="pos" select="position()"/>
+            <step id="{check:SetHeaderID(.)}" type="SET_HEADER" name="{@name}" value="{@default}">
+              <xsl:attribute name="next">
+                <xsl:choose>
+                  <xsl:when test="$pos = last()">
+                    <xsl:value-of separator=" " select="$header_next"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="check:SetHeaderID($default_headers[position() = ($pos+1)])"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </step>
+          </xsl:for-each>
+        </xsl:if>
         <xsl:for-each select="$unfixed_headers">
             <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
             <xsl:variable name="pos" select="position()"/>
@@ -615,6 +653,12 @@
                       type="HEADER_ANY" match="{check:toRegExEscaped(@fixed)}">
                     <xsl:call-template name="check:addMessageExtension"/>
                     <xsl:call-template name="check:addCaptureHeaderExtension"/>
+                    <xsl:if test="$useParamDefaults and @default">
+                      <xsl:if test="@fixed != @default">
+                        <xsl:message terminate="yes">[ERROR] In header param <xsl:value-of select="@name"/> @default value "<xsl:value-of select="@default"/>"
+                        does not match @fixed value "<xsl:value-of select="@fixed"/>".</xsl:message>
+                      </xsl:if>
+                    </xsl:if>
                     <xsl:attribute name="next">
                         <xsl:choose>
                             <xsl:when test="$pos = $last">
@@ -794,6 +838,11 @@
     <xsl:function name="check:WellFormFailID" as="xsd:string">
         <xsl:param name="context" as="node()"/>
         <xsl:value-of select="concat(generate-id($context),'WF')"/>
+    </xsl:function>
+
+    <xsl:function name="check:SetHeaderID" as="xsd:string">
+      <xsl:param name="context" as="node()"/>
+      <xsl:value-of select="concat(generate-id($context), 'SH')"/>
     </xsl:function>
 
     <xsl:function name="check:HeaderID" as="xsd:string">
@@ -1115,7 +1164,11 @@
         <xsl:param name="from" as="node()"/>
         <xsl:variable name="unfixed" select="check:getHeaders($from, false())"/>
         <xsl:variable name="fixed" select="check:getHeaders($from,true())"/>
+        <xsl:variable name="default" select="($fixed, $unfixed)[@default]" as="node()*"/>
         <xsl:choose>
+            <xsl:when test="$useParamDefaults and $default">
+                <xsl:value-of select="check:SetHeaderID($default[1])"/>
+            </xsl:when>
             <xsl:when test="$unfixed">
                 <xsl:value-of select="(check:HeaderID($unfixed[1]), check:HeaderFailID($unfixed[1]))"/>
             </xsl:when>

@@ -27,7 +27,9 @@ class GivenAWadlWithNestedResourcesInMixFormat extends FlatSpec with RaxRolesBeh
   val configs = Map[String, Config]("Config With Roles Enabled" -> configWithRolesEnabled,
     "Config With Roles Enabled and Messsage Extensions Disabled" -> configWithRolesEnabledMessageExtDisabled,
     "Config With Roles Enabled and Duplications Removed" -> configWithRolesEnabledDupsRemoved,
-    "Config With Roles Enabled and Header Checks Disabled" -> configWithRolesEnabledHeaderCheckDisabled)
+    "Config With Roles Enabled and Header Checks Disabled" -> configWithRolesEnabledHeaderCheckDisabled,
+    "Config with Roles Enabled and Default Parameters Enabled" -> configWithRaxRolesEnabledDefaultsEnabled,
+    "Config with Roles Enabled, Default Parameters Enabled and Duplications Removed" -> configWithRaxRolesEnabledDupsRemovedDefaultsEnabled)
 
   val wadls = Map[String, NodeSeq](
     "Mixed 1" -> <application xmlns="http://wadl.dev.java.net/2009/02"
@@ -49,18 +51,18 @@ class GivenAWadlWithNestedResourcesInMixFormat extends FlatSpec with RaxRolesBeh
            </schema>
         </grammars>
         <resources base="https://test.api.openstack.com">
-	  <resource path="/a" rax:roles="a:admin another:admin">
+          <resource path="/a" rax:roles="a:admin another:admin">
             <method name="PUT" rax:roles="a:observer"/>
-	    <resource path="b" rax:roles="b:creator">
+            <resource path="b" rax:roles="b:creator">
               <method name="POST"/>
               <method name="PUT" rax:roles="b:observer"/>
               <method name="DELETE" rax:roles="b:observer b:admin"/>
-	    </resource>
+            </resource>
           </resource>
-	  <resource path="/a/b/c" rax:roles="c:creator">
+          <resource path="/a/b/c" rax:roles="c:creator">
             <method name="POST"/>
-	  </resource>
-	  <resource path="/a/{yn}" rax:roles="a:admin">
+          </resource>
+          <resource path="/a/{yn}" rax:roles="a:admin">
             <param name="yn" style="template" type="tst:yesno"/>
             <method name="GET"/>
           </resource>
@@ -85,23 +87,23 @@ class GivenAWadlWithNestedResourcesInMixFormat extends FlatSpec with RaxRolesBeh
            </schema>
         </grammars>
         <resources base="https://test.api.openstack.com">
-	  <resource path="/a" rax:roles="a:admin">
+          <resource path="/a" rax:roles="a:admin">
             <method name="PUT" rax:roles="a:observer"/>
-	    <resource path="b" rax:roles="b:creator">
+            <resource path="b" rax:roles="b:creator">
               <method name="PUT" rax:roles="b:observer"/>
               <method name="DELETE" rax:roles="b:admin"/>
-	    </resource>
+            </resource>
           </resource>
-	  <resource path="a" rax:roles="another:admin">
-	    <resource path="b">
+          <resource path="a" rax:roles="another:admin">
+            <resource path="b">
               <method name="POST"/>
               <method name="DELETE" rax:roles="b:observer"/>
             </resource>
           </resource>
-	  <resource path="/a/b/c" rax:roles="c:creator">
+          <resource path="/a/b/c" rax:roles="c:creator">
             <method name="POST"/>
-	  </resource>
-	  <resource path="/a/{yn}" rax:roles="a:admin">
+          </resource>
+          <resource path="/a/{yn}" rax:roles="a:admin">
             <param name="yn" style="template" type="tst:yesno"/>
             <method name="GET"/>
           </resource>
@@ -126,20 +128,20 @@ class GivenAWadlWithNestedResourcesInMixFormat extends FlatSpec with RaxRolesBeh
            </schema>
         </grammars>
         <resources base="https://test.api.openstack.com">
-	  <resource path="/a" rax:roles="a:admin another:admin">
+          <resource path="/a" rax:roles="a:admin another:admin">
             <method name="PUT" rax:roles="a:observer"/>
-	    <resource path="b" rax:roles="b:creator">
+            <resource path="b" rax:roles="b:creator">
               <method name="POST"/>
-	    </resource>
+            </resource>
           </resource>
-	  <resource path="/a/b">
-	    <method name="PUT" rax:roles="b:observer"/>
-	    <method name="DELETE" rax:roles="b:observer b:admin"/>
+          <resource path="/a/b">
+            <method name="PUT" rax:roles="b:observer"/>
+            <method name="DELETE" rax:roles="b:observer b:admin"/>
             <resource path="c" rax:roles="c:creator">
               <method name="POST"/>
             </resource>
-	  </resource>
-	  <resource path="/a/{yn}" rax:roles="a:admin">
+          </resource>
+          <resource path="/a/{yn}" rax:roles="a:admin">
             <param name="yn" style="template" type="tst:yesno"/>
             <method name="GET"/>
           </resource>
@@ -164,23 +166,104 @@ class GivenAWadlWithNestedResourcesInMixFormat extends FlatSpec with RaxRolesBeh
            </schema>
         </grammars>
         <resources base="https://test.api.openstack.com">
-	  <resource path="/a" rax:roles="a:admin another:admin">
+          <resource path="/a" rax:roles="a:admin another:admin">
             <method name="PUT" rax:roles="a:observer"/>
-	    <resource path="{yn}" rax:roles="a:admin">
-	      <param name="yn" style="template" type="tst:yesno"/>
-	      <method name="GET"/>
-	    </resource>
-	    <resource path="b" rax:roles="b:creator">
+            <resource path="{yn}" rax:roles="a:admin">
+              <param name="yn" style="template" type="tst:yesno"/>
+              <method name="GET"/>
+            </resource>
+            <resource path="b" rax:roles="b:creator">
               <method name="POST"/>
-	    </resource>
+            </resource>
           </resource>
-	  <resource path="/a/b">
-	    <method name="PUT" rax:roles="b:observer"/>
-	    <method name="DELETE" rax:roles="b:observer b:admin"/>
+          <resource path="/a/b">
+            <method name="PUT" rax:roles="b:observer"/>
+            <method name="DELETE" rax:roles="b:observer b:admin"/>
             <resource path="c" rax:roles="c:creator">
               <method name="POST"/>
             </resource>
-	  </resource>
+          </resource>
+        </resources>
+      </application>,
+    "Mixed 1, with X-ROLES Header in method (X-ROLES header should be ignored)" -> <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tst="test://schema/a">
+        <grammars>
+           <schema elementFormDefault="qualified"
+                   attributeFormDefault="unqualified"
+                   xmlns="http://www.w3.org/2001/XMLSchema"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                   targetNamespace="test://schema/a">
+              <simpleType name="yesno">
+                 <restriction base="xsd:string">
+                     <enumeration value="yes"/>
+                     <enumeration value="no"/>
+                 </restriction>
+             </simpleType>
+           </schema>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+          <resource path="/a" rax:roles="a:admin another:admin">
+            <method name="PUT" rax:roles="a:observer">
+                <request>
+                    <!-- Should be ignored -->
+                    <param name="X-ROLES" style="header" required="true"
+                        fixed="b:observer"/>
+                </request>
+            </method>
+            <resource path="b" rax:roles="b:creator">
+              <method name="POST"/>
+              <method name="PUT" rax:roles="b:observer"/>
+              <method name="DELETE" rax:roles="b:observer b:admin"/>
+            </resource>
+          </resource>
+          <resource path="/a/b/c" rax:roles="c:creator">
+            <method name="POST"/>
+          </resource>
+          <resource path="/a/{yn}" rax:roles="a:admin">
+            <param name="yn" style="template" type="tst:yesno"/>
+            <method name="GET"/>
+          </resource>
+        </resources>
+      </application>,
+    "Mixed 1, with X-ROLES Header in resource (X-ROLES header should be ignored)" -> <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tst="test://schema/a">
+        <grammars>
+           <schema elementFormDefault="qualified"
+                   attributeFormDefault="unqualified"
+                   xmlns="http://www.w3.org/2001/XMLSchema"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                   targetNamespace="test://schema/a">
+              <simpleType name="yesno">
+                 <restriction base="xsd:string">
+                     <enumeration value="yes"/>
+                     <enumeration value="no"/>
+                 </restriction>
+             </simpleType>
+           </schema>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+          <resource path="/a" rax:roles="a:admin another:admin">
+          <!-- Should be ignored -->
+            <param name="X-ROLES" style="header" required="true"
+                fixed="b:creator"/>
+            <method name="PUT" rax:roles="a:observer"/>
+            <resource path="b" rax:roles="b:creator">
+              <method name="POST"/>
+              <method name="PUT" rax:roles="b:observer"/>
+              <method name="DELETE" rax:roles="b:observer b:admin"/>
+            </resource>
+          </resource>
+          <resource path="/a/b/c" rax:roles="c:creator">
+            <method name="POST"/>
+          </resource>
+          <resource path="/a/{yn}" rax:roles="a:admin">
+            <param name="yn" style="template" type="tst:yesno"/>
+            <method name="GET"/>
+          </resource>
         </resources>
       </application>
   )

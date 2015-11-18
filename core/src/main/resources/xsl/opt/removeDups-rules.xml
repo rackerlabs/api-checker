@@ -39,6 +39,9 @@
     <rule types="HEADER HEADERXSD HEADER_ANY HEADERXSD_ANY" required="next name match" optional="captureHeader code message">
         Rule for Header, HeaderXSD, HeaderAny.
     </rule>
+    <rule types="SET_HEADER" required="next name value">
+        Rule for SET_HEADER.
+    </rule>
     <rule types="METHOD REQ_TYPE" required="next match">
         Steps that simply contain a match.
     </rule>

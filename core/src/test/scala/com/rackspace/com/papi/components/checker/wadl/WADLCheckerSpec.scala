@@ -15,14 +15,15 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import com.rackspace.com.papi.components.checker.TestConfig
+import com.rackspace.com.papi.components.checker.{LogAssertions, TestConfig}
+import org.apache.logging.log4j.Level
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import scala.xml._
 
 @RunWith(classOf[JUnitRunner])
-class WADLCheckerSpec extends BaseCheckerSpec {
+class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
 
   //
   //  Register some common prefixes, you'll need the for XPath
@@ -6158,6 +6159,37 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
   }
 
+  //
+  //  Like reqTypeAndHeaderAssertions except we also check default values.
+  //
+  def reqTypeAndHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    Then("The machine should contain paths to all ReqTypes")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),Header("X-TEST", ".*"),
+            Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("GET"))
+    And("ReqTypeFail states should be after PUT and POST states")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
+  }
+
 
   //
   //  Like reqTypeAndHeaderAssertions, but assumes that duplicates
@@ -6173,6 +6205,28 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
+  }
+
+  //
+  //  Like reqTypeAndHeaderDufsOnAssertion but with default headers enabled
+  //
+
+  def reqTypeAndHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    Then("The machine should contain paths to all ReqTypes")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("GET"))
+    And("ReqTypeFail states should be after PUT and POST states")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqTypeFail)
     assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
   }
 
@@ -6200,6 +6254,40 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
   //
+  //  Like wellFormedAndHeaderAssertions except we also check default values.
+  //
+  def wellFormedAndHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should contain paths to WellXML and WELLJSON types")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
+    And("There should be content failed states")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
+  }
+
+  //
   //  Like wellFormedAndHeaderAssertions, but assumes that remove dups
   //  optimization is on, and duplicates have been removed
   //
@@ -6215,6 +6303,31 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
+
+
+  //
+  //  Like wellFormedAndHeaderDupsOnAssertions but with default headers enabled
+  //
+
+  def wellFormedAndHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should contain paths to WellXML and WELLJSON types")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
+    And("There should be content failed states")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
+  }
+
 
   //
   // The following assertions are used to test XSD, ContentError, and
@@ -6232,6 +6345,31 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
+
+  //
+  //  Like xsdAndHeaderAssertions except we also check default values.
+  //
+
+  def xsdAndHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should cantain paths to XSD types")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
   //
   // Like xsdAndHeaderAssertions, but it's assumed that remove dups opt is on
   //
@@ -6244,6 +6382,27 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
             Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
+            Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
+
+  //
+  //  Like xsdAndHeaderDupsOnAnssertions but with default headers enabled
+  //
+
+  def xsdAndHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should cantain paths to XSD types")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
+            Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
+            Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
+            Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
             Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
@@ -6266,6 +6425,39 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
             HeaderAny("X-FOO","bar", 403),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
+
+  //
+  // Like raxCodeHeaderAssertions but with default headers enabled
+  //
+
+  def raxCodeHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The header states should have the appropriate header codes")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","foo", 402), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","bar", 403), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","foo", 402), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","bar", 403), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","foo", 402), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","bar", 403), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","foo", 402), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","bar", 403),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
 
   def raxMessageHeaderAssertions(checker : NodeSeq) : Unit = {
     And("The header states should have the appropriate header codes")
@@ -6303,6 +6495,54 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
 
+  //
+  // Like raxMessageHeaderAssertions but with default headers enabled
+  //
+
+  def raxMessageHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The header states should have the appropriate header codes")
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "X-TEST, bad"),
+            Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","foo", "X-FOO,foo,bad"),
+            Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "X-TEST, bad"),
+            Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","bar", "X-FOO,bar,bad"),
+            Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "X-TEST, bad"),
+            Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","foo", "X-FOO,foo,bad"),
+            Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "X-TEST, bad"),
+            Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","bar", "X-FOO,bar,bad"),
+            Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "X-TEST, bad"),
+            Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","foo", "X-FOO,foo,bad"),
+            Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "X-TEST, bad"),
+            Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","bar", "X-FOO,bar,bad"),
+            Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "X-TEST, bad"),
+            Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","foo", "X-FOO,foo,bad"),
+            Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "X-TEST, bad"),
+            Header("X-TEST2", ".*", "X-TEST2, bad"), HeaderAny("X-FOO","bar", "X-FOO,bar,bad"),
+            Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
+
   def raxSameCodeHeaderDupsAssertion(checker : NodeSeq) : Unit = {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 401),
             HeaderAny("X-FOO","foo|bar", 401), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -6317,6 +6557,30 @@ class WADLCheckerSpec extends BaseCheckerSpec {
             HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
+
+  //
+  // Like raxSameCodeHeaderDupsAssertion but with default headers enabled
+  //
+
+  def raxSameCodeHeaderDupsAssertionWithDefaults(checker : NodeSeq) : Unit = {
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 401),
+            HeaderAny("X-FOO","foo|bar", 401), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 401),
+            HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 401),
+            HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 401),
+            HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
+
   def raxSameMessageHeaderDupsAssertion(checker : NodeSeq) : Unit = {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*", "No!"), Header("X-TEST2", ".*", "No!"),
             HeaderAny("X-FOO","foo|bar", "No!"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -6330,6 +6594,29 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Header("X-TEST", ".*", "No!"), Header("X-TEST2", ".*", "No!"),
             HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
+
+  //
+  //  Like raxSameMessageHeaderDupsAssertion but with default headers enabled
+  //
+
+  def raxSameMessageHeaderDupsAssertionWithDefaults(checker : NodeSeq) : Unit = {
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No!"), Header("X-TEST2", ".*", "No!"),
+            HeaderAny("X-FOO","foo|bar", "No!"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No!"), Header("X-TEST2", ".*", "No!"),
+            HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No!"), Header("X-TEST2", ".*", "No!"),
+            HeaderAny("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No!"), Header("X-TEST2", ".*", "No!"),
+            HeaderAny("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
 
   //
   //  The following assertions are used to test ReqType and
@@ -6547,6 +6834,784 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
   }
 
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, default headers must be ignored if feature is off") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndHeaderAssertions(checker)
+    wellFormedAndHeaderAssertions(checker)
+    xsdAndHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, default headers must be ignored if feature is off, if raxroles is enabled X-ROLES header should be ignored") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+              <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                     default="c:creator"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val cfg = TestConfig(false, false, true, true, true, 1,
+                         true, true, true, "XalanC",
+                         false, true)
+    cfg.enableRaxRolesExtension  = true
+    val checkerLog = log (Level.WARN) {
+      val checker = builder.build (inWADL, cfg)
+      reqTypeAndHeaderAssertions(checker)
+      wellFormedAndHeaderAssertions(checker)
+      xsdAndHeaderAssertions(checker)
+      And("The following assertions should also hold:")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+    }
+    And ("An appropriate warning message should be provided")
+    assert(checkerLog, "you are not allowed to specify an X-ROLES header request parameter")
+    assert(checkerLog, "The X-ROLES header parameter will be ignored")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, default headers must be ignored if feature is off, if raxroles is enabled x-RoLeS header should be ignored") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+              <param name="x-RoLeS" style="header" type="xsd:string" required="true"
+                     default="c:creator"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val cfg = TestConfig(false, false, true, true, true, 1,
+                         true, true, true, "XalanC",
+                         false, true)
+    cfg.enableRaxRolesExtension  = true
+    val checkerLog = log (Level.WARN) {
+      val checker = builder.build (inWADL, cfg)
+      reqTypeAndHeaderAssertions(checker)
+      wellFormedAndHeaderAssertions(checker)
+      xsdAndHeaderAssertions(checker)
+      And("The following assertions should also hold:")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+    }
+    And ("An appropriate warning message should be provided")
+    assert(checkerLog, "you are not allowed to specify an X-ROLES header request parameter")
+    assert(checkerLog, "The X-ROLES header parameter will be ignored")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, default headers must be ignored if feature is off, if raxroles is enabled X-ROLES header should be ignored (method)") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                          default="c:creator"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val cfg = TestConfig(false, false, true, true, true, 1,
+                         true, true, true, "XalanC",
+                         false, true)
+    cfg.enableRaxRolesExtension  = true
+    val checkerLog = log (Level.WARN) {
+      val checker = builder.build (inWADL, cfg)
+      reqTypeAndHeaderAssertions(checker)
+      wellFormedAndHeaderAssertions(checker)
+      xsdAndHeaderAssertions(checker)
+      And("The following assertions should also hold:")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+    }
+    And ("An appropriate warning message should be provided")
+    assert(checkerLog, "you are not allowed to specify an X-ROLES header request parameter")
+    assert(checkerLog, "The X-ROLES header parameter will be ignored")
+  }
+
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, default headers must be ignored if feature is off, if raxroles is enabled X-ROLES header should be ignored (mixed)") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                    default="c:creator"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                          default="c:creator"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val cfg = TestConfig(false, false, true, true, true, 1,
+                         true, true, true, "XalanC",
+                         false, true)
+    cfg.enableRaxRolesExtension  = true
+    val checkerLog = log (Level.WARN) {
+      val checker = builder.build (inWADL, cfg)
+      reqTypeAndHeaderAssertions(checker)
+      wellFormedAndHeaderAssertions(checker)
+      xsdAndHeaderAssertions(checker)
+      And("The following assertions should also hold:")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+    }
+    And ("An appropriate warning message should be provided")
+    assert(checkerLog, "you are not allowed to specify an X-ROLES header request parameter")
+    assert(checkerLog, "The X-ROLES header parameter will be ignored")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, default headers must be ignored if feature is off, if raxroles is enabled X-ROLES header in response should be ignored") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+                  <response>
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                          default="c:creator"/>
+                  </response>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val cfg = TestConfig(false, false, true, true, true, 1,
+                         true, true, true, "XalanC",
+                         false, true)
+    cfg.enableRaxRolesExtension  = true
+    val checkerLog = log (Level.WARN) {
+      val checker = builder.build (inWADL, cfg)
+      reqTypeAndHeaderAssertions(checker)
+      wellFormedAndHeaderAssertions(checker)
+      xsdAndHeaderAssertions(checker)
+      And("The following assertions should also hold:")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+    }
+    And ("No warning messages should be provided")
+    assertEmpty(checkerLog)
+  }
+
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, errors to default headers must be ignored if feature is off (fixed mismatch)") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="bar"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndHeaderAssertions(checker)
+    wellFormedAndHeaderAssertions(checker)
+    xsdAndHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, errors to default headers must be ignored if feature is off (multiple defaults)") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" default="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndHeaderAssertions(checker)
+    wellFormedAndHeaderAssertions(checker)
+    xsdAndHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, default headers should be set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked, default headers should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndHeaderAssertionsWithDefaults(checker)
+    wellFormedAndHeaderAssertionsWithDefaults(checker)
+    xsdAndHeaderAssertionsWithDefaults(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked, default headers should be set, if rax roles is enabled X-ROLES header should be ignored") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked, default headers should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                    default="c:creator"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                          default="c:creator"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    config.enableRaxRolesExtension=true
+    val checkerLog = log (Level.WARN) {
+      val checker = builder.build (inWADL, config)
+      reqTypeAndHeaderAssertionsWithDefaults(checker)
+      wellFormedAndHeaderAssertionsWithDefaults(checker)
+      xsdAndHeaderAssertionsWithDefaults(checker)
+      And("The following assertions should also hold:")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+    }
+    And ("An appropriate warning message should be provided")
+    assert(checkerLog, "you are not allowed to specify an X-ROLES header request parameter")
+    assert(checkerLog, "The X-ROLES header parameter will be ignored")
+  }
+
+
+  scenario("If a default fixed header and default values are set, an error should occur") {
+    Given ("A WADL where default parameters do not match fixed, and defaults are set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="bar"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    When ("the WADL is translated")
+    Then ("A WADLException should be thrown")
+    val checkerLog = log (Level.ERROR) {
+      intercept[WADLException] {
+        val checker = builder.build (inWADL, config)
+      }
+    }
+    And ("There is a proper message detailing the error.")
+    assert(checkerLog, "header param X-FOO")
+    assert(checkerLog, "@default value \"bar\"")
+    assert(checkerLog, "does not match @fixed value \"foo\"")
+  }
+
+  scenario("If multiple defaults are set for the same header value and defaults are enabled, an error should occur") {
+    Given ("A WADL where there are multiple defualts set for for the same header, and defaults are set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" default="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    When ("the WADL is translated")
+    Then ("A WADLException should be thrown")
+    val checkerLog = log (Level.ERROR) {
+      intercept[WADLException] {
+        val checker = builder.build (inWADL, config)
+      }
+    }
+    And ("There is a proper message detailing the error.")
+    assert (checkerLog,"Multiple headers X-FOO have multiple @default vaules.")
+  }
+
+
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (rax:code)") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
@@ -6734,6 +7799,134 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
   }
 
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (rax:code, rax:message) default values should be ignored if the feature is truned off") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndHeaderAssertions(checker)
+    wellFormedAndHeaderAssertions(checker)
+    xsdAndHeaderAssertions(checker)
+    raxMessageHeaderAssertions(checker)
+    raxCodeHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (rax:code, rax:message) default values should be set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked default values should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndHeaderAssertionsWithDefaults(checker)
+    wellFormedAndHeaderAssertionsWithDefaults(checker)
+    xsdAndHeaderAssertionsWithDefaults(checker)
+    raxMessageHeaderAssertionsWithDefaults(checker)
+    raxCodeHeaderAssertionsWithDefaults(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on)") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
     val inWADL =
@@ -6792,6 +7985,271 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on), if raxroles is enabled then X-ROLES header should be ignored") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                    default="c:creator"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
+               <method name="PUT">
+                  <request>
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                          default="c:creator"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(true, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.enableRaxRolesExtension=true
+    val checkerLog = log (Level.WARN) {
+      val checker = builder.build (inWADL, config)
+      reqTypeAndHeaderDupsOnAssertions(checker)
+      wellFormedAndHeaderDupsOnAssertions(checker)
+      xsdAndHeaderDupsOnAssertions(checker)
+      And("The following assertions should also hold:")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+    }
+    And ("An appropriate warning message should be provided")
+    assert(checkerLog, "you are not allowed to specify an X-ROLES header request parameter")
+    assert(checkerLog, "The X-ROLES header parameter will be ignored")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on), default headers should be ignored if feature is off") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndHeaderDupsOnAssertions(checker)
+    wellFormedAndHeaderDupsOnAssertions(checker)
+    xsdAndHeaderDupsOnAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on), default headers should be set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked, default headers should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(true, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndHeaderDupsOnAssertionsWithDefaults(checker)
+    wellFormedAndHeaderDupsOnAssertionsWithDefaults(checker)
+    xsdAndHeaderDupsOnAssertionsWithDefaults(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on), default headers should be set, if raxroles is set X-ROLES header params should be ignored") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked, default headers should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                    default="c:creator"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                          default="c:creator"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(true, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    config.enableRaxRolesExtension=true
+    val checkerLog = log (Level.WARN) {
+      val checker = builder.build (inWADL, config)
+      reqTypeAndHeaderDupsOnAssertionsWithDefaults(checker)
+      wellFormedAndHeaderDupsOnAssertionsWithDefaults(checker)
+      xsdAndHeaderDupsOnAssertionsWithDefaults(checker)
+      And("The following assertions should also hold:")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+    }
+    And ("An appropriate warning message should be provided")
+    assert(checkerLog, "you are not allowed to specify an X-ROLES header request parameter")
+    assert(checkerLog, "The X-ROLES header parameter will be ignored")
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code (same))") {
@@ -6981,6 +8439,133 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
   }
 
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code, rax:message (same)) default headers should be ignored if the feature is off") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndHeaderDupsOnAssertions(checker)
+    wellFormedAndHeaderDupsOnAssertions(checker)
+    xsdAndHeaderDupsOnAssertions(checker)
+    raxSameMessageHeaderDupsAssertion(checker)
+    raxSameCodeHeaderDupsAssertion(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code, rax:message (same)) default headers should be set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked default headers should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(true, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndHeaderDupsOnAssertionsWithDefaults(checker)
+    wellFormedAndHeaderDupsOnAssertionsWithDefaults(checker)
+    xsdAndHeaderDupsOnAssertionsWithDefaults(checker)
+    raxSameMessageHeaderDupsAssertionWithDefaults(checker)
+    raxSameCodeHeaderDupsAssertionWithDefaults(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code (different))") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
@@ -7154,6 +8739,136 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndHeaderAssertions(checker)
     raxMessageHeaderAssertions(checker)
     raxCodeHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
+
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code, rax:message (different)) default headers should be ignored if the feature is not set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndHeaderAssertions(checker)
+    wellFormedAndHeaderAssertions(checker)
+    xsdAndHeaderAssertions(checker)
+    raxMessageHeaderAssertions(checker)
+    raxCodeHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
+
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, required headers must be checked (remove dups on, rax:code, rax:message (different)) default headers should be set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, required headers must be checked default headers should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR"/>
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config =TestConfig(true, false, true, true, true, 1,
+                           true, true, true, "XalanC",
+                           false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndHeaderAssertionsWithDefaults(checker)
+    wellFormedAndHeaderAssertionsWithDefaults(checker)
+    xsdAndHeaderAssertionsWithDefaults(checker)
+    raxMessageHeaderAssertionsWithDefaults(checker)
+    raxCodeHeaderAssertionsWithDefaults(checker)
     And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
@@ -7672,6 +9387,33 @@ class WADLCheckerSpec extends BaseCheckerSpec {
   }
 
 
+  def reqTypeAndReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    Then("The machine should contain paths to all ReqTypes")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("GET"))
+    And("ReqTypeFail states should be after PUT and POST states")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
+  }
+
+
   //
   //  Like reqTypeAndReqHeaderAssertions, but we assume remove dups optimization
   //
@@ -7685,6 +9427,24 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     And("ReqTypeFail states should be after PUT and POST states")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
+  }
+
+  def reqTypeAndReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    Then("The machine should contain paths to all ReqTypes")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("c"), Method("GET"))
+    And("ReqTypeFail states should be after PUT and POST states")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqTypeFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
     assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
   }
@@ -7711,6 +9471,31 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
+  def wellFormedAndReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should contain paths to WellXML and WELLJSON types")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
+    And("There should be content failed states")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
+  }
+
   //
   //  Like wellFormedAndReqHeaderAssertions, but we assume remove dups on optimization
   //
@@ -7727,6 +9512,25 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
   }
 
+
+  def wellFormedAndReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should contain paths to WellXML and WELLJSON types")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
+    And("There should be content failed states")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
+  }
+
+
   //
   // The following assertions are used to test XSD, ContentError, and
   // header nodes. They are used in the next couple of tests.
@@ -7741,6 +9545,21 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
+
+  def xsdAndReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should cantain paths to XSD types")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
   //
   // Like xsdAndReqHeaderAssertions, but we assume remove dups optimization
   //
@@ -7750,6 +9569,18 @@ class WADLCheckerSpec extends BaseCheckerSpec {
             ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
+            ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
+  def xsdAndReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should cantain paths to XSD types")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
+            ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*"), Header("X-TEST2", ".*"), HeaderAny("X-FOO","foo|bar"),
             ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
@@ -7772,6 +9603,28 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
+  def raxCodeReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should contain header assertions with correct error code")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","foo", 402), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","bar", 403), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","foo", 402), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401), Header("X-TEST2", ".*", 404),
+            HeaderAny("X-FOO","bar", 403), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
   def raxCodeReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
     And("The machine should cantain header assertions with the correct error code")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*", 401),
@@ -7784,6 +9637,20 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
+  def raxCodeReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should cantain header assertions with the correct error code")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401),
+            Header("X-TEST2", ".*", 401), HeaderAny("X-FOO","foo|bar", 401),
+            ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", 401),
+            Header("X-TEST2", ".*", 401), HeaderAny("X-FOO","foo|bar", 401),
+            ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
   def raxMessageReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
     And("The machine should cantain header assertions with the correct error code")
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*", "No!"),
@@ -7791,6 +9658,20 @@ class WADLCheckerSpec extends BaseCheckerSpec {
             ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("PUT"), Header("X-TEST", ".*", "No!"),
+            Header("X-TEST2", ".*", "No!"), HeaderAny("X-FOO","foo|bar", "No!"),
+            ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
+  def raxMessageReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should cantain header assertions with the correct error code")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No!"),
+            Header("X-TEST2", ".*", "No!"), HeaderAny("X-FOO","foo|bar", "No!"),
+            ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No!"),
             Header("X-TEST2", ".*", "No!"), HeaderAny("X-FOO","foo|bar", "No!"),
             ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -7813,6 +9694,29 @@ class WADLCheckerSpec extends BaseCheckerSpec {
 
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
+
+  def raxMessageReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should contain header assertions with correct error code")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No1"), Header("X-TEST2", ".*", "No4"),
+            HeaderAny("X-FOO","foo", "No2"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No1"), Header("X-TEST2", ".*", "No4"),
+            HeaderAny("X-FOO","bar", "No3"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No1"), Header("X-TEST2", ".*", "No4"),
+            HeaderAny("X-FOO","foo", "No2"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-FOO","foo"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"),
+            Header("X-TEST", ".*", "No1"), Header("X-TEST2", ".*", "No4"),
+            HeaderAny("X-FOO","bar", "No3"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
 
   //
   //  The following assertions are used to test ReqType and
@@ -7990,6 +9894,23 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqTypeFail)
   }
 
+  def reqTypeAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    Then("The machine should contain paths to all ReqTypes")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"))
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"))
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("GET"))
+    And("ReqTypeFail states should be after PUT and POST states")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqTypeFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqTypeFail)
+  }
+
+
+
   //
   //  The following assertions are used to test WellFormXML,
   //  ContentError, and header and xsd header nodes.  They are used in
@@ -8010,6 +9931,28 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), ContentFail)
   }
 
+
+  def wellFormedAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should contain paths to WellXML and WELLJSON types")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
+            HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), WellJSON)
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
+            HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML)
+    And("There should be content failed states")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
+            HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
+            HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), ContentFail)
+  }
+
+
+
   //
   // The following assertions are used to test XSD, ContentError, and
   // header and xsd header nodes. They are used in the next couple of
@@ -8023,6 +9966,18 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
     assert (checker, Start, URL("c"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
+  def xsdAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker : NodeSeq) : Unit = {
+    And("The machine should cantain paths to XSD types")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), Header("X-TEST", ".*"), HeaderXSD("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
+            HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+    assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSD("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
+            HeaderXSD("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked") {
@@ -8085,6 +10040,130 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
   }
 
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked default values should be ignored if the feature is not set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndReqHeaderAssertions(checker)
+    wellFormedAndReqHeaderAssertions(checker)
+    xsdAndReqHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked default values should be set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked default values should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndReqHeaderAssertionsWithDefaults(checker)
+    wellFormedAndReqHeaderAssertionsWithDefaults(checker)
+    xsdAndReqHeaderAssertionsWithDefaults(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+
+
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (method ref)") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
@@ -8134,6 +10213,73 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
     xsdAndReqHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (method ref) with default values set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked with default values set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method href="#headerMethod"/>
+               <method href="#postOnAB"/>
+           </resource>
+           <resource path="/c">
+               <method href="#postOnC"/>
+               <method href="#getOnC"/>
+           </resource>
+        </resources>
+        <method id="headerMethod" name="PUT">
+          <request>
+           <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
+           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
+           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+           <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
+           <representation mediaType="application/xml"/>
+           <representation mediaType="application/json"/>
+         </request>
+       </method>
+       <method id="postOnAB" name="POST">
+         <request>
+           <representation mediaType="application/xml"/>
+         </request>
+       </method>
+       <method id="postOnC" name="POST">
+          <request>
+            <representation mediaType="application/json"/>
+          </request>
+       </method>
+       <method id="getOnC" name="GET"/>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndReqHeaderAssertionsWithDefaults(checker)
+    wellFormedAndReqHeaderAssertionsWithDefaults(checker)
+    xsdAndReqHeaderAssertionsWithDefaults(checker)
     And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
@@ -8323,6 +10469,71 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndReqHeaderAssertions(checker)
     raxCodeReqHeaderAssertions(checker)
     raxMessageReqHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 7")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (rax:code, rax:message) with defaults set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked with defaults set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true" default="FOO"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="No2" required="true" fixed="foo" default="foo"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="No3" required="true" fixed="bar"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true" default="BAR"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndReqHeaderAssertionsWithDefaults(checker)
+    wellFormedAndReqHeaderAssertionsWithDefaults(checker)
+    xsdAndReqHeaderAssertionsWithDefaults(checker)
+    raxCodeReqHeaderAssertionsWithDefaults(checker)
+    raxMessageReqHeaderAssertionsWithDefaults(checker)
     And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
@@ -8587,6 +10798,71 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
   }
 
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:code, rax:message(same)) defaults should be set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked and defaults should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" default="FOO"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="foo" default="foo"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="bar"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" default="BAR"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(true, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndReqHeaderDupsOnAssertionsWithDefaults(checker)
+    wellFormedAndReqHeaderDupsOnAssertionsWithDefaults(checker)
+    xsdAndReqHeaderDupsOnAssertionsWithDefaults(checker)
+    raxCodeReqHeaderDupsOnAssertionsWithDefaults(checker)
+    raxMessageReqHeaderDupsOnAssertionsWithDefaults(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
+
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:code(diff))") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked")
     val inWADL =
@@ -8759,6 +11035,71 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     xsdAndReqHeaderAssertions(checker)
     raxCodeReqHeaderAssertions(checker)
     raxMessageReqHeaderAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 1")
+  }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required header on a PUT that must be checked (dups on, rax:code, rax:message(diff)) with default values set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required header on a PUT that must be checked with default values set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true" default="FOO"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="No2" required="true" fixed="foo" default="foo"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="No3" required="true" fixed="bar"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true" default="BAR"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(true, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndReqHeaderAssertionsWithDefaults(checker)
+    wellFormedAndReqHeaderAssertionsWithDefaults(checker)
+    xsdAndReqHeaderAssertionsWithDefaults(checker)
+    raxCodeReqHeaderAssertionsWithDefaults(checker)
+    raxMessageReqHeaderAssertionsWithDefaults(checker)
     And("The following assertions should also hold:")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
@@ -9312,6 +11653,132 @@ class WADLCheckerSpec extends BaseCheckerSpec {
     assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 9")
   }
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, mixed, multiple similar Headers default values should be ignored if feature is not set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="99"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="999"/>
+               <method name="POST">
+                  <request>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" default="2015-11-28"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
+                                                    true, true, true, "XalanC",
+                                                    false, true))
+    reqTypeAndReqHeaderXSDHeader2MixAssertions(checker)
+    wellFormedAndReqHeaderXSDHeader2MixAssertions(checker)
+    xsdAndReqHeaderXSDHeader2MixAssertions(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 9")
+  }
+
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, mixed, multiple similar Headers default values should be set") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers default values should be set")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="99"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="999"/>
+               <method name="POST">
+                  <request>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" default="2015-11-28"/>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1,
+                            true, true, true, "XalanC",
+                            false, true)
+    config.setParamDefaults=true
+    val checker = builder.build (inWADL, config)
+    reqTypeAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker)
+    wellFormedAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker)
+    xsdAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker)
+    And("The following assertions should also hold:")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 0")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 3")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 9")
+  }
+
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, mixed, non req headers should be ignored") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD, a required request XSD header and request header must be checked, multiple similar Headers, nonrequired headers should be ignored")

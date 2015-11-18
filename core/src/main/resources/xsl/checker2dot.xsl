@@ -163,6 +163,18 @@
                                                  </xsl:choose>
                                                  <xsl:text>)</xsl:text>
                                                </xsl:when>
+                                               <xsl:when test="$nextStep/@value">
+                                                 <xsl:text>ε (</xsl:text>
+                                                 <xsl:choose>
+                                                     <xsl:when test="$nextStep/@name">
+                                                         <xsl:value-of select="concat($nextStep/@name,':&#x2190;? ',$nextStep/@value)"/>
+                                                     </xsl:when>
+                                                     <xsl:otherwise>
+                                                         <xsl:value-of select="check:escapeRegex($nextStep/@match)"/>
+                                                     </xsl:otherwise>
+                                                 </xsl:choose>
+                                                 <xsl:text>)</xsl:text>
+                                               </xsl:when>
                                                <xsl:otherwise>
                                                    <xsl:call-template name="check:getErrorRegex">
                                                        <xsl:with-param name="nextStep" select="$nextStep"/>
@@ -198,6 +210,9 @@
                      </xsl:when>
                      <xsl:when test="@name and @match">
                          <xsl:value-of select="concat(@name,' : ',check:escapeRegex(@match))"/>
+                     </xsl:when>
+                     <xsl:when test="@name and @value">
+                         <xsl:value-of select="concat(@name,':&#x2190;? ',@value)"/>
                      </xsl:when>
                      <xsl:when test="@match">
                          <xsl:value-of select="check:escapeRegex(@match)"/>

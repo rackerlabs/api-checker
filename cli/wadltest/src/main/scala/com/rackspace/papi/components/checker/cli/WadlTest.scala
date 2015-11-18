@@ -80,6 +80,9 @@ object WadlTest {
   val header = parser.flag[Boolean] (List("H", "header"),
                                          "Add checks to ensure that required headers are passed in: false")
 
+  val setDefaults = parser.flag[Boolean] (List("s", "setParamDefaults"),
+                                          "Fill in required parameters if a default value is specified Default: false")
+
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
 
@@ -108,7 +111,7 @@ object WadlTest {
                                           "Display the generated dot in NFA mode. Default: false")
 
   val consoleLog = parser.flag[Boolean](List("L", "console-log"),
-					"Display request log in console. Default: false")
+                                        "Display request log in console. Default: false")
 
   val port = parser.option[Int]("o", "portNumber", s"Port number. Default: $DEFAULT_PORT")
 
@@ -159,9 +162,9 @@ object WadlTest {
     println (" ╞"+padString("",currMax,"═")+"╡")
     content.split("\n").map(s=>s.trim()).foreach (s => {
       if (s.contains(Console.RESET)) {
-	println (" │ "+padString(s,currMax+7)+"│")
+        println (" │ "+padString(s,currMax+7)+"│")
       } else {
-	println (" │ "+padString(s,currMax-1)+"│")
+        println (" │ "+padString(s,currMax-1)+"│")
       }
     })
     println (" ╘"+padString("",currMax,"═")+"╛")
@@ -173,9 +176,9 @@ object WadlTest {
 
     val sourceName = {
       if (source.asInstanceOf[StreamSource].getInputStream() != null) {
-	"<STDIN>"
+        "<STDIN>"
       } else {
-	source.asInstanceOf[StreamSource].getSystemId()
+        source.asInstanceOf[StreamSource].getSystemId()
       }
     }
 
@@ -213,21 +216,21 @@ object WadlTest {
     val R  = Console.RESET
 
     drawBox(s"$title $version",
-	    s"""
-	     Running validator $B$name$R
+            s"""
+             Running validator $B$name$R
 
-	     Port: $B$port$R
-	     WADL Input: $B$sourceName$R
-	     Dot File: $B$dot$R
+             Port: $B$port$R
+             WADL Input: $B$sourceName$R
+             Dot File: $B$dot$R
 
-	     The service should return a 200 response if the request
-	     validates against the WADL, it will return a 4xx code
-	     with an appropriate message otherwise.
+             The service should return a 200 response if the request
+             validates against the WADL, it will return a 4xx code
+             with an appropriate message otherwise.
 
-	     You can pass an '$B$param$R' query paramater to the
-	     request to have the service echo the body of the request
-	     in the response.
-	    """)
+             You can pass an '$B$param$R' query paramater to the
+             request to have the service echo the body of the request
+             in the response.
+            """)
 
     //
     // Let the current thread join until the server is don executing...
@@ -255,6 +258,7 @@ object WadlTest {
         c.enablePreProcessExtension = !preProc.value.getOrElse(false)
         c.joinXPathChecks = joinXPaths.value.getOrElse(false)
         c.checkHeaders = header.value.getOrElse(false)
+        c.setParamDefaults = setDefaults.value.getOrElse(false)
         c.enableIgnoreXSDExtension = !ignoreXSD.value.getOrElse(false)
         c.enableIgnoreJSONSchemaExtension = !ignoreJSON.value.getOrElse(false)
         c.enableMessageExtension = !message.value.getOrElse(false)
@@ -263,27 +267,27 @@ object WadlTest {
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
         c.validateChecker = !validate.value.getOrElse(false)
 
-	val dot = File.createTempFile("chk", ".dot")
-	dot.deleteOnExit()
+        val dot = File.createTempFile("chk", ".dot")
+        dot.deleteOnExit()
 
-	val handlerList = {
-	  val dotHandler = new SaveDotHandler(dot, !showErrors.value.getOrElse(false),
-					      nfaMode.value.getOrElse(false))
+        val handlerList = {
+          val dotHandler = new SaveDotHandler(dot, !showErrors.value.getOrElse(false),
+                                              nfaMode.value.getOrElse(false))
 
-	  val initList = List[ResultHandler](dotHandler,
-					     new ServletResultHandler(),
-					     new InstrumentedHandler())
+          val initList = List[ResultHandler](dotHandler,
+                                             new ServletResultHandler(),
+                                             new InstrumentedHandler())
 
-	  if (consoleLog.value.getOrElse(false)) {
-	    initList :+ new ConsoleResultHandler()
-	  } else {
-	    initList
-	  }
-	}
+          if (consoleLog.value.getOrElse(false)) {
+            initList :+ new ConsoleResultHandler()
+          } else {
+            initList
+          }
+        }
 
-	c.resultHandler = new DispatchResultHandler(handlerList)
+        c.resultHandler = new DispatchResultHandler(handlerList)
 
-	runServer(name.value.getOrElse(DEFAULT_NAME), port.value.getOrElse(DEFAULT_PORT), dot, c)
+        runServer(name.value.getOrElse(DEFAULT_NAME), port.value.getOrElse(DEFAULT_PORT), dot, c)
       }
     } catch {
       case e: ArgotUsageException => println(e.message)

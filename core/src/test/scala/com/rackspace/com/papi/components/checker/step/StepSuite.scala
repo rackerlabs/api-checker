@@ -3851,6 +3851,106 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     assert (req2.contentErrorPriority == 101)
   }
 
+  test ("In a set header step, if a header does not exist in context and in the request the value should be set (No Request Headers, No Context Headers)") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    var context = StepContext()
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.getOrElse("X-TEST", List[String]()) == List("A_VALUE"),"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does not exist in context and in the request the value should be set (Mismatch Request Header)") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("OTHER"->List("FOO")))
+    var context = StepContext()
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.getOrElse("X-TEST", List[String]()) == List("A_VALUE"),"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does not exist in context and in the request the value should be set (Mismatch Context Header)") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    var context = StepContext(requestHeaders = (new HeaderMap).addHeader("OTHER","FOO"))
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.getOrElse("X-TEST", List[String]()) == List("A_VALUE"),"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does not exist in context and in the request the value should be set (Mismatch Context and Request Header)") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("OTHER2"->List("FOO")))
+    var context = StepContext(requestHeaders = (new HeaderMap).addHeader("OTHER","FOO"))
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.getOrElse("X-TEST", List[String]()) == List("A_VALUE"),"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does exist in the request but not in the context the vaule should not be set") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+    var context = StepContext()
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.get("X-TEST") == None,"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does not exist in the request, but does exist in the context the value should not be set") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("OTHER"->List("FOO")))
+    var context = StepContext(requestHeaders = (new HeaderMap).addHeader("X-TEST", "BAR"))
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.get("X-TEST").get == List("BAR"),"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does exist in the request and it exists in the context the value should not be set") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+    var context = StepContext(requestHeaders = (new HeaderMap).addHeader("X-TEST", "BAR"))
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.get("X-TEST").get == List("BAR"),"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does exist in the request and contains multiple values but not in the context the vaule should not be set") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO", "BAR")))
+    var context = StepContext()
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.get("X-TEST") == None,"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does not exist in the request, but does exist in the context and contains multiple values the value should not be set") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("OTHER"->List("FOO")))
+    var context = StepContext(requestHeaders = (new HeaderMap).addHeaders("X-TEST", List("FOO", "BAR")))
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.get("X-TEST").get == List("FOO", "BAR"),"The header should be set in the context with the correct value")
+  }
+
+  test ("In a set header step, if a header does exist in the request AND it exists in the context and they both contain multiple values the value should not be set") {
+    val setHeader = new SetHeader("SET_HEADER", "SET_HEADER", "X-TEST", "A_VALUE", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("OTHER"->List("FOO", "BAR")))
+    var context = StepContext(requestHeaders = (new HeaderMap).addHeaders("X-TEST", List("FOO", "BAR")))
+    val newContext = setHeader.checkStep(req, response, chain, context)
+
+    assert (newContext != None, "A context should be returned")
+    assert (newContext.get.requestHeaders.get("X-TEST").get == List("FOO", "BAR"),"The header should be set in the context with the correct value")
+  }
+
   test ("In a JSON Schema test, if the content contains valid JSON, the uriLevel should stay the same.") {
     val jsonSchema = new JSONSchema("JSONSchema","JSONSchema", testJSONSchema, 10, Array[Step]())
     val req1 = request ("PUT", "/a/b", "application/json", """

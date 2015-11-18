@@ -56,7 +56,7 @@ class HeaderXSD(id : String, label : String, val name : String, val value : QNam
   val xsd = new XSDStringValidator(value, schema, id)
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
-    val headers : List[String] = getHeaders(req, name).toList
+    val headers : List[String] = getHeaders(context, req, name)
     var last_err : Option[SAXParseException] = None
 
     //
