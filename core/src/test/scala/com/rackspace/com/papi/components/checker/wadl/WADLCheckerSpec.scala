@@ -334,7 +334,7 @@ class WADLCheckerSpec extends BaseCheckerSpec {
       singlePathAssertions(checker)
     }
 
-    ignore("The WADL contains a single multi-path resource ending in /") {
+    scenario("The WADL contains a single multi-path resource ending in /") {
       Given("a WADL that contains a single multi-path resource with a GET, DELETE, and POST method and ending in /")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
