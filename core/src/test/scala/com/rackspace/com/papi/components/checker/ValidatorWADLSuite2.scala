@@ -104,9 +104,9 @@ class ValidatorWADLSuite2 extends BaseValidatorSuite {
     <resources base="https://test.api.openstack.com">
       <resource path="/foo">
         <method href="#TestGET"/>
-	<method href="#Test2GET"/>
+        <method href="#Test2GET"/>
         <resource path="bar">
-	      <method href="#Test2GET"/>
+              <method href="#Test2GET"/>
           </resource>
         </resource>
        </resources>

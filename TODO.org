@@ -680,22 +680,22 @@
       3. [X] Produce error if fixed != default or multiple defualts on
          the same header
       4. [X] Extend XSD to support New Step [1/1]
-	 1. [X] SetHeader
+         1. [X] SetHeader
       5. [X] Add support in XSL
       6. [X] Update optimizations to support new headers
       7. [X] Update wadl2dot to display default values
       8. [X] Checker assertions related to SET_HEADER.
       9. [X] Ensure that context based headers propagate correcetly
       10. [X] Should defualts further down the chain override?
-	  For now, we're going to say no. At least we can't handle
+          For now, we're going to say no. At least we can't handle
           it in this fix, this is actually an issue with WADL
           tools where params at a higher level with the same name
           overrite stuff at lower level.
 
-	  That issue is being tracked here:
+          That issue is being tracked here:
           [https://github.com/rackerlabs/wadl-tools/issues/134]
 
-	  ...and actually this may not even make sense...and we have a
+          ...and actually this may not even make sense...and we have a
           /a/b should we unset anything set on the context if the
           request doesn't have a value?  How do we know that the value
           was set with setHeader and say not with captureHeader??  We
@@ -704,24 +704,24 @@
           header at lover levels even at the method as a way to be
           more specific.
       11. [X] Create New Step [1/1]
-	  1. [X] SetHeader
+          1. [X] SetHeader
       12. [X] Update handler for new step
       13. [X] Add Tests [4/4]
-	  1. [X] Step
-	  2. [X] Builder
-	  3. [X] Validator
-	  4. [X] Test relationship with rax roles [2/2]
-	     1. [X] Add set defualts to all existing tests
-	     2. [X] Add tests to ensure that header X-ROLES header params are ignored in rax:roles [8/8]
-		1. [X] Test roles with defaults disabled (resource)
-		2. [X] Test roles with defaults disabled (resource,
+          1. [X] Step
+          2. [X] Builder
+          3. [X] Validator
+          4. [X] Test relationship with rax roles [2/2]
+             1. [X] Add set defualts to all existing tests
+             2. [X] Add tests to ensure that header X-ROLES header params are ignored in rax:roles [8/8]
+                1. [X] Test roles with defaults disabled (resource)
+                2. [X] Test roles with defaults disabled (resource,
                    mixed case)
-		3. [X] Test roles with defaults disabled (method)
-		4. [X] Test roles with defaults disabled (mixed)
-		5. [X] Test roles with defaults disabled response (no warning)
-		6. [X] Test roles with defaults enabled (mixed)
-		7. [X] Test roles with defaults disabled dups (mixed)
-		8. [X] Test roles with defaults enabled dups (mixed)
+                3. [X] Test roles with defaults disabled (method)
+                4. [X] Test roles with defaults disabled (mixed)
+                5. [X] Test roles with defaults disabled response (no warning)
+                6. [X] Test roles with defaults enabled (mixed)
+                7. [X] Test roles with defaults disabled dups (mixed)
+                8. [X] Test roles with defaults enabled dups (mixed)
 ** TODO Compile Performance improvements
 ** TODO Assign CONTENT_FAIL to XSL steps in builder
 ** TODO Investigate whether there is an issue with rax:roles with other headers
