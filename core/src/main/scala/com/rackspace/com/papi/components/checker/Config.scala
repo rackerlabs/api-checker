@@ -285,6 +285,15 @@ class Config {
   var checkHeaders : Boolean = false
 
   //
+  //  Fill in required parameters if a default value is specified.
+  //  This currently only works with header parameters.
+  //
+
+  @BeanProperty
+  @AffectsChecker
+  var setParamDefaults : Boolean = false
+
+  //
   // Preserve the ability to process the request body always. Setting
   // this to true ensures that the request remains readable after
   // validation is performed. Setting this to true, however, may also

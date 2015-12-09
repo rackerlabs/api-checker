@@ -33,6 +33,15 @@
         </xsl:copy>
     </xsl:template>
 
+    <!--
+        Specifiing assertions on X-ROLES request header can really
+        mess things up. Don't allow it.
+    -->
+    <xsl:template match="wadl:param[upper-case(@name)='X-ROLES' and @style='header' and not(ancestor::*/wadl:response)]">
+      <xsl:message>[WARNING] When the rax-roles extension is enabled, you are not allowed to specify an X-ROLES header request parameter.</xsl:message>
+      <xsl:message>[WARNING] The X-ROLES header parameter will be ignored.</xsl:message>
+    </xsl:template>
+
     <xsl:template match="wadl:resource">
         <xsl:param name="roles" as="xsd:string*" select="()"/>
 

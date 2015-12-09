@@ -210,6 +210,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithHeaderXSDAnyMessageMatch (checker, name, headerMatch, message).filter (n => (n \ "@code").text == code.toString)
   }
 
+  def stepsWithSetHeader (checker : NodeSeq, name : String, value : String) : NodeSeq = {
+    stepsWithType(checker, "SET_HEADER").filter (n => (n \ "@name").text == name).filter (n => (n \ "@value").text == value)
+  }
+
   def Start : (NodeSeq) => NodeSeq = stepsWithType(_, "START")
   def Accept : (NodeSeq) => NodeSeq = stepsWithType(_, "ACCEPT")
   def URLFail : (NodeSeq) => NodeSeq = stepsWithType(_, "URL_FAIL")
@@ -257,6 +261,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def HeaderXSDAny(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMessageMatch (_, name, headerMatch, message)
   def HeaderXSDAny(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyCodeMatch (_, name, headerMatch, code)
   def HeaderXSDAny(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMessageCodeMatch (_, name, headerMatch, message, code)
+  def SetHeader(name : String, value : String) : (NodeSeq) => NodeSeq = stepsWithSetHeader(_, name, value)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {
 

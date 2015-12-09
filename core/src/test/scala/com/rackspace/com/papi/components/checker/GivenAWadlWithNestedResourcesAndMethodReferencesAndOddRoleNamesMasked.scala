@@ -26,7 +26,9 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNamesMasked exte
   val configs = Map[String, Config]("Config With Roles Enabled" -> configWithRolesMaskedEnabled,
     "Config With Roles Enabled and Messsage Extensions Disabled" -> configWithRolesMaskedEnabledMessageExtDisabled,
     "Config With Roles Enabled and Duplications Removed" -> configWithRolesMaskedEnabledDupsRemoved,
-    "Config With Roles Enabled and Header Checks Disabled" -> configWithRolesMaskedEnabledHeaderCheckDisabled)
+    "Config With Roles Enabled and Header Checks Disabled" -> configWithRolesMaskedEnabledHeaderCheckDisabled,
+    "Config With Roles Enabled and Defaults Enabled" -> configWithRolesMaskedEnabledDefaultsEnabled,
+    "Config With Roles Enabled and Dubplications Removed and Defaults Enabled" -> configWithRolesMaskedEnabledDupsRemovedDefaultsEnabled)
 
   for ((description, configuration) <- configs) {
 

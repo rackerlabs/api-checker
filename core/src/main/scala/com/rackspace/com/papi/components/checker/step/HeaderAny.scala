@@ -52,7 +52,7 @@ class HeaderAny(id : String, label : String, val name : String, val value : Rege
   }
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
-    val headers : List[String] = getHeaders(req, name).toList
+    val headers : List[String] = getHeaders(context, req, name)
 
     //
     //  If there exists at least one header matching the the name AND
