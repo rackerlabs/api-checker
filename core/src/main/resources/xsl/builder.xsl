@@ -438,7 +438,7 @@
         </xsl:if>
     </xsl:template>
     
-    <xsl:template match="wadl:resource">
+    <xsl:template match="wadl:resource[@path]">
         <xsl:variable name="haveHeaders" as="xsd:boolean"
                       select="check:haveHeaders(.)"/>
         <xsl:variable name="nextSteps" as="xsd:string*">
@@ -1152,7 +1152,7 @@
         
     <xsl:function name="check:getNextURLLinks" as="xsd:string*">
         <xsl:param name="from" as="node()"/>
-        <xsl:sequence select="for $r in $from/wadl:resource return
+        <xsl:sequence select="for $r in $from/wadl:resource[@path] return
             if ($r/@path = '/') then
             (check:getNextURLLinks($r))
             else if (xsd:boolean($r/@rax:invisible)) then
