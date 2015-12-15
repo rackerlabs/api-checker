@@ -64,7 +64,7 @@ class Config {
   @BeanProperty var validateChecker : Boolean = true
 
   //
-  //  The result handler, recives and manages all results.
+  //  The result handler, receives and manages all results.
   //
   @BeanProperty var resultHandler : ResultHandler = new ServletResultHandler
 

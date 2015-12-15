@@ -85,7 +85,7 @@ object Wadl2Dot {
   val captureHeader = parser.flag[Boolean] (List("c", "disable-capture-header-ext"),
                                             "Disable capture header extension : false")
 
-  val validate = parser.flag[Boolean] (List("D", "dont-validate"),
+  val dontValidate = parser.flag[Boolean] (List("D", "dont-validate"),
                                        "Don't validate produced checker Default: false")
 
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
@@ -163,7 +163,7 @@ object Wadl2Dot {
         c.enableCaptureHeaderExtension = !captureHeader.value.getOrElse(false)
         c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
-        c.validateChecker = !validate.value.getOrElse(false)
+        c.validateChecker = !dontValidate.value.getOrElse(false)
 
         new WADLDotBuilder().build(getSource, getResult,
           c,

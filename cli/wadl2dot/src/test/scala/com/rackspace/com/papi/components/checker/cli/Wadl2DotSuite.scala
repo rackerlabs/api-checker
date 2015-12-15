@@ -60,18 +60,32 @@ class Wadl2DotSuite extends FunSuite {
     assert (Wadl2Dot.removeDups.value.get == true)
   }
 
-  test ("-r should set rax-roles") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.raxRoles.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("-r"))
-    assert (Wadl2Dot.raxRoles.value.get == true)
-  }
-
   test ("--remove-dups should set removeDups") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.removeDups.value.isEmpty)
     Wadl2Dot.handleArgs(Array("--remove-dups"))
     assert (Wadl2Dot.removeDups.value.get == true)
+  }
+
+  test ("-D should set validate") {
+    Wadl2Dot.parser.reset()
+    assert (Wadl2Dot.dontValidate.value.isEmpty)
+    Wadl2Dot.handleArgs(Array("-D"))
+    assert (Wadl2Dot.dontValidate.value.get == true)
+  }
+
+  test ("--dont-validate should set validate") {
+    Wadl2Dot.parser.reset()
+    assert (Wadl2Dot.dontValidate.value.isEmpty)
+    Wadl2Dot.handleArgs(Array("--dont-validate"))
+    assert (Wadl2Dot.dontValidate.value.get == true)
+  }
+
+  test ("-r should set raxRoles") {
+    Wadl2Dot.parser.reset()
+    assert (Wadl2Dot.raxRoles.value.isEmpty)
+    Wadl2Dot.handleArgs(Array("-r"))
+    assert (Wadl2Dot.raxRoles.value.get == true)
   }
 
   test ("-e should show errors") {

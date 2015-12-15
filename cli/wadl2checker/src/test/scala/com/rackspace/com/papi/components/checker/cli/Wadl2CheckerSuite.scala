@@ -39,7 +39,6 @@ class Wadl2CheckerSuite extends FunSuite {
     }
   }
 
-
   test ("-bad_data should generate usage info") {
     Wadl2Checker.parser.reset()
     intercept[ArgotUsageException] {
@@ -61,14 +60,6 @@ class Wadl2CheckerSuite extends FunSuite {
     assert (Wadl2Checker.removeDups.value.get == true)
   }
 
-
-  test ("-r should set raxRoles") {
-    Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.raxRoles.value.isEmpty)
-    Wadl2Checker.handleArgs(Array("-r"))
-    assert (Wadl2Checker.raxRoles.value.get == true)
-  }
-
   test ("--remove-dups should set removeDups") {
     Wadl2Checker.parser.reset()
     assert (Wadl2Checker.removeDups.value.isEmpty)
@@ -76,18 +67,25 @@ class Wadl2CheckerSuite extends FunSuite {
     assert (Wadl2Checker.removeDups.value.get == true)
   }
 
-  test ("-v should set validate") {
+  test ("-D should set validate") {
     Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.validate.value.isEmpty)
-    Wadl2Checker.handleArgs(Array("-v"))
-    assert (Wadl2Checker.validate.value.get == true)
+    assert (Wadl2Checker.dontValidate.value.isEmpty)
+    Wadl2Checker.handleArgs(Array("-D"))
+    assert (Wadl2Checker.dontValidate.value.get == true)
   }
 
-  test ("--validate should set validate") {
+  test ("--dont-validate should set validate") {
     Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.validate.value.isEmpty)
-    Wadl2Checker.handleArgs(Array("--validate"))
-    assert (Wadl2Checker.validate.value.get == true)
+    assert (Wadl2Checker.dontValidate.value.isEmpty)
+    Wadl2Checker.handleArgs(Array("--dont-validate"))
+    assert (Wadl2Checker.dontValidate.value.get == true)
+  }
+
+  test ("-r should set raxRoles") {
+    Wadl2Checker.parser.reset()
+    assert (Wadl2Checker.raxRoles.value.isEmpty)
+    Wadl2Checker.handleArgs(Array("-r"))
+    assert (Wadl2Checker.raxRoles.value.get == true)
   }
 
   test ("no params should set source and result with input/output stream"){

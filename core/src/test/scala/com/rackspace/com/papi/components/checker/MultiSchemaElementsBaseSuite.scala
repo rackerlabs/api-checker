@@ -221,7 +221,7 @@ abstract class MultiSchemaElementsBaseSuite extends BaseValidatorSuite {
     config.doXSDGrammarTransform = true // -g
     config.joinXPathChecks       = true // -j
     config.checkHeaders          = true // -H
-    config.validateChecker       = true // -v Wadl2Checker default is different from Config default.
+    config.validateChecker       = true // !-D
 
     config.resultHandler = TestConfig.assertHandler
 

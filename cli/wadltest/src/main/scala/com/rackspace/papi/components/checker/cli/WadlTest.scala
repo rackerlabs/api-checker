@@ -101,7 +101,7 @@ object WadlTest {
   val captureHeader = parser.flag[Boolean] (List("c", "disable-capture-header-ext"),
                                             "Disable capture header extension : false")
 
-  val validate = parser.flag[Boolean] (List("D", "dont-validate"),
+  val dontValidate = parser.flag[Boolean] (List("D", "dont-validate"),
                                        "Don't validate produced checker Default: false")
 
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
@@ -120,10 +120,12 @@ object WadlTest {
   val help = parser.flag[Boolean] (List("h", "help"),
                                    "Display usage.")
 
+  val xpathVersion = parser.option[Int](List("t", "xpath-version"), "n",
+                                           "XPath version to use. Can be 1 or 2. Default: 1")
+
   val input = parser.parameter[String]("wadl",
                                        "WADL file/uri to read.  If not specified, stdin will be used.",
                                        true)
-
 
   val printVersion = parser.flag[Boolean] (List("version"),
                                             "Display version.")
@@ -263,9 +265,10 @@ object WadlTest {
         c.enableIgnoreJSONSchemaExtension = !ignoreJSON.value.getOrElse(false)
         c.enableMessageExtension = !message.value.getOrElse(false)
         c.enableCaptureHeaderExtension = !captureHeader.value.getOrElse(false)
+        c.xpathVersion = xpathVersion.value.getOrElse(1)
         c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
-        c.validateChecker = !validate.value.getOrElse(false)
+        c.validateChecker = !dontValidate.value.getOrElse(false)
 
         val dot = File.createTempFile("chk", ".dot")
         dot.deleteOnExit()
