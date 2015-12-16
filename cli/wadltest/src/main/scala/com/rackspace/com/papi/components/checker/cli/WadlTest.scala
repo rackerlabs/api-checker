@@ -168,10 +168,10 @@ object WadlTest {
     val source = getSource
 
     val sourceName = {
-      if (source.asInstanceOf[StreamSource].getInputStream() != null) {
+      if (source.asInstanceOf[StreamSource].getInputStream != null) {
         "<STDIN>"
       } else {
-        source.asInstanceOf[StreamSource].getSystemId()
+        source.asInstanceOf[StreamSource].getSystemId
       }
     }
 
@@ -188,8 +188,8 @@ object WadlTest {
     //  Initialize the server....
     //
     val server = new Server(port)
-    val servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-    val servletHandler = servletContextHandler.getServletHandler()
+    val servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS)
+    val servletHandler = servletContextHandler.getServletHandler
 
     servletContextHandler.setContextPath("/")
     servletContextHandler.setResourceBase(System.getProperty("java.io.tmpdir"))

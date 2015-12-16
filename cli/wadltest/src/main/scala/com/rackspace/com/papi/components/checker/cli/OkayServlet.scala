@@ -35,7 +35,7 @@ class OkayServlet extends HttpServlet {
     //
     if (req.getParameter(ECHO_CONTENT_PARAM) != null) {
       try {
-        copy(req.getInputStream(), resp.getOutputStream())
+        copy(req.getInputStream, resp.getOutputStream)
       }catch {
         case e : Exception => throw new ServletException ("Error while coyping data", e)
       }
