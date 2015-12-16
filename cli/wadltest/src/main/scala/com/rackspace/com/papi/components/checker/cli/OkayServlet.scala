@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.rackspace.papi.components.checker.cli
+package com.rackspace.com.papi.components.checker.cli
 
 import java.io.{BufferedInputStream, BufferedOutputStream, InputStream, OutputStream}
 import javax.servlet.ServletException
@@ -24,7 +24,7 @@ object OkayServlet {
   val ECHO_CONTENT_PARAM : String = "echoContent"
 }
 
-import com.rackspace.papi.components.checker.cli.OkayServlet._
+import com.rackspace.com.papi.components.checker.cli.OkayServlet._
 
 class OkayServlet extends HttpServlet {
 

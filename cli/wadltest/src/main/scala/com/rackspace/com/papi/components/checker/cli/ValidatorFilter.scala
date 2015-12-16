@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.rackspace.papi.components.checker.cli
+package com.rackspace.com.papi.components.checker.cli
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletException, ServletRequest, ServletResponse}
@@ -21,10 +21,10 @@ import javax.servlet.{Filter, FilterChain, FilterConfig, ServletException, Servl
 import com.rackspace.com.papi.components.checker.{Validator, ValidatorException}
 
 object ValidatorFilter {
-  val VALIDATOR_ATTRIB = "com.rackspace.papi.components.checker.cli.wadltest.validator"
+  val VALIDATOR_ATTRIB = "com.rackspace.com.papi.components.checker.cli.wadltest.validator"
 }
 
-import com.rackspace.papi.components.checker.cli.ValidatorFilter._
+import com.rackspace.com.papi.components.checker.cli.ValidatorFilter._
 
 /**
  * A filter which can be used to test api-checker.

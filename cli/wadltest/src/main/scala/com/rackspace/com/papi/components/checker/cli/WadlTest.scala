@@ -15,26 +15,17 @@
  */
 package com.rackspace.com.papi.components.checker.cli
 
+import java.io.File
 import javax.xml.transform._
 import javax.xml.transform.stream._
 
-import java.io.File
-
-import org.clapper.argot.ArgotConverters._
-import org.clapper.argot.{ArgotParser, ArgotUsageException}
-
-import com.rackspace.com.papi.components.checker.{Config, Validator, ValidatorException}
 import com.rackspace.com.papi.components.checker.handler._
 import com.rackspace.com.papi.components.checker.util.URLResolver
-
-import com.rackspace.papi.components.checker.cli.OkayServlet
-import com.rackspace.papi.components.checker.cli.ValidatorFilter
-
-
+import com.rackspace.com.papi.components.checker.{Config, Validator}
+import org.clapper.argot.ArgotConverters._
+import org.clapper.argot.{ArgotParser, ArgotUsageException}
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.servlet.ServletHandler
-import org.eclipse.jetty.servlet.ServletContextHandler
-import org.eclipse.jetty.servlet.FilterMapping
+import org.eclipse.jetty.servlet.{FilterMapping, ServletContextHandler}
 
 object WadlTest {
   val MAX_CONSOLE_WIDTH = 100
