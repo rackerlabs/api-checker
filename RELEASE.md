@@ -1,5 +1,11 @@
 # Releases #
 
+## Release ??? (201?-??-??) ##
+1. Normalized the options available in the CLI utilities.
+   1. The -v/--validate option was removed from Wadl2Checker in favor of the -D/--dont-validate used by the other CLI utilities.
+   1. This inverts the default behavior in Wadl2Checker, but normalizes it across all the CLI utilities to validate by default.
+   1. Added the -t/--xpath-version option to WadlTest.
+
 ## Release 1.1.3 (2015-11-10) ##
 1. Added missing xsd-grammar-transform (g) option to wadl2checker.
 1. Added the ability to disable checker validation in wadl2dot.

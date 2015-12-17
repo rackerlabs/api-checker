@@ -193,7 +193,7 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
     config.checkHeaders             = true    // -H
     config.enableRaxRolesExtension  = enabled // -r
     config.maskRaxRoles403          = masked  // -M
-    config.validateChecker          = true    // -v Wadl2Checker default is different from Config default.
+    config.validateChecker          = true    // !-D
 
     config.resultHandler = TestConfig.assertHandler
 

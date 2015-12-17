@@ -15,26 +15,17 @@
  */
 package com.rackspace.com.papi.components.checker.cli
 
+import java.io.File
 import javax.xml.transform._
 import javax.xml.transform.stream._
 
-import java.io.File
-
-import org.clapper.argot.ArgotConverters._
-import org.clapper.argot.{ArgotParser, ArgotUsageException}
-
-import com.rackspace.com.papi.components.checker.{Config, Validator, ValidatorException}
 import com.rackspace.com.papi.components.checker.handler._
 import com.rackspace.com.papi.components.checker.util.URLResolver
-
-import com.rackspace.papi.components.checker.cli.OkayServlet
-import com.rackspace.papi.components.checker.cli.ValidatorFilter
-
-
+import com.rackspace.com.papi.components.checker.{Config, Validator}
+import org.clapper.argot.ArgotConverters._
+import org.clapper.argot.{ArgotParser, ArgotUsageException}
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.servlet.ServletHandler
-import org.eclipse.jetty.servlet.ServletContextHandler
-import org.eclipse.jetty.servlet.FilterMapping
+import org.eclipse.jetty.servlet.{FilterMapping, ServletContextHandler}
 
 object WadlTest {
   val MAX_CONSOLE_WIDTH = 100
@@ -101,7 +92,7 @@ object WadlTest {
   val captureHeader = parser.flag[Boolean] (List("c", "disable-capture-header-ext"),
                                             "Disable capture header extension : false")
 
-  val validate = parser.flag[Boolean] (List("D", "dont-validate"),
+  val dontValidate = parser.flag[Boolean] (List("D", "dont-validate"),
                                        "Don't validate produced checker Default: false")
 
   val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
@@ -120,10 +111,12 @@ object WadlTest {
   val help = parser.flag[Boolean] (List("h", "help"),
                                    "Display usage.")
 
+  val xpathVersion = parser.option[Int](List("t", "xpath-version"), "n",
+                                           "XPath version to use. Can be 1 or 2. Default: 1")
+
   val input = parser.parameter[String]("wadl",
                                        "WADL file/uri to read.  If not specified, stdin will be used.",
                                        true)
-
 
   val printVersion = parser.flag[Boolean] (List("version"),
                                             "Display version.")
@@ -175,10 +168,10 @@ object WadlTest {
     val source = getSource
 
     val sourceName = {
-      if (source.asInstanceOf[StreamSource].getInputStream() != null) {
+      if (source.asInstanceOf[StreamSource].getInputStream != null) {
         "<STDIN>"
       } else {
-        source.asInstanceOf[StreamSource].getSystemId()
+        source.asInstanceOf[StreamSource].getSystemId
       }
     }
 
@@ -195,8 +188,8 @@ object WadlTest {
     //  Initialize the server....
     //
     val server = new Server(port)
-    val servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-    val servletHandler = servletContextHandler.getServletHandler()
+    val servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS)
+    val servletHandler = servletContextHandler.getServletHandler
 
     servletContextHandler.setContextPath("/")
     servletContextHandler.setResourceBase(System.getProperty("java.io.tmpdir"))
@@ -263,9 +256,10 @@ object WadlTest {
         c.enableIgnoreJSONSchemaExtension = !ignoreJSON.value.getOrElse(false)
         c.enableMessageExtension = !message.value.getOrElse(false)
         c.enableCaptureHeaderExtension = !captureHeader.value.getOrElse(false)
+        c.xpathVersion = xpathVersion.value.getOrElse(1)
         c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
-        c.validateChecker = !validate.value.getOrElse(false)
+        c.validateChecker = !dontValidate.value.getOrElse(false)
 
         val dot = File.createTempFile("chk", ".dot")
         dot.deleteOnExit()

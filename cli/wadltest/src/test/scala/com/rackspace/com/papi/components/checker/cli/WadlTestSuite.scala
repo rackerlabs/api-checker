@@ -67,18 +67,32 @@ class WadlTestSuite extends FunSuite {
     assert (WadlTest.removeDups.value.get == true)
   }
 
-  test ("-r should set rax-roles") {
-    WadlTest.parser.reset()
-    assert (WadlTest.raxRoles.value.isEmpty)
-    WadlTest.handleArgs(Array("-r"))
-    assert (WadlTest.raxRoles.value.get == true)
-  }
-
   test ("--remove-dups should set removeDups") {
     WadlTest.parser.reset()
     assert (WadlTest.removeDups.value.isEmpty)
     WadlTest.handleArgs(Array("--remove-dups"))
     assert (WadlTest.removeDups.value.get == true)
+  }
+
+  test ("-D should set validate") {
+    WadlTest.parser.reset()
+    assert (WadlTest.dontValidate.value.isEmpty)
+    WadlTest.handleArgs(Array("-D"))
+    assert (WadlTest.dontValidate.value.get == true)
+  }
+
+  test ("--dont-validate should set validate") {
+    WadlTest.parser.reset()
+    assert (WadlTest.dontValidate.value.isEmpty)
+    WadlTest.handleArgs(Array("--dont-validate"))
+    assert (WadlTest.dontValidate.value.get == true)
+  }
+
+  test ("-r should set raxRoles") {
+    WadlTest.parser.reset()
+    assert (WadlTest.raxRoles.value.isEmpty)
+    WadlTest.handleArgs(Array("-r"))
+    assert (WadlTest.raxRoles.value.get == true)
   }
 
   test ("no params should set source with input stream"){

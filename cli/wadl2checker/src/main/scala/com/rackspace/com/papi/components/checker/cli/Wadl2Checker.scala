@@ -40,6 +40,9 @@ object Wadl2Checker {
   val raxRolesMask403 = parser.flag[Boolean] (List("M", "rax-roles-mask-403s"),
                                               "When Rax-Roles is enable mask 403 errors with 404 or 405s. Default: false")
 
+  val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
+                                         "Add checks to ensure that XML and JSON are well formed. Default: false")
+
   val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
                                          "Join multiple XPath and XML well-formed checks into a single check. Default: false")
 
@@ -48,9 +51,6 @@ object Wadl2Checker {
 
   val preserveRequestBody = parser.flag[Boolean] (List("b", "preserve-req-body"),
                                               "Ensure that the request body is preserved after validating the request.")
-
-  val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
-                                         "Add checks to ensure that XML and JSON are well formed. Default: false")
 
   val xsdCheck = parser.flag[Boolean] (List("x", "xsd"),
                                          "Add checks to ensure that XML validates against XSD grammar Default: false")
@@ -66,7 +66,6 @@ object Wadl2Checker {
 
   val setDefaults = parser.flag[Boolean] (List("s", "setParamDefaults"),
                                           "Fill in required parameters if a default value is specified Default: false")
-
 
   val plainParam = parser.flag[Boolean] (List("p", "plain"),
                                          "Add checks for plain parameters : false")
@@ -86,8 +85,8 @@ object Wadl2Checker {
   val captureHeader = parser.flag[Boolean] (List("c", "disable-capture-header-ext"),
                                             "Disable capture header extension : false")
 
-  val validate = parser.flag[Boolean] (List("v", "validate"),
-                                       "Validate produced checker Default: false")
+  val dontValidate = parser.flag[Boolean] (List("D", "dont-validate"),
+                                       "Don't validate produced checker Default: false")
 
   val help = parser.flag[Boolean] (List("h", "help"),
                                    "Display usage.")
@@ -146,7 +145,6 @@ object Wadl2Checker {
         c.removeDups = removeDups.value.getOrElse(false)
         c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
         c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
-        c.validateChecker = validate.value.getOrElse(false)
         c.checkWellFormed = wellFormed.value.getOrElse(false)
         c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
         c.checkJSONGrammar = jsonCheck.value.getOrElse(false)
@@ -163,6 +161,7 @@ object Wadl2Checker {
         c.xpathVersion = xpathVersion.value.getOrElse(1)
         c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
+        c.validateChecker = !dontValidate.value.getOrElse(false)
 
         new WADLCheckerBuilder().build(getSource, getResult, c)
       }
