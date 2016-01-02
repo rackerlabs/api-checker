@@ -1,10 +1,18 @@
 # Releases #
 
-## Release ??? (201?-??-??) ##
-1. Normalized the options available in the CLI utilities.
-   1. The -v/--validate option was removed from Wadl2Checker in favor of the -D/--dont-validate used by the other CLI utilities.
-   1. This inverts the default behavior in Wadl2Checker, but normalizes it across all the CLI utilities to validate by default.
-   1. Added the -t/--xpath-version option to WadlTest.
+## Release 1.1.4 (2016-01-01) ##
+1. Added support for default values in required headers.
+1. Added a new CLI tool (wadltest) that runs api-checker on command for manual testing, this replaces the sample filter and filter-test-app.
+1. Added start-up scripts for CLI utilities. Placing bin in the system path in *nix environments should allow easy running of CLI tools.
+1. Fixed a bug where header parameters with the same name, but no fixed value, were not handled correctly.
+1. Clean up: The -v/--validate option was removed from wadl2checker in favor of the -D/--dont-validate used by the other CLI utilities.
+   This inverts the default behavior in wadl2checker, but normalizes it across all the CLI utilities to validate by default.
+1. Clean up: Cleaned the code base of nasty tab characters.
+1. Clean up: Brought back an ignored test that was disabled because of a previous bug with wadl-tools.
+1. Updated wadl-tools: 1.0.31 → 1.0.32. This addressed a number of bugs affecting this project:
+   1. Fixed a bug where multiple slashes // on the root resource (/) with a method was creating empty resources.
+   1. Fixed a bug where a WADL with no resources was not handled correctly.
+
 
 ## Release 1.1.3 (2015-11-10) ##
 1. Added missing xsd-grammar-transform (g) option to wadl2checker.
