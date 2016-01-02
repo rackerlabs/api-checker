@@ -722,6 +722,29 @@
                 6. [X] Test roles with defaults enabled (mixed)
                 7. [X] Test roles with defaults disabled dups (mixed)
                 8. [X] Test roles with defaults enabled dups (mixed)
+** DONE Correctly handle repeating in header params [10/10]
+   1. [X] Extend XSD to support New Step [2/2]
+      1. [X] HEADER_SINGLE
+      2. [X] HEADERXSD_SINGLE
+   2. [X] Add support in XSL:
+      If repeating is == false (or not there), then use HEADER_SINGLE,
+      otherwise use whatever.
+   3. [X] Checker assertions related to HEADER_SINGLE
+   4. [X] Ensure that wadl2dot correctly displays HEADER(XSD)_SINGLE
+   5. [X] Modify rax_roles to specify repeating
+   6. [X] Update optimizations to support new headers
+   7. [X] Create New Step [2/2]
+      1. [X] HEADER_SINGLE
+      2. [X] HEADERXSD_SINGLE
+   8. [X] Update handler for new step
+   9. [X] Update newly broken tests
+   10. [X] Add Tests
+       1. [X] Step
+       2. [X] Builder
+       3. [X] Validator
+       4. [X] Test capture header with non-repeating headers
+       5. [X] Test rax:roles and rax:roles masked along side of
+          non-repeating headers
 ** TODO Compile Performance improvements
 ** TODO Assign CONTENT_FAIL to XSL steps in builder
 ** TODO Investigate whether there is an issue with rax:roles with other headers

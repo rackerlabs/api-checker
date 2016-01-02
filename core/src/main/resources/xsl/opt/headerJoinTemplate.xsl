@@ -36,7 +36,7 @@
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
     <xsl:variable name="rules" as="node()" select="/rules:rules"/>
-    <xsl:variable name="types" as="xs:string*" select="('HEADER', 'HEADER_ANY')"/>
+    <xsl:variable name="types" as="xs:string*" select="('HEADER', 'HEADER_ANY', 'HEADER_SINGLE')"/>
 
     <xsl:key name="rule-by-type" match="rules:rule" use="tokenize(@types,' ')"/>
 

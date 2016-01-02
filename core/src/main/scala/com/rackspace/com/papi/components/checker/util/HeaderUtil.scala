@@ -79,4 +79,23 @@ object HeaderUtil {
     all_headers.foreach(i => list = list ++ i.split(",").map(j => j.trim))
     list
   }
+
+  /**
+   * Like getHeaders, but we don't split header values by comma.
+   * We return all header values, context header values are returned
+   * before  request header values.
+   *
+   */
+  def getNonSplitHeaders(context : StepContext, request : HttpServletRequest, name : String) : List[String] = {
+    val req_headers = request.getHeaders(name) match {
+      case null => List[String]()
+      case e : Enumeration[String] =>  e.toList
+    }
+
+    context.requestHeaders.get(name) match {
+      case Some(Nil) => req_headers
+      case Some(l) => l ++ req_headers
+      case _ => req_headers
+    }
+  }
 }

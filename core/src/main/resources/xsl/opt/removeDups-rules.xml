@@ -36,7 +36,7 @@
     <rule types="XPATH" required="next match" optional="captureHeader version code message">
         Rule for XPath states.
     </rule>
-    <rule types="HEADER HEADERXSD HEADER_ANY HEADERXSD_ANY" required="next name match" optional="captureHeader code message">
+    <rule types="HEADER HEADERXSD HEADER_ANY HEADERXSD_ANY HEADER_SINGLE HEADERXSD_SINGLE" required="next name match" optional="captureHeader code message">
         Rule for Header, HeaderXSD, HeaderAny.
     </rule>
     <rule types="SET_HEADER" required="next name value">

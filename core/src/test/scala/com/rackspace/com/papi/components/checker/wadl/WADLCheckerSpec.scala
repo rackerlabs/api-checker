@@ -1027,7 +1027,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <grammars/>
            <resources base="https://test.api.openstack.com">
               <resource path="path/to/my/resource/{id}">
-                   <param name="id" style="header" type="xsd:string"/>
+                   <param name="id" style="header" type="xsd:string" repeating="true"/>
                    <method href="#getMethod" />
               </resource>
            </resources>
@@ -6784,10 +6784,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" repeating="true" fixed="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" repeating="true" fixed="bar"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -6844,10 +6844,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true" default="FOO"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true" default="BAR"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" repeating="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" repeating="true" fixed="bar"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -6904,12 +6904,12 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="X-ROLES" style="header" type="xsd:string" required="true"
+              <param name="X-ROLES" style="header" type="xsd:string" required="true" repeating="true"
                      default="c:creator"/>
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true" default="FOO"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true" default="BAR"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" repeating="true" fixed="foo" default="foo"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" repeating="true" fixed="bar"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -6973,12 +6973,12 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="x-RoLeS" style="header" type="xsd:string" required="true"
+              <param name="x-RoLeS" style="header" type="xsd:string" required="true" repeating="true"
                      default="c:creator"/>
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true" default="FOO"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7042,13 +7042,13 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true" repeating="true"
                           default="c:creator"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
@@ -7112,15 +7112,15 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-ROLES" style="header" type="xsd:string" required="true"
+               <param name="X-ROLES" style="header" type="xsd:string" required="true" repeating="true"
                     default="c:creator"/>
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true" repeating="true"
                           default="c:creator"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
@@ -7183,17 +7183,17 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
                   <response>
-                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true" repeating="true"
                           default="c:creator"/>
                   </response>
                </method>
@@ -7254,10 +7254,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="bar"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="bar" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7315,10 +7315,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" default="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" default="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7376,10 +7376,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7438,15 +7438,15 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-ROLES" style="header" type="xsd:string" required="true"
+               <param name="X-ROLES" style="header" type="xsd:string" required="true" repeating="true"
                     default="c:creator"/>
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-ROLES" style="header" type="xsd:string" required="true"
+                      <param name="X-ROLES" style="header" type="xsd:string" required="true" repeating="true"
                           default="c:creator"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
@@ -7511,10 +7511,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="bar"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="bar" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7567,10 +7567,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" default="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" default="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7623,10 +7623,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7685,10 +7685,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:message="X-TEST, bad" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:message="X-TEST2, bad" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:message="X-FOO,foo,bad" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="X-TEST, bad" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:message="X-TEST2, bad" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:message="X-FOO,foo,bad" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:message="X-FOO,bar,bad" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7747,10 +7747,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7810,10 +7810,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7873,10 +7873,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7937,10 +7937,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -7998,15 +7998,15 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
                <param name="X-ROLES" style="header" type="xsd:string" required="true"
-                    default="c:creator"/>
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                    default="c:creator" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <param name="X-ROLES" style="header" type="xsd:string" required="true"
-                          default="c:creator"/>
+                          default="c:creator" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -8068,10 +8068,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8128,10 +8128,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8191,15 +8191,15 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
                <param name="X-ROLES" style="header" type="xsd:string" required="true"
-                    default="c:creator"/>
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                    default="c:creator" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <param name="X-ROLES" style="header" type="xsd:string" required="true"
-                          default="c:creator"/>
+                          default="c:creator" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -8263,10 +8263,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="401" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="401" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="401" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="401" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8325,10 +8325,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8387,10 +8387,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8450,10 +8450,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8513,10 +8513,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" rax:code="401" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="No!" rax:code="401" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8578,10 +8578,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8640,10 +8640,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:message="X-TEST, bad" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:message="X-TEST2, bad" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="X-FOO,foo,bad" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="X-TEST, bad" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:message="X-TEST2, bad" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="X-FOO,foo,bad" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:message="X-FOO,bar,bad" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8702,10 +8702,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8766,10 +8766,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8830,10 +8830,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO"/>
-               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="X-TEST, bad" required="true" default="FOO" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="X-TEST2, bad" required="true" default="BAR" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="X-FOO,foo,bad" required="true" fixed="foo" default="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="X-FOO,bar,bad" required="true" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8895,13 +8895,13 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
-               <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST3" style="header" type="xsd:string" required="false"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
-               <param name="X-FOO" style="header" type="xsd:string" required="false" fixed="bar"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
+               <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST3" style="header" type="xsd:string" required="false" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
+               <param name="X-FOO" style="header" type="xsd:string" required="false" fixed="bar" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -8958,7 +8958,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9015,8 +9015,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9073,8 +9073,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9132,9 +9132,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9191,8 +9191,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9206,7 +9206,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="POST">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9251,9 +9251,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9267,8 +9267,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false" repeating="true"/>
                <method name="POST">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9313,8 +9313,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9328,7 +9328,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="POST">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -9992,10 +9992,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10052,10 +10052,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10112,10 +10112,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10184,10 +10184,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </resources>
         <method id="headerMethod" name="PUT">
           <request>
-           <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-           <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
-           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
-           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+           <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+           <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true"/>
+           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
            <representation mediaType="application/xml"/>
            <representation mediaType="application/json"/>
          </request>
@@ -10249,10 +10249,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
         </resources>
         <method id="headerMethod" name="PUT">
           <request>
-           <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO"/>
-           <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR"/>
-           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo"/>
-           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+           <param name="X-TEST" style="header" type="xsd:string" required="true" default="FOO" repeating="true"/>
+           <param name="X-TEST2" style="header" type="xsd:string" required="true" default="BAR" repeating="true"/>
+           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" default="foo" repeating="true"/>
+           <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
            <representation mediaType="application/xml"/>
            <representation mediaType="application/json"/>
          </request>
@@ -10309,10 +10309,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10372,10 +10372,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:message="No1" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:message="No4" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string"  rax:message="No2" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string"  rax:message="No3" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:message="No1" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:message="No4" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:message="No2" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:message="No3" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10434,10 +10434,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="No2" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="No3" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="No2" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="No3" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10497,10 +10497,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true" default="FOO"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true" default="BAR"/>
-                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="No2" required="true" fixed="foo" default="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="No3" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true" default="FOO" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true" default="BAR" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="402" rax:message="No2" required="true" fixed="foo" default="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string"  rax:code="403" rax:message="No3" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10562,10 +10562,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10624,10 +10624,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10686,10 +10686,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:message="No!" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:message="No!" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:message="No!" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:message="No!" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:message="No!" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10748,10 +10748,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10811,10 +10811,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" default="FOO"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" default="BAR"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="foo" default="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" default="FOO" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" default="BAR" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="foo" default="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10876,10 +10876,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="402" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="403" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="402" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="403" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -10938,10 +10938,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:message="No1" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:message="No4" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:message="No2" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:message="No3" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:message="No1" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:message="No4" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:message="No2" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:message="No3" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11000,10 +11000,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="No2" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="No3" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="No2" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="No3" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11063,10 +11063,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true" default="FOO"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true" default="BAR"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="No2" required="true" fixed="foo" default="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="No3" required="true" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No1" required="true" default="FOO" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" rax:code="404" rax:message="No4" required="true" default="BAR" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="402" rax:message="No2" required="true" fixed="foo" default="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" rax:code="403" rax:message="No3" required="true" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11128,13 +11128,13 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
-                      <param name="X-TEST2" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST3" style="header" type="xsd:string" required="false"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar"/>
-                      <param name="X-FOO" style="header" type="xsd:string" required="false" fixed="bar"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
+                      <param name="X-TEST2" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST3" style="header" type="xsd:string" required="false" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
+                      <param name="X-FOO" style="header" type="xsd:string" required="false" fixed="bar" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11191,7 +11191,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11248,8 +11248,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11306,8 +11306,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11364,9 +11364,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11423,8 +11423,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11436,7 +11436,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="POST">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -11483,9 +11483,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11497,8 +11497,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false" repeating="true"/>
                <method name="POST">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -11545,8 +11545,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11558,7 +11558,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="POST">
                   <request>
                       <representation mediaType="application/xml"/>
@@ -11605,8 +11605,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11618,10 +11618,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="POST">
                   <request>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11666,8 +11666,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="99"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="99" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11679,10 +11679,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="999"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="999" repeating="true"/>
                <method name="POST">
                   <request>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" default="2015-11-28"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" default="2015-11-28" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11728,8 +11728,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="99"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="99" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11741,10 +11741,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="999"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="999" repeating="true"/>
                <method name="POST">
                   <request>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" default="2015-11-28"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" default="2015-11-28" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11792,9 +11792,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11806,11 +11806,11 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false" repeating="true"/>
                <method name="POST">
                   <request>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" repeating="true"/>
                       <representation mediaType="application/xml"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -11903,9 +11903,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                   </request>
                </method>
                <method name="POST">
@@ -11915,11 +11915,11 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false" repeating="true"/>
                <method name="POST">
                   <request>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" repeating="true"/>
                   </request>
                </method>
                <method name="GET"/>
@@ -12065,11 +12065,11 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true" fixed="foo"/>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true" fixed="bar"/>
-                      <param name="X-TEST" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
+                      <param name="X-TEST" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                   </request>
                </method>
                <method name="POST">
@@ -12079,12 +12079,12 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false" repeating="true"/>
                <method name="POST">
                   <request>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:int" required="true" fixed="22"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:int" required="true" fixed="22" repeating="true"/>
                   </request>
                </method>
                <method name="GET"/>
@@ -12127,11 +12127,11 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true" fixed="foo"/>
-                      <param name="X-TEST" style="header" type="xsd:string" required="true" fixed="bar"/>
-                      <param name="X-TEST" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" fixed="foo" repeating="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" required="true" fixed="bar" repeating="true"/>
+                      <param name="X-TEST" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:string" required="false" repeating="true"/>
                   </request>
                </method>
                <method name="POST">
@@ -12141,12 +12141,12 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
                </method>
            </resource>
            <resource path="/c">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
-               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-OTHER-INT" style="header" type="xsd:int" required="false" repeating="true"/>
                <method name="POST">
                   <request>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true"/>
-                      <param name="X-TEST-OTHER" style="header" type="xsd:int" required="true" fixed="22"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:date" required="true" repeating="true"/>
+                      <param name="X-TEST-OTHER" style="header" type="xsd:int" required="true" fixed="22" repeating="true"/>
                   </request>
                </method>
                <method name="GET"/>
