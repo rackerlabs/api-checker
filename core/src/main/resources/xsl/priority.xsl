@@ -102,7 +102,7 @@
     <xsl:function name="chkp:priority" as="xs:integer">
         <xsl:param as="node()" name="step"/>
         <xsl:param as="xs:integer" name="inPriority"/>
-        <xsl:variable name="map" as="node()" select="key('type-to-priority',$step/@type, $priority-map)"/>
+        <xsl:variable name="map" as="node()?" select="key('type-to-priority',$step/@type, $priority-map)"/>
         <xsl:if test="not($map)">
             <xsl:message  terminate="yes">[ERROR] Cannot find priority information for step type <xsl:value-of select="$step/@type"/> that's very strange</xsl:message>
         </xsl:if>
