@@ -371,7 +371,7 @@
     </xsl:template>
 
     <!-- Only the following methods need error states added -->
-    <xsl:template match="check:step[@type=('URL','URLXSD','START','HEADER','HEADERXSD','HEADER_ANY','HEADERXSD_ANY') and not(@inRequest)]" mode="addErrorStates">
+    <xsl:template match="check:step[@type=('URL','URLXSD','START','HEADER','HEADERXSD','HEADER_ANY','HEADERXSD_ANY','HEADER_SINGLE','HEADERXSD_SINGLE') and not(@inRequest)]" mode="addErrorStates">
         <xsl:variable name="myId" as="xsd:string" select="generate-id()"/>
         <xsl:variable name="nexts" as="xsd:string*" select="check:next(.)"/>
         <xsl:variable name="nextSteps" as="node()*" select="check:stepsByIds(..,$nexts)"/>
@@ -609,16 +609,23 @@
           <xsl:for-each select="$headers[@name=$current]">
             <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
             <xsl:variable name="isFixed" as="xsd:boolean" select="exists(@fixed)"/>
+            <xsl:variable name="isRepeating" as="xsd:boolean" select="exists(@repeating) and xsd:boolean(@repeating)"/>
                 <step id="{check:HeaderID(.)}" name="{@name}">
                     <xsl:call-template name="check:addMessageExtension"/>
                     <xsl:call-template name="check:addCaptureHeaderExtension"/>
                     <xsl:attribute name="type">
                       <xsl:choose>
-                        <xsl:when test="$isFixed">HEADER_ANY</xsl:when>
-                        <xsl:when test="$isXSD and $multipleHeaders">HEADERXSD_ANY</xsl:when>
-                        <xsl:when test="$isXSD">HEADERXSD</xsl:when>
-                        <xsl:when test="$multipleHeaders">HEADER_ANY</xsl:when>
-                        <xsl:otherwise>HEADER</xsl:otherwise>
+                        <xsl:when test="$isRepeating">
+                          <xsl:choose>
+                            <xsl:when test="$isFixed">HEADER_ANY</xsl:when>
+                            <xsl:when test="$isXSD and $multipleHeaders">HEADERXSD_ANY</xsl:when>
+                            <xsl:when test="$isXSD">HEADERXSD</xsl:when>
+                            <xsl:when test="$multipleHeaders">HEADER_ANY</xsl:when>
+                            <xsl:otherwise>HEADER</xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:when>
+                        <xsl:when test="$isXSD and not($isFixed)">HEADERXSD_SINGLE</xsl:when>
+                        <xsl:otherwise>HEADER_SINGLE</xsl:otherwise>
                       </xsl:choose>
                     </xsl:attribute>
                     <xsl:attribute name="match">

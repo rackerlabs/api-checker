@@ -64,7 +64,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -102,7 +102,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="test"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="test" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -141,7 +141,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -179,7 +179,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -217,7 +217,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -254,7 +254,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -292,8 +292,8 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -330,9 +330,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -370,9 +370,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" required="true" default="texto"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" default="texto" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -411,9 +411,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="foo!" required="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="bar!" required="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="foo!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="bar!" required="true" repeating="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -451,9 +451,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -491,9 +491,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" required="true" default="texto"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" default="texto" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -532,9 +532,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="foo!" required="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="bar!" required="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="foo!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="bar!" required="true" repeating="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -572,11 +572,11 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TESTO" style="header" type="xsd:string" required="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true"/>
-                      <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -611,11 +611,11 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TESTO" style="header" type="xsd:string" required="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true"/>
-                      <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -650,7 +650,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-UUID" style="header" type="tst:UUID" required="true"/>
+               <param name="X-TEST-UUID" style="header" type="tst:UUID" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -687,7 +687,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -725,7 +725,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-INT" style="header" type="xsd:int" rax:code="401" rax:message="No!" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" rax:code="401" rax:message="No!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -765,7 +765,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -801,10 +801,10 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+              <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -839,10 +839,10 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="X-TEST" style="header" type="xsd:string" required="true" default="foo!"/>
+              <param name="X-TEST" style="header" type="xsd:string" required="true" default="foo!" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="54321"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="54321" repeating="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -878,10 +878,10 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true"/>
+              <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" rax:code="401" rax:message="No!" required="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" rax:code="401" rax:message="No!" required="true" repeating="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>

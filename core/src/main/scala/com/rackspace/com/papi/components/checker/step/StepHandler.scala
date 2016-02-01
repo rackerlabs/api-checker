@@ -310,6 +310,8 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "XSL"         => addXSLT(atts)
           case "HEADER"      => addHeader(atts)
           case "HEADERXSD"   => addHeaderXSD(atts)
+          case "HEADER_SINGLE" => addHeaderSingle(atts)
+          case "HEADERXSD_SINGLE" => addHeaderXSDSingle(atts)
           case "HEADER_ANY"  => addHeaderAny(atts)
           case "HEADERXSD_ANY"  => addHeaderXSDAny(atts)
           case "SET_HEADER"  => addSetHeader(atts)
@@ -770,6 +772,24 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
                                new Array[Step](nexts.length)))
   }
 
+  private[this] def addHeaderSingle(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val name : String = atts.getValue("name")
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
+    val priority = getPriority (atts)
+    val captureHeader = getCaptureHeader(atts)
+
+    next += (id -> nexts)
+    steps += (id -> new HeaderSingle(id, label, name, _match.r,
+                               message, code, captureHeader, priority,
+                               new Array[Step](nexts.length)))
+  }
+
   private[this] def addHeaderAny(atts : Attributes) : Unit = {
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
@@ -803,6 +823,25 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new HeaderXSD(id, label, name, qn, schema(qn),
+                                  message, code, captureHeader,
+                                  priority, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addHeaderXSDSingle(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val name : String = atts.getValue("name")
+    val qn : QName = qname(_match)
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
+    val priority = getPriority (atts)
+    val captureHeader = getCaptureHeader(atts)
+
+    next += (id -> nexts)
+    steps += (id -> new HeaderXSDSingle(id, label, name, qn, schema(qn),
                                   message, code, captureHeader,
                                   priority, new Array[Step](nexts.length)))
   }

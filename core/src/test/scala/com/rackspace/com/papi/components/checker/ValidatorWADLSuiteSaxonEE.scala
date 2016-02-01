@@ -774,7 +774,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-UUID" style="header" type="tst:UUID" required="true"/>
+               <param name="X-TEST-UUID" style="header" type="tst:UUID" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -811,7 +811,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -850,7 +850,7 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -885,10 +885,10 @@ class ValidatorWADLSuiteSaxonEE extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="X-TEST" style="header" type="xsd:string" required="true"/>
+              <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>

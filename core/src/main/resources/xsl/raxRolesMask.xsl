@@ -86,7 +86,10 @@
         as we are traversing one of these states...
     -->
     <xsl:variable name="searchStates"
-                  select="('URL', 'URLXSD','METHOD','HEADER','HEADER_ANY', 'HEADERXSD','HEADERXSD_ANY')"
+                  select="('URL',
+                          'URLXSD','METHOD','HEADER','HEADER_ANY',
+                          'HEADERXSD','HEADERXSD_ANY',
+                          'HEADER_SINGLE', 'HEADERXSD_SINGLE')"
                   as="xs:string*"/>
 
     <xsl:template match="/">

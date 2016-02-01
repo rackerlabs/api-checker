@@ -35,6 +35,8 @@
     <map type="CONTENT_FAIL"  priority="40000"/>
     <map type="HEADER"        priority="41000"/>
     <map type="HEADERXSD"     priority="41000"/>
+    <map type="HEADER_SINGLE" priority="41000"/>
+    <map type="HEADERXSD_SINGLE" priority="41000"/>
     <map type="HEADER_ANY"    priority="41000"/>
     <map type="HEADERXSD_ANY" priority="41000"/>
     <map type="WELL_XML"      priority="41000"/>

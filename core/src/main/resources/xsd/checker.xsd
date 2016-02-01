@@ -107,6 +107,8 @@
                 <alternative test="@type eq 'SET_HEADER'" type="chk:SetHeaderStep"/>
                 <alternative test="@type eq 'HEADER'" type="chk:HeaderStep"/>
                 <alternative test="@type eq 'HEADERXSD'" type="chk:HeaderXSDStep"/>
+                <alternative test="@type eq 'HEADER_SINGLE'" type="chk:HeaderSingleStep"/>
+                <alternative test="@type eq 'HEADERXSD_SINGLE'" type="chk:HeaderXSDSingleStep"/>
                 <alternative test="@type eq 'HEADER_ANY'" type="chk:HeaderAnyStep"/>
                 <alternative test="@type eq 'HEADERXSD_ANY'" type="chk:HeaderXSDAnyStep"/>
                 <alternative test="@type eq 'JSON_SCHEMA'" type="chk:JsonSchemaStep"/>
@@ -377,8 +379,9 @@
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
-                    A check on a required header. The match attribute
-                    contains a regex that matches the header value.
+                    A check on a required repeating header. The match
+                    attribute contains a regex that matches the header
+                    value.  All header values must match the value.
                 </html:p>
             </documentation>
         </annotation>
@@ -392,13 +395,31 @@
         </complexContent>
     </complexType>
 
+
+    <complexType name="HeaderSingleStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A check on a required header. The match attribute
+                    contains a regex that matches the header
+                    value. This step checks to ensure that there is
+                    only a single header value, and fails if multiple
+                    values are specified.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:HeaderStep"/>
+        </complexContent>
+    </complexType>
+
     <complexType name="HeaderAnyStep">
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
                     Exactly like HeaderStep, except that given
-                    multiple headers, this step accepts if *any* of
-                    the header values pass.
+                    multiple header values, this step accepts if *any*
+                    of the header values pass.
                 </html:p>
             </documentation>
         </annotation>
@@ -411,9 +432,11 @@
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
-                    A check on a required header. The match attribute
-                    contains a QName that is used to represent an XSD
-                    simple type that validates the header value.
+                    A check on a required repeating header. The match
+                    attribute contains a QName that is used to
+                    represent an XSD simple type that validates the
+                    header value. All header values must match XSD
+                    type.
                 </html:p>
             </documentation>
         </annotation>
@@ -427,13 +450,31 @@
         </complexContent>
     </complexType>
 
+    <complexType name="HeaderXSDSingleStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    A check on a required header. The match attribute
+                    contains a QName that is used to represent an XSD
+                    simple type that validates the header value. This
+                    step checks to ensure that there is only a single
+                    header value, and fails if multiple values are
+                    specified.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:HeaderXSDStep"/>
+        </complexContent>
+    </complexType>
+
     <complexType name="HeaderXSDAnyStep">
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
                     Exactly like HeaderXSDStep, except that given
-                    multiple headers, this step accepts if *any* of
-                    the header values pass.
+                    multiple header values, this step accepts if *any*
+                    of the header values pass.
                 </html:p>
             </documentation>
         </annotation>
@@ -710,6 +751,8 @@
             <enumeration value="HEADERXSD"/>
             <enumeration value="HEADER_ANY"/>
             <enumeration value="HEADERXSD_ANY"/>
+            <enumeration value="HEADER_SINGLE"/>
+            <enumeration value="HEADERXSD_SINGLE"/>
             <enumeration value="JSON_SCHEMA"/>
         </restriction>
     </simpleType>

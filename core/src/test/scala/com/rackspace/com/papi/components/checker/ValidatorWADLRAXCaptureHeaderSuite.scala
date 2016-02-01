@@ -281,49 +281,49 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
       <resource path="path/to/resource1">
         <method name="GET" rax:roles="headerRole">
           <request>
-            <param name="MyHeader" style="header" required="true"
+            <param name="MyHeader" style="header" required="true" repeating="false"
                    rax:captureHeader="X-DEVICE-ID"/>
-            <param name="OtherHeader" style="header" required="true"
+            <param name="OtherHeader" style="header" required="true" repeating="true"
                    type="xs:int"/>
           </request>
         </method>
         <method name="POST">
           <request>
-            <param name="MyHeader" style="header" required="true" fixed="FOO"
+            <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
                    rax:captureHeader="X-DEVICE-ID"/>
-            <param name="MyHeader" style="header" required="true" fixed="FAR"
+            <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
                    rax:captureHeader="X-DEVICE-ID"/>
-            <param name="MyHeader" style="header" required="true" fixed="OUT"
+            <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
                    rax:captureHeader="X-DEVICE-ID"/>
           </request>
         </method>
         <method name="PUT">
           <request>
-            <param name="MyHeader" style="header" required="true" fixed="FOO"
+            <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
                    type="xs:string" rax:captureHeader="X-DEVICE-ID"/>
-            <param name="MyHeader" style="header" required="true" fixed="FAR"
+            <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
                    type="xs:string"/>
-            <param name="MyHeader" style="header" required="true" fixed="OUT"
+            <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
                    type="xs:string"/>
           </request>
         </method>
         <method name="DELETE">
           <request>
-            <param name="MyHeader" style="header" required="true" fixed="1"
+            <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
                    type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
-            <param name="MyHeader" style="header" required="true" fixed="2"
+            <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
                    type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
-            <param name="MyHeader" style="header" required="true" fixed="3"
+            <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
                    type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
           </request>
         </method>
         <method name="PATCH">
           <request>
-            <param name="MyHeader" style="header" required="true" fixed="1"
+            <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
                    type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
-            <param name="MyHeader" style="header" required="true" fixed="2"
+            <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
                    type="xs:int"/>
-            <param name="MyHeader" style="header" required="true" fixed="3"
+            <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
                    type="xs:int"/>
           </request>
         </method>
@@ -396,49 +396,49 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
       <resource path="path/to/resource1">
         <method name="GET" rax:roles="headerRole">
           <request>
-            <param name="MyHeader" style="header" required="true"
+            <param name="MyHeader" style="header" required="true" repeating="false"
                    rax:device="true"/>
-            <param name="OtherHeader" style="header" required="true"
+            <param name="OtherHeader" style="header" required="true" repeating="true"
                    type="xs:int"/>
           </request>
         </method>
         <method name="POST">
           <request>
-            <param name="MyHeader" style="header" required="true" fixed="FOO"
+            <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
                    rax:device="true"/>
-            <param name="MyHeader" style="header" required="true" fixed="FAR"
+            <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
                    rax:device="true"/>
-            <param name="MyHeader" style="header" required="true" fixed="OUT"
+            <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
                    rax:device="true"/>
           </request>
         </method>
         <method name="PUT">
           <request>
-            <param name="MyHeader" style="header" required="true" fixed="FOO"
+            <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
                    type="xs:string" rax:device="true"/>
-            <param name="MyHeader" style="header" required="true" fixed="FAR"
+            <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
                    type="xs:string"/>
-            <param name="MyHeader" style="header" required="true" fixed="OUT"
+            <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
                    type="xs:string"/>
           </request>
         </method>
         <method name="DELETE">
           <request>
-            <param name="MyHeader" style="header" required="true" fixed="1"
+            <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
                    type="xs:int" rax:device="true"/>
-            <param name="MyHeader" style="header" required="true" fixed="2"
+            <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
                    type="xs:int" rax:device="true"/>
-            <param name="MyHeader" style="header" required="true" fixed="3"
+            <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
                    type="xs:int" rax:device="true"/>
           </request>
         </method>
         <method name="PATCH">
           <request>
-            <param name="MyHeader" style="header" required="true" fixed="1"
+            <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
                    type="xs:int" rax:device="true"/>
-            <param name="MyHeader" style="header" required="true" fixed="2"
+            <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
                    type="xs:int"/>
-            <param name="MyHeader" style="header" required="true" fixed="3"
+            <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
                    type="xs:int"/>
           </request>
         </method>
@@ -475,6 +475,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
       test("A GET on path/to/resource1 should  fail if MyHeader is missing " + desc + attr) {
         val req = request("GET", "/path/to/resource1", "", "", false, Map("OtherHeader" -> List("2")))
         assertResultFailed(validator.validate(req, response, chain), 400, List("MyHeader"))
+      }
+
+      test("A GET on path/to/resource1 should  fail if MyHeader has multiple values " + desc + attr) {
+        val req = request("GET", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("1", "2"), "OtherHeader" -> List("2", "3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("MyHeader","1 and only 1"))
       }
 
       test("A GET on path/to/resource1 should fail if OtherHeader is malformed " + desc + attr) {
@@ -991,6 +996,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         val req = request("GET", "/path/to/resource1", "", "", false, Map("OtherHeader" -> List("2"), "X-ROLES" -> List("headerRole")))
         assertResultFailed(validator.validate(req, response, chain), 400, List("MyHeader"))
       }
+
+      test("A GET on path/to/resource1 should  fail if MyHeader is has multiple values " + desc + attr) {
+        val req = request("GET", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("1", "2"), "OtherHeader" -> List("2"), "X-ROLES" -> List("headerRole")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("MyHeader","1 and only 1"))
+      }
+
 
       test("A GET on path/to/resource1 should fail if OtherHeader is malformed " + desc + attr) {
         val req = request("GET", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("Foo"), "OtherHeader" -> List("two"), "X-ROLES" -> List("headerRole")))

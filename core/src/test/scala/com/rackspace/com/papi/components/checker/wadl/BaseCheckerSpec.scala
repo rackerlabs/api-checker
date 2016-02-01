@@ -197,7 +197,6 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithHeaderXSDAnyMatch(checker, name, headerMatch).filter (n => (n \ "@captureHeader").text == captureHeader)
   }
 
-
   def stepsWithHeaderXSDAnyCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
     stepsWithHeaderXSDAnyMatch (checker, name, headerMatch).filter (n => (n \ "@code").text == code.toString)
   }
@@ -208,6 +207,47 @@ class BaseCheckerSpec extends BaseWADLSpec {
 
   def stepsWithHeaderXSDAnyMessageCodeMatch (checker : NodeSeq, name : String, headerMatch : String, message : String, code : Int) : NodeSeq = {
     stepsWithHeaderXSDAnyMessageMatch (checker, name, headerMatch, message).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderSingleMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
+    stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADER_SINGLE")
+  }
+
+  def stepsWithHeaderSingleMatchCapture (checker : NodeSeq, name : String, headerMatch : String, captureHeader : String) : NodeSeq = {
+    stepsWithHeaderSingleMatch(checker, name, headerMatch).filter (n => (n \ "@captureHeader").text == captureHeader)
+  }
+
+  def stepsWithHeaderSingleCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
+    stepsWithHeaderSingleMatch (checker, name, headerMatch).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderSingleMessageMatch (checker : NodeSeq, name : String, headerMatch : String, message : String) : NodeSeq = {
+    stepsWithHeaderSingleMatch (checker, name, headerMatch).filter (n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderSingleMessageCodeMatch (checker : NodeSeq, name : String, headerMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderSingleMessageMatch (checker, name, headerMatch, message).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderXSDSingleMatch (checker : NodeSeq, name : String, headerMatch : String) : NodeSeq = {
+    stepsWithNameMatch (checker, headerMatch, name).filter (n => (n \ "@type").text == "HEADERXSD_SINGLE")
+  }
+
+  def stepsWithHeaderXSDSingleMatchCapture (checker : NodeSeq, name : String, headerMatch : String, captureHeader : String) : NodeSeq = {
+    stepsWithHeaderXSDSingleMatch(checker, name, headerMatch).filter (n => (n \ "@captureHeader").text == captureHeader)
+  }
+
+
+  def stepsWithHeaderXSDSingleCodeMatch (checker : NodeSeq, name : String, headerMatch : String, code : Int) : NodeSeq = {
+    stepsWithHeaderXSDSingleMatch (checker, name, headerMatch).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderXSDSingleMessageMatch (checker : NodeSeq, name : String, headerMatch : String, message : String) : NodeSeq = {
+    stepsWithHeaderXSDSingleMatch (checker, name, headerMatch).filter (n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderXSDSingleMessageCodeMatch (checker : NodeSeq, name : String, headerMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderXSDSingleMessageMatch (checker, name, headerMatch, message).filter (n => (n \ "@code").text == code.toString)
   }
 
   def stepsWithSetHeader (checker : NodeSeq, name : String, value : String) : NodeSeq = {
@@ -261,6 +301,18 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def HeaderXSDAny(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMessageMatch (_, name, headerMatch, message)
   def HeaderXSDAny(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyCodeMatch (_, name, headerMatch, code)
   def HeaderXSDAny(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDAnyMessageCodeMatch (_, name, headerMatch, message, code)
+  def HeaderSingleWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderSingleMatchCapture(_, name, headerMatch, captureHeader)
+  def HeaderSingle(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderSingleMatch(_, name, headerMatch)
+  def HeaderSingle(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderSingleMessageMatch(_, name, headerMatch, message)
+  def HeaderSingle(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderSingleCodeMatch(_, name, headerMatch, code)
+  def HeaderSingle(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderSingleMessageCodeMatch(_, name, headerMatch, message, code)
+  def HeaderXSDSingleWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDSingleMatchCapture(_, name, headerMatch, captureHeader)
+  def HeaderXSDSingle(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDSingleMatch (_, name, headerMatch)
+  def HeaderXSDSingle(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDSingleMessageMatch (_, name, headerMatch, message)
+  def HeaderXSDSingle(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDSingleCodeMatch (_, name, headerMatch, code)
+  def HeaderXSDSingle(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDSingleMessageCodeMatch (_, name, headerMatch, message, code)
+
+
   def SetHeader(name : String, value : String) : (NodeSeq) => NodeSeq = stepsWithSetHeader(_, name, value)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {

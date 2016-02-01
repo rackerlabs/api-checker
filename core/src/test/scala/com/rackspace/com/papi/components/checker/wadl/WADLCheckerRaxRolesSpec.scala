@@ -71,7 +71,7 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
             </resource>
           </resource>
           <resource path="/c">
-            <param name="X-Auth-Token" style="header" required="true" />
+            <param name="X-Auth-Token" style="header" required="true" repeating="true"/>
             <method name="GET" rax:roles="a:admin"/>
             <method name="POST" rax:roles="a:observer a:admin"/>
           </resource>
@@ -111,7 +111,7 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
             </resource>
           </resource>
           <resource path="/c">
-            <param name="X-Auth-Token" style="header" required="true" />
+            <param name="X-Auth-Token" style="header" required="true" repeating="true"/>
             <method href="#getOnC"/>
             <method href="#postOnC"/>
           </resource>

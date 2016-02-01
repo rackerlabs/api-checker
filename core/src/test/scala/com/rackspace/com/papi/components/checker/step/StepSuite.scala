@@ -2257,6 +2257,701 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     assert (req2.contentErrorPriority == 10123)
   }
 
+  test ("In a headerSingle step, if the header is not avaliable the result of checkStep should be None") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) == None)
+    assert (header.checkStep(req2, response, chain, StepContext()) == None)
+  }
+
+  test ("In a headerSingle step, if the header is not available a correct error message should be set") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("foo"))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("foo"))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header is not available and a custom message is set, make sure the message is reflected") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, Some("Error! :-("), None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header is not available and a custom error code is set, then the error code should be retuned") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("foo"))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("foo"))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header is not available and a custom error code and message is set, then then these should be returend") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, Some("Error! :-("), Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header value does not match the result of checkStep should be None") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("goo")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) == None)
+    assert (header.checkStep(req2, response, chain, StepContext()) == None)
+  }
+
+  test ("In a headerSingle step, if the header value does not match a correct error message should be set") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("foo"))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("foo"))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header vaule does not match and a custom message is set, make sure the message is reflected") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, Some("Error! :-("), None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header value does not match a custom error code is set, then the error code should be retuned") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("foo"))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("foo"))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header value does not match and a custom error code and message is set, then then these should be returend") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, Some("Error! :-("), Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header value contains multiple values then checkStep should return None") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) == None)
+    assert (header.checkStep(req2, response, chain, StepContext()) == None)
+  }
+
+  test ("In a headerSingle step, if the header contains multiple values a correct error message should be set") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("1 and only 1 instance"))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("1 and only 1 instance"))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header contains multiple values and a custom message is set, make sure the message is reflected") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, Some("Error! :-("), None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header contains multiple values and a custom error code is set, then the error code should be retuned") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("1 and only 1 instance"))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("1 and only 1 instance"))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header contians multiple values and a custom error code and message is set, then then these should be returend") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, Some("Error! :-("), Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerSingle step, if the header contians a single valid value, then the return context should not be None") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("foo")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) != None)
+    assert (header.checkStep(req2, response, chain, StepContext()) != None)
+  }
+
+  test ("In a headerSingle step, if the header contians a single valid value, then the return context should not have additional headers set") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("foo")))
+
+    val ctx1 = header.checkStep(req1, response, chain, StepContext())
+    val ctx2 = header.checkStep(req2, response, chain, StepContext())
+
+    assert (ctx1.get.requestHeaders.isEmpty)
+    assert (ctx2.get.requestHeaders.isEmpty)
+  }
+
+  test("In a headerSingle step, if the header contains a valid value and a capture header is specified then it should be set"){
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "foo".r, None, None, Some("X-TEST-COPY"), 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("foo")))
+
+    val ctx1 = header.checkStep(req1, response, chain, StepContext())
+    val ctx2 = header.checkStep(req2, response, chain, StepContext())
+
+    assert (ctx1.get.requestHeaders.get("X-TEST-COPY").get == List("foo"))
+    assert (ctx2.get.requestHeaders.get("X-TEST-COPY").get == List("foo"))
+  }
+
+  test ("In a headerSingle step, if the header contians a single valid value, then the return context should not be None (comma valid)") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "f.*".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("f,o,o")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("f, oo, o")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) != None)
+    assert (header.checkStep(req2, response, chain, StepContext()) != None)
+  }
+
+  test ("In a headerSingle step, if the header contians a single valid value, then the return context should not have additional headers set (comma valid)") {
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "f.*".r, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("f,o,o")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("f, oo, o")))
+
+    val ctx1 = header.checkStep(req1, response, chain, StepContext())
+    val ctx2 = header.checkStep(req2, response, chain, StepContext())
+
+    assert (ctx1.get.requestHeaders.isEmpty)
+    assert (ctx2.get.requestHeaders.isEmpty)
+  }
+
+  test("In a headerSingle step, if the header contains a valid value and a capture header is specified then it should be set (comma valid)"){
+    val header = new HeaderSingle("HEADER_SINGLE", "HEADER_SINGLE", "X-TEST-HEADER", "f.*".r, None, None, Some("X-TEST-COPY"), 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("f,o,o")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("f, oo, o")))
+
+    val ctx1 = header.checkStep(req1, response, chain, StepContext())
+    val ctx2 = header.checkStep(req2, response, chain, StepContext())
+
+    assert (ctx1.get.requestHeaders.get("X-TEST-COPY").get == List("f,o,o"))
+    assert (ctx2.get.requestHeaders.get("X-TEST-COPY").get == List("f, oo, o"))
+  }
+
+  test ("In a headerXSDSingle step, if the header is not avaliable the result of checkStep should be None") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) == None)
+    assert (header.checkStep(req2, response, chain, StepContext()) == None)
+  }
+
+  test ("In a headerXSDSingle step, if the header is not available a correct error message should be set") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("{http://www.rackspace.com/repose/wadl/checker/step/test}UUID"))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("{http://www.rackspace.com/repose/wadl/checker/step/test}UUID"))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header is not available and a custom message is set, make sure the message is reflected") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, Some("Error! :-("), None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header is not available and a custom error code is set, then the error code should be retuned") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("{http://www.rackspace.com/repose/wadl/checker/step/test}UUID"))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("{http://www.rackspace.com/repose/wadl/checker/step/test}UUID"))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header is not available and a custom error code and message is set, then then these should be returend") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, Some("Error! :-("), Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map[String, List[String]]())
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST"->List("FOO")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header value does not match the result of checkStep should be None") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("4bf1b3d6-e847-42d9-8562-63d84ebce74z")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) == None)
+    assert (header.checkStep(req2, response, chain, StepContext()) == None)
+  }
+
+  test ("In a headerXSDSingle step, if the header value does not match a correct error message should be set") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("4bf1b3d6-e847-42d9-8562-63d84ebce74z")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("{http://www.rackspace.com/repose/wadl/checker/step/test}UUID"))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("{http://www.rackspace.com/repose/wadl/checker/step/test}UUID"))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header vaule does not match and a custom message is set, make sure the message is reflected") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, Some("Error! :-("), None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("4bf1b3d6-e847-42d9-8562-63d84ebce74z")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header value does not match a custom error code is set, then the error code should be retuned") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("4bf1b3d6-e847-42d9-8562-63d84ebce74z")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("{http://www.rackspace.com/repose/wadl/checker/step/test}UUID"))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("{http://www.rackspace.com/repose/wadl/checker/step/test}UUID"))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header value does not match and a custom error code and message is set, then then these should be returend") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, Some("Error! :-("), Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("FOO")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("4bf1b3d6-e847-42d9-8562-63d84ebce74z")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header value contains multiple values then checkStep should return None") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("fe7f23cb-ab31-41d1-8f0a-82c7cf09b17d", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) == None)
+    assert (header.checkStep(req2, response, chain, StepContext()) == None)
+  }
+
+  test ("In a headerXSDSingle step, if the header contains multiple values a correct error message should be set") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("fe7f23cb-ab31-41d1-8f0a-82c7cf09b17d", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("1 and only 1 instance"))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("1 and only 1 instance"))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header contains multiple values and a custom message is set, make sure the message is reflected") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, Some("Error! :-("), None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("fe7f23cb-ab31-41d1-8f0a-82c7cf09b17d", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 400)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 400)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header contains multiple values and a custom error code is set, then the error code should be retuned") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("fe7f23cb-ab31-41d1-8f0a-82c7cf09b17d", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("xpecting"))
+    assert (req1.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req1.contentError.getMessage.contains("1 and only 1 instance"))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("xpecting"))
+    assert (req2.contentError.getMessage.contains("X-TEST-HEADER"))
+    assert (req2.contentError.getMessage.contains("1 and only 1 instance"))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header contians multiple values and a custom error code and message is set, then then these should be returend") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, Some("Error! :-("), Some(403), None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("fe7f23cb-ab31-41d1-8f0a-82c7cf09b17d", "BAR")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("foo", "goo")))
+
+    header.checkStep(req1, response, chain, StepContext())
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[Exception])
+    assert (req1.contentError.getMessage.contains("Error! :-("))
+    assert (req1.contentErrorCode == 403)
+    assert (req1.contentErrorPriority == 12345)
+    header.checkStep(req2, response, chain, StepContext())
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[Exception])
+    assert (req2.contentError.getMessage.contains("Error! :-("))
+    assert (req2.contentErrorCode == 403)
+    assert (req2.contentErrorPriority == 12345)
+  }
+
+  test ("In a headerXSDSingle step, if the header contians a single valid value, then the return context should not be None") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("b5e4b5f7-454d-4f1e-82fb-292d110f0783")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("b5e4b5f7-454d-4f1e-82fb-292d110f0783")))
+
+    assert (header.checkStep(req1, response, chain, StepContext()) != None)
+    assert (header.checkStep(req2, response, chain, StepContext()) != None)
+  }
+
+  test ("In a headerXSDSingle step, if the header contians a single valid value, then the return context should not have additional headers set") {
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, None, 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("b5e4b5f7-454d-4f1e-82fb-292d110f0783")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("b5e4b5f7-454d-4f1e-82fb-292d110f0783")))
+
+    val ctx1 = header.checkStep(req1, response, chain, StepContext())
+    val ctx2 = header.checkStep(req2, response, chain, StepContext())
+
+    assert (ctx1.get.requestHeaders.isEmpty)
+    assert (ctx2.get.requestHeaders.isEmpty)
+  }
+
+  test("In a headerXSDSingle step, if the header contains a valid value and a capture header is specified then it should be set"){
+    val header = new HeaderXSDSingle("HEADER_XSD_SINGLE", "HEADER_XSD_SINGLE", "X-TEST-HEADER", uuidType, testSchema, None, None, Some("X-TEST-COPY"), 12345, Array[Step]())
+
+    val req1 = request("GET", "/path/to/resource", "", "", false, Map("X-TEST-HEADER"->List("b5e4b5f7-454d-4f1e-82fb-292d110f0783")))
+    val req2 = request("GET", "/path/to/resource", "", "", false, Map("X-test-HEADER"->List("b5e4b5f7-454d-4f1e-82fb-292d110f0783")))
+
+    val ctx1 = header.checkStep(req1, response, chain, StepContext())
+    val ctx2 = header.checkStep(req2, response, chain, StepContext())
+
+    assert (ctx1.get.requestHeaders.get("X-TEST-COPY").get == List("b5e4b5f7-454d-4f1e-82fb-292d110f0783"))
+    assert (ctx2.get.requestHeaders.get("X-TEST-COPY").get == List("b5e4b5f7-454d-4f1e-82fb-292d110f0783"))
+  }
 
   test ("In an XSD header step, if the header is available then the uri level should stay the same.") {
     val header = new HeaderXSD("HEADER", "HEADER", "X-ID", uuidType, testSchema, 10, Array[Step]())
