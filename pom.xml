@@ -44,10 +44,11 @@
     </distributionManagement>
 
     <properties>
-        <scala.version>2.10.3</scala.version>
-        <scala.dep.version>2.10</scala.dep.version>
+        <scala.major>2</scala.major>
+        <scala.minor>11</scala.minor>
+        <scala.patch>7</scala.patch>
         <saxon-ee.version>9.4.0.9</saxon-ee.version>
-        <scala.test.version>2.0</scala.test.version>
+        <scala.test.version>2.2.6</scala.test.version>
         <scala.uri.version>0.4.2</scala.uri.version>
         <junit.version>4.10</junit.version>
         <wadl-tools.version>1.0.32</wadl-tools.version>
@@ -58,7 +59,7 @@
         <pool.version>1.6</pool.version>
         <codec.version>1.7</codec.version>
         <xalan.version>2.7.1</xalan.version>
-        <metrics-scala.version>2.2.0</metrics-scala.version>
+        <metrics-scala.version>3.5.2_a2.3</metrics-scala.version>
         <jackson-databind.version>2.2.3</jackson-databind.version>
         <json-schema-validator.version>2.1.7</json-schema-validator.version>
         <scala-logging.version>2.1.2</scala-logging.version>
@@ -71,7 +72,7 @@
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
+            <version>${scala.major}.${scala.minor}.${scala.patch}</version>
         </dependency>
         <dependency>
             <groupId>net.sf.saxon</groupId>
@@ -106,17 +107,17 @@
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.10</artifactId>
+            <artifactId>scalatest_${scala.major}.${scala.minor}</artifactId>
             <version>${scala.test.version}</version>
         </dependency>
         <dependency>
             <groupId>com.netaporter</groupId>
-            <artifactId>scala-uri_2.10</artifactId>
+            <artifactId>scala-uri_${scala.major}.${scala.minor}</artifactId>
             <version>${scala.uri.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
-            <artifactId>wadl-tools_2.10</artifactId>
+            <artifactId>wadl-tools_${scala.major}.${scala.minor}</artifactId>
             <version>${wadl-tools.version}</version>
         </dependency>
         <dependency>
@@ -134,14 +135,14 @@
              <artifactId>javax.servlet</artifactId>
              <version>${servlet.version}</version>
          </dependency>
-         <dependency>
+        <dependency>
              <groupId>nl.grons</groupId>
-             <artifactId>metrics-scala_${scala.dep.version}</artifactId>
+             <artifactId>metrics-scala_${scala.major}.${scala.minor}</artifactId>
              <version>${metrics-scala.version}</version>
          </dependency>
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging-slf4j_2.10</artifactId>
+            <artifactId>scala-logging-slf4j_${scala.major}.${scala.minor}</artifactId>
             <version>${scala-logging.version}</version>
         </dependency>
         <dependency>
@@ -182,7 +183,7 @@
         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
-            <artifactId>wadl-tools_2.10</artifactId>
+            <artifactId>wadl-tools_${scala.major}.${scala.minor}</artifactId>
             <version>${wadl-tools.version}</version>
             <type>test-jar</type>
             <scope>test</scope>

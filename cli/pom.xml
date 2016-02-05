@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>org.clapper</groupId>
-            <artifactId>argot_2.10</artifactId>
+            <artifactId>argot_${scala.major}.${scala.minor}</artifactId>
             <version>${argot.version}</version>
         </dependency>
         <dependency>
