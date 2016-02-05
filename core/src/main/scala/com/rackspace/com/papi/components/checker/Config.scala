@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker
 import com.rackspace.com.papi.components.checker.handler.{ResultHandler, ServletResultHandler}
 
 import scala.annotation.StaticAnnotation
-import scala.reflect.BeanProperty
+import scala.beans.BeanProperty
 import scala.reflect.runtime.universe
 import scala.xml._
 
