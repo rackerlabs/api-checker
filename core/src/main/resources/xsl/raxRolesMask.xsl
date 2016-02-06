@@ -88,7 +88,7 @@
     <xsl:variable name="searchStates"
                   select="('URL',
                           'URLXSD','METHOD','HEADER','HEADER_ANY',
-                          'HEADERXSD','HEADERXSD_ANY',
+                          'HEADERXSD','HEADERXSD_ANY', 'HEADER_ALL',
                           'HEADER_SINGLE', 'HEADERXSD_SINGLE')"
                   as="xs:string*"/>
 

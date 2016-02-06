@@ -57,6 +57,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   val validator_Header = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -64,7 +65,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -94,7 +95,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //  Like validator_Header, but with header defaults enabled
   //
   val validator_HeaderDefaults = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -102,7 +103,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" required="true" default="test" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" required="true" default="test" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -141,7 +142,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -179,7 +180,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:message="No!" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -217,7 +218,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -246,7 +247,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like validator header, but expects the header to contain a fixed value
   //
   val validator_HeaderFixed = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -254,7 +255,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -284,7 +285,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like header fixed, but expects the header to contain one of multiple fixed values
   //
   val validator_HeaderFixed2 = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -292,8 +293,8 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -322,7 +323,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like header fixed2, but also expects a non-fixed header value.
   //
   val validator_HeaderFixed3 = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -330,9 +331,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -362,7 +363,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //  Like header fixed 3, but with default values set
   //
   val validator_HeaderFixed3Defaults = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -370,9 +371,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!" repeating="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" required="true" default="texto" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" default="texto" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -411,8 +412,8 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="foo!" required="true" repeating="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="bar!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="foo!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
                <param name="X-TESTO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
                <method name="PUT">
                   <request>
@@ -443,7 +444,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like header fixed3, but has remove dups optimization enabled
   //
   val validator_HeaderFixed3Opt = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -451,9 +452,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -483,7 +484,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
 
   val validator_HeaderFixed3DefaultsOpt = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -491,9 +492,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!" repeating="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" required="true" default="texto" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" default="texto" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -532,9 +533,9 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="foo!" required="true" repeating="true"/>
-               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="bar!" required="true" repeating="true"/>
-               <param name="X-TESTO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="foo!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -564,7 +565,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like header fixed3, but fixed values are only allowed in the PUT request.
   //
   val validator_HeaderFixed4 = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -572,11 +573,11 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
-                      <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" rax:anyMatch="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -603,7 +604,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like header fixed4, but with remove dups optimization on.
   //
   val validator_HeaderFixed4Opt = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -611,11 +612,11 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true"/>
+               <param name="X-TESTO" style="header" type="xsd:string" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true"/>
-                      <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" rax:anyMatch="true"/>
+                      <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:anyMatch="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -642,7 +643,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like validator header, but expects the header to be a UUID.
   //
   val validator_HeaderUUID = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -650,7 +651,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-UUID" style="header" type="tst:UUID" required="true" repeating="true"/>
+               <param name="X-TEST-UUID" style="header" type="tst:UUID" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -679,7 +680,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like validator header, but expects the header to be an int.
   //
   val validator_HeaderInt = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -687,7 +688,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -725,7 +726,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-               <param name="X-TEST-INT" style="header" type="xsd:int" rax:code="401" rax:message="No!" required="true" repeating="true"/>
+               <param name="X-TEST-INT" style="header" type="xsd:int" rax:code="401" rax:message="No!" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml" element="tst:a"/>
@@ -755,7 +756,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like validator header int, but expects the header to only be required in the PUT request.
   //
   val validator_HeaderIntPut = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -765,7 +766,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
            <resource path="/a/b">
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true" rax:anyMatch="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -793,7 +794,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   // Like validator header int, but expects the header to only be required in the PUT request.
   //
   val validator_HeaderIntPutMix = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -801,10 +802,10 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true"/>
+              <param name="X-TEST" style="header" type="xsd:string" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" repeating="true" rax:anyMatch="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -831,7 +832,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //  Like validator_HeaderIntPutMix but with defaults enabled
   //
   val validator_HeaderIntPutMixDefaults = Validator((localWADLURI,
-      <application xmlns="http://wadl.dev.java.net/2009/02"
+      <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <grammars>
@@ -839,10 +840,10 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="X-TEST" style="header" type="xsd:string" required="true" default="foo!" repeating="true"/>
+              <param name="X-TEST" style="header" type="xsd:string" required="true" default="foo!" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="54321" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" required="true" default="54321" repeating="true" rax:anyMatch="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>
@@ -878,10 +879,10 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
         </grammars>
         <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
-              <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true"/>
+              <param name="X-TEST" style="header" type="xsd:string" rax:code="401" rax:message="No!" required="true" repeating="true" rax:anyMatch="true"/>
                <method name="PUT">
                   <request>
-                      <param name="X-TEST-INT" style="header" type="xsd:int" rax:code="401" rax:message="No!" required="true" repeating="true"/>
+                      <param name="X-TEST-INT" style="header" type="xsd:int" rax:code="401" rax:message="No!" required="true" repeating="true" rax:anyMatch="true"/>
                       <representation mediaType="application/xml" element="tst:a"/>
                       <representation mediaType="application/json"/>
                   </request>

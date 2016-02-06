@@ -1843,7 +1843,7 @@ val configAdvance = {
       Then ("The checker should be rejected with an appropriate message")
       assert(checkerLog, "d47e23WF")
       assert(checkerLog, "reference")
-      assert(checkerLog, "WELL_XML or WELL_JSON or XSD or XPATH or XSL or HEADER or HEADERXSD or HEADER_ANY or HEADERXSD_ANY or HEADER_SINGLE or HEADERXSD_SINGLE or JSON_SCHEMA")
+      assert(checkerLog, "WELL_XML or WELL_JSON or XSD or XPATH or XSL or HEADER or HEADERXSD or HEADER_ANY or HEADERXSD_ANY or HEADER_SINGLE or HEADERXSD_SINGLE or HEADER_ALL or JSON_SCHEMA")
     }
 
     scenario ("Checker with a missing CONTENT_FAIL step (WELL_XML)") {

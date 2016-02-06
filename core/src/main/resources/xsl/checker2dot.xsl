@@ -151,14 +151,14 @@
                                        <xsl:otherwise>
                                            <xsl:value-of select="substring($nextStep/@type,1,1)"/>
                                            <xsl:choose>
-                                               <xsl:when test="$nextStep/@match">
+                                               <xsl:when test="$nextStep/@match or $nextStep/@matchRegEx">
                                                  <xsl:text> (</xsl:text>
                                                  <xsl:choose>
                                                      <xsl:when test="$nextStep/@name">
-                                                         <xsl:value-of select="concat($nextStep/@name,' : ',check:escapeRegex($nextStep/@match))"/>
+                                                         <xsl:value-of select="concat($nextStep/@name,' : ',check:matchValue($nextStep))"/>
                                                      </xsl:when>
                                                      <xsl:otherwise>
-                                                         <xsl:value-of select="check:escapeRegex($nextStep/@match)"/>
+                                                         <xsl:value-of select="check:matchValue($nextStep)"/>
                                                      </xsl:otherwise>
                                                  </xsl:choose>
                                                  <xsl:text>)</xsl:text>
@@ -170,7 +170,7 @@
                                                          <xsl:value-of select="concat($nextStep/@name,':&#x2190;? ',$nextStep/@value)"/>
                                                      </xsl:when>
                                                      <xsl:otherwise>
-                                                         <xsl:value-of select="check:escapeRegex($nextStep/@match)"/>
+                                                         <xsl:value-of select="check:matchValue($nextStep)"/>
                                                      </xsl:otherwise>
                                                  </xsl:choose>
                                                  <xsl:text>)</xsl:text>
@@ -206,16 +206,16 @@
                          <xsl:value-of select="@id"/>
                      </xsl:when>
                      <xsl:when test="@label">
-                         <xsl:value-of select="concat(check:escapeRegex(@match),' \n(',@label,')')"/>
+                         <xsl:value-of select="concat(check:matchValue(.),' \n(',@label,')')"/>
                      </xsl:when>
-                     <xsl:when test="@name and @match">
-                         <xsl:value-of select="concat(@name,' : ',check:escapeRegex(@match))"/>
+                     <xsl:when test="@name and (@match or @matchRegEx)">
+                         <xsl:value-of select="concat(@name,' : ',check:matchValue(.))"/>
                      </xsl:when>
                      <xsl:when test="@name and @value">
                          <xsl:value-of select="concat(@name,':&#x2190;? ',@value)"/>
                      </xsl:when>
-                     <xsl:when test="@match">
-                         <xsl:value-of select="check:escapeRegex(@match)"/>
+                     <xsl:when test="@match or @matchRegEx">
+                         <xsl:value-of select="check:matchValue(.)"/>
                      </xsl:when>
                      <xsl:when test="@notMatch and @notTypes">
                          <xsl:value-of select="check:notMatchRegex((tokenize(@notMatch,' '), tokenize(@notTypes,' ')))"/>
@@ -347,5 +347,9 @@
            <xsl:value-of select="$shape"/>
            <xsl:text>"]&#x0a;</xsl:text>
        </xsl:value-of>
+   </xsl:function>
+   <xsl:function name="check:matchValue" as="xsd:string">
+     <xsl:param name="step" as="node()"/>
+     <xsl:value-of select="for $m in ($step/@match, $step/@matchRegEx) return check:escapeRegex($m)" separator=" "/>
    </xsl:function>
 </xsl:stylesheet>

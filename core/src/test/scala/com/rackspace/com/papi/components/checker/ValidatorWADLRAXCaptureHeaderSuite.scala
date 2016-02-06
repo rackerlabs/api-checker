@@ -290,11 +290,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         <method name="POST">
           <request>
             <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
-                   rax:captureHeader="X-DEVICE-ID"/>
+                   rax:captureHeader="X-DEVICE-ID" rax:anyMatch="true"/>
             <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
-                   rax:captureHeader="X-DEVICE-ID"/>
+                   rax:captureHeader="X-DEVICE-ID" rax:anyMatch="true"/>
             <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
-                   rax:captureHeader="X-DEVICE-ID"/>
+                   rax:captureHeader="X-DEVICE-ID" rax:anyMatch="true"/>
           </request>
         </method>
         <method name="PUT">
@@ -311,10 +311,10 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
           <request>
             <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
                    type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
-            <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
-                   type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
-            <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
-                   type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
+            <param name="MyHeader" style="header" required="true" repeating="true"
+                   type="xs:date" rax:captureHeader="X-DEVICE-ID"/>
+            <param name="MyHeader" style="header" required="true"  repeating="true"
+                   type="xs:time" rax:captureHeader="X-DEVICE-ID"/>
           </request>
         </method>
         <method name="PATCH">
@@ -405,11 +405,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         <method name="POST">
           <request>
             <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
-                   rax:device="true"/>
+                   rax:device="true" rax:anyMatch="true"/>
             <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
-                   rax:device="true"/>
+                   rax:device="true" rax:anyMatch="true"/>
             <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
-                   rax:device="true"/>
+                   rax:device="true" rax:anyMatch="true"/>
           </request>
         </method>
         <method name="PUT">
@@ -426,10 +426,10 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
           <request>
             <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
                    type="xs:int" rax:device="true"/>
-            <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
-                   type="xs:int" rax:device="true"/>
-            <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
-                   type="xs:int" rax:device="true"/>
+            <param name="MyHeader" style="header" required="true" repeating="true"
+                   type="xs:date" rax:device="true"/>
+            <param name="MyHeader" style="header" required="true" repeating="true"
+                   type="xs:time" rax:device="true"/>
           </request>
         </method>
         <method name="PATCH">
@@ -529,6 +529,60 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
+      test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (FOO, FAR, OUT) with " + desc + attr) {
+        val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FOO","FAR","OUT")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct header should be set...
+
+          //
+          //  With RAXAny set to true the behavior is somewhat
+          //  undefined.  You're guranteede to recive at least one
+          //  correct header item, but you may get all three --
+          //  depending on settings etc.
+          //
+          val resList = csReq.getHeaders("X-DEVICE-ID").toList
+          assert(resList.contains("FOO") || resList.contains("FAR") || resList.contains("OUT"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-FOO") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+      test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (FOO, 75, FAR, BLA, OUT, 22) with " + desc + attr) {
+        val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FOO","75","FAR","BLA","OUT","22")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct header should be set...
+
+          //
+          //  With RAXAny set to true the behavior is somewhat
+          //  undefined.  You're guranteede to recive at least one
+          //  correct header item, but you may get all three --
+          //  depending on settings etc.
+          //
+          val resList = csReq.getHeaders("X-DEVICE-ID").toList
+          assert(resList.contains("FOO") || resList.contains("FAR") || resList.contains("OUT"))
+
+          //
+          //  Items that don't match should never be set
+          //
+          assert(!resList.contains("22"))
+          assert(!resList.contains("75"))
+          assert(!resList.contains("BLA"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-FOO") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+
       test("A POST on path/to/resource1 should  fail if MyHeader is missing " + desc + attr) {
         val req = request("POST", "/path/to/resource1", "", "", false, Map("OtherHeader" -> List("2")))
         assertResultFailed(validator.validate(req, response, chain), 400, List("MyHeader"))
@@ -553,11 +607,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A PUT on path/to/resource1 of FAR should *not* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+      test("A PUT on path/to/resource1 of FAR should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FAR")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
-          // X-DEVICE-ID should *not* be set
-          assert(csReq.getHeader("X-DEVICE-ID") == null)
+          // X-DEVICE-ID should be set
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("FAR"))
 
           //  Other capture headers should *not* be set either
           assert(csReq.getHeader("X-FOO") == null)
@@ -567,11 +621,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A PUT on path/to/resource1 of OUT should *not* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+      test("A PUT on path/to/resource1 of OUT should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("OUT")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
-          // X-DEVICE-ID should *not* be set
-          assert(csReq.getHeader("X-DEVICE-ID") == null)
+          // X-DEVICE-ID should be set
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("OUT"))
 
           //  Other capture headers should *not* be set either
           assert(csReq.getHeader("X-FOO") == null)
@@ -600,11 +654,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A DELETE on path/to/resource1 of 2 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
-        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2")))
+      test("A DELETE on path/to/resource1 of 00:00:00Z should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("00:00:00Z")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
           // Correct header should be set...
-          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("2"))
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("00:00:00Z"))
 
           //  Other capture headers should *not* be set
           assert(csReq.getHeader("X-FOO") == null)
@@ -614,11 +668,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A DELETE on path/to/resource1 of 3 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
-        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("3")))
+      test("A DELETE on path/to/resource1 of 00:00:00Z, 1, 2001-01-01 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("00:00:00Z","1","2001-01-01")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
           // Correct header should be set...
-          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("3"))
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("00:00:00Z","1","2001-01-01"))
 
           //  Other capture headers should *not* be set
           assert(csReq.getHeader("X-FOO") == null)
@@ -627,6 +681,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         })
         validator.validate(req, response, chain)
       }
+
+      test("A DELETE on path/to/resource1 should  fail if MyHeader if any item is malformed " + desc + attr) {
+        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2","00:00:00Z", "1")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("MyHeader","2"))
+      }
+
 
       test("A DELETE on path/to/resource1 should  fail if MyHeader is missing " + desc + attr) {
         val req = request("DELETE", "/path/to/resource1", "", "", false, Map("OtherHeader" -> List("2")))
@@ -652,11 +712,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A PATCH on path/to/resource1 of 2 should *NOT* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+      test("A PATCH on path/to/resource1 of 2 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
           // Correct header should be set...
-          assert(csReq.getHeader("X-DEVICE-ID") == null)
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("2"))
 
           //  Other capture headers should *not* be set
           assert(csReq.getHeader("X-FOO") == null)
@@ -666,11 +726,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A PATCH on path/to/resource1 of 3 should *NOT* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+      test("A PATCH on path/to/resource1 of 3 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("3")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
           // Correct header should be set...
-          assert(csReq.getHeader("X-DEVICE-ID") == null)
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("3"))
 
           //  Other capture headers should *not* be set
           assert(csReq.getHeader("X-FOO") == null)
@@ -1050,6 +1110,58 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
+      test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (FOO, FAR, OUT) with " + desc + attr) {
+        val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FOO","FAR","OUT")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct header should be set...
+
+          //
+          //  With RAXAny set to true the behavior is somewhat
+          //  undefined.  You're guranteede to recive at least one
+          //  correct header item, but you may get all three --
+          //  depending on settings etc.
+          //
+          val resList = csReq.getHeaders("X-DEVICE-ID").toList
+          assert(resList.contains("FOO") || resList.contains("FAR") || resList.contains("OUT"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-FOO") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+      test("A POST on path/to/resource1 should set X-DEVICE-ID with the contents of MyHeader (FOO, 75, FAR, BLA, OUT, 22) with " + desc + attr) {
+        val req = request("POST", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FOO","75","FAR","BLA","OUT","22")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct header should be set...
+
+          //
+          //  With RAXAny set to true the behavior is somewhat
+          //  undefined.  You're guranteede to recive at least one
+          //  correct header item, but you may get all three --
+          //  depending on settings etc.
+          //
+          val resList = csReq.getHeaders("X-DEVICE-ID").toList
+          assert(resList.contains("FOO") || resList.contains("FAR") || resList.contains("OUT"))
+
+          //
+          //  Items that don't match should never be set
+          //
+          assert(!resList.contains("22"))
+          assert(!resList.contains("75"))
+          assert(!resList.contains("BLA"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-FOO") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
       test("A POST on path/to/resource1 should  fail if MyHeader is missing " + desc + attr) {
         val req = request("POST", "/path/to/resource1", "", "", false, Map("OtherHeader" -> List("2")))
         assertResultFailed(validator.validate(req, response, chain), 400, List("MyHeader"))
@@ -1074,11 +1186,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A PUT on path/to/resource1 of FAR should *not* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+      test("A PUT on path/to/resource1 of FAR should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("FAR")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
-          // X-DEVICE-ID should *not* be set
-          assert(csReq.getHeader("X-DEVICE-ID") == null)
+          // X-DEVICE-ID should be set
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("FAR"))
 
           //  Other capture headers should *not* be set either
           assert(csReq.getHeader("X-FOO") == null)
@@ -1088,11 +1200,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A PUT on path/to/resource1 of OUT should *not* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+      test("A PUT on path/to/resource1 of OUT should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PUT", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("OUT")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
-          // X-DEVICE-ID should *not* be set
-          assert(csReq.getHeader("X-DEVICE-ID") == null)
+          // X-DEVICE-ID should be set
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("OUT"))
 
           //  Other capture headers should *not* be set either
           assert(csReq.getHeader("X-FOO") == null)
@@ -1121,11 +1233,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A DELETE on path/to/resource1 of 2 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
-        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2")))
+      test("A DELETE on path/to/resource1 of 00:00:00Z should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("00:00:00Z")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
           // Correct header should be set...
-          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("2"))
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("00:00:00Z"))
 
           //  Other capture headers should *not* be set
           assert(csReq.getHeader("X-FOO") == null)
@@ -1135,11 +1247,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A DELETE on path/to/resource1 of 3 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
-        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("3")))
+      test("A DELETE on path/to/resource1 of 1, 00:00:00Z, 1975-07-08 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("1","00:00:00Z","1975-07-08")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
           // Correct header should be set...
-          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("3"))
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("1","00:00:00Z","1975-07-08"))
 
           //  Other capture headers should *not* be set
           assert(csReq.getHeader("X-FOO") == null)
@@ -1148,6 +1260,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         })
         validator.validate(req, response, chain)
       }
+
+      test("A DELETE on path/to/resource1 should  fail if MyHeader if any item is malformed " + desc + attr) {
+        val req = request("DELETE", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2","00:00:00Z", "1")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("MyHeader","2"))
+      }
+
 
       test("A DELETE on path/to/resource1 should  fail if MyHeader is missing " + desc + attr) {
         val req = request("DELETE", "/path/to/resource1", "", "", false, Map("OtherHeader" -> List("2")))
@@ -1173,11 +1291,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A PATCH on path/to/resource1 of 2 should *NOT* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+      test("A PATCH on path/to/resource1 of 2 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("2")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
           // Correct header should be set...
-          assert(csReq.getHeader("X-DEVICE-ID") == null)
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("2"))
 
           //  Other capture headers should *not* be set
           assert(csReq.getHeader("X-FOO") == null)
@@ -1187,11 +1305,11 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
       }
 
-      test("A PATCH on path/to/resource1 of 3 should *NOT* set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
+      test("A PATCH on path/to/resource1 of 3 should set X-DEVICE-ID with the contents of MyHeader with " + desc + attr) {
         val req = request("PATCH", "/path/to/resource1", "", "", false, Map("MyHeader" -> List("3")))
         req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
           // Correct header should be set...
-          assert(csReq.getHeader("X-DEVICE-ID") == null)
+          assert(csReq.getHeaders("X-DEVICE-ID").toList == List("3"))
 
           //  Other capture headers should *not* be set
           assert(csReq.getHeader("X-FOO") == null)
