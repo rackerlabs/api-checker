@@ -21,7 +21,7 @@
     </modules>
 
     <properties>
-        <argot.version>1.0.1</argot.version>
+        <argot.version>1.0.4</argot.version>
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>2.1</log4j.version>
     </properties>
