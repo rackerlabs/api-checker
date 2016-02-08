@@ -17,15 +17,16 @@ package com.rackspace.com.papi.components.checker.handler
 
 import java.lang.management._
 import java.net.URLDecoder
-import java.util.{Collections, LinkedHashMap}
 import java.util.concurrent.atomic.AtomicLong
+import java.util.{Collections, LinkedHashMap}
 import javax.management._
 import javax.servlet.FilterChain
 
-import com.rackspace.com.papi.components.checker.Validator
+import com.codahale.metrics.MetricRegistry
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, MultiFailResult, Result}
-import com.yammer.metrics.scala.{Instrumented, Meter}
+import com.rackspace.com.papi.components.checker.{Instrumented, Validator}
+import nl.grons.metrics.scala.Meter
 import org.w3c.dom.{Document, Element}
 
 class InstrumentedHandler extends ResultHandler with Instrumented with InstrumentedHandlerMBean {
@@ -58,7 +59,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
         val id = elm.getAttribute("id")
         val etype = elm.getAttribute("type")
 
-        stepMeters = stepMeters + (id -> metrics.meter(id, etype, validator.name))
+        stepMeters = stepMeters + (id -> metrics.meter(MetricRegistry.name(id, etype, validator.name)))
       }
     }
 
@@ -111,7 +112,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
     }
 
     if (validator.isDefined) {
-      stepMeters.keys.foreach ( k => metricsRegistry.removeMetric(getClass, k, validator.get.name))
+      stepMeters.keys.foreach(k => metricRegistry.remove(MetricRegistry.name(getClass, k, validator.get.name)))
       validator = None
       stepMeters = Map.empty
     }

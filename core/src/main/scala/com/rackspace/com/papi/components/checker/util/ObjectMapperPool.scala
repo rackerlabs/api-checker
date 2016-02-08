@@ -16,7 +16,7 @@
 package com.rackspace.com.papi.components.checker.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.yammer.metrics.scala.Instrumented
+import com.rackspace.com.papi.components.checker.Instrumented
 
 /*
  * Actually, this is only a pool for legacy reasons.

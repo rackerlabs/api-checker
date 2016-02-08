@@ -17,10 +17,10 @@ package com.rackspace.com.papi.components.checker.util
 
 import javax.xml.transform.{Templates, Transformer}
 
-import com.yammer.metrics.core.Gauge
-import com.yammer.metrics.scala.Instrumented
+import com.rackspace.com.papi.components.checker.Instrumented
 import net.sf.saxon.Controller
 import net.sf.saxon.serialize.MessageWarner
+import nl.grons.metrics.scala.Gauge
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 

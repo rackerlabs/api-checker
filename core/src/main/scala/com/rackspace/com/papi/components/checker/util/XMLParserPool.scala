@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING
 import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
 
-import com.yammer.metrics.scala.Instrumented
+import com.rackspace.com.papi.components.checker.Instrumented
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 

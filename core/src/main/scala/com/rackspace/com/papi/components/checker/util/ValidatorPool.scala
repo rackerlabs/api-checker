@@ -17,9 +17,9 @@ package com.rackspace.com.papi.components.checker.util
 
 import javax.xml.validation.{Schema, Validator}
 
+import com.rackspace.com.papi.components.checker.Instrumented
 import com.saxonica.jaxp.SchemaReference
-import com.yammer.metrics.core.Gauge
-import com.yammer.metrics.scala.Instrumented
+import nl.grons.metrics.scala.Gauge
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
