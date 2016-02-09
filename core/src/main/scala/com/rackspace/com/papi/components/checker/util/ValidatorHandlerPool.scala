@@ -19,13 +19,15 @@ import javax.xml.validation.{Schema, ValidatorHandler}
 
 import com.rackspace.com.papi.components.checker.Instrumented
 import com.saxonica.jaxp.SchemaReference
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import nl.grons.metrics.scala.Gauge
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
 import scala.collection.mutable.{HashMap, LinkedList, Map}
+import scala.util.Try
 
-object ValidatorHandlerPool extends Instrumented {
+object ValidatorHandlerPool extends Instrumented with LazyLogging {
   private val validatorHandlerPools : Map[Schema, SoftReferenceObjectPool[ValidatorHandler]] = new HashMap[Schema, SoftReferenceObjectPool[ValidatorHandler]]
   private def pool(schema : Schema) : SoftReferenceObjectPool[ValidatorHandler] = validatorHandlerPools.getOrElseUpdate(schema, addPool(schema))
 
@@ -34,8 +36,16 @@ object ValidatorHandlerPool extends Instrumented {
 
   private def addPool(schema : Schema) : SoftReferenceObjectPool[ValidatorHandler] = {
     val pool = new SoftReferenceObjectPool[ValidatorHandler](new ValidatorHandlerFactory(schema))
-    activeGauges :+ metrics.gauge("Active", Integer.toHexString(schema.hashCode()))(pool.getNumActive)
-    idleGauges :+ metrics.gauge("Idle", Integer.toHexString(schema.hashCode()))(pool.getNumIdle)
+    Try {
+      activeGauges :+ metrics.gauge("Active", Integer.toHexString(schema.hashCode()))(pool.getNumActive)
+    } recover {
+      case e: RuntimeException => logger.info("Problem adding new Active gauge metric.", e)
+    }
+    Try {
+      idleGauges :+ metrics.gauge("Idle", Integer.toHexString(schema.hashCode()))(pool.getNumIdle)
+    } recover {
+      case e: RuntimeException => logger.info("Problem adding new Idle gauge metric.", e)
+    }
     pool
   }
 

@@ -19,13 +19,15 @@ import javax.xml.namespace.NamespaceContext
 import javax.xml.xpath.XPathExpression
 
 import com.rackspace.com.papi.components.checker.Instrumented
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import nl.grons.metrics.scala.Gauge
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
 import scala.collection.mutable.{HashMap, LinkedList, Map}
+import scala.util.Try
 
-object XPathExpressionPool extends Instrumented {
+object XPathExpressionPool extends Instrumented with LazyLogging {
   private val xpathExpressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext), 
                                                                                                                          SoftReferenceObjectPool[XPathExpression]]
   private val xpath2Expressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext),
@@ -38,8 +40,16 @@ object XPathExpressionPool extends Instrumented {
     val pool = new SoftReferenceObjectPool[XPathExpression](version match { case 1 => new XPathExpressionFactory(expression, nc)
                                                                             case 2 => new XPath2ExpressionFactory(expression, nc)
                                                                          })
-    activeGauges :+ metrics.gauge("Active", expression+" ("+version+")")(pool.getNumActive)
-    idleGauges :+ metrics.gauge("Idle", expression+" ("+version+")")(pool.getNumIdle)
+    Try {
+      activeGauges :+ metrics.gauge("Active", expression+" ("+version+")")(pool.getNumActive)
+    } recover {
+      case e: RuntimeException => logger.info("Problem adding new Active gauge metric.", e)
+    }
+    Try {
+      idleGauges :+ metrics.gauge("Idle", expression+" ("+version+")")(pool.getNumIdle)
+    } recover {
+      case e: RuntimeException => logger.info("Problem adding new Idle gauge metric.", e)
+    }
     pool
   }
 

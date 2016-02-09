@@ -18,10 +18,13 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.transform.{Transformer, TransformerFactory}
 
 import com.rackspace.com.papi.components.checker.Instrumented
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-object IdentityTransformPool extends Instrumented  {
+import scala.util.Try
+
+object IdentityTransformPool extends Instrumented with LazyLogging {
   //
   //  We purposly use Xalan-C for identity transform, it's fast and we
   //  avoid licence check in SaxonEE, which for some reason is always
@@ -29,8 +32,16 @@ object IdentityTransformPool extends Instrumented  {
   //
   private val tf = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", this.getClass.getClassLoader)
   private val pool = new SoftReferenceObjectPool[Transformer](new IdentityTransformerFactory(tf))
-  private val activeGauge = metrics.gauge("Active")(numActive)
-  private val idleGauge = metrics.gauge("Idle")(numIdle)
+  Try {
+    metrics.gauge("Active")(numActive)
+  } recover {
+    case e: RuntimeException => logger.info("Problem adding new Active gauge metric.", e)
+  }
+  Try {
+    metrics.gauge("Idle")(numIdle)
+  } recover {
+    case e: RuntimeException => logger.info("Problem adding new Idle gauge metric.", e)
+  }
 
   def borrowTransformer : Transformer = pool.borrowObject()
   def returnTransformer (transformer : Transformer) : Unit = pool.returnObject(transformer)

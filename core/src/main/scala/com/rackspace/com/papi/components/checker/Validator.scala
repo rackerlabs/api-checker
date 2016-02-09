@@ -26,16 +26,19 @@ import javax.xml.transform.sax._
 import javax.xml.transform.stream._
 
 import com.codahale.metrics.RatioGauge.Ratio
-import com.codahale.metrics.{RatioGauge, MetricRegistry}
+import com.codahale.metrics.{MetricRegistry, RatioGauge}
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
 import com.rackspace.com.papi.components.checker.step.results.Result
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
 import com.rackspace.com.papi.components.checker.wadl.{StepBuilder, WADLDotBuilder}
-import nl.grons.metrics.scala.{Timer, Meter, InstrumentedBuilder}
+import com.typesafe.scalalogging.slf4j.LazyLogging
+import nl.grons.metrics.scala.{InstrumentedBuilder, Meter, Timer}
 import org.apache.commons.codec.digest.DigestUtils.sha1Hex
 import org.w3c.dom.Document
+
+import scala.util.Try
 
 object Validator {
   /** The application wide metrics registry. */
@@ -93,7 +96,7 @@ object Validator {
   def apply (in : InputStream, config : Config) : Validator = apply (null, in, config)
 }
 
-class Validator private (private val _name : String, val startStep : Step, val config : Config, val checker : Option[Document] = None) extends Instrumented  with ValidatorMBean {
+class Validator private (private val _name : String, val startStep : Step, val config : Config, val checker : Option[Document] = None) extends Instrumented with ValidatorMBean with LazyLogging {
 
   val name = _name match {
     case null => Integer.toHexString(hashCode())
@@ -164,10 +167,14 @@ class Validator private (private val _name : String, val startStep : Step, val c
 
   private val timer = metrics.timer(TIMER_NAME, name)
   private val failMeter = metrics.meter(MetricRegistry.name(FAIL_METER_NAME, FAIL_METER_EVENT, name))
-  private val failGauge = metricRegistry.register(
-    MetricRegistry.name(getClass, FAIL_RATE_NAME, name),
-    new ValidatorFailGauge(timer, failMeter)
-  )
+  Try {
+    metricRegistry.register(
+      MetricRegistry.name(getClass, FAIL_RATE_NAME, name),
+      new ValidatorFailGauge(timer, failMeter)
+    )
+  } recover {
+    case e: RuntimeException => logger.info("Problem adding new Fail gauge metric.", e)
+  }
 
   private val resultHandler = {
     if (config == null) {

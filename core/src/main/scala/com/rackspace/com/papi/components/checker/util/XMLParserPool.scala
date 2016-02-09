@@ -19,13 +19,24 @@ import javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING
 import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
 
 import com.rackspace.com.papi.components.checker.Instrumented
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-object XMLParserPool extends Instrumented {
+import scala.util.Try
+
+object XMLParserPool extends Instrumented with LazyLogging {
   private val pool = new SoftReferenceObjectPool[DocumentBuilder](new XMLParserFactory)
-  private val activeGauge = metrics.gauge("Active")(numActive)
-  private val idleGauge = metrics.gauge("Idle")(numIdle)
+  Try {
+    metrics.gauge("Active")(numActive)
+  } recover {
+    case e: RuntimeException => logger.info("Problem adding new Active gauge metric.", e)
+  }
+  Try {
+    metrics.gauge("Idle")(numIdle)
+  } recover {
+    case e: RuntimeException => logger.info("Problem adding new Idle gauge metric.", e)
+  }
 
   def borrowParser : DocumentBuilder = pool.borrowObject()
   def returnParser (builder : DocumentBuilder) : Unit = pool.returnObject(builder)

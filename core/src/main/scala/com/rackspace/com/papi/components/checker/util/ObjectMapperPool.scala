@@ -17,16 +17,27 @@ package com.rackspace.com.papi.components.checker.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.rackspace.com.papi.components.checker.Instrumented
+import com.typesafe.scalalogging.slf4j.LazyLogging
+
+import scala.util.Try
 
 /*
  * Actually, this is only a pool for legacy reasons.
  * we converted from JSONSimple to Jackson and Jackson
  * has a threadsafe object mapper.
  */
-object ObjectMapperPool extends Instrumented {
+object ObjectMapperPool extends Instrumented with LazyLogging {
   private val om = new ObjectMapper()
-  private val activeGauge = metrics.gauge("Active")(numActive)
-  private val idleGauge = metrics.gauge("Idle")(numIdle)
+  Try {
+    metrics.gauge("Active")(numActive)
+  } recover {
+    case e: RuntimeException => logger.info("Problem adding new Active gauge metric.", e)
+  }
+  Try {
+    metrics.gauge("Idle")(numIdle)
+  } recover {
+    case e: RuntimeException => logger.info("Problem adding new Idle gauge metric.", e)
+  }
 
   def borrowParser : ObjectMapper = om
   def returnParser (parser : ObjectMapper) : Unit = {}

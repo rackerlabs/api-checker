@@ -18,6 +18,7 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.transform.{Templates, Transformer}
 
 import com.rackspace.com.papi.components.checker.Instrumented
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import net.sf.saxon.Controller
 import net.sf.saxon.serialize.MessageWarner
 import nl.grons.metrics.scala.Gauge
@@ -25,8 +26,9 @@ import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
 import scala.collection.mutable.{HashMap, LinkedList, Map}
+import scala.util.Try
 
-object TransformPool extends Instrumented {
+object TransformPool extends Instrumented with LazyLogging {
   private val transformPools : Map[Templates, SoftReferenceObjectPool[Transformer]] = new HashMap[Templates, SoftReferenceObjectPool[Transformer]]
   private val activeGauges = new LinkedList[Gauge[Int]]
   private val idleGauges = new LinkedList[Gauge[Int]]
@@ -34,8 +36,16 @@ object TransformPool extends Instrumented {
 
   private def addPool(templates : Templates) : SoftReferenceObjectPool[Transformer] = {
     val pool = new SoftReferenceObjectPool[Transformer](new XSLTransformerFactory(templates))
-    activeGauges :+ metrics.gauge("Active", Integer.toHexString(templates.hashCode()))(pool.getNumActive)
-    idleGauges :+ metrics.gauge("Idle", Integer.toHexString(templates.hashCode()))(pool.getNumIdle)
+    Try {
+      activeGauges :+ metrics.gauge("Active", Integer.toHexString(templates.hashCode()))(pool.getNumActive)
+    } recover {
+      case e: RuntimeException => logger.info("Problem adding new Active gauge metric.", e)
+    }
+    Try {
+      idleGauges :+ metrics.gauge("Idle", Integer.toHexString(templates.hashCode()))(pool.getNumIdle)
+    } recover {
+      case e: RuntimeException => logger.info("Problem adding new Idle gauge metric.", e)
+    }
     pool
   }
 
