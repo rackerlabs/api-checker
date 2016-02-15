@@ -26,7 +26,7 @@ import javax.xml.transform.sax._
 import javax.xml.transform.stream._
 
 import com.codahale.metrics.RatioGauge.Ratio
-import com.codahale.metrics.{MetricRegistry, RatioGauge}
+import com.codahale.metrics.{JmxReporter, MetricRegistry, RatioGauge}
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
@@ -43,6 +43,8 @@ import scala.util.Try
 object Validator {
   /** The application wide metrics registry. */
   val metricRegistry = new com.codahale.metrics.MetricRegistry()
+  val reporter = JmxReporter.forRegistry(metricRegistry).inDomain(getClass.getPackage.getName).build()
+  reporter.start()
 
   def apply (name : String, startStep : Step, config : Config) : Validator = {
     val validator = new Validator(name, startStep, config)
