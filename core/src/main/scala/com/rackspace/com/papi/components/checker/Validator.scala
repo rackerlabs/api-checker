@@ -107,8 +107,8 @@ class Validator private (private val _name : String, val startStep : Step, val c
 
 
   private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
-  private val objectName = new ObjectName("\"com.rackspace.com.papi.components.checker\":type=\"Validator\",scope=\""+
-                                 name+"\",name=\"checker\"")
+  private val objectName = new ObjectName("com.rackspace.com.papi.components.checker:type=Validator,scope="+
+                                 name+",name=checker")
 
   private val TIMER_NAME       = "validation-timer"
   private val FAIL_METER_NAME  = "fail-meter"
@@ -167,11 +167,11 @@ class Validator private (private val _name : String, val startStep : Step, val c
     override def getRatio: Ratio = Ratio.of(failMeter.oneMinuteRate, timer.oneMinuteRate)
   }
 
-  private val timer = metrics.timer(TIMER_NAME, name)
-  private val failMeter = metrics.meter(MetricRegistry.name(FAIL_METER_NAME, FAIL_METER_EVENT, name))
+  private val timer = metrics.timer(name, TIMER_NAME)
+  private val failMeter = metrics.meter(MetricRegistry.name(name, FAIL_METER_NAME, FAIL_METER_EVENT))
   Try {
     metricRegistry.register(
-      MetricRegistry.name(getClass, FAIL_RATE_NAME, name),
+      MetricRegistry.name(getClass, name, FAIL_RATE_NAME),
       new ValidatorFailGauge(timer, failMeter)
     )
   } recover {
@@ -210,9 +210,9 @@ class Validator private (private val _name : String, val startStep : Step, val c
       platformMBeanServer.unregisterMBean(objectName)
     }
 
-    metricRegistry.remove(MetricRegistry.name(getClass, TIMER_NAME, name))
-    metricRegistry.remove(MetricRegistry.name(getClass, FAIL_METER_NAME, name))
-    metricRegistry.remove(MetricRegistry.name(getClass, FAIL_RATE_NAME, name))
+    metricRegistry.remove(MetricRegistry.name(getClass, name, TIMER_NAME))
+    metricRegistry.remove(MetricRegistry.name(getClass, name, FAIL_METER_NAME))
+    metricRegistry.remove(MetricRegistry.name(getClass, name, FAIL_RATE_NAME))
   }
 
   //

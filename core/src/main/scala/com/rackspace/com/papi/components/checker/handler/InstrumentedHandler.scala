@@ -59,15 +59,15 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
         val id = elm.getAttribute("id")
         val etype = elm.getAttribute("type")
 
-        stepMeters = stepMeters + (id -> metrics.meter(MetricRegistry.name(id, etype, validator.name)))
+        stepMeters = stepMeters + (id -> metrics.meter(MetricRegistry.name(validator.name, id)))
       }
     }
 
     //
     // Register the MBean
     //
-    latestFailMBeanName = Some(new ObjectName("\"com.rackspace.com.papi.components.checker.handler\":type=\"InstrumentedHandler\",scope=\""+
-                                   validator.name+"\",name=\"latestFails\""))
+    latestFailMBeanName = Some(new ObjectName("com.rackspace.com.papi.components.checker.handler:type=InstrumentedHandler,scope="+
+                                   validator.name+",name=latestFails"))
     platformMBeanServer.registerMBean(this,latestFailMBeanName.get)
   }
 
@@ -112,7 +112,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
     }
 
     if (validator.isDefined) {
-      stepMeters.keys.foreach(k => metricRegistry.remove(MetricRegistry.name(getClass, k, validator.get.name)))
+      stepMeters.keys.foreach(k => metricRegistry.remove(MetricRegistry.name(getClass, validator.get.name, k)))
       validator = None
       stepMeters = Map.empty
     }

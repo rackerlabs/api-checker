@@ -86,7 +86,7 @@ class InstrumentedHandlerSuite extends BaseValidatorSuite {
   val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
 
   def getStepObjectName (stepId : String) : ObjectName = {
-    new ObjectName("\"com.rackspace.com.papi.components.checker.handler\":type=\"InstrumentedHandler\",scope=\"MyInstTestValidator\",name=\""+stepId+"\"")
+    new ObjectName("com.rackspace.com.papi.components.checker:name=com.rackspace.com.papi.components.checker.handler.InstrumentedHandler.MyInstTestValidator."+stepId)
   }
 
   def getStepCount (stepId : String) : Long = {
