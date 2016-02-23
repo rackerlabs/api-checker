@@ -22,11 +22,11 @@ import java.util.{Collections, LinkedHashMap}
 import javax.management._
 import javax.servlet.FilterChain
 
-import com.codahale.metrics.MetricRegistry
+import com.codahale.metrics.{Meter, MetricRegistry}
+import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, MultiFailResult, Result}
-import com.rackspace.com.papi.components.checker.{Instrumented, Validator}
-import nl.grons.metrics.scala.Meter
+import com.rackspace.com.papi.components.checker.util.Instrumented
 import org.w3c.dom.{Document, Element}
 
 class InstrumentedHandler extends ResultHandler with Instrumented with InstrumentedHandlerMBean {
@@ -59,15 +59,14 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
         val id = elm.getAttribute("id")
         val etype = elm.getAttribute("type")
 
-        stepMeters = stepMeters + (id -> metrics.meter(MetricRegistry.name(validator.name, id)))
+        stepMeters += (id -> metricRegistry.meter(MetricRegistry.name(getRegistryClassName(getClass), validator.name, id)))
       }
     }
 
     //
     // Register the MBean
     //
-    latestFailMBeanName = Some(new ObjectName("com.rackspace.com.papi.components.checker.handler:type=InstrumentedHandler,scope="+
-                                   validator.name+",name=latestFails"))
+    latestFailMBeanName = Some(new ObjectName(s"$metricBaseName:type=handler.InstrumentedHandler,scope=${validator.name},name=latestFails"))
     platformMBeanServer.registerMBean(this,latestFailMBeanName.get)
   }
 
@@ -112,7 +111,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
     }
 
     if (validator.isDefined) {
-      stepMeters.keys.foreach(k => metricRegistry.remove(MetricRegistry.name(getClass, validator.get.name, k)))
+      stepMeters.keys.foreach(k => metricRegistry.remove(MetricRegistry.name(getRegistryClassName(getClass), validator.get.name, k)))
       validator = None
       stepMeters = Map.empty
     }

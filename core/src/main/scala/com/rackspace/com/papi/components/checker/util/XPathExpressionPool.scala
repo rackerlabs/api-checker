@@ -18,16 +18,13 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.namespace.NamespaceContext
 import javax.xml.xpath.XPathExpression
 
-import com.rackspace.com.papi.components.checker.Instrumented
-import com.typesafe.scalalogging.slf4j.LazyLogging
-import nl.grons.metrics.scala.Gauge
+import com.codahale.metrics.{Gauge, MetricRegistry}
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
 import scala.collection.mutable.{HashMap, LinkedList, Map}
-import scala.util.Try
 
-object XPathExpressionPool extends Instrumented with LazyLogging {
+object XPathExpressionPool extends Instrumented {
   private val xpathExpressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext), 
                                                                                                                          SoftReferenceObjectPool[XPathExpression]]
   private val xpath2Expressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext),
@@ -40,16 +37,10 @@ object XPathExpressionPool extends Instrumented with LazyLogging {
     val pool = new SoftReferenceObjectPool[XPathExpression](version match { case 1 => new XPathExpressionFactory(expression, nc)
                                                                             case 2 => new XPath2ExpressionFactory(expression, nc)
                                                                          })
-    Try {
-      activeGauges :+ metrics.gauge("Active", expression+" ("+version+")")(pool.getNumActive)
-    } recover {
-      case e: RuntimeException => logger.info("Problem adding new Active gauge metric.", e)
-    }
-    Try {
-      idleGauges :+ metrics.gauge("Idle", expression+" ("+version+")")(pool.getNumIdle)
-    } recover {
-      case e: RuntimeException => logger.info("Problem adding new Idle gauge metric.", e)
-    }
+    val registryClassName = getRegistryClassName(getClass)
+    val metricName = s"$expression ($version)"
+    activeGauges :+ gaugeOrAdd(MetricRegistry.name(registryClassName, "Active", metricName))(pool.getNumActive)
+    idleGauges :+ gaugeOrAdd(MetricRegistry.name(registryClassName, "Idle", metricName))(pool.getNumIdle)
     pool
   }
 

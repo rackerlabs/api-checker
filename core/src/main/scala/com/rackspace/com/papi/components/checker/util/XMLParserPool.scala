@@ -18,25 +18,15 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING
 import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
 
-import com.rackspace.com.papi.components.checker.Instrumented
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.codahale.metrics.MetricRegistry
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-import scala.util.Try
-
-object XMLParserPool extends Instrumented with LazyLogging {
+object XMLParserPool extends Instrumented {
   private val pool = new SoftReferenceObjectPool[DocumentBuilder](new XMLParserFactory)
-  Try {
-    metrics.gauge("Active")(numActive)
-  } recover {
-    case e: RuntimeException => logger.info("Problem adding new Active gauge metric.", e)
-  }
-  Try {
-    metrics.gauge("Idle")(numIdle)
-  } recover {
-    case e: RuntimeException => logger.info("Problem adding new Idle gauge metric.", e)
-  }
+  val registryClassName = getRegistryClassName(getClass)
+  gaugeOrAdd(MetricRegistry.name(registryClassName, "Active"))(numActive)
+  gaugeOrAdd(MetricRegistry.name(registryClassName, "Idle"))(numIdle)
 
   def borrowParser : DocumentBuilder = pool.borrowObject()
   def returnParser (builder : DocumentBuilder) : Unit = pool.returnObject(builder)

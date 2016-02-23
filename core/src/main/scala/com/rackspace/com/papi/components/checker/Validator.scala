@@ -26,24 +26,25 @@ import javax.xml.transform.sax._
 import javax.xml.transform.stream._
 
 import com.codahale.metrics.RatioGauge.Ratio
-import com.codahale.metrics.{JmxReporter, MetricRegistry, RatioGauge}
+import com.codahale.metrics._
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
 import com.rackspace.com.papi.components.checker.step.results.Result
-import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
+import com.rackspace.com.papi.components.checker.util.{Instrumented, IdentityTransformPool, JmxObjectNameFactory}
 import com.rackspace.com.papi.components.checker.wadl.{StepBuilder, WADLDotBuilder}
-import com.typesafe.scalalogging.slf4j.LazyLogging
-import nl.grons.metrics.scala.{InstrumentedBuilder, Meter, Timer}
 import org.apache.commons.codec.digest.DigestUtils.sha1Hex
 import org.w3c.dom.Document
 
-import scala.util.Try
-
 object Validator {
   /** The application wide metrics registry. */
-  val metricRegistry = new com.codahale.metrics.MetricRegistry()
-  val reporter = JmxReporter.forRegistry(metricRegistry).inDomain(getClass.getPackage.getName).build()
+  val metricRegistry = new MetricRegistry()
+  val metricDomain = getClass.getPackage.getName
+  val reporter = JmxReporter
+    .forRegistry(metricRegistry)
+    .inDomain(metricDomain)
+    .createsObjectNamesWith(new JmxObjectNameFactory())
+    .build()
   reporter.start()
 
   def apply (name : String, startStep : Step, config : Config) : Validator = {
@@ -98,7 +99,7 @@ object Validator {
   def apply (in : InputStream, config : Config) : Validator = apply (null, in, config)
 }
 
-class Validator private (private val _name : String, val startStep : Step, val config : Config, val checker : Option[Document] = None) extends Instrumented with ValidatorMBean with LazyLogging {
+class Validator private (private val _name : String, val startStep : Step, val config : Config, val checker : Option[Document] = None) extends Instrumented with ValidatorMBean {
 
   val name = _name match {
     case null => Integer.toHexString(hashCode())
@@ -107,8 +108,7 @@ class Validator private (private val _name : String, val startStep : Step, val c
 
 
   private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
-  private val objectName = new ObjectName("com.rackspace.com.papi.components.checker:type=Validator,scope="+
-                                 name+",name=checker")
+  private val objectName = new ObjectName(s"$metricBaseName:type=Validator,scope=$name,name=checker")
 
   private val TIMER_NAME       = "validation-timer"
   private val FAIL_METER_NAME  = "fail-meter"
@@ -164,19 +164,17 @@ class Validator private (private val _name : String, val startStep : Step, val c
 
   private class ValidatorFailGauge(private val timer : Timer,
                                    private val failMeter : Meter) extends RatioGauge {
-    override def getRatio: Ratio = Ratio.of(failMeter.oneMinuteRate, timer.oneMinuteRate)
+    override def getRatio: Ratio = Ratio.of(failMeter.getOneMinuteRate, timer.getOneMinuteRate)
   }
 
-  private val timer = metrics.timer(name, TIMER_NAME)
-  private val failMeter = metrics.meter(MetricRegistry.name(name, FAIL_METER_NAME, FAIL_METER_EVENT))
-  Try {
+  private val timer = metricRegistry.timer(MetricRegistry.name(getRegistryClassName(getClass), name, TIMER_NAME))
+  private val failMeter = metricRegistry.meter(MetricRegistry.name(getRegistryClassName(getClass), name, FAIL_METER_NAME, FAIL_METER_EVENT))
+  guard[ValidatorFailGauge](() => {
     metricRegistry.register(
-      MetricRegistry.name(getClass, name, FAIL_RATE_NAME),
+      MetricRegistry.name(getRegistryClassName(getClass), name, FAIL_RATE_NAME),
       new ValidatorFailGauge(timer, failMeter)
     )
-  } recover {
-    case e: RuntimeException => logger.info("Problem adding new Fail gauge metric.", e)
-  }
+  })
 
   private val resultHandler = {
     if (config == null) {
@@ -187,7 +185,7 @@ class Validator private (private val _name : String, val startStep : Step, val c
   }
 
   def validate (req : HttpServletRequest, res : HttpServletResponse, chain : FilterChain) : Result = {
-    val context = timer.timerContext()
+    val context = timer.time()
     try {
       val creq = new CheckerServletRequest (req)
       val cres = new CheckerServletResponse(res)
@@ -210,9 +208,10 @@ class Validator private (private val _name : String, val startStep : Step, val c
       platformMBeanServer.unregisterMBean(objectName)
     }
 
-    metricRegistry.remove(MetricRegistry.name(getClass, name, TIMER_NAME))
-    metricRegistry.remove(MetricRegistry.name(getClass, name, FAIL_METER_NAME))
-    metricRegistry.remove(MetricRegistry.name(getClass, name, FAIL_RATE_NAME))
+    val registryClassName = getRegistryClassName(getClass)
+    metricRegistry.remove(MetricRegistry.name(registryClassName, name, TIMER_NAME))
+    metricRegistry.remove(MetricRegistry.name(registryClassName, name, FAIL_METER_NAME))
+    metricRegistry.remove(MetricRegistry.name(registryClassName, name, FAIL_RATE_NAME))
   }
 
   //
@@ -222,8 +221,4 @@ class Validator private (private val _name : String, val startStep : Step, val c
   override def checkerDOT = dot
   override def getXmlSHA1 = xmlSHA1
   override def getDotSHA1 = dotSHA1
-}
-
-trait Instrumented extends InstrumentedBuilder {
-  val metricRegistry = Validator.metricRegistry
 }
