@@ -28,35 +28,34 @@ trait Instrumented extends LazyLogging {
       .replaceAll("""\.$""", "")
   }
 
-  def guard[A](buildMetric: () => A): Option[A] = {
-    try {
-      Some(buildMetric())
-    } catch {
-      case e: IllegalArgumentException =>
-        logger.warn("Failed to add new metric. Reason: {}", e.getMessage)
-        logger.debug("", e)
-        None
-    }
+  def gaugeOrAdd[T](name: String)(f: => T): Gauge[T] = {
+    gaugeOrAdd(name, new Gauge[T] {
+      def getValue: T = f
+    }).asInstanceOf[Gauge[T]]
   }
 
   /**
     * @see com.codahale.metrics.MetricRegistry.getOrAdd
     */
-  def gaugeOrAdd[T](name: String)(f: => T): Gauge[T] = {
-    val gauge = guard[Gauge[T]](() => {
-      metricRegistry.register(name, new Gauge[T] {
-        def getValue: T = f
-      })
-    })
-    if (gauge.isDefined) {
-      gauge.get
+  def gaugeOrAdd(name: String, gauge: Gauge[_]): Gauge[_] = {
+    val addedGauge = try {
+      Some(metricRegistry.register(name, gauge))
+    } catch {
+      case e: IllegalArgumentException =>
+        logger.warn("Failed to add new gauge. Reason: {}", e.getMessage)
+        logger.debug("", e)
+        None
+    }
+    if (addedGauge.isDefined) {
+      addedGauge.get
     } else {
+      logger.debug("Retrieving gauge named: {}", name)
       metricRegistry.getGauges(new MetricFilter() {
         override def matches(filterName: String, metric: Metric): Boolean = {
           filterName.equals(name) &&
-            metric.isInstanceOf[Gauge[T]]
+            metric.isInstanceOf[Gauge[_]]
         }
-      }).get(name).asInstanceOf[Gauge[T]]
+      }).get(name)
     }
   }
 }

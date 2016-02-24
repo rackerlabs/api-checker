@@ -31,7 +31,7 @@ import com.rackspace.com.papi.components.checker.handler.ResultHandler
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{Step, StepContext}
 import com.rackspace.com.papi.components.checker.step.results.Result
-import com.rackspace.com.papi.components.checker.util.{Instrumented, IdentityTransformPool, JmxObjectNameFactory}
+import com.rackspace.com.papi.components.checker.util.{IdentityTransformPool, Instrumented, JmxObjectNameFactory}
 import com.rackspace.com.papi.components.checker.wadl.{StepBuilder, WADLDotBuilder}
 import org.apache.commons.codec.digest.DigestUtils.sha1Hex
 import org.w3c.dom.Document
@@ -169,12 +169,10 @@ class Validator private (private val _name : String, val startStep : Step, val c
 
   private val timer = metricRegistry.timer(MetricRegistry.name(getRegistryClassName(getClass), name, TIMER_NAME))
   private val failMeter = metricRegistry.meter(MetricRegistry.name(getRegistryClassName(getClass), name, FAIL_METER_NAME, FAIL_METER_EVENT))
-  guard[ValidatorFailGauge](() => {
-    metricRegistry.register(
-      MetricRegistry.name(getRegistryClassName(getClass), name, FAIL_RATE_NAME),
-      new ValidatorFailGauge(timer, failMeter)
-    )
-  })
+  gaugeOrAdd(
+    MetricRegistry.name(getRegistryClassName(getClass), name, FAIL_RATE_NAME),
+    new ValidatorFailGauge(timer, failMeter)
+  )
 
   private val resultHandler = {
     if (config == null) {
