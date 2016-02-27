@@ -18,14 +18,15 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING
 import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
 
-import com.yammer.metrics.scala.Instrumented
+import com.codahale.metrics.MetricRegistry
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
 object XMLParserPool extends Instrumented {
   private val pool = new SoftReferenceObjectPool[DocumentBuilder](new XMLParserFactory)
-  private val activeGauge = metrics.gauge("Active")(numActive)
-  private val idleGauge = metrics.gauge("Idle")(numIdle)
+  val registryClassName = getRegistryClassName(getClass)
+  gaugeOrAdd(MetricRegistry.name(registryClassName, "Active"))(numActive)
+  gaugeOrAdd(MetricRegistry.name(registryClassName, "Idle"))(numIdle)
 
   def borrowParser : DocumentBuilder = pool.borrowObject()
   def returnParser (builder : DocumentBuilder) : Unit = pool.returnObject(builder)

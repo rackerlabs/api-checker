@@ -15,8 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.util
 
+import com.codahale.metrics.MetricRegistry
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.yammer.metrics.scala.Instrumented
 
 /*
  * Actually, this is only a pool for legacy reasons.
@@ -25,8 +25,9 @@ import com.yammer.metrics.scala.Instrumented
  */
 object ObjectMapperPool extends Instrumented {
   private val om = new ObjectMapper()
-  private val activeGauge = metrics.gauge("Active")(numActive)
-  private val idleGauge = metrics.gauge("Idle")(numIdle)
+  val registryClassName = getRegistryClassName(getClass)
+  gaugeOrAdd(MetricRegistry.name(registryClassName, "Active"))(numActive)
+  gaugeOrAdd(MetricRegistry.name(registryClassName, "Idle"))(numIdle)
 
   def borrowParser : ObjectMapper = om
   def returnParser (parser : ObjectMapper) : Unit = {}

@@ -21,11 +21,10 @@ import javax.servlet.FilterChain
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
 import com.rackspace.com.papi.components.checker.step.results.Result
-import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
 
-class ApiCoverageHandler extends ResultHandler with LazyLogging {
+class ApiCoverageHandler extends ResultHandler {
   val coverageLogger = LoggerFactory.getLogger("api-coverage-logger")
 
   override def init(validator: Validator, checker: Option[Document]): Unit = {}

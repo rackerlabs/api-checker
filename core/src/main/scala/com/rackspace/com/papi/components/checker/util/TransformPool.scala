@@ -17,8 +17,7 @@ package com.rackspace.com.papi.components.checker.util
 
 import javax.xml.transform.{Templates, Transformer}
 
-import com.yammer.metrics.core.Gauge
-import com.yammer.metrics.scala.Instrumented
+import com.codahale.metrics.{Gauge, MetricRegistry}
 import net.sf.saxon.Controller
 import net.sf.saxon.serialize.MessageWarner
 import org.apache.commons.pool.PoolableObjectFactory
@@ -34,8 +33,10 @@ object TransformPool extends Instrumented {
 
   private def addPool(templates : Templates) : SoftReferenceObjectPool[Transformer] = {
     val pool = new SoftReferenceObjectPool[Transformer](new XSLTransformerFactory(templates))
-    activeGauges :+ metrics.gauge("Active", Integer.toHexString(templates.hashCode()))(pool.getNumActive)
-    idleGauges :+ metrics.gauge("Idle", Integer.toHexString(templates.hashCode()))(pool.getNumIdle)
+    val registryClassName = getRegistryClassName(getClass)
+    val hash = Integer.toHexString(templates.hashCode())
+    activeGauges :+ gaugeOrAdd(MetricRegistry.name(registryClassName, "Active", hash))(pool.getNumActive)
+    idleGauges :+ gaugeOrAdd(MetricRegistry.name(registryClassName, "Idle", hash))(pool.getNumIdle)
     pool
   }
 

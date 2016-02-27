@@ -18,8 +18,7 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.namespace.NamespaceContext
 import javax.xml.xpath.XPathExpression
 
-import com.yammer.metrics.core.Gauge
-import com.yammer.metrics.scala.Instrumented
+import com.codahale.metrics.{Gauge, MetricRegistry}
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
@@ -38,8 +37,10 @@ object XPathExpressionPool extends Instrumented {
     val pool = new SoftReferenceObjectPool[XPathExpression](version match { case 1 => new XPathExpressionFactory(expression, nc)
                                                                             case 2 => new XPath2ExpressionFactory(expression, nc)
                                                                          })
-    activeGauges :+ metrics.gauge("Active", expression+" ("+version+")")(pool.getNumActive)
-    idleGauges :+ metrics.gauge("Idle", expression+" ("+version+")")(pool.getNumIdle)
+    val registryClassName = getRegistryClassName(getClass)
+    val metricName = s"$expression ($version)"
+    activeGauges :+ gaugeOrAdd(MetricRegistry.name(registryClassName, "Active", metricName))(pool.getNumActive)
+    idleGauges :+ gaugeOrAdd(MetricRegistry.name(registryClassName, "Idle", metricName))(pool.getNumIdle)
     pool
   }
 

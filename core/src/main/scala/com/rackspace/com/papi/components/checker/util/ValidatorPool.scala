@@ -17,9 +17,8 @@ package com.rackspace.com.papi.components.checker.util
 
 import javax.xml.validation.{Schema, Validator}
 
+import com.codahale.metrics.{Gauge, MetricRegistry}
 import com.saxonica.jaxp.SchemaReference
-import com.yammer.metrics.core.Gauge
-import com.yammer.metrics.scala.Instrumented
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
@@ -34,8 +33,10 @@ object ValidatorPool extends Instrumented {
 
   private def addPool(schema : Schema) : SoftReferenceObjectPool[Validator] = {
     val pool = new SoftReferenceObjectPool[Validator](new ValidatorFactory(schema))
-    activeGauges :+ metrics.gauge("Active", Integer.toHexString(schema.hashCode()))(pool.getNumActive)
-    idleGauges :+ metrics.gauge("Idle", Integer.toHexString(schema.hashCode()))(pool.getNumIdle)
+    val registryClassName = getRegistryClassName(getClass)
+    val hash = Integer.toHexString(schema.hashCode())
+    activeGauges :+ gaugeOrAdd(MetricRegistry.name(registryClassName, "Active", hash))(pool.getNumActive)
+    idleGauges :+ gaugeOrAdd(MetricRegistry.name(registryClassName, "Idle", hash))(pool.getNumIdle)
     pool
   }
 
