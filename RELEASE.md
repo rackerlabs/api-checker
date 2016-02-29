@@ -1,5 +1,13 @@
 # Releases #
 
+## Release 2.0.0 (2016-03-??) ##
+1. Moved to Scala v2.11.
+   1. Specifically v2.11.7.
+   1. Updated all of the dependencies as well.
+   1. Updated the base metrics library from Yammer to DropWizard/CodaHale.
+   1. Removed the ```nl.grons``` wrapper of the metrics library since the new version was enough.
+
+
 ## Release 1.1.4 (2016-01-01) ##
 1. Added support for default values in required headers.
 1. Added a new CLI tool (wadltest) that runs api-checker on command for manual testing, this replaces the sample filter and filter-test-app.
