@@ -18,8 +18,8 @@
 
     <scm>
         <connection>scm:git:git@github.com:rackerlabs/api-checker.git</connection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <repositories>
         <repository>
@@ -132,11 +132,11 @@
             <artifactId>commons-codec</artifactId>
             <version>${codec.version}</version>
         </dependency>
-         <dependency>
-             <groupId>org.glassfish</groupId>
-             <artifactId>javax.servlet</artifactId>
-             <version>${servlet.version}</version>
-         </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>${servlet.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
