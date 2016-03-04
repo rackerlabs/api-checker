@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.rackspace.papi.components</groupId>
     <artifactId>api-checker</artifactId>
-    <version>1.1.5-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>API Checker</name>
@@ -18,8 +18,8 @@
 
     <scm>
         <connection>scm:git:git@github.com:rackerlabs/api-checker.git</connection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <repositories>
         <repository>
@@ -47,6 +47,7 @@
         <scala.major>2</scala.major>
         <scala.minor>11</scala.minor>
         <scala.patch>7</scala.patch>
+        <scala.MajDotMin>${scala.major}.${scala.minor}</scala.MajDotMin>
         <saxon-ee.version>9.4.0.9</saxon-ee.version>
         <scala.test.version>2.2.6</scala.test.version>
         <scala.uri.version>0.4.2</scala.uri.version>
@@ -73,7 +74,7 @@
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>${scala.major}.${scala.minor}.${scala.patch}</version>
+            <version>${scala.MajDotMin}.${scala.patch}</version>
         </dependency>
         <dependency>
             <groupId>net.sf.saxon</groupId>
@@ -108,17 +109,17 @@
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.major}.${scala.minor}</artifactId>
+            <artifactId>scalatest_${scala.MajDotMin}</artifactId>
             <version>${scala.test.version}</version>
         </dependency>
         <dependency>
             <groupId>com.netaporter</groupId>
-            <artifactId>scala-uri_${scala.major}.${scala.minor}</artifactId>
+            <artifactId>scala-uri_${scala.MajDotMin}</artifactId>
             <version>${scala.uri.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
-            <artifactId>wadl-tools_${scala.major}.${scala.minor}</artifactId>
+            <artifactId>wadl-tools_${scala.MajDotMin}</artifactId>
             <version>${wadl-tools.version}</version>
         </dependency>
         <dependency>
@@ -131,11 +132,11 @@
             <artifactId>commons-codec</artifactId>
             <version>${codec.version}</version>
         </dependency>
-         <dependency>
-             <groupId>org.glassfish</groupId>
-             <artifactId>javax.servlet</artifactId>
-             <version>${servlet.version}</version>
-         </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>${servlet.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
@@ -143,7 +144,7 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging-slf4j_${scala.major}.${scala.minor}</artifactId>
+            <artifactId>scala-logging-slf4j_${scala.MajDotMin}</artifactId>
             <version>${scala-logging.version}</version>
         </dependency>
         <dependency>
@@ -184,7 +185,7 @@
         </dependency>
         <dependency>
             <groupId>com.rackspace.cloud.api</groupId>
-            <artifactId>wadl-tools_${scala.major}.${scala.minor}</artifactId>
+            <artifactId>wadl-tools_${scala.MajDotMin}</artifactId>
             <version>${wadl-tools.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
