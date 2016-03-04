@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>org.clapper</groupId>
-            <artifactId>argot_${scala.major}.${scala.minor}</artifactId>
+            <artifactId>argot_${scala.MajDotMin}</artifactId>
             <version>${argot.version}</version>
         </dependency>
         <dependency>
