@@ -85,7 +85,7 @@ trait LogAssertions {
       case None =>
         /* No Log == Empty Log so ignore...*/
       case Some(q) =>
-        if (!q.isEmpty) {
+        if (q.nonEmpty) {
           throw new TestFailedException(Some(s"Log $logName is not empty"), None, 4)
         }
     }

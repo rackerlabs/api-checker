@@ -60,7 +60,7 @@ class Header(id : String, label : String, val name : String, val value : Regex,
     //  all of the headers with the name match the value regex, then
     //  return a valid context otherwise set an error and return None
     //
-    if (!headers.isEmpty && headers.filterNot(v => v match { case value() => true ; case _ => false } ).isEmpty) {
+    if (headers.nonEmpty && headers.filterNot(v => v match { case value() => true ; case _ => false } ).isEmpty) {
       captureHeader match {
          case None => Some(context)
          case Some(h) => Some(context.copy(requestHeaders = context.requestHeaders.addHeaders(h, headers)))

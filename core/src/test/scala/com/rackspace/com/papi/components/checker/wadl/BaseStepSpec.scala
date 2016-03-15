@@ -73,12 +73,12 @@ class BaseStepSpec extends BaseWADLSpec {
   def XPath(m : String) : (Array[Step]) => Array[Step] = withXPath(_, m)
 
   def assert(s : Step, step_funs : ((Array[Step]) => Array[Step])*) : Unit = {
-    if (step_funs.length == 0) throw new TestFailedException("Path assertion should contain at least one step!",4)
+    if (step_funs.isEmpty) throw new TestFailedException("Path assertion should contain at least one step!",4)
 
     var next : Array[Step] = Array(s)
     for (a <- 0 to step_funs.length - 1) {
       val result : Array[Step] = step_funs(a)(next)
-      if (result.length == 0) {
+      if (result.isEmpty) {
         throw new TestFailedException("Could not complete path",4)
       }
       var list : LinkedList[Step] = new LinkedList[Step]

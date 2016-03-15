@@ -317,10 +317,10 @@ class BaseCheckerSpec extends BaseWADLSpec {
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {
 
-    if (step_funs.length == 0) throw new TestFailedException("Path assertion should contain at least one step!",4)
+    if (step_funs.isEmpty) throw new TestFailedException("Path assertion should contain at least one step!",4)
 
     def followPath(step : NodeSeq, nextSteps : Seq[NodeSeq]) : Boolean = {
-      if (nextSteps.length == 0) return true
+      if (nextSteps.isEmpty) return true
       val next = nextSteps(0)
       step.foreach(n =>
         (n \ "@next").text.split(" ").foreach(m => next.foreach (o =>
@@ -335,7 +335,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
     //
     //  Check to make sure all the steps are available...
     //
-    steps.foreach (s => if (s.length == 0) throw new TestFailedException("A step in the path could not be found", 4))
+    steps.foreach (s => if (s.isEmpty) throw new TestFailedException("A step in the path could not be found", 4))
 
     //
     //  Try to follow the path
