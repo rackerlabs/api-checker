@@ -22,14 +22,14 @@ import com.saxonica.jaxp.SchemaReference
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-import scala.collection.mutable.{HashMap, LinkedList, Map}
+import scala.collection.mutable.{HashMap, MutableList, Map}
 
 object ValidatorPool extends Instrumented {
   private val validatorPools : Map[Schema, SoftReferenceObjectPool[Validator]] = new HashMap[Schema, SoftReferenceObjectPool[Validator]]
   private def pool(schema : Schema) : SoftReferenceObjectPool[Validator] = validatorPools.getOrElseUpdate(schema, addPool(schema))
 
-  private val activeGauges = new LinkedList[Gauge[Int]]
-  private val idleGauges = new LinkedList[Gauge[Int]]
+  private val activeGauges = new MutableList[Gauge[Int]]
+  private val idleGauges = new MutableList[Gauge[Int]]
 
   private def addPool(schema : Schema) : SoftReferenceObjectPool[Validator] = {
     val pool = new SoftReferenceObjectPool[Validator](new ValidatorFactory(schema))

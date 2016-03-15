@@ -4,6 +4,8 @@ import com.codahale.metrics.{Gauge, Metric, MetricFilter, MetricRegistry}
 import com.rackspace.com.papi.components.checker.Validator
 import com.typesafe.scalalogging.slf4j.LazyLogging
 
+import scala.language.existentials
+
 /**
   * @see nl.grons.metrics.scala.InstrumentedBuilder
   */

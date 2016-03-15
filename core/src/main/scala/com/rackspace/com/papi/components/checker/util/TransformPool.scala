@@ -23,12 +23,12 @@ import net.sf.saxon.serialize.MessageWarner
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-import scala.collection.mutable.{HashMap, LinkedList, Map}
+import scala.collection.mutable.{HashMap, MutableList, Map}
 
 object TransformPool extends Instrumented {
   private val transformPools : Map[Templates, SoftReferenceObjectPool[Transformer]] = new HashMap[Templates, SoftReferenceObjectPool[Transformer]]
-  private val activeGauges = new LinkedList[Gauge[Int]]
-  private val idleGauges = new LinkedList[Gauge[Int]]
+  private val activeGauges = new MutableList[Gauge[Int]]
+  private val idleGauges = new MutableList[Gauge[Int]]
   private def pool (templates : Templates) : SoftReferenceObjectPool[Transformer] = transformPools.getOrElseUpdate (templates, addPool(templates))
 
   private def addPool(templates : Templates) : SoftReferenceObjectPool[Transformer] = {

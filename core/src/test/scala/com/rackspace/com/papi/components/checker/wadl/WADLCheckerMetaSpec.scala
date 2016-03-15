@@ -485,7 +485,7 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
       val conf = clearConfig(new Config)
       val conf_ref = universe.runtimeMirror(conf.getClass.getClassLoader).reflect(conf)
       val cType = universe.typeOf[Config]
-      conf_ref.reflectField(cType.member(universe.newTermName(name)).asTerm).set(value)
+      conf_ref.reflectField(cType.member(universe.TermName(name)).asTerm).set(value)
       conf
     }
 

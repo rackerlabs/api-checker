@@ -23,7 +23,7 @@ import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step}
 import com.rackspace.com.papi.components.checker.step.startend._
 import org.scalatest.exceptions.TestFailedException
 
-import scala.collection.mutable.LinkedList
+import scala.collection.mutable.MutableList
 
 class BaseStepSpec extends BaseWADLSpec {
   var builder = new StepBuilder(wadl)
@@ -81,7 +81,7 @@ class BaseStepSpec extends BaseWADLSpec {
       if (result.isEmpty) {
         throw new TestFailedException("Could not complete path",4)
       }
-      var list : LinkedList[Step] = new LinkedList[Step]
+      var list : MutableList[Step] = new MutableList[Step]
       result.filter(f => f.isInstanceOf[ConnectedStep]).foreach(r => list ++= r.asInstanceOf[ConnectedStep].next)
       next = list.toArray
     }

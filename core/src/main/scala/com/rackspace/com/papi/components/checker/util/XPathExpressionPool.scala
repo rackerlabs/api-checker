@@ -22,7 +22,7 @@ import com.codahale.metrics.{Gauge, MetricRegistry}
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-import scala.collection.mutable.{HashMap, LinkedList, Map}
+import scala.collection.mutable.{HashMap, MutableList, Map}
 
 object XPathExpressionPool extends Instrumented {
   private val xpathExpressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext), 
@@ -30,8 +30,8 @@ object XPathExpressionPool extends Instrumented {
   private val xpath2Expressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext),
                                                                                                                           SoftReferenceObjectPool[XPathExpression]]
 
-  private val activeGauges = new LinkedList[Gauge[Int]]
-  private val idleGauges = new LinkedList[Gauge[Int]]
+  private val activeGauges = new MutableList[Gauge[Int]]
+  private val idleGauges = new MutableList[Gauge[Int]]
 
   private def addXPathPool(expression : String, nc : NamespaceContext, version : Int) : SoftReferenceObjectPool[XPathExpression] = {
     val pool = new SoftReferenceObjectPool[XPathExpression](version match { case 1 => new XPathExpressionFactory(expression, nc)
