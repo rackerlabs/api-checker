@@ -417,7 +417,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
 
     xsd.checkStep (req1, response, chain, 0)
 
-    val updatedRequest = XML.load(req1.getInputStream())
+    val updatedRequest = XML.load(req1.getInputStream)
     assert ((updatedRequest \ "stepType").text == "START")
     assert ((updatedRequest \ "even").text == "50")
   }
@@ -430,7 +430,7 @@ class StepSuiteSaxonEE extends BaseStepSuiteSaxonEE {
 
     xsd.checkStep (req1, response, chain, 0)
 
-    val updatedRequest = XML.load(req1.getInputStream())
+    val updatedRequest = XML.load(req1.getInputStream)
     assert ((updatedRequest \ "@stepType").text == "START")
     assert ((updatedRequest \ "@even").text == "50")
   }

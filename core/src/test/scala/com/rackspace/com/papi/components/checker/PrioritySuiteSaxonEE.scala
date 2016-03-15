@@ -25,10 +25,9 @@ import scala.xml._
 @RunWith(classOf[JUnitRunner])
 class PrioritySuiteSaxonEE extends FunSuite {
 
-  val priorityMapAsserter = new SchemaAsserter(getClass().getClassLoader().getResource("xsd/priority-map.xsd"), true)
+  val priorityMapAsserter = new SchemaAsserter(getClass.getClassLoader.getResource("xsd/priority-map.xsd"), true)
 
   test("Make sure priorites validate...") {
-    priorityMapAsserter.assert(XML.load(getClass().getClassLoader().getResource("xsl/priority-map.xml")))
+    priorityMapAsserter.assert(XML.load(getClass.getClassLoader.getResource("xsl/priority-map.xml")))
   }
-
 }

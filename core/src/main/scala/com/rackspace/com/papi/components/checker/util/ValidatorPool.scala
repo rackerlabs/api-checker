@@ -67,7 +67,7 @@ object ValidatorPool extends Instrumented {
   def numActive(schema : Schema) : Int = {
     var ret = 0
     if (!schema.isInstanceOf[SchemaReference]) {
-      ret = pool(schema).getNumActive()
+      ret = pool(schema).getNumActive
     }
     ret
   }
@@ -75,7 +75,7 @@ object ValidatorPool extends Instrumented {
   def numIdle(schema : Schema) : Int = {
     var ret = 0
     if (!schema.isInstanceOf[SchemaReference]) {
-      ret = pool(schema).getNumIdle()
+      ret = pool(schema).getNumIdle
     }
     ret
   }

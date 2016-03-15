@@ -599,12 +599,12 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     val wfx = new WellFormedXML("WFXML", "WFXML", 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
     wfx.checkStep (req1, response, chain, 0)
-    val xml1 = XML.load(req1.getInputStream())
+    val xml1 = XML.load(req1.getInputStream)
     assert (xml1 != null)
 
     val req2 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"><more/></validXML>)
     wfx.checkStep (req2, response, chain, 1)
-    val xml2 = XML.load(req2.getInputStream())
+    val xml2 = XML.load(req2.getInputStream)
     assert (xml2 != null)
     assert ((xml2 \ "more") != null)
   }
@@ -728,8 +728,8 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
     try {
       jparser = ObjectMapperPool.borrowParser
-      val j1 = jparser.readValue(req1.getInputStream(), classOf[java.util.Map[Object, Object]])
-      val j2 = jparser.readValue(req2.getInputStream(), classOf[java.util.Map[Object, Object]])
+      val j1 = jparser.readValue(req1.getInputStream, classOf[java.util.Map[Object, Object]])
+      val j2 = jparser.readValue(req2.getInputStream, classOf[java.util.Map[Object, Object]])
 
       assert (j1 != null)
       assert (j2 != null)
@@ -1015,7 +1015,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
     xsd.checkStep (req1, response, chain, 0)
 
-    val updatedRequest = XML.load(req1.getInputStream())
+    val updatedRequest = XML.load(req1.getInputStream)
     assert ((updatedRequest \ "stepType").text == "START")
     assert ((updatedRequest \ "even").text == "50")
   }
@@ -1028,7 +1028,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
     xsd.checkStep (req1, response, chain, 0)
 
-    val updatedRequest = XML.load(req1.getInputStream())
+    val updatedRequest = XML.load(req1.getInputStream)
     assert ((updatedRequest \ "@stepType").text == "START")
     assert ((updatedRequest \ "@even").text == "50")
   }
@@ -1721,7 +1721,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
                       <child attribute="value"/>
                       </foot>, true)
     xsl.checkStep (req, response, chain, 0)
-    val transXML = XML.load(req.getInputStream())
+    val transXML = XML.load(req.getInputStream)
     assert (transXML.label == "success")
     assert (transXML.namespace == "http://www.rackspace.com/repose/wadl/checker/step/test")
     assert ((transXML \ "@didIt").text == "true")
@@ -1734,7 +1734,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
                       <child attribute="value"/>
                       </foot>, true)
     xsl.checkStep (req, response, chain, 0)
-    val transXML = XML.load(req.getInputStream())
+    val transXML = XML.load(req.getInputStream)
     assert (transXML.label == "success")
     assert (transXML.namespace == "http://www.rackspace.com/repose/wadl/checker/step/test")
     assert ((transXML \ "@didIt").text == "true")
@@ -4798,11 +4798,11 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     jsonSchema.checkStep (req1, response, chain, 0)
     assert (req1.contentError != null)
     assert (req1.contentError.getCause.isInstanceOf[ProcessingException])
-    assert (req1.contentError.getMessage().contains("/age"))
+    assert (req1.contentError.getMessage.contains("/age"))
     jsonSchema.checkStep (req2, response, chain, 1)
     assert (req2.contentError != null)
     assert (req2.contentError.getCause.isInstanceOf[ProcessingException])
-    assert (req2.contentError.getMessage().contains("/firstName"))
+    assert (req2.contentError.getMessage.contains("/firstName"))
   }
 
   test ("In a JSON Schema test, if the content contains invalid JSON, that references an invalid attribute, the error message must be concise") {

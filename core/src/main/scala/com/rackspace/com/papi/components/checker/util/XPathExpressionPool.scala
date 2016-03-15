@@ -62,15 +62,15 @@ object XPathExpressionPool extends Instrumented {
 
   def numActive (expression : String, nc : NamespaceContext, version : Int) : Int = {
     version match {
-      case 1 => xpathExpressions((expression, nc)).getNumActive()
-      case 2 => xpath2Expressions((expression,nc)).getNumActive()
+      case 1 => xpathExpressions((expression, nc)).getNumActive
+      case 2 => xpath2Expressions((expression,nc)).getNumActive
     }
   }
 
   def numIdle (expression : String, nc : NamespaceContext, version : Int) : Int = {
     version match {
-      case 1 => xpathExpressions((expression, nc)).getNumIdle()
-      case 2 => xpath2Expressions((expression, nc)).getNumIdle()
+      case 1 => xpathExpressions((expression, nc)).getNumIdle
+      case 2 => xpath2Expressions((expression, nc)).getNumIdle
     }
   }
 }

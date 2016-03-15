@@ -36,7 +36,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
   stdConfig.removeDups = false
   dupConfig.removeDups = true
 
-  private val pathNodesTemplates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResourceAsStream("/xsl/path-nodes.xsl")))
+  private val pathNodesTemplates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResourceAsStream("/xsl/path-nodes.xsl")))
 
   def allStepsFromStep (checker : NodeSeq, id : String, max : Int = 0) : NodeSeq = {
     val bytesOut = new ByteArrayOutputStream()
@@ -46,7 +46,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
       transformer.setParameter("max",max)
     }
     transformer.transform (new StreamSource(checker), new StreamResult(bytesOut))
-    XML.loadString(bytesOut.toString())
+    XML.loadString(bytesOut.toString)
   }
 
   def allStepsFromStep (checker : NodeSeq, step_fun : (NodeSeq) => NodeSeq, max : Int) : NodeSeq = {

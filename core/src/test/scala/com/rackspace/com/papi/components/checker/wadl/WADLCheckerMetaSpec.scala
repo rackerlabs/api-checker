@@ -557,7 +557,7 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
         scenario ("The checker for "+fw._1+" contains Metadata and "+t._1) {
           val checkerOutBytes = new ByteArrayOutputStream()
           builder.build (new StreamSource(new File(fw._2)), new StreamResult(checkerOutBytes), t._2)
-          val checker = XML.loadString(checkerOutBytes.toString())
+          val checker = XML.loadString(checkerOutBytes.toString)
           for (dep <- fw._2 +: fw._3) {
             assert(checker, s"exactly-one(/chk:checker/chk:meta/chk:created-from[contains(.,'$dep')])")
           }

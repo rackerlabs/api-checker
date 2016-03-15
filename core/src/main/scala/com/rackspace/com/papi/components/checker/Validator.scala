@@ -107,7 +107,7 @@ class Validator private (private val _name : String, val startStep : Step, val c
   }
 
 
-  private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
+  private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer
   private val objectName = new ObjectName(s"$metricBaseName:type=Validator,scope=$name,name=checker")
 
   private val TIMER_NAME       = "validation-timer"
@@ -199,7 +199,7 @@ class Validator private (private val _name : String, val startStep : Step, val c
     }
   }
 
-  def destroy : Unit = {
+  def destroy() : Unit = {
     resultHandler.destroy
 
     if (checker.isDefined) {

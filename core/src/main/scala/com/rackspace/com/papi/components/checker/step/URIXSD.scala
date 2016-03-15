@@ -41,7 +41,7 @@ class URIXSD(id : String, label : String, val simpleType : QName, val schema : S
          val v = req.URISegment(context.uriLevel)
          val error = xsd.validate(v)
          if (error.isDefined) {
-           result = Some(new MismatchResult(error.get.getMessage(), context, id))
+           result = Some(new MismatchResult(error.get.getMessage, context, id))
          } else {
            val newContext = captureHeader match {
              case None => context.copy(uriLevel = context.uriLevel + 1)
@@ -65,4 +65,3 @@ class URIXSD(id : String, label : String, val simpleType : QName, val schema : S
        result
      }
 }
-

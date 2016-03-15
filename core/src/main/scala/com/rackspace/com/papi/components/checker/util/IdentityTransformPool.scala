@@ -35,8 +35,8 @@ object IdentityTransformPool extends Instrumented {
 
   def borrowTransformer : Transformer = pool.borrowObject()
   def returnTransformer (transformer : Transformer) : Unit = pool.returnObject(transformer)
-  def numActive : Int = pool.getNumActive()
-  def numIdle : Int = pool.getNumIdle()
+  def numActive : Int = pool.getNumActive
+  def numIdle : Int = pool.getNumIdle
 }
 
 private class IdentityTransformerFactory(private val tf : TransformerFactory) extends PoolableObjectFactory[Transformer] {

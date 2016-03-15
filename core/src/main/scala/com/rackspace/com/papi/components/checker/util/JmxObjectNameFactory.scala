@@ -43,7 +43,7 @@ class JmxObjectNameFactory extends ObjectNameFactory with LazyLogging {
       nameBuilder.append("name=")
       nameBuilder.append(nameVal)
 
-      val objectName: ObjectName = new ObjectName(nameBuilder.toString())
+      val objectName: ObjectName = new ObjectName(nameBuilder.toString)
       if (objectName.isPattern) {
         new ObjectName(domain, "name", ObjectName.quote(name))
       } else {

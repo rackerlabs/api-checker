@@ -141,7 +141,7 @@ class WADLCheckerPreProcSpec extends BaseCheckerSpec {
         When("The WADL is transalted")
         val checker = builder.build(testWADL, TestConfig(false, false, false, false, false, 1, false, false, false))
         Then("There should not be any well-form checks")
-        assert(checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 0");
+        assert(checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 0")
       }
 
       scenario("The testWADL is processed with preporc extension enabled") {
@@ -149,7 +149,7 @@ class WADLCheckerPreProcSpec extends BaseCheckerSpec {
         When("The WADL is transalted")
         val checker = builder.build(testWADL, TestConfig(false, false, false, false, false, 1, false, false, true))
         Then("There should not be any well-form checks")
-        assert(checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 0");
+        assert(checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 0")
       }
 
       scenario("The testPreProcWADL is processed with preporc extension enabled") {

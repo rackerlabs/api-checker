@@ -32,7 +32,7 @@ trait LogAssertions {
   private val logEntries = new HashMap[LogName, Log]() with SynchronizedMap[LogName, Log]
 
   def log(logName: LogName, level: Level)(f : => Any) : Unit = {
-    val loggerConfig = LogManager.getContext(false).asInstanceOf[LoggerContext].getConfiguration().getLoggerConfig("root")
+    val loggerConfig = LogManager.getContext(false).asInstanceOf[LoggerContext].getConfiguration.getLoggerConfig("root")
     val appenderName = "LogAssertionAppender_"+UUID.randomUUID.toString
 
     loggerConfig.addAppender(new AbstractAppender(appenderName, null, null) {
@@ -74,7 +74,7 @@ trait LogAssertions {
    */
   def assert(logName: LogName, assertMessage : String) : Unit = {
     assert(logName, s"No log message found containing '$assertMessage'",
-           _.getMessage().getFormattedMessage().contains(assertMessage))
+           _.getMessage.getFormattedMessage.contains(assertMessage))
   }
 
   /**
@@ -92,17 +92,17 @@ trait LogAssertions {
   }
 
   def printLog(logName: LogName) : Unit = {
-    logEntries.get(logName).foreach(_.foreach(le => println(le.getMessage().getFormattedMessage())))
+    logEntries.get(logName).foreach(_.foreach(le => println(le.getMessage.getFormattedMessage)))
   }
 
   def clearLog(logName : LogName) : Unit = {
     logEntries.get(logName) match {
-      case Some(q) => q.clear
+      case Some(q) => q.clear()
       case None => /* Ignore */
     }
   }
 
-  def clearAllLogs : Unit = {
+  def clearAllLogs() : Unit = {
     logEntries.clear
   }
 }

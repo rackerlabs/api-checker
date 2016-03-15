@@ -71,7 +71,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
         }
       }
     }
-    return resultBuffer.toArray
+    resultBuffer.toArray
   }
 
   //
@@ -99,6 +99,6 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
       result = Some( new MismatchResult( mismatchMessage, context, id) )
     }
 
-    return result
+    result
   }
 }

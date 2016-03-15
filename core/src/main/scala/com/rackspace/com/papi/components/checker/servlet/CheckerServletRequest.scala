@@ -52,7 +52,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   val parsedRequestURI : (Option[URI], Option[URISyntaxException]) = {
     try {
-      (Some(new URI(request.getRequestURI())), None)
+      (Some(new URI(request.getRequestURI)), None)
     } catch {
       case u : URISyntaxException => (None, Some(u))
     }
@@ -61,10 +61,10 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   val URISegment : Array[String] = parsedRequestURI match {
     case (Some(u), None) => u.getPath.split("/").filterNot(e => e == "")
     case (None, Some(e)) => Array[String]()
-    case (Some(u), Some(e)) => val ru = request.getRequestURI()
+    case (Some(u), Some(e)) => val ru = request.getRequestURI
                                logger.warn (s"Very strange, was simultaneously able to parse the request uri: '{$ru}' and also got a syntax error. Assuming a bad URI.")
                                Array[String]()
-    case (None, None) => val ru = request.getRequestURI()
+    case (None, None) => val ru = request.getRequestURI
                          val e = new URISyntaxException(ru, s"Unable to parse URI, don't know why???")
                          logger.error ("Very strange, unable to parse the URI, but didn't recieve a URISyntaxException, so I'm generating one anyway", e)
                          Array[String]()
@@ -147,10 +147,10 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
 
   override def getRequestURI : String = parsedRequestURI match {
-    case (Some(u), _) => request.getRequestURI()
+    case (Some(u), _) => request.getRequestURI
     case _  => // Try to encode the URI if there was a syntax error.
                // Handlers may try to parse it.
-               uriEncoder.encode(super.getRequestURI(), DEFAULT_URI_CHARSET)
+               uriEncoder.encode(super.getRequestURI, DEFAULT_URI_CHARSET)
   }
 
   override def getInputStream : ServletInputStream = {
@@ -178,15 +178,15 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
         }
       }
     } else {
-      super.getInputStream()
+      super.getInputStream
     }
   }
 
   override def getReader : BufferedReader = {
     if (parsedXML != null) {
-      new BufferedReader(new InputStreamReader (getInputStream(), parsedXML.getInputEncoding()))
+      new BufferedReader(new InputStreamReader (getInputStream, parsedXML.getInputEncoding))
     } else if (parsedJSON != null) {
-      new BufferedReader(new InputStreamReader (getInputStream(), "UTF-8"))
+      new BufferedReader(new InputStreamReader (getInputStream, "UTF-8"))
     }else {
       super.getReader
     }

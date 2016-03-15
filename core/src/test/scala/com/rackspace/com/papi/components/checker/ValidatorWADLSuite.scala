@@ -223,22 +223,22 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a/<randomLong>/c should succeed on validator_REG") {
-    val rl = new Random(new Date().getTime()).nextLong()
+    val rl = new Random(new Date().getTime).nextLong()
     validator_REG.validate(request("GET","/a/"+rl+"/c"),response,chain)
   }
 
   test ("GET on /a/<bigInt>/c should succeed on validator_REG") {
-    val bi = new BigInteger(1024, new Random(new Date().getTime()).self)
+    val bi = new BigInteger(1024, new Random(new Date().getTime).self)
     validator_REG.validate(request("GET","/a/"+bi+"/c"),response,chain)
   }
 
   test ("GET on /a/<randomDouble>/c should succeed validator_REG") {
-    val rf = new Random(new Date().getTime()).nextDouble()
+    val rf = new Random(new Date().getTime).nextDouble()
     validator_REG.validate(request("GET","/a/"+rf+"/c"),response,chain)
   }
 
   test ("GET on /a/<uuid>/c should succeed validator_REG") {
-    val uuid = UUID.randomUUID().toString()
+    val uuid = UUID.randomUUID().toString
     validator_REG.validate(request("GET","/a/"+uuid+"/c"),response,chain)
   }
 
@@ -317,22 +317,22 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a/<randomLong>/c should succeed on validator_INT") {
-    val rl = new Random(new Date().getTime()).nextLong()
+    val rl = new Random(new Date().getTime).nextLong()
     validator_INT.validate(request("GET","/a/"+rl+"/c"),response,chain)
   }
 
   test ("GET on /a/<bigInt>/c should succeed on validator_INT") {
-    val bi = new BigInteger(1024, new Random(new Date().getTime()).self)
+    val bi = new BigInteger(1024, new Random(new Date().getTime).self)
     validator_INT.validate(request("GET","/a/"+bi+"/c"),response,chain)
   }
 
   test ("GET on /a/<randomDouble>/c should fail validator_INT") {
-    val rf = new Random(new Date().getTime()).nextDouble()
+    val rf = new Random(new Date().getTime).nextDouble()
     assertResultFailed(validator_INT.validate(request("GET","/a/"+rf+"/c"),response,chain), 404)
   }
 
   test ("GET on /a/<uuid>/c should fail validator_INT") {
-    val uuid = UUID.randomUUID().toString()
+    val uuid = UUID.randomUUID().toString
     assertResultFailed(validator_INT.validate(request("GET","/a/"+uuid+"/c"),response,chain), 404)
   }
 

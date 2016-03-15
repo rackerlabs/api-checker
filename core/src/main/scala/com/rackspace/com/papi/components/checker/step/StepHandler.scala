@@ -176,19 +176,19 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   //
   private[this] var _schema : Schema = null
   private[this] def schema(qn : QName) : Schema = {
-    if ((_schema == null) && (qn.getNamespaceURI() != "http://www.w3.org/2001/XMLSchema")) {
+    if ((_schema == null) && (qn.getNamespaceURI != "http://www.w3.org/2001/XMLSchema")) {
       throw new SAXParseException("No schema available.", locator)
     } else if (_schema == null) {
-      schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/blank.xsd")))
+      schemaFactory.newSchema(new StreamSource(getClass.getResourceAsStream("/xsd/blank.xsd")))
     } else {
       _schema
     }
   }
   private[this] def schema (qn : Array[QName]) : Schema = {
-    if ((_schema == null) && (qn.exists(q => q.getNamespaceURI() != "http://www.w3.org/2001/XMLSchema"))) {
+    if ((_schema == null) && (qn.exists(q => q.getNamespaceURI != "http://www.w3.org/2001/XMLSchema"))) {
       throw new SAXParseException("No schema available.", locator)
     } else if (_schema == null) {
-      schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/blank.xsd")))
+      schemaFactory.newSchema(new StreamSource(getClass.getResourceAsStream("/xsd/blank.xsd")))
     } else {
       _schema
     }
@@ -266,12 +266,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   }
 
   override def endDocument = {
-    next.foreach { case (id, nexts) => {
+    next.foreach { case (id, nexts) =>
       val step = steps(id).asInstanceOf[ConnectedStep]
       for ( i <- 0 to (nexts.length - 1)) {
         step.next(i) = steps(nexts(i))
       }
-    }}
+    }
     next.clear
     if (contentHandler != null) {
       contentHandler.endDocument()
@@ -432,7 +432,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       currentSchemaHandler.endDocument()
       currentSchemaHandler = null
 
-      grammarSources += new DOMSource(currentSchemaResult.getNode())
+      grammarSources += new DOMSource(currentSchemaResult.getNode)
 
       currentSchemaResult = null
     }
@@ -663,7 +663,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   private[this] def closeXSLTStep : Unit = {
     try {
       val templates : Templates = {
-        val xslDoc = currentXSLResult.getNode().asInstanceOf[Document]
+        val xslDoc = currentXSLResult.getNode.asInstanceOf[Document]
         lastXSLVersion match {
           case "1" => transformFactoryXSL1.newTemplates(new DOMSource(xslDoc))
           case "2" => transformFactoryXSL2.newTemplates(new DOMSource(xslDoc))

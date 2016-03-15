@@ -40,8 +40,8 @@ class BaseStepSuite extends BaseValidatorSuite {
   val xsl1Factory = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", this.getClass.getClassLoader)
   val xsl2Factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
 
-  val xsl1Templates = xsl1Factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/testXSL1.xsl")))
-  val xsl2Templates = xsl2Factory.newTemplates (new StreamSource(getClass().getResourceAsStream("/xsl/testXSL2.xsl")))
+  val xsl1Templates = xsl1Factory.newTemplates (new StreamSource(getClass.getResourceAsStream("/xsl/testXSL1.xsl")))
+  val xsl2Templates = xsl2Factory.newTemplates (new StreamSource(getClass.getResourceAsStream("/xsl/testXSL2.xsl")))
 
 
   //
@@ -52,7 +52,7 @@ class BaseStepSuite extends BaseValidatorSuite {
   //
   //  Test schema
   //
-  val testSchema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/test-urlxsd.xsd")))
+  val testSchema = schemaFactory.newSchema(new StreamSource(getClass.getResourceAsStream("/xsd/test-urlxsd.xsd")))
 
   //
   // Test json schema
@@ -61,7 +61,7 @@ class BaseStepSuite extends BaseValidatorSuite {
     var om : ObjectMapper = null
     try {
       om = ObjectMapperPool.borrowParser
-      val jsonGrammar = om.readValue(getClass().getResource("/jsonSchema/test.json"), classOf[JsonNode])
+      val jsonGrammar = om.readValue(getClass.getResource("/jsonSchema/test.json"), classOf[JsonNode])
       jsonSchemaFactory.getJsonSchema(jsonGrammar)
     } finally {
       if (om != null) ObjectMapperPool.returnParser(om)

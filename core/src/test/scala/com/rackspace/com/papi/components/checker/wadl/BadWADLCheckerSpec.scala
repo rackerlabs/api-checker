@@ -49,8 +49,8 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
         builder.build (inWADL, stdConfig)
       }
       Then("A WADL Exception should be thrown with the words 'missing' and 'does not seem to exist'.")
-      assert(thrown.getMessage().contains("missing"))
-      assert(thrown.getMessage().contains("does not seem to exist"))
+      assert(thrown.getMessage.contains("missing"))
+      assert(thrown.getMessage.contains("does not seem to exist"))
     }
 
     scenario ("The WADL contains an XSD which is missing an import") {
@@ -91,10 +91,10 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
         builder.build (inWADL, stdConfig)
       }
       Then("Then a WADLException should be thrown with the words 'transform.xsd' and 'does not seem to exist'.")
-      assert(thrown.getMessage().contains("transform.xsd"))
-      assert(thrown.getMessage().contains("does not seem to exist"))
+      assert(thrown.getMessage.contains("transform.xsd"))
+      assert(thrown.getMessage.contains("does not seem to exist"))
       And("The exception should point to the file in error")
-      assert(thrown.getMessage().contains("test://app/xsd/simple.xsd"))
+      assert(thrown.getMessage.contains("test://app/xsd/simple.xsd"))
     }
 
     scenario("A WADL contians extensions before plain params") {
@@ -162,7 +162,7 @@ class BadWADLCheckerSpec extends BaseCheckerSpec {
         builder.build (inWADL, stdConfig)
       }
       Then("An expetion should be thrown referencing the misplaced param")
-      assert(thrown.getMessage().contains("param"))
+      assert(thrown.getMessage.contains("param"))
     }
   }
 }

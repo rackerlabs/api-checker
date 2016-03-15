@@ -42,7 +42,7 @@ class BadWADLValidatorSuite extends BaseValidatorSuite {
            </resources>
         </application>, assertConfig)
     }
-    assert(thrown.getMessage().contains("fooMethod"))
-    assert(thrown.getMessage().contains("does not seem to exist"))
+    assert(thrown.getMessage.contains("fooMethod"))
+    assert(thrown.getMessage.contains("does not seem to exist"))
   }
 }

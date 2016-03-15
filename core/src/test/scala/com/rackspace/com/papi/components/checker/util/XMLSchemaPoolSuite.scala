@@ -27,7 +27,7 @@ class XMLSchemaPoolSuite extends FunSuite {
   System.setProperty ("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory")
   private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
 
-  val testSchema = schemaFactory.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/test-urlxsd.xsd")))
+  val testSchema = schemaFactory.newSchema(new StreamSource(getClass.getResourceAsStream("/xsd/test-urlxsd.xsd")))
 
   test ("The validator pool should successfully create a validator") {
     var validator : Validator = null

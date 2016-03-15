@@ -41,7 +41,7 @@ object ValidatorHandlerPool extends Instrumented {
   }
 
   //
-  //  Unfortunetly, SAXON schema handlers cannot be pooled.  We detect
+  //  Unfortunately, SAXON schema handlers cannot be pooled.  We detect
   //  this and always create a new handler in this case.
   //
 
@@ -65,7 +65,7 @@ object ValidatorHandlerPool extends Instrumented {
   def numActive(schema : Schema) : Int = {
     var ret = 0
     if (!schema.isInstanceOf[SchemaReference]) {
-      ret = pool(schema).getNumActive()
+      ret = pool(schema).getNumActive
     }
     ret
   }
@@ -73,7 +73,7 @@ object ValidatorHandlerPool extends Instrumented {
   def numIdle(schema : Schema) : Int = {
     var ret = 0
     if (!schema.isInstanceOf[SchemaReference]) {
-      ret = pool(schema).getNumIdle()
+      ret = pool(schema).getNumIdle
     }
     ret
   }

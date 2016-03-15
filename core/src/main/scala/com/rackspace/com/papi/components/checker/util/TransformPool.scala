@@ -42,8 +42,8 @@ object TransformPool extends Instrumented {
 
   def borrowTransformer (templates : Templates) = pool(templates).borrowObject
   def returnTransformer (templates : Templates, transformer : Transformer) = pool(templates).returnObject(transformer)
-  def numActive (templates : Templates) : Int  = pool(templates).getNumActive()
-  def numIdle (templates : Templates) : Int = pool(templates).getNumIdle()
+  def numActive (templates : Templates) : Int  = pool(templates).getNumActive
+  def numIdle (templates : Templates) : Int = pool(templates).getNumIdle
 }
 
 private class XSLTransformerFactory(private val templates : Templates) extends PoolableObjectFactory[Transformer] {

@@ -30,8 +30,8 @@ object XMLParserPool extends Instrumented {
 
   def borrowParser : DocumentBuilder = pool.borrowObject()
   def returnParser (builder : DocumentBuilder) : Unit = pool.returnObject(builder)
-  def numActive : Int = pool.getNumActive()
-  def numIdle : Int = pool.getNumIdle()
+  def numActive : Int = pool.getNumActive
+  def numIdle : Int = pool.getNumIdle
 }
 
 private class XMLParserFactory extends PoolableObjectFactory[DocumentBuilder] {

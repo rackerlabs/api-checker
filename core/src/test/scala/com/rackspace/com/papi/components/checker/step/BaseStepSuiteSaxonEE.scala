@@ -26,5 +26,5 @@ class BaseStepSuiteSaxonEE extends BaseStepSuite {
   //
   schemaFactorySaxon.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
 
-  val testSchemaSaxon = schemaFactorySaxon.newSchema(new StreamSource(getClass().getResourceAsStream("/xsd/test-urlxsd.xsd")))
+  val testSchemaSaxon = schemaFactorySaxon.newSchema(new StreamSource(getClass.getResourceAsStream("/xsd/test-urlxsd.xsd")))
 }
