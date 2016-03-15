@@ -31,7 +31,7 @@ class URI(id : String, label : String, val uri : Regex, val captureHeader : Opti
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     var ret : Option[StepContext] = None
-    if (context.uriLevel < req.URISegment.size) {
+    if (context.uriLevel < req.URISegment.length) {
       val v = req.URISegment(context.uriLevel)
       v match {
         case uri() => captureHeader match {

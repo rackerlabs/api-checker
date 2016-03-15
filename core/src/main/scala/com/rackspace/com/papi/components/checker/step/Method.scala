@@ -27,7 +27,7 @@ class Method(id : String, label : String, val method : Regex, next : Array[Step]
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     req.getMethod match {
-      case method() if context.uriLevel >= req.URISegment.size => Some(context)
+      case method() if context.uriLevel >= req.URISegment.length => Some(context)
       case _ => None
     }
   }

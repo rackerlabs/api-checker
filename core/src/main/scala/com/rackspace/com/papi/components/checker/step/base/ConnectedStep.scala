@@ -88,7 +88,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
     if (nextContext.isDefined) {
       val results : Array[Result] =
           nextStep (req, resp, chain, nextContext.get.handler.map{ handler => handler.inStep(this, req, resp, nextContext.get) }.getOrElse(nextContext.get))
-      if (results.size == 1) {
+      if (results.length == 1) {
         results(0).addStepId(id)
         result = Some(results(0))
       } else {

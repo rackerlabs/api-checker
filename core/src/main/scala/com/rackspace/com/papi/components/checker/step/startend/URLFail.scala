@@ -36,7 +36,7 @@ class URLFail(id : String, label : String, val priority : Long) extends Step(id,
     //
     var result : Option[URLFailResult] = None
 
-    if (context.uriLevel < req.URISegment.size) {
+    if (context.uriLevel < req.URISegment.length) {
       val path = (for (i <- 0 until context.uriLevel) yield req.URISegment(i)).foldLeft("")(_ + "/" + _)+"/{"+req.URISegment(context.uriLevel)+"}"
       val ufr = new URLFailResult("Resource not found: "+path, context, id, priority)
       result = Some(ufr)
