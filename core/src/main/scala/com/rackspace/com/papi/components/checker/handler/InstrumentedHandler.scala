@@ -53,7 +53,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
     if (checker.isDefined) {
       val elms = checker.get.getElementsByTagNameNS("http://www.rackspace.com/repose/wadl/checker",
                                                     "step")
-      for (i <- 0 to (elms.getLength-1)) {
+      for (i <- 0 until elms.getLength) {
         val elm = elms.item(i).asInstanceOf[Element]
 
         val id = elm.getAttribute("id")

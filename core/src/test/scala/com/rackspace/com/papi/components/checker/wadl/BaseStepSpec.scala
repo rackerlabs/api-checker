@@ -76,7 +76,7 @@ class BaseStepSpec extends BaseWADLSpec {
     if (step_funs.isEmpty) throw new TestFailedException("Path assertion should contain at least one step!",4)
 
     var next : Array[Step] = Array(s)
-    for (a <- 0 to step_funs.length - 1) {
+    for (a <- 0 until step_funs.length) {
       val result : Array[Step] = step_funs(a)(next)
       if (result.isEmpty) {
         throw new TestFailedException("Could not complete path",4)

@@ -60,7 +60,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
                 context : StepContext) : Array[Result] = {
 
     val resultBuffer = new ListBuffer[Result]
-    for (i <- 0 to next.length-1) {
+    for (i <- next.indices) {
       val oresult = next(i).check(req, resp, chain, context)
       if (oresult.isDefined) {
         val result = oresult.get

@@ -268,7 +268,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
   override def endDocument = {
     next.foreach { case (id, nexts) =>
       val step = steps(id).asInstanceOf[ConnectedStep]
-      for ( i <- 0 to (nexts.length - 1)) {
+      for ( i <- nexts.indices) {
         step.next(i) = steps(nexts(i))
       }
     }
