@@ -83,7 +83,7 @@ class InstrumentedHandlerSuite extends BaseValidatorSuite {
 
   val allSteps = (xmlChecker \\ "step" \\ "@id").map (n => n.text).toList
 
-  val platformMBeanServer = ManagementFactory.getPlatformMBeanServer()
+  val platformMBeanServer = ManagementFactory.getPlatformMBeanServer
 
   def getStepObjectName (stepId : String) : ObjectName = {
     new ObjectName(s"com.rackspace.com.papi.components.checker:type=handler.InstrumentedHandler,scope=MyInstTestValidator,name=$stepId")

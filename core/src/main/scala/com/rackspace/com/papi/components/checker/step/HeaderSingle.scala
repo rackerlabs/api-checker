@@ -31,7 +31,7 @@ class HeaderSingle(id : String, label : String, val name : String, val value : R
 
   override val mismatchMessage : String = {
     if (message.isEmpty) {
-      "Expecting an HTTP header "+name+" to have a value matching "+value.toString()
+      "Expecting an HTTP header "+name+" to have a value matching "+value.toString
     } else {
       message.get
     }

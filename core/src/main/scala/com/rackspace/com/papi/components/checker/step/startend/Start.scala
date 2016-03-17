@@ -39,7 +39,7 @@ class Start(id : String, label : String, next : Array[Step]) extends ConnectedSt
     // machine, so return a 400 result.
     //
     req.parsedRequestURI match {
-      case (_, Some(e)) => Some(new ErrorResult(e.getMessage(), 400, context, id, Long.MaxValue))
+      case (_, Some(e)) => Some(new ErrorResult(e.getMessage, 400, context, id, Long.MaxValue))
       case _ => super.check(req, resp, chain, context)
     }
   }

@@ -27,11 +27,11 @@ class URI(id : String, label : String, val uri : Regex, val captureHeader : Opti
   def this (id : String, label : String, uri : Regex, next : Array[Step]) =
     this(id, label, uri, None, next)
 
-  override val mismatchMessage : String = uri.toString;
+  override val mismatchMessage : String = uri.toString
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     var ret : Option[StepContext] = None
-    if (context.uriLevel < req.URISegment.size) {
+    if (context.uriLevel < req.URISegment.length) {
       val v = req.URISegment(context.uriLevel)
       v match {
         case uri() => captureHeader match {

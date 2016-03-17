@@ -61,7 +61,6 @@
         <codec.version>1.7</codec.version>
         <xalan.version>2.7.1</xalan.version>
         <metrics-core.version>3.1.2</metrics-core.version>
-        <metrics-scala.version>3.5.2_a2.3</metrics-scala.version>
         <jackson-databind.version>2.2.3</jackson-databind.version>
         <json-schema-validator.version>2.1.7</json-schema-validator.version>
         <scala-logging.version>2.1.2</scala-logging.version>

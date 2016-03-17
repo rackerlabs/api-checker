@@ -15,24 +15,26 @@
  */
 package com.rackspace.com.papi.components.checker
 
-import java.util.UUID
+import java.util.{Queue, UUID}
+import java.util.concurrent.ConcurrentLinkedQueue
 
-import org.apache.logging.log4j.{Level, LogManager}
-import org.apache.logging.log4j.core.{LogEvent, LoggerContext}
 import org.apache.logging.log4j.core.appender.AbstractAppender
+import org.apache.logging.log4j.core.{LogEvent, LoggerContext}
+import org.apache.logging.log4j.{Level, LogManager}
 import org.scalatest.exceptions.TestFailedException
 
-import scala.collection.mutable.{HashMap, Queue, SynchronizedMap, SynchronizedQueue}
+import scala.collection.JavaConversions._
+import scala.collection.concurrent.TrieMap
 
 trait LogAssertions {
 
   type LogName = String
   type Log = Queue[LogEvent]
 
-  private val logEntries = new HashMap[LogName, Log]() with SynchronizedMap[LogName, Log]
+  private val logEntries = new TrieMap[LogName, Log]()
 
   def log(logName: LogName, level: Level)(f : => Any) : Unit = {
-    val loggerConfig = LogManager.getContext(false).asInstanceOf[LoggerContext].getConfiguration().getLoggerConfig("root")
+    val loggerConfig = LogManager.getContext(false).asInstanceOf[LoggerContext].getConfiguration.getLoggerConfig("root")
     val appenderName = "LogAssertionAppender_"+UUID.randomUUID.toString
 
     loggerConfig.addAppender(new AbstractAppender(appenderName, null, null) {
@@ -40,7 +42,7 @@ trait LogAssertions {
       override def isStopped : Boolean = false
 
       override protected def append (event : LogEvent) : Unit = {
-        logEntries.getOrElseUpdate(logName, new SynchronizedQueue[LogEvent]()) += event
+        logEntries.getOrElseUpdate(logName, new ConcurrentLinkedQueue[LogEvent]()).add(event)
       }
     }, level, null)
     f
@@ -74,7 +76,7 @@ trait LogAssertions {
    */
   def assert(logName: LogName, assertMessage : String) : Unit = {
     assert(logName, s"No log message found containing '$assertMessage'",
-           _.getMessage().getFormattedMessage().contains(assertMessage))
+           _.getMessage.getFormattedMessage.contains(assertMessage))
   }
 
   /**
@@ -85,24 +87,24 @@ trait LogAssertions {
       case None =>
         /* No Log == Empty Log so ignore...*/
       case Some(q) =>
-        if (!q.isEmpty) {
+        if (q.nonEmpty) {
           throw new TestFailedException(Some(s"Log $logName is not empty"), None, 4)
         }
     }
   }
 
   def printLog(logName: LogName) : Unit = {
-    logEntries.get(logName).foreach(_.foreach(le => println(le.getMessage().getFormattedMessage())))
+    logEntries.get(logName).foreach(_.foreach(le => println(le.getMessage.getFormattedMessage)))
   }
 
   def clearLog(logName : LogName) : Unit = {
     logEntries.get(logName) match {
-      case Some(q) => q.clear
+      case Some(q) => q.clear()
       case None => /* Ignore */
     }
   }
 
-  def clearAllLogs : Unit = {
+  def clearAllLogs() : Unit = {
     logEntries.clear
   }
 }

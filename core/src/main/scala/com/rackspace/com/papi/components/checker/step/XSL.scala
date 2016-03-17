@@ -53,7 +53,7 @@ class XSL(id : String, label : String, templates : Templates, val priority : Lon
         if (req.parsedXML != null) {
           new DOMSource(req.parsedXML)
         } else {
-          new StreamSource(req.getInputStream())
+          new StreamSource(req.getInputStream)
         }
       }
 
@@ -111,7 +111,7 @@ private class TransformErrorCapture extends ErrorListener {
     if (error.isEmpty) {
       error = Some(exception)
 
-      val message = exception.getMessage()
+      val message = exception.getMessage
       if (message.contains("xsl:message") && msg.isDefined) {
         error = Some(new TransformerException(msg.get, error.get))
       }
@@ -125,7 +125,7 @@ private class TransformErrorCapture extends ErrorListener {
     if (error.isEmpty) {
       error = Some(exception)
 
-      val message = exception.getMessage()
+      val message = exception.getMessage
       if (message.contains("termination") && msg.isDefined) {
         error = Some(new TransformerException(msg.get, error.get))
       }
@@ -136,14 +136,14 @@ private class TransformErrorCapture extends ErrorListener {
   }
 
   def warning (exception : TransformerException) : Unit = {
-    msg = Some(exception.getMessage())
+    msg = Some(exception.getMessage)
   }
 
   private def getCodeFromError(exception : Option[TransformerException]) : Option[Int] = {
     exception match {
       case None => None
       case Some(e) =>
-        errorCode findFirstIn e.getMessage()  match {
+        errorCode findFirstIn e.getMessage  match {
           case Some(errorCode(code)) => Some(code.toInt)
           case None => Some(DEFAULT_ERROR_CODE)
         }
@@ -154,8 +154,8 @@ private class TransformErrorCapture extends ErrorListener {
     exception match {
       case None => None
       case Some(e) =>
-        errorCode findFirstIn e.getMessage()  match {
-          case Some(c) => Some(new TransformerException(errorCode.replaceAllIn(e.getMessage(), ""), e))
+        errorCode findFirstIn e.getMessage  match {
+          case Some(c) => Some(new TransformerException(errorCode.replaceAllIn(e.getMessage, ""), e))
           case None => exception
         }
     }

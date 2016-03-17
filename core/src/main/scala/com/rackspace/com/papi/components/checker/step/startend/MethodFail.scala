@@ -39,11 +39,11 @@ class MethodFail(id : String, label : String, val priority : Long) extends Step(
     //
     var result : Option[MethodFailResult] = None
 
-    if (context.uriLevel >= req.URISegment.size) {
-      val mfr = new MethodFailResult("Bad method: "+req.getMethod(), context, id, priority, allowHeaders.clone().asInstanceOf[java.util.Map[String,String]] )
+    if (context.uriLevel >= req.URISegment.length) {
+      val mfr = new MethodFailResult("Bad method: "+req.getMethod, context, id, priority, allowHeaders.clone().asInstanceOf[java.util.Map[String,String]] )
       result = Some(mfr)
     }
 
-    return result
+    result
   }
 }

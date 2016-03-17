@@ -112,9 +112,9 @@ class BaseValidatorSuite extends FunSuite {
     reqAttribs += (CONTENT_ERROR -> null)
     reqAttribs += (CONTENT_ERROR_PRIORITY -> null)
 
-    when(req.getCharacterEncoding()).thenReturn("UTF-8")
-    when(req.getMethod()).thenReturn(method)
-    when(req.getRequestURI()).thenReturn(url)
+    when(req.getCharacterEncoding).thenReturn("UTF-8")
+    when(req.getMethod).thenReturn(method)
+    when(req.getRequestURI).thenReturn(url)
     when(req.getAttribute(anyString())).thenAnswer(new Answer[Object] {
       val attribs = reqAttribs
 
@@ -135,31 +135,31 @@ class BaseValidatorSuite extends FunSuite {
       }
     } ).when(req).setAttribute(anyString(), anyObject())
 
-    return req
+    req
   }
 
   def request(method : String, url : String, contentType : String) : HttpServletRequest = {
 
     val req = request(method, url)
-    when(req.getContentType()).thenReturn(contentType)
+    when(req.getContentType).thenReturn(contentType)
 
-    return req
+    req
   }
 
   def request(method : String, url : String, contentType : String, content : String) : HttpServletRequest = {
     val req = request(method, url, contentType)
 
-    when(req.getInputStream()).thenReturn(new ByteArrayServletInputStream(content))
+    when(req.getInputStream).thenReturn(new ByteArrayServletInputStream(content))
 
-    return req
+    req
   }
 
   def request(method : String, url : String, contentType : String, content : NodeSeq) : HttpServletRequest = {
     val req = request(method, url,contentType)
 
-    when(req.getInputStream()).thenReturn(new ByteArrayServletInputStream(content))
+    when(req.getInputStream).thenReturn(new ByteArrayServletInputStream(content))
 
-    return req
+    req
   }
 
   def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean) : HttpServletRequest = {
@@ -181,7 +181,7 @@ class BaseValidatorSuite extends FunSuite {
         contentType match {
           case "application/xml"  =>
             xmlParser = XMLParserPool.borrowParser
-            req.setAttribute (PARSED_XML, xmlParser.parse(new ByteArrayInputStream(content.getBytes())))
+            req.setAttribute (PARSED_XML, xmlParser.parse(new ByteArrayInputStream(content.getBytes)))
           case "application/json" =>
             jsonParser = ObjectMapperPool.borrowParser
             req.setAttribute (PARSED_JSON, jsonParser.readValue(content,classOf[JsonNode]))
@@ -192,7 +192,7 @@ class BaseValidatorSuite extends FunSuite {
       if (jsonParser != null) ObjectMapperPool.returnParser(jsonParser)
     }
 
-    return req
+    req
   }
 
   def request(method : String, url : String, contentType : String, content : String, parseContent : Boolean, headers : Map[String, List[String]]) : HttpServletRequest = {
@@ -219,18 +219,18 @@ class BaseValidatorSuite extends FunSuite {
       }
     })
 
-    return req
+    req
   }
 
   def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean, headers : Map[String, List[String]]) : HttpServletRequest = {
-    request (method, url, contentType, content.toString(), parseContent, headers)
+    request (method, url, contentType, content.toString, parseContent, headers)
   }
 
   def request(method : String, url : String, contentType : String, content : NodeSeq, parseContent : Boolean) : HttpServletRequest = {
-    request (method, url, contentType, content.toString(), parseContent)
+    request (method, url, contentType, content.toString, parseContent)
   }
 
-  def response : HttpServletResponse = mock(classOf[HttpServletResponse]);
+  def response : HttpServletResponse = mock(classOf[HttpServletResponse])
 
   def chain : FilterChain = mock(classOf[FilterChain])
 
@@ -241,7 +241,7 @@ class BaseValidatorSuite extends FunSuite {
       None
     } catch {
       case v : ValidatorException =>
-        val cause = v.getCause()
+        val cause = v.getCause
         if (cause == null) {
           throw new TestFailedException(Some(expectMsg+" but got null cause"), None, 4)
         } else if (!cause.isInstanceOf[ResultFailedException]) {

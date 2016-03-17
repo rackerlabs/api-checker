@@ -46,11 +46,11 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   def this() = this(null)
 
-  val dotTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass().getResource("/xsl/checker2dot.xsl").toString))
+  val dotTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/checker2dot.xsl").toString))
 
   def buildFromChecker (in : Source, out: Result, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
-    val transformer = dotHandler.getTransformer()
+    val transformer = dotHandler.getTransformer
     transformer.setParameter (IGNORE_SINKS, ignoreSinks)
     transformer.setParameter (NFA_MODE, nfaMode)
     transformer.asInstanceOf[Controller].addLogErrorListener
@@ -60,7 +60,7 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   def build (in : Source, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
-    val transformer = dotHandler.getTransformer()
+    val transformer = dotHandler.getTransformer
     dotHandler.setResult(out)
     transformer.setParameter (IGNORE_SINKS, ignoreSinks)
     transformer.setParameter (NFA_MODE, nfaMode)
@@ -88,7 +88,7 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
   def build (in : (String, NodeSeq), config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : String = {
     val bytesOut = new ByteArrayOutputStream()
     build (in, new StreamResult(bytesOut), config, ignoreSinks, nfaMode)
-    bytesOut.toString()
+    bytesOut.toString
   }
 
   def build (in: NodeSeq, config : Config = null,

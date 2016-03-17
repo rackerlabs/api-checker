@@ -33,8 +33,8 @@ class JSONSchema(id : String, label : String, schema : JsonSchema, val priority 
     } catch {
       case pe : ProcessingException => {
         val message = {
-          val fmsg = formatMessage(pe.getProcessingMessage().asJson())
-          if (fmsg != null) fmsg else pe.getProcessingMessage().toString()
+          val fmsg = formatMessage(pe.getProcessingMessage.asJson())
+          if (fmsg != null) fmsg else pe.getProcessingMessage.toString
         }
 
         req.contentError = new Exception(message, pe)

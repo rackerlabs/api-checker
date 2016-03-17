@@ -24,13 +24,13 @@ import java.net.URI
 //
 object URLResolver {
   def toAbsoluteSystemId(systemId : String) : String = {
-    toAbsoluteSystemId(systemId, (new File(System.getProperty("user.dir")).toURI().toString()))
+    toAbsoluteSystemId(systemId, (new File(System.getProperty("user.dir")).toURI().toString))
   }
 
   def toAbsoluteSystemId(systemId : String, base : String) : String = {
     val inURI = new URI(systemId)
     if (!inURI.isAbsolute()) {
-      (new URI(base)).resolve(systemId).toString()
+      (new URI(base)).resolve(systemId).toString
     } else {
       systemId
     }

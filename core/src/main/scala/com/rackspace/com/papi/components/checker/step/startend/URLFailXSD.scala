@@ -46,7 +46,7 @@ class URLFailXSD(id : String, label : String, types : Array[QName], schema : Sch
       val errors = for (validator <- validators) yield {
         val e = validator.validate(in)
         if (e.isEmpty) return None
-        e.get.getMessage()
+        e.get.getMessage
       }
 
       val message = errors.foldLeft(result.get.message)(_ + " "+_)

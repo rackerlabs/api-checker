@@ -35,7 +35,7 @@ class ConsoleResultHandler(val out : PrintStream=System.out) extends ResultHandl
         vout+Console.RESET+"]"
       }
 
-      printf ("%s %s %s %s\n", valid(result.valid), req.getMethod() , (new URI(req.getRequestURI())).getPath, result.toString)
+      printf ("%s %s %s %s\n", valid(result.valid), req.getMethod , (new URI(req.getRequestURI)).getPath, result.toString)
     }
   }
 }

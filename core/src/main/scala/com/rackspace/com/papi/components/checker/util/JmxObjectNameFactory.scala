@@ -30,12 +30,12 @@ class JmxObjectNameFactory extends ObjectNameFactory with LazyLogging {
       val typeVal = name.substring(0, scopeDot)
       val nameBuilder = new StringBuilder(domain)
       nameBuilder.append(':')
-      if(!typeVal.isEmpty) {
+      if(typeVal.nonEmpty) {
         nameBuilder.append("type=")
         nameBuilder.append(typeVal)
         nameBuilder.append(',')
       }
-      if(!scopeVal.isEmpty) {
+      if(scopeVal.nonEmpty) {
         nameBuilder.append("scope=")
         nameBuilder.append(scopeVal)
         nameBuilder.append(',')
@@ -43,7 +43,7 @@ class JmxObjectNameFactory extends ObjectNameFactory with LazyLogging {
       nameBuilder.append("name=")
       nameBuilder.append(nameVal)
 
-      val objectName: ObjectName = new ObjectName(nameBuilder.toString())
+      val objectName: ObjectName = new ObjectName(nameBuilder.toString)
       if (objectName.isPattern) {
         new ObjectName(domain, "name", ObjectName.quote(name))
       } else {

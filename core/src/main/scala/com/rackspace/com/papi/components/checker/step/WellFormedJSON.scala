@@ -32,7 +32,7 @@ class WellFormedJSON(id : String, label : String, val priority : Long, next : Ar
     try {
       if (req.parsedJSON == null) {
         parser = borrowParser
-        req.parsedJSON = parser.readValue(req.getInputStream(),classOf[JsonNode])
+        req.parsedJSON = parser.readValue(req.getInputStream,classOf[JsonNode])
       }
       ret = Some(context)
     } catch {

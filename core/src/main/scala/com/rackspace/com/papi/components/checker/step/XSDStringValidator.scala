@@ -58,7 +58,7 @@ class XSDStringValidator(val simpleType : QName, val schema : Schema, val elemen
       }
     }
 
-    return capture.error
+    capture.error
   }
 
   //

@@ -60,7 +60,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
                 context : StepContext) : Array[Result] = {
 
     val resultBuffer = new ListBuffer[Result]
-    for (i <- 0 to next.length-1) {
+    for (i <- next.indices) {
       val oresult = next(i).check(req, resp, chain, context)
       if (oresult.isDefined) {
         val result = oresult.get
@@ -71,7 +71,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
         }
       }
     }
-    return resultBuffer.toArray
+    resultBuffer.toArray
   }
 
   //
@@ -88,7 +88,7 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
     if (nextContext.isDefined) {
       val results : Array[Result] =
           nextStep (req, resp, chain, nextContext.get.handler.map{ handler => handler.inStep(this, req, resp, nextContext.get) }.getOrElse(nextContext.get))
-      if (results.size == 1) {
+      if (results.length == 1) {
         results(0).addStepId(id)
         result = Some(results(0))
       } else {
@@ -99,6 +99,6 @@ abstract class ConnectedStep(id : String, label : String, val next : Array[Step]
       result = Some( new MismatchResult( mismatchMessage, context, id) )
     }
 
-    return result
+    result
   }
 }

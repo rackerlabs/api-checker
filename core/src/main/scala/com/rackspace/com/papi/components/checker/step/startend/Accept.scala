@@ -42,6 +42,6 @@ class Accept(id : String, label : String, val priority : Long) extends Step(id, 
     //
     //  Send request...
     //
-    return Some( new AcceptResult( "", context, id, priority ) )
+    Some( new AcceptResult( "", context, id, priority ) )
   }
 }

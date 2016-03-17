@@ -57,62 +57,62 @@ class Wadl2CheckerSuite extends FunSuite {
     Wadl2Checker.parser.reset()
     assert (Wadl2Checker.removeDups.value.isEmpty)
     Wadl2Checker.handleArgs(Array("-d"))
-    assert (Wadl2Checker.removeDups.value.get == true)
+    assert (Wadl2Checker.removeDups.value.get)
   }
 
   test ("--remove-dups should set removeDups") {
     Wadl2Checker.parser.reset()
     assert (Wadl2Checker.removeDups.value.isEmpty)
     Wadl2Checker.handleArgs(Array("--remove-dups"))
-    assert (Wadl2Checker.removeDups.value.get == true)
+    assert (Wadl2Checker.removeDups.value.get)
   }
 
   test ("-D should set validate") {
     Wadl2Checker.parser.reset()
     assert (Wadl2Checker.dontValidate.value.isEmpty)
     Wadl2Checker.handleArgs(Array("-D"))
-    assert (Wadl2Checker.dontValidate.value.get == true)
+    assert (Wadl2Checker.dontValidate.value.get)
   }
 
   test ("--dont-validate should set validate") {
     Wadl2Checker.parser.reset()
     assert (Wadl2Checker.dontValidate.value.isEmpty)
     Wadl2Checker.handleArgs(Array("--dont-validate"))
-    assert (Wadl2Checker.dontValidate.value.get == true)
+    assert (Wadl2Checker.dontValidate.value.get)
   }
 
   test ("-r should set raxRoles") {
     Wadl2Checker.parser.reset()
     assert (Wadl2Checker.raxRoles.value.isEmpty)
     Wadl2Checker.handleArgs(Array("-r"))
-    assert (Wadl2Checker.raxRoles.value.get == true)
+    assert (Wadl2Checker.raxRoles.value.get)
   }
 
   test ("no params should set source and result with input/output stream"){
     Wadl2Checker.parser.reset()
     Wadl2Checker.handleArgs(Array())
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream() != null)
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId() == null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream() != null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId() == null)
+    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream != null)
+    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId == null)
+    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream != null)
+    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId == null)
   }
 
   test ("one params should set source to systemid and result to stream"){
     Wadl2Checker.parser.reset()
     Wadl2Checker.handleArgs(Array("test.wadl"))
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream() == null)
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId() != null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream() != null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId() == null)
+    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream == null)
+    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId != null)
+    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream != null)
+    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId == null)
   }
 
   test ("two params should set source and result to systemid"){
     Wadl2Checker.parser.reset()
     Wadl2Checker.handleArgs(Array("test.wadl", "out.xml"))
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream() == null)
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId() != null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream() == null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId() != null)
+    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream == null)
+    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId != null)
+    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream == null)
+    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId != null)
   }
 
 }

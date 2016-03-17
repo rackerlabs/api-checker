@@ -37,9 +37,9 @@ class ContentFail(id : String, label : String, val priority : Long) extends Step
 
     if (req.contentError != null) {
       val msg = {
-        var m = req.contentError.getMessage()
+        var m = req.contentError.getMessage
         if (m == null) {
-          m = req.contentError.toString()
+          m = req.contentError.toString
         }
         m
       }
@@ -60,6 +60,6 @@ class ContentFail(id : String, label : String, val priority : Long) extends Step
       result = Some(bcr)
     }
 
-    return result
+    result
   }
 }

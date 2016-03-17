@@ -64,49 +64,49 @@ class WadlTestSuite extends FunSuite {
     WadlTest.parser.reset()
     assert (WadlTest.removeDups.value.isEmpty)
     WadlTest.handleArgs(Array("-d"))
-    assert (WadlTest.removeDups.value.get == true)
+    assert (WadlTest.removeDups.value.get)
   }
 
   test ("--remove-dups should set removeDups") {
     WadlTest.parser.reset()
     assert (WadlTest.removeDups.value.isEmpty)
     WadlTest.handleArgs(Array("--remove-dups"))
-    assert (WadlTest.removeDups.value.get == true)
+    assert (WadlTest.removeDups.value.get)
   }
 
   test ("-D should set validate") {
     WadlTest.parser.reset()
     assert (WadlTest.dontValidate.value.isEmpty)
     WadlTest.handleArgs(Array("-D"))
-    assert (WadlTest.dontValidate.value.get == true)
+    assert (WadlTest.dontValidate.value.get)
   }
 
   test ("--dont-validate should set validate") {
     WadlTest.parser.reset()
     assert (WadlTest.dontValidate.value.isEmpty)
     WadlTest.handleArgs(Array("--dont-validate"))
-    assert (WadlTest.dontValidate.value.get == true)
+    assert (WadlTest.dontValidate.value.get)
   }
 
   test ("-r should set raxRoles") {
     WadlTest.parser.reset()
     assert (WadlTest.raxRoles.value.isEmpty)
     WadlTest.handleArgs(Array("-r"))
-    assert (WadlTest.raxRoles.value.get == true)
+    assert (WadlTest.raxRoles.value.get)
   }
 
   test ("no params should set source with input stream"){
     WadlTest.parser.reset()
     WadlTest.handleArgs(Array())
-    assert (WadlTest.getSource.asInstanceOf[StreamSource].getInputStream() != null)
-    assert (WadlTest.getSource.asInstanceOf[StreamSource].getSystemId() == null)
+    assert (WadlTest.getSource.asInstanceOf[StreamSource].getInputStream != null)
+    assert (WadlTest.getSource.asInstanceOf[StreamSource].getSystemId == null)
   }
 
   test ("one params should set source to systemid and result to stream"){
     WadlTest.parser.reset()
     WadlTest.handleArgs(Array("test.wadl"))
-    assert (WadlTest.getSource.asInstanceOf[StreamSource].getInputStream() == null)
-    assert (WadlTest.getSource.asInstanceOf[StreamSource].getSystemId() != null)
+    assert (WadlTest.getSource.asInstanceOf[StreamSource].getInputStream == null)
+    assert (WadlTest.getSource.asInstanceOf[StreamSource].getSystemId != null)
   }
 
 }

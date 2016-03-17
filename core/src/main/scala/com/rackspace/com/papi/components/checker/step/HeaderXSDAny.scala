@@ -72,7 +72,7 @@ class HeaderXSDAny(id : String, label : String, val name : String, val value : Q
       }
     } else {
      last_err match {
-        case Some(_) => req.contentError(new Exception(mismatchMessage+value+" "+last_err.get.getMessage(), last_err.get), mismatchCode, priority)
+        case Some(_) => req.contentError(new Exception(mismatchMessage+value+" "+last_err.get.getMessage, last_err.get), mismatchCode, priority)
         case None => req.contentError(new Exception(mismatchMessage), mismatchCode, priority)
       }
       None

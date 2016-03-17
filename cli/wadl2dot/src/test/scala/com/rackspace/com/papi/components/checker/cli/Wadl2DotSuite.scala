@@ -57,90 +57,90 @@ class Wadl2DotSuite extends FunSuite {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.removeDups.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-d"))
-    assert (Wadl2Dot.removeDups.value.get == true)
+    assert (Wadl2Dot.removeDups.value.get)
   }
 
   test ("--remove-dups should set removeDups") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.removeDups.value.isEmpty)
     Wadl2Dot.handleArgs(Array("--remove-dups"))
-    assert (Wadl2Dot.removeDups.value.get == true)
+    assert (Wadl2Dot.removeDups.value.get)
   }
 
   test ("-D should set validate") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.dontValidate.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-D"))
-    assert (Wadl2Dot.dontValidate.value.get == true)
+    assert (Wadl2Dot.dontValidate.value.get)
   }
 
   test ("--dont-validate should set validate") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.dontValidate.value.isEmpty)
     Wadl2Dot.handleArgs(Array("--dont-validate"))
-    assert (Wadl2Dot.dontValidate.value.get == true)
+    assert (Wadl2Dot.dontValidate.value.get)
   }
 
   test ("-r should set raxRoles") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.raxRoles.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-r"))
-    assert (Wadl2Dot.raxRoles.value.get == true)
+    assert (Wadl2Dot.raxRoles.value.get)
   }
 
   test ("-e should show errors") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.showErrors.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-e"))
-    assert (Wadl2Dot.showErrors.value.get == true)
+    assert (Wadl2Dot.showErrors.value.get)
   }
 
   test ("--show-errors should set validate") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.showErrors.value.isEmpty)
     Wadl2Dot.handleArgs(Array("--show-errors"))
-    assert (Wadl2Dot.showErrors.value.get == true)
+    assert (Wadl2Dot.showErrors.value.get)
   }
 
   test ("-n should enable nfaMode") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.nfaMode.value.isEmpty)
     Wadl2Dot.handleArgs(Array("-n"))
-    assert (Wadl2Dot.nfaMode.value.get == true)
+    assert (Wadl2Dot.nfaMode.value.get)
   }
 
   test ("--nfa-mode should enable nfaMode") {
     Wadl2Dot.parser.reset()
     assert (Wadl2Dot.nfaMode.value.isEmpty)
     Wadl2Dot.handleArgs(Array("--nfa-mode"))
-    assert (Wadl2Dot.nfaMode.value.get == true)
+    assert (Wadl2Dot.nfaMode.value.get)
   }
 
   test ("no params should set source and result with input/output stream"){
     Wadl2Dot.parser.reset()
     Wadl2Dot.handleArgs(Array())
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream() != null)
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId() == null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream() != null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId() == null)
+    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream != null)
+    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId == null)
+    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream != null)
+    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId == null)
   }
 
   test ("one params should set source to systemid and result to stream"){
     Wadl2Dot.parser.reset()
     Wadl2Dot.handleArgs(Array("test.wadl"))
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream() == null)
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId() != null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream() != null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId() == null)
+    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream == null)
+    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId != null)
+    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream != null)
+    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId == null)
   }
 
   test ("two params should set source and result to systemid"){
     Wadl2Dot.parser.reset()
     Wadl2Dot.handleArgs(Array("test.wadl", "out.xml"))
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream() == null)
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId() != null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream() == null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId() != null)
+    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream == null)
+    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId != null)
+    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream == null)
+    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId != null)
   }
 
 }

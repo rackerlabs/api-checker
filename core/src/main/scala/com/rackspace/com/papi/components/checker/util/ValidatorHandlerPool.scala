@@ -22,14 +22,14 @@ import com.saxonica.jaxp.SchemaReference
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 
-import scala.collection.mutable.{HashMap, LinkedList, Map}
+import scala.collection.mutable.{HashMap, MutableList, Map}
 
 object ValidatorHandlerPool extends Instrumented {
   private val validatorHandlerPools : Map[Schema, SoftReferenceObjectPool[ValidatorHandler]] = new HashMap[Schema, SoftReferenceObjectPool[ValidatorHandler]]
   private def pool(schema : Schema) : SoftReferenceObjectPool[ValidatorHandler] = validatorHandlerPools.getOrElseUpdate(schema, addPool(schema))
 
-  private val activeGauges = new LinkedList[Gauge[Int]]
-  private val idleGauges = new LinkedList[Gauge[Int]]
+  private val activeGauges = new MutableList[Gauge[Int]]
+  private val idleGauges = new MutableList[Gauge[Int]]
 
   private def addPool(schema : Schema) : SoftReferenceObjectPool[ValidatorHandler] = {
     val pool = new SoftReferenceObjectPool[ValidatorHandler](new ValidatorHandlerFactory(schema))
@@ -41,7 +41,7 @@ object ValidatorHandlerPool extends Instrumented {
   }
 
   //
-  //  Unfortunetly, SAXON schema handlers cannot be pooled.  We detect
+  //  Unfortunately, SAXON schema handlers cannot be pooled.  We detect
   //  this and always create a new handler in this case.
   //
 
@@ -65,7 +65,7 @@ object ValidatorHandlerPool extends Instrumented {
   def numActive(schema : Schema) : Int = {
     var ret = 0
     if (!schema.isInstanceOf[SchemaReference]) {
-      ret = pool(schema).getNumActive()
+      ret = pool(schema).getNumActive
     }
     ret
   }
@@ -73,7 +73,7 @@ object ValidatorHandlerPool extends Instrumented {
   def numIdle(schema : Schema) : Int = {
     var ret = 0
     if (!schema.isInstanceOf[SchemaReference]) {
-      ret = pool(schema).getNumIdle()
+      ret = pool(schema).getNumIdle
     }
     ret
   }

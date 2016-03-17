@@ -26,13 +26,13 @@ import scala.collection.JavaConverters._
 class RequestResponseSuite extends BaseValidatorSuite {
 
   test ("Ensure wrapper does not parse commas on getHeader") {
-    val req = request("POST","/foo","application/XML","",false,Map("User-Agent"->List("Bla, bla bla")));
+    val req = request("POST","/foo","application/XML","",false,Map("User-Agent"->List("Bla, bla bla")))
     val wrap = new CheckerServletRequest(req)
     assert(wrap.getHeader("User-Agent")=="Bla, bla bla")
   }
 
   test ("Ensure wrapper does not parse commas on getHeaders") {
-    val req = request("POST","/foo","application/XML","",false,Map("User-Agent"->List("Bla, bla bla")));
+    val req = request("POST","/foo","application/XML","",false,Map("User-Agent"->List("Bla, bla bla")))
     val wrap = new CheckerServletRequest(req)
     assert(wrap.getHeaders("User-Agent").nextElement()=="Bla, bla bla")
   }
@@ -132,7 +132,7 @@ class RequestResponseSuite extends BaseValidatorSuite {
     wrapper.addHeader("Foo", "Bar")
     wrapper.addHeader("Foo", "Baz")
     wrapper.addHeader("Moo", "Baz")
-    val headers = wrapper.getHeaderNames()
+    val headers = wrapper.getHeaderNames
     assert(headers.nextElement() == "Foo")
     assert(headers.nextElement() == "Moo")
   }
@@ -143,7 +143,7 @@ class RequestResponseSuite extends BaseValidatorSuite {
     wrapper.addHeader("Foo", "Bar")
     wrapper.addHeader("Foo", "Baz")
     wrapper.addHeader("Moo", "Baz")
-    val headers = wrapper.getHeaderNames()
+    val headers = wrapper.getHeaderNames
     assert(headers == null)
   }
 }

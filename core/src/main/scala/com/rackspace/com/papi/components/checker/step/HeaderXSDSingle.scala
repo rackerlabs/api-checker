@@ -70,7 +70,7 @@ class HeaderXSDSingle(id : String, label : String, val name : String, val value 
                   case None => Some(context)
                   case Some(h) => Some(context.copy(requestHeaders = context.requestHeaders.addHeader(h, header)))
               }
-              case Some(e) => req.contentError(new Exception(mismatchMessage+" "+e.getMessage(), e),mismatchCode, priority)
+              case Some(e) => req.contentError(new Exception(mismatchMessage+" "+e.getMessage, e),mismatchCode, priority)
                               None
       }
       case _  => req.contentError(new Exception(numMessage), mismatchCode, priority)

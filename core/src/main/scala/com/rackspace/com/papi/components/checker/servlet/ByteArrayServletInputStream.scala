@@ -24,11 +24,11 @@ class ByteArrayServletInputStream (private val byteArray : Array[Byte]) extends 
   val bin = new ByteArrayInputStream(byteArray)
 
   def this(content : String) {
-    this(content.getBytes())
+    this(content.getBytes)
   }
 
   def this(n : NodeSeq) {
-    this(n.toString())
+    this(n.toString)
   }
 
   override def available : Int = bin.available()

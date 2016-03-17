@@ -65,14 +65,14 @@ class HeaderXSD(id : String, label : String, val name : String, val value : QNam
     //  XSD, then return a valid context otherwise set an error and
     //  return None
     //
-    if (!headers.isEmpty && headers.filterNot(v => { last_err = xsd.validate(v);  last_err match { case None => true ; case Some(_) => false } }).isEmpty) {
+    if (headers.nonEmpty && headers.filterNot(v => { last_err = xsd.validate(v);  last_err match { case None => true ; case Some(_) => false } }).isEmpty) {
       captureHeader match {
         case None => Some(context)
         case Some(h) => Some(context.copy(requestHeaders = context.requestHeaders.addHeaders(h, headers)))
       }
     } else {
      last_err match {
-        case Some(_) => req.contentError(new Exception(mismatchMessage+" "+last_err.get.getMessage(), last_err.get), mismatchCode, priority)
+        case Some(_) => req.contentError(new Exception(mismatchMessage+" "+last_err.get.getMessage, last_err.get), mismatchCode, priority)
         case None => req.contentError(new Exception(mismatchMessage), mismatchCode, priority)
       }
       None

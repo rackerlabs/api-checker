@@ -32,7 +32,7 @@ private final class AffectsChecker extends StaticAnnotation
 object Config {
   private val checkerConfigTypes = {
     val affectsCheckerType = universe.typeOf[AffectsChecker]
-    universe.typeOf[Config].members.filter(i => i.annotations.map(a => a.tpe).contains(affectsCheckerType))
+    universe.typeOf[Config].members.filter(i => i.annotations.map(a => a.tree.tpe).contains(affectsCheckerType))
   }
 }
 

@@ -36,7 +36,7 @@ object Converters {
     try {
       transf = IdentityTransformPool.borrowTransformer
       transf.transform(new DOMSource(doc), new StreamResult(swriter))
-      XML.loadString (swriter.toString())
+      XML.loadString (swriter.toString)
     } finally {
       if (transf != null) IdentityTransformPool.returnTransformer(transf)
     }
@@ -47,7 +47,7 @@ object Converters {
     try {
       val result = new DOMResult()
       transf = IdentityTransformPool.borrowTransformer
-      transf.transform(new StreamSource(new ByteArrayInputStream(n.toString().getBytes())),
+      transf.transform(new StreamSource(new ByteArrayInputStream(n.toString.getBytes)),
                        result)
       result.getNode.asInstanceOf[Document]
     } finally {

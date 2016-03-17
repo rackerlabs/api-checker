@@ -149,17 +149,17 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a/<randomLong>/c should succeed on validator_REG1") {
-    val rl = new Random(new Date().getTime()).nextLong()
+    val rl = new Random(new Date().getTime).nextLong()
     validator_REG1.validate(request("GET","/a/"+rl+"/c"),response,chain)
   }
 
   test ("GET on /a/<bigInt>/c should succeed on validator_REG1") {
-    val bi = new BigInteger(1024, new Random(new Date().getTime()).self)
+    val bi = new BigInteger(1024, new Random(new Date().getTime).self)
     validator_REG1.validate(request("GET","/a/"+bi+"/c"),response,chain)
   }
 
   test ("GET on /a/<randomDouble>/c should fail validator_REG1") {
-    val rf = new Random(new Date().getTime()).nextDouble()
+    val rf = new Random(new Date().getTime).nextDouble()
     assertResultFailed(validator_REG1.validate(request("GET","/a/"+rf+"/c"),response,chain), 404)
   }
 
@@ -209,22 +209,22 @@ class ValidatorSuite extends BaseValidatorSuite {
   }
 
   test ("GET on /a/<randomLong>/c should succeed on validator_REG2") {
-    val rl = new Random(new Date().getTime()).nextLong()
+    val rl = new Random(new Date().getTime).nextLong()
     validator_REG2.validate(request("GET","/a/"+rl+"/c"),response,chain)
   }
 
   test ("GET on /a/<bigInt>/c should succeed on validator_REG2") {
-    val bi = new BigInteger(1024, new Random(new Date().getTime()).self)
+    val bi = new BigInteger(1024, new Random(new Date().getTime).self)
     validator_REG2.validate(request("GET","/a/"+bi+"/c"),response,chain)
   }
 
   test ("GET on /a/<randomDouble>/c should succeed validator_REG2") {
-    val rf = new Random(new Date().getTime()).nextDouble()
+    val rf = new Random(new Date().getTime).nextDouble()
     validator_REG2.validate(request("GET","/a/"+rf+"/c"),response,chain)
   }
 
   test ("GET on /a/<uuid>/c should succeed validator_REG2") {
-    val uuid = UUID.randomUUID().toString()
+    val uuid = UUID.randomUUID().toString
     validator_REG2.validate(request("GET","/a/"+uuid+"/c"),response,chain)
   }
 

@@ -34,7 +34,7 @@ class ReqTypeFail(id : String, label : String, val types : Regex, val priority :
                      chain : FilterChain,
                      context : StepContext) : Option[Result] = {
     var result : Option[BadMediaTypeResult] = None
-    req.getContentType() match {
+    req.getContentType match {
       case types() => result = None
       case _ => result = Some(new BadMediaTypeResult("The content type did not match the pattern: '"+types.toString.replaceAll("\\(\\?i\\)","")+"'", context, id, priority))
     }

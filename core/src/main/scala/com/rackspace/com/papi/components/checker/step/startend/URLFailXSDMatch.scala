@@ -47,7 +47,7 @@ class URLFailXSDMatch(id : String, label : String, uri : Regex, types : Array[QN
       val errors = for (validator <- validators) yield {
         val e = validator.validate(in)
         if (e.isEmpty) return None
-        e.get.getMessage()
+        e.get.getMessage
       }
 
       val message = errors.foldLeft(result.get.message)(_ + " and "+_)

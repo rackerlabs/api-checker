@@ -19,7 +19,6 @@ package com.rackspace.com.papi.components.checker.handler
 import javax.xml.transform.stream.StreamSource
 
 import com.rackspace.com.papi.components.checker._
-import com.rackspace.com.papi.components.checker.step.results.{ErrorResult, Result}
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.test.appender.ListAppender
@@ -89,9 +88,7 @@ class ApiCoverageHandlerTest extends BaseValidatorSuite with BeforeAndAfter {
     }
   }
 
-  import javax.servlet.http.HttpServletResponse.SC_NOT_FOUND // 404
-  import javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED // 405
-  import javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE // 415
+  import javax.servlet.http.HttpServletResponse.{SC_METHOD_NOT_ALLOWED, SC_NOT_FOUND, SC_UNSUPPORTED_MEDIA_TYPE} // 405, 404, 415
 
   List(
     ("GET",   "/nova/entries",          "application/atom+xml", good_usage16, SC_METHOD_NOT_ALLOWED,      """{"steps":["S0","d59e4","d59e5","d67e4m"]}"""),

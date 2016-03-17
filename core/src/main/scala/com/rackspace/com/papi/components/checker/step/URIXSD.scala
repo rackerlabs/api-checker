@@ -37,11 +37,11 @@ class URIXSD(id : String, label : String, val simpleType : QName, val schema : S
                         chain : FilterChain,
                         context : StepContext) : Option[Result] = {
        var result : Option[Result] = None
-       if (context.uriLevel < req.URISegment.size) {
+       if (context.uriLevel < req.URISegment.length) {
          val v = req.URISegment(context.uriLevel)
          val error = xsd.validate(v)
          if (error.isDefined) {
-           result = Some(new MismatchResult(error.get.getMessage(), context, id))
+           result = Some(new MismatchResult(error.get.getMessage, context, id))
          } else {
            val newContext = captureHeader match {
              case None => context.copy(uriLevel = context.uriLevel + 1)
@@ -49,7 +49,7 @@ class URIXSD(id : String, label : String, val simpleType : QName, val schema : S
                                          requestHeaders = context.requestHeaders.addHeader(h, v))
            }
            val results : Array[Result] = nextStep (req, resp, chain, newContext)
-           results.size match {
+           results.length match {
              case 0 =>
                result = None
              case 1 =>
@@ -65,4 +65,3 @@ class URIXSD(id : String, label : String, val simpleType : QName, val schema : S
        result
      }
 }
-
