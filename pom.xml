@@ -48,7 +48,7 @@
         <scala.minor>11</scala.minor>
         <scala.patch>7</scala.patch>
         <scala.MajDotMin>${scala.major}.${scala.minor}</scala.MajDotMin>
-        <saxon-ee.version>9.4.0.9</saxon-ee.version>
+        <saxon-ee.version>9.5.1-8</saxon-ee.version>
         <scala.test.version>2.2.6</scala.test.version>
         <scala.uri.version>0.4.2</scala.uri.version>
         <junit.version>4.10</junit.version>
@@ -77,7 +77,7 @@
         </dependency>
         <dependency>
             <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-ee</artifactId>
+            <artifactId>Saxon-EE</artifactId>
             <version>${saxon-ee.version}</version>
         </dependency>
         <dependency>
