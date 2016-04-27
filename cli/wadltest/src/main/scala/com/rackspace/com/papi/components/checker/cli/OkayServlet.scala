@@ -22,6 +22,7 @@ import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 object OkayServlet {
   private val BUFFER_SIZE : Int = 1024
   val ECHO_CONTENT_PARAM : String = "echoContent"
+  val RESPONSE_TYPE : String = "respType"
 }
 
 import com.rackspace.com.papi.components.checker.cli.OkayServlet._
@@ -29,6 +30,14 @@ import com.rackspace.com.papi.components.checker.cli.OkayServlet._
 class OkayServlet extends HttpServlet {
 
   override def service(req : HttpServletRequest, resp : HttpServletResponse) {
+    //
+    // If the parameter RESPONSE_TYPE is set, then we set the content
+    // type of the response to that value.
+    //
+    if (req.getParameter(RESPONSE_TYPE) != null) {
+      resp.setHeader("Content-Type", req.getParameter(RESPONSE_TYPE))
+    }
+
     //
     //  If the parameter ECHO_CONTENT_PARAM is set, then we echo the content
     //  on response.
