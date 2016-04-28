@@ -175,7 +175,8 @@ object WadlTest {
       }
     }
 
-    val param = OkayServlet.ECHO_CONTENT_PARAM
+    val echoParam = OkayServlet.ECHO_CONTENT_PARAM
+    val respParam = OkayServlet.RESPONSE_TYPE
 
     //
     //  Initalize the validator, this catches errors early...
@@ -220,9 +221,13 @@ object WadlTest {
              validates against the WADL, it will return a 4xx code
              with an appropriate message otherwise.
 
-             You can pass an '$B$param$R' query paramater to the
+             You can pass an '$B$echoParam$R' query paramater to the
              request to have the service echo the body of the request
              in the response.
+
+             You can pass a '$B$respParam$R' query paramater to the
+             request to set the ContentType of the response to the value
+             of that parameter.
             """)
 
     //
