@@ -769,10 +769,10 @@
       4. [X] Validator
       5. [X] capture header
       6. [X] rax:roles and rax:roles masked with other header_all
-** TODO Document Breaking Changes [0/3]
-   1. [ ] Use of repeating with headers
-   2. [ ] Use of header_all and header_any
-   3. [ ] capture_header and message and code changes
+** TODO Document Breaking Changes [3/3]
+   1. [X] Use of repeating with headers
+   2. [X] Use of header_all and header_any
+   3. [X] capture_header and message and code changes
 ** TODO Compile Performance improvements
 ** TODO Assign CONTENT_FAIL to XSL steps in builder
 ** TODO Investigate whether there is an issue with rax:roles with other headers
@@ -823,7 +823,7 @@
 ** TODO Expand checker to dot conversion in builder
 ** TODO Bring checker to dot conversion to cli
 ** TODO Better XSD tests
-
+  
 
 * Tests 10 Threads 5000 count
 |--------+---------+--------+----------------+-----------------+----------------------------------------------+----------------------------------------------|
