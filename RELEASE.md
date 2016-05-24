@@ -1,12 +1,23 @@
 # Releases #
 
-## Release 2.0.0 (2016-03-??) ##
-1. Moved to Scala v2.11.
-   1. Specifically v2.11.7.
-   1. Updated all of the dependencies as well.
-   1. Updated the base metrics library from Yammer to DropWizard/CodaHale.
-   1. Removed the ```nl.grons``` wrapper of the metrics library since the new version was enough.
+## Release 2.0.0 (2016-05-24) ##
+This release introduces breaking changes. Refer to [BREAKING.md](BREAKING.md) for details.
 
+1. Updated Dependencies
+   1. scala: 2.10.3 → 2.11.7
+   1. saxon: 9.4.0.9 → 9.5.1-8
+   1. scala-test: 2.0 → 2.2.6
+   1. metrics: 2.2.0 (Yammer) → 3.1.2 (DropWizard/CodaHale)
+   1. argot: 1.0.1  → 1.0.4
+1. Breaking Change: The ```repeating``` attribute is now honored correctly by header parameters. New default is ```repeating="false"```.
+1. Breaking Change: If there are multiple repeating headers parameters of the same name then *all* header values must correctly validate
+   against *all* header parameters.
+1. Added support for the rax:anyMatch extension. On a repeating header
+   parameter adding ```rax:anyMatch="true"``` means that the header correctly validates if *any* header vaule validates. This was the default
+   behavior for header parameters before this version.
+1. The wadltest cli utility now allows setting Content-Type of a sample response by passing it in a ```respType``` query parameter.
+1. Clean up: Minor cleanup of code to address static analysis findings and remove deprication warnings.
+1. Fixed a bug where a missing item in the priority map did not error out correctly.
 
 ## Release 1.1.4 (2016-01-01) ##
 1. Added support for default values in required headers.
