@@ -68,6 +68,7 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
         <resource path="/c">
           <param name="X-Auth-Token" style="header" required="true" repeating="true"/>
           <param name="X-INT" style="header" type="xs:int" required="true" repeating="true"/>
+          <param name="X-INT" style="header" type="xs:double" required="true" repeating="true"/>
           <method name="GET" rax:roles="a:admin">
             <request>
               <representation mediaType="application/xml"/>
@@ -94,6 +95,87 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
             <request>
               <param name="X-Auth-Token" style="header" required="true" repeating="true"/>
               <param name="X-INT" style="header" type="xs:int" required="true" repeating="true"/>
+              <param name="X-INT" style="header" type="xs:double" required="true" repeating="true"/>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="POST" rax:roles="#all">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+        </resource>
+      </resources>
+    </application>,
+    "Repeat Headers, anyMatch=true" -> <application xmlns="http://wadl.dev.java.net/2009/02"
+                 xmlns:rax="http://docs.rackspace.com/api"
+                 xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <resources base="https://test.api.openstack.com">
+        <resource path="/a">
+          <method name="POST" rax:roles="a:admin">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="GET" rax:roles="a:observer b:test&#xA0;with&#xA0;space">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="PUT">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="DELETE" rax:roles="a:observer a:admin b:test with space">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+        </resource>
+        <resource path="/b">
+          <method name="POST" rax:roles="a:admin">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="DELETE" rax:roles="a:observer a:admin">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+        </resource>
+        <resource path="/c">
+          <param name="X-Auth-Token" style="header" required="true" repeating="true" rax:anyMatch="true"/>
+          <param name="X-INT" style="header" type="xs:int" required="true" repeating="true" rax:anyMatch="true"/>
+          <param name="X-INT" style="header" type="xs:double" required="true" repeating="true" rax:anyMatch="true"/>
+          <method name="GET" rax:roles="a:admin">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="POST" rax:roles="a:observer a:admin">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="PUT" rax:roles="#all">
+            <request>
+              <representation mediaType="application/xml"/>
+            </request>
+          </method>
+          <method name="DELETE" rax:roles="a:admin">
+            <request>
+              <param name="some-generic-header" style="header" required="true" repeating="true"/>
+            </request>
+          </method>
+        </resource>
+        <resource path="/d">
+          <method name="GET" rax:roles="a:admin">
+            <request>
+              <param name="X-Auth-Token" style="header" required="true" repeating="true" rax:anyMatch="true"/>
+              <param name="X-INT" style="header" type="xs:int" required="true" repeating="true" rax:anyMatch="true"/>
+              <param name="X-INT" style="header" type="xs:double" required="true" repeating="true" rax:anyMatch="true"/>
               <representation mediaType="application/xml"/>
             </request>
           </method>
@@ -146,6 +228,7 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
         <resource path="/c">
           <param name="X-Auth-Token" style="header" required="true"/>
           <param name="X-INT" style="header" type="xs:int" required="true"/>
+          <param name="X-INT" style="header" type="xs:double" required="true"/>
           <method name="GET" rax:roles="a:admin">
             <request>
               <representation mediaType="application/xml"/>
@@ -172,6 +255,7 @@ class GivenAWadlWithRolesAtMethodLevelMasked extends FlatSpec with RaxRolesBehav
             <request>
               <param name="X-Auth-Token" style="header" required="true"/>
               <param name="X-INT" style="header" type="xs:int" required="true"/>
+              <param name="X-INT" style="header" type="xs:double" required="true"/>
               <representation mediaType="application/xml"/>
             </request>
           </method>

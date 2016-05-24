@@ -37,6 +37,7 @@ import org.w3c.dom.Document
 import org.xml.sax.{Attributes, ContentHandler, InputSource, Locator, SAXParseException}
 
 import scala.collection.mutable.{ArrayBuffer, HashMap, Map}
+import scala.util.matching.Regex
 
 
 /**
@@ -314,6 +315,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "HEADERXSD_SINGLE" => addHeaderXSDSingle(atts)
           case "HEADER_ANY"  => addHeaderAny(atts)
           case "HEADERXSD_ANY"  => addHeaderXSDAny(atts)
+          case "HEADER_ALL" => addHeaderAll(atts)
           case "SET_HEADER"  => addSetHeader(atts)
           case "JSON_SCHEMA" => addJSONSchema(atts)
         }
@@ -681,6 +683,24 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
   }
 
+  private[this] def getOptQNameList(name : String, atts : Attributes) : Option[List[QName]] = {
+    val qlistString = atts.getValue(name)
+    if (qlistString == null) {
+      None
+    } else {
+      Some(qlistString.split(" ").toList.map(q => qname(q)))
+    }
+  }
+
+  private[this] def getOptRegex(name : String, atts : Attributes) : Option[Regex] = {
+    val rString = atts.getValue(name)
+    if (rString == null) {
+      None
+    } else {
+      Some(rString.r)
+    }
+  }
+
   private[this] def getMessageCode(atts : Attributes) = {
     val message : Option[String] = {
       if (atts.getValue("message") == null) {
@@ -863,6 +883,26 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     steps += (id -> new HeaderXSDAny(id, label, name, qn, schema(qn),
                                      message, code, captureHeader,
                                      priority, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addHeaderAll(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : Option[List[QName]] = getOptQNameList("match", atts)
+    val _schema : Option[Schema]  = if (_match.isEmpty) None else Some(schema(_match.get.head))
+    val value  = getOptRegex("matchRegEx", atts)
+    val name : String = atts.getValue("name")
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
+    val priority = getPriority (atts)
+    val captureHeader = getCaptureHeader(atts)
+
+    next += (id -> nexts)
+    steps += (id -> new HeaderAll(id, label, name, _match, _schema, value,
+                                  message, code, captureHeader,
+                                  priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addSetHeader(atts : Attributes) : Unit = {

@@ -254,6 +254,66 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithType(checker, "SET_HEADER").filter (n => (n \ "@name").text == name).filter (n => (n \ "@value").text == value)
   }
 
+  def stepsWithHeaderAll(checker : NodeSeq, name : String) : NodeSeq = {
+    stepsWithType(checker, "HEADER_ALL").filter (n => (n \ "@name").text == name)
+  }
+
+  def stepsWithHeaderAllValue(checker : NodeSeq, name : String, value : String) : NodeSeq = {
+    stepsWithHeaderAll(checker, name).filter (n => (n \ "@matchRegEx").text == value)
+  }
+
+  def stepsWithHeaderAllMatchTypes(checker : NodeSeq, name : String, matchTypes : String) : NodeSeq = {
+    stepsWithHeaderAll(checker, name).filter (n => (n \ "@match").text == matchTypes)
+  }
+
+  def stepsWithHeaderAllValueMessage(checker : NodeSeq, name : String, value : String, message : String) : NodeSeq = {
+    stepsWithHeaderAllValue(checker, name, value).filter(n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderAllValueMessageCode(checker : NodeSeq, name : String, value : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderAllValueMessage(checker, name, value, message).filter(n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderAllValueCode(checker : NodeSeq, name : String, value : String, code : Int) : NodeSeq = {
+    stepsWithHeaderAllValue(checker, name, value).filter(n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderAllMatchTypesMessage(checker : NodeSeq, name : String, matchTypes : String, message : String) : NodeSeq = {
+    stepsWithHeaderAllMatchTypes(checker, name, matchTypes).filter(n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderAllMatchTypesMessageCode(checker : NodeSeq, name : String, matchTypes : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderAllMatchTypesMessage(checker, name, matchTypes, message).filter(n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderAllMatchTypesCode(checker : NodeSeq, name : String, matchTypes : String, code : Int) : NodeSeq = {
+    stepsWithHeaderAllMatchTypes(checker, name, matchTypes).filter(n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderAllValueMatchTypes(checker : NodeSeq, name : String, value : String, matchTypes : String) : NodeSeq = {
+    stepsWithHeaderAllValue(checker, name, value).filter (n => (n \ "@match").text == matchTypes)
+  }
+
+  def stepsWithHeaderAllValueMatchTypesMessage(checker : NodeSeq, name : String, value : String, matchTypes : String, message : String) : NodeSeq = {
+    stepsWithHeaderAllValueMatchTypes(checker, name, value, matchTypes).filter(n => (n \ "@message").text == message)
+  }
+
+  def stepsWithHeaderAllValueMatchTypesCode(checker : NodeSeq, name : String, value : String, matchTypes : String, code : Int) : NodeSeq = {
+    stepsWithHeaderAllValueMatchTypes(checker, name, value, matchTypes).filter(n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderAllValueMatchTypesMessageCode(checker : NodeSeq, name : String, value : String, matchTypes : String, message : String, code : Int) : NodeSeq = {
+    stepsWithHeaderAllValueMatchTypesMessage(checker, name, value, matchTypes, message).filter(n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithHeaderAllValueMatchTypesMessageCodeCaptureHeader(checker : NodeSeq, name : String, value : String, matchTypes : String, message : String,
+    code : Int, captureHeader : String) : NodeSeq = {
+    stepsWithHeaderAllValueMatchTypesMessageCode(checker, name, value, matchTypes, message, code).filter(n => (n \ "@captureHeader").text == captureHeader)
+  }
+
+
+
+
   def Start : (NodeSeq) => NodeSeq = stepsWithType(_, "START")
   def Accept : (NodeSeq) => NodeSeq = stepsWithType(_, "ACCEPT")
   def URLFail : (NodeSeq) => NodeSeq = stepsWithType(_, "URL_FAIL")
@@ -311,7 +371,20 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def HeaderXSDSingle(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDSingleMessageMatch (_, name, headerMatch, message)
   def HeaderXSDSingle(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDSingleCodeMatch (_, name, headerMatch, code)
   def HeaderXSDSingle(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderXSDSingleMessageCodeMatch (_, name, headerMatch, message, code)
-
+  def HeaderAll(name : String, headerMatch : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAllValue(_, name, headerMatch)
+  def HeaderAll(name : String, headerMatch : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAllValueMessage(_, name, headerMatch, message)
+  def HeaderAll(name : String, headerMatch : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderAllValueCode(_, name, headerMatch, code)
+  def HeaderAll(name : String, headerMatch : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderAllValueMessageCode(_, name, headerMatch, message, code)
+  def HeaderAllWithTypes(name : String, matchTypes : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAllMatchTypes(_, name, matchTypes)
+  def HeaderAllWithTypes(name : String, matchTypes : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAllMatchTypesMessage(_, name, matchTypes, message)
+  def HeaderAllWithTypes(name : String, matchTypes : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderAllMatchTypesCode(_, name, matchTypes, code)
+  def HeaderAllWithTypes(name : String, matchTypes : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithHeaderAllMatchTypesMessageCode(_, name, matchTypes, message, code)
+  def HeaderAllWithMatchAndTypes(name : String, headerMatch : String, matchTypes : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAllValueMatchTypes(_, name, headerMatch, matchTypes)
+  def HeaderAllWithMatchAndTypes(name : String, headerMatch : String, matchTypes : String, message : String) : (NodeSeq) => NodeSeq = stepsWithHeaderAllValueMatchTypesMessage(_, name, headerMatch, matchTypes, message)
+  def HeaderAllWithMatchAndTypes(name : String, headerMatch : String, matchTypes : String, code : Int) : (NodeSeq) => NodeSeq =
+    stepsWithHeaderAllValueMatchTypesCode(_, name, headerMatch, matchTypes, code)
+  def HeaderAllWithMatchAndTypes(name : String, headerMatch : String, matchTypes : String, message : String, code : Int) : (NodeSeq) => NodeSeq =
+    stepsWithHeaderAllValueMatchTypesMessageCode(_, name, headerMatch, matchTypes, message, code)
 
   def SetHeader(name : String, value : String) : (NodeSeq) => NodeSeq = stepsWithSetHeader(_, name, value)
 

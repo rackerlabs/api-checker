@@ -115,7 +115,7 @@
         <xsl:param name="roles" as="xsd:string*" select="()"/>
         <xsl:if test="not('#all' = $roles)">
             <xsl:for-each select="$roles">
-                <wadl:param name="X-ROLES" style="header" rax:code="403"
+                <wadl:param name="X-ROLES" style="header" rax:code="403" rax:anyMatch="true"
                             rax:message="You are forbidden to perform the operation" type="xsd:string"
                             required="true" repeating="true">
                     <xsl:attribute name="fixed" select="rax:transformNBSP(.)"/>

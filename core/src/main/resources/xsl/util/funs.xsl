@@ -57,7 +57,7 @@
     <xsl:variable name="cont-error-types" as="xs:string*" select="('WELL_XML','WELL_JSON', 'XSD',
                                                                    'XPATH', 'XSL', 'HEADER',
                                                                    'HEADERXSD', 'HEADER_ANY', 'HEADERXSD_ANY',
-                                                                   'HEADER_SINGLE', 'HEADERXSD_SINGLE',
+                                                                   'HEADER_SINGLE', 'HEADERXSD_SINGLE', 'HEADER_ALL',
                                                                    'JSON_SCHEMA')"/>
 
     <!--

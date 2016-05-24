@@ -160,49 +160,49 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         <resource path="path/to/resource1">
           <method name="GET" rax:roles="headerRole">
             <request>
-              <param name="MyHeader" style="header" required="true" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" repeating="true"
                      rax:captureHeader="X-DEVICE-ID"/>
-              <param name="OtherHeader" style="header" required="true" repeating="true"
+              <param name="OtherHeader" style="header" rax:anyMatch="true" required="true" repeating="true"
                      type="xs:int"/>
             </request>
           </method>
           <method name="POST">
             <request>
-              <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="FOO" repeating="true"
                      rax:captureHeader="X-DEVICE-ID"/>
-              <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="FAR" repeating="true"
                      rax:captureHeader="X-DEVICE-ID"/>
-              <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="OUT" repeating="true"
                      rax:captureHeader="X-DEVICE-ID"/>
             </request>
           </method>
           <method name="PUT">
             <request>
-              <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="FOO" repeating="true"
                      type="xs:string" rax:captureHeader="X-DEVICE-ID"/>
-              <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="FAR" repeating="true"
                      type="xs:string"/>
-              <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="OUT" repeating="true"
                      type="xs:string"/>
             </request>
           </method>
           <method name="DELETE">
             <request>
-              <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="1" repeating="true"
                      type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
-              <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="2" repeating="true"
                      type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
-              <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="3" repeating="true"
                      type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
             </request>
           </method>
           <method name="PATCH">
             <request>
-              <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="1" repeating="true"
                      type="xs:int" rax:captureHeader="X-DEVICE-ID"/>
-              <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="2" repeating="true"
                      type="xs:int"/>
-              <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="3" repeating="true"
                      type="xs:int"/>
             </request>
           </method>
@@ -275,49 +275,49 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         <resource path="path/to/resource1">
           <method name="GET" rax:roles="headerRole">
             <request>
-              <param name="MyHeader" style="header" required="true" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" repeating="true"
                      rax:device="true"/>
-              <param name="OtherHeader" style="header" required="true" repeating="true"
+              <param name="OtherHeader" style="header" rax:anyMatch="true" required="true" repeating="true"
                      type="xs:int"/>
             </request>
           </method>
           <method name="POST">
             <request>
-              <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="FOO" repeating="true"
                      rax:device="true"/>
-              <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="FAR" repeating="true"
                      rax:device="true"/>
-              <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="OUT" repeating="true"
                      rax:device="true"/>
             </request>
           </method>
           <method name="PUT">
             <request>
-              <param name="MyHeader" style="header" required="true" fixed="FOO" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="FOO" repeating="true"
                      type="xs:string" rax:device="true"/>
-              <param name="MyHeader" style="header" required="true" fixed="FAR" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="FAR" repeating="true"
                      type="xs:string"/>
-              <param name="MyHeader" style="header" required="true" fixed="OUT" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="OUT" repeating="true"
                      type="xs:string"/>
             </request>
           </method>
           <method name="DELETE">
             <request>
-              <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="1" repeating="true"
                      type="xs:int" rax:device="true"/>
-              <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="2" repeating="true"
                      type="xs:int" rax:device="true"/>
-              <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="3" repeating="true"
                      type="xs:int" rax:device="true"/>
             </request>
           </method>
           <method name="PATCH">
             <request>
-              <param name="MyHeader" style="header" required="true" fixed="1" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="1" repeating="true"
                      type="xs:int" rax:device="true"/>
-              <param name="MyHeader" style="header" required="true" fixed="2" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="2" repeating="true"
                      type="xs:int"/>
-              <param name="MyHeader" style="header" required="true" fixed="3" repeating="true"
+              <param name="MyHeader" style="header" rax:anyMatch="true" required="true" fixed="3" repeating="true"
                      type="xs:int"/>
             </request>
           </method>

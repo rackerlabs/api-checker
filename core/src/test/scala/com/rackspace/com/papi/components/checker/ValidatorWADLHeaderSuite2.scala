@@ -53,14 +53,107 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
   val checkHeadersDisabledConfigDups : CaseConfig = ("check headers disabled and remove dups enabled", TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, false, false, false))
   val checkHeadersConfig : CaseConfig = ("check headers enabled", TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, false))
   val checkHeadersConfigDups : CaseConfig = ("check headers and remove dups enabled", TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, false))
-  val checkHeadersDefaultsConfig : CaseConfig = ("check headers and param defaults enabled", { val t = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, false); t.setParamDefaults = true; t })
-  val checkHeadersDefaultsConfigDups : CaseConfig = ("check headers, param defaults,  and remove dups enabled", { val t = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, false); t.setParamDefaults = true; t})
-  val checkHeadersDisabledMsgConfig : CaseConfig = ("check headers disabled, message extension enabled", TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, false, false, true))
-  val checkHeadersDisabledMsgConfigDups : CaseConfig = ("check headers disabled and remove dups enabled and message extension enabled", TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, false, false, true))
-  val checkHeadersMsgConfig : CaseConfig = ("check headers enabled and message extension enabled", TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, true))
-  val checkHeadersMsgConfigDups : CaseConfig = ("check headers and remove dups enabled and message extension enabled", TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, true))
-  val checkHeadersMsgDefaultsConfig : CaseConfig = ("check headers and param defaults enabled and message extension enabled", { val t = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, true); t.setParamDefaults = true; t })
-  val checkHeadersMsgDefaultsConfigDups : CaseConfig = ("check headers, param defaults,  and remove dups enabled and message extension enabled", { val t = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, true); t.setParamDefaults = true; t})
+  val checkHeadersConfigDisableAnyMatch  : CaseConfig = ("check headers enabled, anymatch extension disabled", {
+    val tc = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, false)
+    tc.enableAnyMatchExtension = false
+    tc
+  })
+  val checkHeadersConfigDupsDisableAnyMatch : CaseConfig = ("check headers and remove dups enabled, anymatch disabled", {
+    val tc = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, false)
+    tc.enableAnyMatchExtension = false
+    tc
+  })
+
+  val checkHeadersDefaultsConfig : CaseConfig = ("check headers and param defaults enabled", {
+    val t = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, false);
+    t.setParamDefaults = true;
+    t
+  })
+  val checkHeadersDefaultsConfigDups : CaseConfig = ("check headers, param defaults,  and remove dups enabled", {
+    val t = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, false);
+    t.setParamDefaults = true;
+    t
+  })
+
+  val checkHeadersDefaultsConfigDisableAnyMatch : CaseConfig = ("check headers and param defaults enabled disabled anyMatch", {
+    val t = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, false);
+    t.setParamDefaults = true;
+    t.enableAnyMatchExtension = false
+    t
+  })
+  val checkHeadersDefaultsConfigDupsDisableAnyMatch : CaseConfig = ("check headers, param defaults,  and remove dups enabled, disabled anyMatch", {
+    val t = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, false);
+    t.setParamDefaults = true;
+    t.enableAnyMatchExtension = false
+    t
+  })
+
+  val checkHeadersDisabledMsgConfig : CaseConfig = ("check headers disabled, message extension enabled",
+                                                    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, false, false, true))
+
+  val checkHeadersDisabledMsgConfigDups : CaseConfig = ("check headers disabled and remove dups enabled and message extension enabled",
+                                                        TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, false, false, true))
+
+
+  val checkHeadersDisabledMsgConfigDisableAnyMatch : CaseConfig = ("check headers disabled, message extension enabled disable any match", {
+    val t = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, false, false, true)
+    t.enableAnyMatchExtension = false
+    t
+  })
+
+  val checkHeadersDisabledMsgConfigDupsDisableAnyMatch : CaseConfig = ("check headers disabled and remove dups enabled and message extension enabled disable any match", {
+    val t = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, false, false, true)
+    t.enableAnyMatchExtension = false
+    t
+  })
+
+
+  val checkHeadersMsgConfig : CaseConfig = ("check headers enabled and message extension enabled",
+                                            TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, true))
+
+  val checkHeadersMsgConfigDups : CaseConfig = ("check headers and remove dups enabled and message extension enabled",
+                                                TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, true))
+
+
+  val checkHeadersMsgConfigDisableAnyMatch : CaseConfig = ("check headers enabled and message extension enabled disable any match", {
+    val t = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, true)
+    t.enableAnyMatchExtension = false
+    t
+  })
+
+  val checkHeadersMsgConfigDupsDisableAnyMatch : CaseConfig = ("check headers and remove dups enabled and message extension enabled disable any match", {
+    val t = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, true)
+    t.enableAnyMatchExtension = false
+    t
+  })
+
+
+  val checkHeadersMsgDefaultsConfig : CaseConfig = ("check headers and param defaults enabled and message extension enabled", {
+    val t = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, true);
+    t.setParamDefaults = true;
+    t
+  })
+
+  val checkHeadersMsgDefaultsConfigDups : CaseConfig = ("check headers, param defaults,  and remove dups enabled and message extension enabled", {
+    val t = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, true);
+    t.setParamDefaults = true;
+    t
+  })
+
+
+  val checkHeadersMsgDefaultsConfigDisableAnyMatch : CaseConfig = ("check headers and param defaults enabled and message extension enabled disable any match", {
+    val t = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", false, true, false, true);
+    t.setParamDefaults = true;
+    t.enableAnyMatchExtension = false
+    t
+  })
+
+  val checkHeadersMsgDefaultsConfigDupsDisableAnyMatch : CaseConfig = ("check headers, param defaults,  and remove dups enabled and message extension enabled disable any match", {
+    val t = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, false, true);
+    t.setParamDefaults = true;
+    t.enableAnyMatchExtension = false
+    t
+  })
 
   val resourceHeadersWADL : TestWADL = ("WADL with mixed same name headers at the resource level",
                                             <application xmlns="http://wadl.dev.java.net/2009/02"
@@ -69,9 +162,10 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                               xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
                                           <resources base="https://test.api.openstack.com">
                                       <resource path="/a/b">
-                                        <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" default="foo!" rax:code="401" rax:message="No!"/>
-                                        <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!"/>
-                                        <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!"/>
+                                        <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" default="foo!" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                        <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                        <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                        <param name="X-TEST" style="header" type="xsd:date" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
                                         <param name="X-TESTO" style="header" type="xsd:int" required="true" repeating="true" default="42" rax:message="Bad Testo"/>
                                         <method name="PUT">
                                           <request>
@@ -96,6 +190,42 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                       </resources>
                                       </application>)
 
+  val resourceHeadersAllMatchWADL : TestWADL = ("WADL with mixed same name headers at the resource level anyMatch=false",
+                                            <application xmlns="http://wadl.dev.java.net/2009/02"
+                                              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                                              xmlns:rax="http://docs.rackspace.com/api"
+                                              xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                          <resources base="https://test.api.openstack.com">
+                                      <resource path="/a/b">
+                                        <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" default="foo!" rax:code="401" rax:message="No!" rax:anyMatch="false"/>
+                                        <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="false"/>
+                                        <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!"/>
+                                        <param name="X-TEST" style="header" type="xsd:date" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="0"/>
+                                        <param name="X-TESTO" style="header" type="xsd:int" required="true" repeating="true" default="42" rax:message="Bad Testo"/>
+                                        <method name="PUT">
+                                          <request>
+                                            <representation mediaType="application/xml" element="tst:a"/>
+                                            <representation mediaType="application/json"/>
+                                          </request>
+                                        </method>
+                                        <method name="POST">
+                                          <request>
+                                            <representation mediaType="application/xml" element="tst:e"/>
+                                          </request>
+                                        </method>
+                                      </resource>
+                                      <resource path="/c">
+                                        <method name="POST">
+                                          <request>
+                                            <representation mediaType="application/json"/>
+                                          </request>
+                                        </method>
+                                        <method name="GET"/>
+                                       </resource>
+                                      </resources>
+                                      </application>)
+
+
   val resourceHeadersNoRepeatWADL : TestWADL = ("WADL with mixed same name non-repeating headers at the resource level",
                                             <application xmlns="http://wadl.dev.java.net/2009/02"
                                               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -106,6 +236,7 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                         <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="false" default="foo!" rax:code="401" rax:message="No!"/>
                                         <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" rax:code="401" rax:message="No!"/>
                                         <param name="X-TEST" style="header" type="xsd:dateTime" required="true" rax:code="401" rax:message="No!"/>
+                                        <param name="X-TEST" style="header" type="xsd:date" required="true" repeating="false" rax:code="401" rax:message="No!"/>
                                         <param name="X-TESTO" style="header" type="xsd:int" required="true" default="42" rax:message="Bad Testo"/>
                                         <method name="PUT">
                                           <request>
@@ -130,6 +261,7 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                       </resources>
                                       </application>)
 
+
   val requestHeadersWADL : TestWADL = ("WADL with mixed same name headers at the request level",
                                             <application xmlns="http://wadl.dev.java.net/2009/02"
                                               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -145,9 +277,10 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                         </method>
                                         <method name="POST">
                                           <request>
-                                             <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" default="foo!" rax:code="401" rax:message="No!"/>
-                                             <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!"/>
-                                             <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!"/>
+                                             <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" default="foo!" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                             <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                             <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                             <param name="X-TEST" style="header" type="xsd:date" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
                                              <param name="X-TESTO" style="header" type="xsd:int" required="true" repeating="true" default="42" rax:message="Bad Testo"/>
                                              <representation mediaType="application/xml" element="tst:e"/>
                                           </request>
@@ -163,6 +296,42 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                        </resource>
                                       </resources>
                                       </application>)
+
+  val requestHeadersAllMatchWADL : TestWADL = ("WADL with mixed same name headers at the request level anyMatch = false",
+                                            <application xmlns="http://wadl.dev.java.net/2009/02"
+                                              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                                              xmlns:rax="http://docs.rackspace.com/api"
+                                              xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                          <resources base="https://test.api.openstack.com">
+                                      <resource path="/a/b">
+                                        <method name="PUT">
+                                          <request>
+                                            <representation mediaType="application/xml" element="tst:a"/>
+                                            <representation mediaType="application/json"/>
+                                          </request>
+                                        </method>
+                                        <method name="POST">
+                                          <request>
+                                             <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" default="foo!" rax:code="401" rax:message="No!" rax:anyMatch="false"/>
+                                             <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="false"/>
+                                             <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="0"/>
+                                             <param name="X-TEST" style="header" type="xsd:date" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="0"/>
+                                             <param name="X-TESTO" style="header" type="xsd:int" required="true" repeating="true" default="42" rax:message="Bad Testo"/>
+                                             <representation mediaType="application/xml" element="tst:e"/>
+                                          </request>
+                                        </method>
+                                      </resource>
+                                      <resource path="/c">
+                                        <method name="POST">
+                                          <request>
+                                            <representation mediaType="application/json"/>
+                                          </request>
+                                        </method>
+                                        <method name="GET"/>
+                                       </resource>
+                                      </resources>
+                                      </application>)
+
 
   val requestHeadersNoRepeatWADL : TestWADL = ("WADL with mixed same name no repeat headers at the request level",
                                             <application xmlns="http://wadl.dev.java.net/2009/02"
@@ -182,6 +351,7 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                              <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" default="foo!" rax:code="401" rax:message="No!"/>
                                              <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="false" rax:code="401" rax:message="No!"/>
                                              <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="0" rax:code="401" rax:message="No!"/>
+                                             <param name="X-TEST" style="header" type="xsd:date" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
                                              <param name="X-TESTO" style="header" type="xsd:int" required="true" default="42" rax:message="Bad Testo"/>
                                              <representation mediaType="application/xml" element="tst:e"/>
                                           </request>
@@ -224,6 +394,11 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
     test(s"$desc : should allow PUT on /a/b with X-TEST=2001-10-26T19:32:52Z and X-TESTO=23 and goodXML") {
       validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
                                  Map("X-TEST"->List("2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=2001-10-26 and X-TESTO=23 and goodXML") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("2001-10-26"), "X-TESTO"->List("23"))), response, chain)
     }
 
     test(s"$desc : should allow PUT on /a/b with X-TEST=foo!, baz, bing and X-TESTO=23 and goodXML") {
@@ -289,6 +464,104 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
 
   }
 
+
+  def mixedHeaderHappyPathTestsAllMatch (desc : String, validator : Validator) : Unit = {
+    test(s"$desc : should allow GET on /c ") {
+      validator.validate(request("GET","/c"), response, chain)
+    }
+
+    test(s"$desc : should allow json post on /c, with no headers") {
+      validator.validate(request("POST", "/c", "application/json", goodJSON, false, Map[String,List[String]]()), response, chain)
+    }
+
+    test(s"$desc : should allow json post on /c, with weird X-TEST header") {
+      validator.validate(request("POST", "/c", "application/json", goodJSON, false, Map("X-TEST"->List("foo"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=foo! and X-TESTO=23 and goodXML") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=bar! and X-TESTO=23 and goodXML") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("bar!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=2001-10-26T19:32:52Z and X-TESTO=23 and goodXML") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=2001-10-26 and X-TESTO=23 and goodXML") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("2001-10-26"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=foo!, 2001-10-26,  2001-10-26T19:32:52Z, bar! and X-TESTO=23 and goodXML") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!", "2001-10-26", "2001-10-26T19:32:52Z", "bar!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=bar!, 2001-10-26,  2001-10-26T19:32:52Z and X-TESTO=23 and goodXML") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("bar!", "2001-10-26", "2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=2001-10-26T19:32:52Z, foo!, bar! and X-TESTO=23 and goodXML") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!", "bar!", "2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=foo! and X-TESTO=23 and goodJSON") {
+      validator.validate(request("PUT", "/a/b", "application/json", goodJSON, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=bar! and X-TESTO=23 and goodJSON") {
+      validator.validate(request("PUT", "/a/b", "application/json", goodJSON, false,
+                                 Map("X-TEST"->List("bar!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=2001-10-26T19:32:52Z and X-TESTO=23 and goodJSON") {
+      validator.validate(request("PUT", "/a/b", "application/json", goodJSON, false,
+                                 Map("X-TEST"->List("2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=foo! and X-TESTO=23 and goodXML") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=bar! and X-TESTO=23 and goodXML") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("bar!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=2001-10-26T19:32:52Z and X-TESTO=23 and goodXML") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=foo!, bar!, 1975-07-08 and X-TESTO=23 and goodXML") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("foo!", "bar!", "1975-07-08"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=bar!, 1975-07-08, foo! and X-TESTO=23 and goodXML") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("bar!", "1975-07-08", "foo!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=2001-10-26T19:32:52Z, 1975-07-08, foo! and X-TESTO=23 and goodXML") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("1975-07-08", "foo!", "2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+  }
+
+
   def mixedHeaderHappyPathNoRepeatTests (desc : String, validator : Validator) : Unit = {
     test(s"$desc : should allow GET on /c ") {
       validator.validate(request("GET","/c"), response, chain)
@@ -337,6 +610,12 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
       validator.validate(request("PUT", "/a/b", "application/json", goodJSON, false,
                                  Map("X-TEST"->List("2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
     }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=2001-10-26 and X-TESTO=23 and goodJSON") {
+      validator.validate(request("PUT", "/a/b", "application/json", goodJSON, false,
+                                 Map("X-TEST"->List("2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
+    }
+
 
     test(s"$desc : should allow POST on /a/b with X-TEST=foo! and X-TESTO=23 and goodXML") {
       validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
@@ -562,6 +841,126 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
 
   }
 
+
+  def mixedHeaderNegHeaderTestsAll (desc : String, validator : Validator) : Unit = {
+
+
+    test(s"$desc : should not allow PUT /a/b with no headers") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map[String,List[String]]()), response, chain), 400,
+                                            List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO is not set") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST is not set") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b with no headers") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map[String,List[String]]()), response, chain), 400,
+                                            List("X-TEST","header"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO is not set") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST is not set") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, bing!") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","bing!"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header","bing!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, 1975-07-08, 9999-99-99") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","1975-07-08","9999-99-99"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header","9999-99-99"))
+    }
+
+  }
+
+
   def mixedHeaderMsgNegHeaderTests (desc : String, validator : Validator) : Unit = {
 
 
@@ -665,6 +1064,126 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
     }
 
   }
+
+def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Unit = {
+
+
+    test(s"$desc : should not allow PUT /a/b with no headers") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map[String,List[String]]()), response, chain), 401,
+                                            List("No!"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO is not set") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST is not set") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b with no headers") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map[String,List[String]]()), response, chain), 401,
+                                            List("No!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO is not set") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST is not set") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, bing!") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","bing!"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, 1975-07-08, 9999-99-99") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","1975-07-08","9999-99-99"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+
+  }
+
+
 
   def mixedHeaderNegHeaderNoRepeatTests (desc : String, validator : Validator) : Unit = {
 
@@ -903,6 +1422,153 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
 
   }
 
+  def mixedHeaderDefaultHeaderTestsAll (desc : String, validator : Validator) : Unit = {
+
+    test(s"$desc : should allow PUT /a/b with no headers, default X-TEST and X-TESTO should be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map[String,List[String]]())
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO is not set, default value for X-TESTO should be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map("X-TEST"->List("bar!")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("bar!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : allow PUT /a/b if X-TEST is not set, default vaule of X-TEST should be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map("X-TESTO"->List("23")))
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("23"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should allow POST /a/b with no headers, default X-TEST and X-TESTO should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map[String,List[String]]())
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TESTO is not set, default value for X-TESTO should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map("X-TEST"->List("bar!")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("bar!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TEST is not set, default value for X-TEST should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map("X-TESTO"->List("23")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("23"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, bing!") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","bing!"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header","bing!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, 1975-07-08, 9999-99-99") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","1975-07-08","9999-99-99"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header","9999-99-99"))
+    }
+
+
+  }
+
 
   def mixedHeaderMsgDefaultHeaderTests (desc : String, validator : Validator) : Unit = {
 
@@ -1036,6 +1702,154 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
     }
 
   }
+
+
+  def mixedHeaderMsgDefaultHeaderTestsAll (desc : String, validator : Validator) : Unit = {
+
+    test(s"$desc : should allow PUT /a/b with no headers, default X-TEST and X-TESTO should be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map[String,List[String]]())
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO is not set, default value for X-TESTO should be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map("X-TEST"->List("bar!")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("bar!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : allow PUT /a/b if X-TEST is not set, default vaule of X-TEST should be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map("X-TESTO"->List("23")))
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("23"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+
+    test(s"$desc : should not allow PUT /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should allow POST /a/b with no headers, default X-TEST and X-TESTO should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map[String,List[String]]())
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TESTO is not set, default value for X-TESTO should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map("X-TEST"->List("bar!")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("bar!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TEST is not set, default value for X-TEST should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map("X-TESTO"->List("23")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("23"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, bing!") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","bing!"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, 1975-07-08, 9999-99-99") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","1975-07-08","9999-99-99"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+  }
+
 
 
   def mixedHeaderDefaultHeaderNoRepeatTests (desc : String, validator : Validator) : Unit = {
@@ -1266,6 +2080,116 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
 
   }
 
+
+  def mixedReqHeaderNegHeaderTestsAll (desc : String, validator : Validator) : Unit = {
+
+
+    test(s"$desc : should allow PUT /a/b with no headers") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map[String,List[String]]()), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO is not set") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST is not set") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST=foo") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST=baz, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=foo") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=baz, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=23, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing"))), response, chain)
+    }
+
+    test(s"$desc : should not allow POST /a/b with no headers") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map[String,List[String]]()), response, chain), 400,
+                                            List("X-TEST","header"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO is not set") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST is not set") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+     test(s"$desc : should not allow POST /a/b if X-TEST=foo!, bing!") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","bing!"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header","bing!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, 1975-07-08, 9999-99-99") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","1975-07-08","9999-99-99"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header","9999-99-99"))
+    }
+
+  }
+
+
   def mixedReqHeaderMsgNegHeaderTests (desc : String, validator : Validator) : Unit = {
 
 
@@ -1362,6 +2286,116 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
   }
 
 
+  def mixedReqHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Unit = {
+
+
+    test(s"$desc : should allow PUT /a/b with no headers") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map[String,List[String]]()), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO is not set") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST is not set") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST=foo") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST=baz, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=foo") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=baz, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=23, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing"))), response, chain)
+    }
+
+    test(s"$desc : should not allow POST /a/b with no headers") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map[String,List[String]]()), response, chain), 401,
+                                            List("No!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO is not set") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST is not set") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, bing!") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","bing!"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, 1975-07-08, 9999-99-99") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","1975-07-08","9999-99-99"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+
+  }
+
+
   def mixedReqHeaderNegHeaderNoRepeatTests (desc : String, validator : Validator) : Unit = {
 
 
@@ -1434,7 +2468,7 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
     test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
       assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
                                                     Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 400,
-                       List("X-TEST","Header","1 and only 1"))
+                       List("X-TEST","date"))
     }
 
     test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
@@ -1585,6 +2619,149 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
 
   }
 
+  def mixedReqHeaderDefaultHeaderTestsAll (desc : String, validator : Validator) : Unit = {
+
+    test(s"$desc : should allow PUT /a/b with no headers, default X-TEST and X-TESTO should not be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map[String,List[String]]())
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == Nil)
+        assert (csReq.getHeaders("X-TESTO").toList == Nil)
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO is not set, default value for X-TESTO should not be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map("X-TEST"->List("bar!")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("bar!"))
+        assert (csReq.getHeaders("X-TESTO").toList == Nil)
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : allow PUT /a/b if X-TEST is not set, default vaule of X-TEST should not be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map("X-TESTO"->List("23")))
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == Nil)
+        assert (csReq.getHeaders("X-TESTO").toList == List("23"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST=foo") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST=baz, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=foo") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=baz, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=23, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b with no headers, default X-TEST and X-TESTO should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map[String,List[String]]())
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TESTO is not set, default value for X-TESTO should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map("X-TEST"->List("bar!")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("bar!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TEST is not set, default value for X-TEST should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map("X-TESTO"->List("23")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("23"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing!"))), response, chain), 400,
+                       List("X-TESTO","header"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, bing!") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","bing!"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header","bing!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, 1975-07-08, 9999-99-99") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","1975-07-08","9999-99-99"), "X-TESTO"->List("23"))), response, chain), 400,
+                       List("X-TEST","header","9999-99-99"))
+    }
+
+
+  }
+
+
+
 
   def mixedReqHeaderMsgDefaultHeaderTests (desc : String, validator : Validator) : Unit = {
 
@@ -1714,6 +2891,147 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
   }
 
 
+  def mixedReqHeaderMsgDefaultHeaderTestsAll (desc : String, validator : Validator) : Unit = {
+
+    test(s"$desc : should allow PUT /a/b with no headers, default X-TEST and X-TESTO should not be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map[String,List[String]]())
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == Nil)
+        assert (csReq.getHeaders("X-TESTO").toList == Nil)
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO is not set, default value for X-TESTO should not be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map("X-TEST"->List("bar!")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("bar!"))
+        assert (csReq.getHeaders("X-TESTO").toList == Nil)
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : allow PUT /a/b if X-TEST is not set, default vaule of X-TEST should not be set") {
+      val req = request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                        Map("X-TESTO"->List("23")))
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == Nil)
+        assert (csReq.getHeaders("X-TESTO").toList == List("23"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST=foo") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TEST=baz, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=foo") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=baz, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT /a/b if X-TESTO=23, bing") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b with no headers, default X-TEST and X-TESTO should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map[String,List[String]]())
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TESTO is not set, default value for X-TESTO should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map("X-TEST"->List("bar!")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("bar!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("42"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TEST is not set, default value for X-TEST should be set") {
+      val req = request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                        Map("X-TESTO"->List("23")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+        assert (csReq.getHeaders("X-TEST").toList == List("foo!"))
+        assert (csReq.getHeaders("X-TESTO").toList == List("23"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("foo"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=baz, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("baz", "bing!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TESTO=23, bing") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!"), "X-TESTO"->List("23", "bing!"))), response, chain), 400,
+                       List("Bad Testo"))
+    }
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, bing!") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","bing!"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+
+    test(s"$desc : should not allow POST /a/b if X-TEST=foo!, 1975-07-08, 9999-99-99") {
+      assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                                    Map("X-TEST"->List("foo!","1975-07-08","9999-99-99"), "X-TESTO"->List("23"))), response, chain), 401,
+                       List("No!"))
+    }
+
+  }
+
+
   def mixedReqHeaderDefaultHeaderNoRepeatTests (desc : String, validator : Validator) : Unit = {
 
     test(s"$desc : should allow PUT /a/b with no headers, default X-TEST and X-TESTO should not be set") {
@@ -1818,7 +3136,7 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
     test(s"$desc : should not allow POST /a/b if X-TEST=baz, bing") {
       assertResultFailed(validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
                                                     Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain), 400,
-                       List("X-TEST","Header","1 and only 1"))
+                       List("X-TEST","date"))
     }
 
     test(s"$desc : should not allow POST /a/b if X-TESTO=foo") {
@@ -1855,6 +3173,21 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
   run(mixedHeadersMsgDisabledCase)
 
 
+  val mixedHeadersAllMatchDisabledCase : TestCase = (resourceHeadersAllMatchWADL,
+                                                     List(checkHeadersDisabledConfig, checkHeadersDisabledConfigDups),
+                                                     List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
+
+  run(mixedHeadersAllMatchDisabledCase)
+
+
+  val mixedHeadersAllMatchMsgDisabledCase : TestCase = (resourceHeadersAllMatchWADL,
+                                                        List(checkHeadersDisabledMsgConfig, checkHeadersDisabledMsgConfigDups),
+                                                        List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
+
+  run(mixedHeadersAllMatchMsgDisabledCase)
+
+
+
 
   val mixedHeadersDisabledNoRepeatCase : TestCase = (resourceHeadersNoRepeatWADL,
                                      List(checkHeadersDisabledConfig, checkHeadersDisabledConfigDups),
@@ -1877,11 +3210,41 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
 
   run(mixedHeadersCase)
 
+
+  val mixedHeadersAllCase : TestCase = (resourceHeadersAllMatchWADL,
+                                     List(checkHeadersConfig, checkHeadersConfigDups),
+                                     List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderNegHeaderTestsAll))
+
+  run(mixedHeadersAllCase)
+
+
+  val mixedHeadersDisableAnyCase : TestCase = (resourceHeadersWADL,
+                                     List(checkHeadersConfigDisableAnyMatch, checkHeadersConfigDupsDisableAnyMatch),
+                                     List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderNegHeaderTestsAll))
+
+  run(mixedHeadersDisableAnyCase)
+
+
+
   val mixedHeadersMsgCase : TestCase = (resourceHeadersWADL,
                                      List(checkHeadersMsgConfig, checkHeadersMsgConfigDups),
                                      List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderMsgNegHeaderTests))
 
   run(mixedHeadersMsgCase)
+
+
+  val mixedHeadersMsgAllCase : TestCase = (resourceHeadersAllMatchWADL,
+                                     List(checkHeadersMsgConfig, checkHeadersMsgConfigDups),
+                                     List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderMsgNegHeaderTestsAll))
+
+  run(mixedHeadersMsgAllCase)
+
+  val mixedHeadersMsgDisableAnyCase : TestCase = (resourceHeadersWADL,
+                                     List(checkHeadersMsgConfigDisableAnyMatch, checkHeadersMsgConfigDupsDisableAnyMatch),
+                                     List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderMsgNegHeaderTestsAll))
+
+  run(mixedHeadersMsgDisableAnyCase)
+
 
 
 
@@ -1907,11 +3270,41 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
   run(mixedHeadersDefaultCase)
 
 
+  val mixedHeadersDefaultAllCase : TestCase = (resourceHeadersAllMatchWADL,
+                                            List(checkHeadersDefaultsConfig, checkHeadersDefaultsConfigDups),
+                                            List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderDefaultHeaderTestsAll))
+
+  run(mixedHeadersDefaultAllCase)
+
+
+  val mixedHeadersDefaultDisableAnyCase : TestCase = (resourceHeadersWADL,
+                                            List(checkHeadersDefaultsConfigDisableAnyMatch, checkHeadersDefaultsConfigDupsDisableAnyMatch),
+                                            List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderDefaultHeaderTestsAll))
+
+  run(mixedHeadersDefaultDisableAnyCase)
+
+
+
   val mixedHeadersMsgDefaultCase : TestCase = (resourceHeadersWADL,
                                                List(checkHeadersMsgDefaultsConfig, checkHeadersMsgDefaultsConfigDups),
                                                List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderMsgDefaultHeaderTests))
 
   run(mixedHeadersMsgDefaultCase)
+
+
+  val mixedHeadersMsgDefaultAllCase : TestCase = (resourceHeadersAllMatchWADL,
+                                               List(checkHeadersMsgDefaultsConfig, checkHeadersMsgDefaultsConfigDups),
+                                               List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderMsgDefaultHeaderTestsAll))
+
+  run(mixedHeadersMsgDefaultAllCase)
+
+
+  val mixedHeadersMsgDefaultDisabledAnyCase : TestCase = (resourceHeadersWADL,
+                                                          List(checkHeadersMsgDefaultsConfigDisableAnyMatch, checkHeadersMsgDefaultsConfigDupsDisableAnyMatch),
+                                                          List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderMsgDefaultHeaderTestsAll))
+
+  run(mixedHeadersMsgDefaultDisabledAnyCase)
+
 
 
   val mixedHeadersDefaultNoRepeatCase : TestCase = (resourceHeadersNoRepeatWADL,
@@ -1936,11 +3329,27 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
   run(mixedReqHeadersDisabledCase)
 
 
+
   val mixedReqHeadersMsgDisabledCase : TestCase = (requestHeadersWADL,
                                                    List(checkHeadersDisabledMsgConfig, checkHeadersDisabledMsgConfigDups),
                                                    List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
 
   run(mixedReqHeadersMsgDisabledCase)
+
+
+  val mixedReqHeadersAllMatchDisabledCase : TestCase = (requestHeadersAllMatchWADL,
+                                                        List(checkHeadersDisabledConfig, checkHeadersDisabledConfigDups),
+                                                        List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
+
+  run(mixedReqHeadersAllMatchDisabledCase)
+
+
+
+  val mixedReqHeadersAllMatchMsgDisabledCase : TestCase = (requestHeadersAllMatchWADL,
+                                                           List(checkHeadersDisabledMsgConfig, checkHeadersDisabledMsgConfigDups),
+                                                           List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
+
+  run(mixedReqHeadersAllMatchMsgDisabledCase)
 
 
 
@@ -1966,11 +3375,40 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
   run(mixedReqHeadersCase)
 
 
+  val mixedReqHeadersAllCase : TestCase = (requestHeadersAllMatchWADL,
+                                        List(checkHeadersConfig, checkHeadersConfigDups),
+                                        List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests,mixedReqHeaderNegHeaderTestsAll))
+
+  run(mixedReqHeadersAllCase)
+
+
+  val mixedReqHeadersDisableAnyCase : TestCase = (requestHeadersWADL,
+                                        List(checkHeadersConfigDisableAnyMatch, checkHeadersConfigDupsDisableAnyMatch),
+                                        List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderNegHeaderTestsAll))
+
+  run(mixedReqHeadersDisableAnyCase)
+
+
   val mixedReqHeadersMsgCase : TestCase = (requestHeadersWADL,
                                            List(checkHeadersMsgConfig, checkHeadersMsgConfigDups),
                                            List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedReqHeaderMsgNegHeaderTests))
 
   run(mixedReqHeadersMsgCase)
+
+
+  val mixedReqHeadersMsgAllCase : TestCase = (requestHeadersAllMatchWADL,
+                                           List(checkHeadersMsgConfig, checkHeadersMsgConfigDups),
+                                           List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderMsgNegHeaderTestsAll))
+
+  run(mixedReqHeadersMsgAllCase)
+
+  val mixedReqHeadersMsgDisableAnyCase : TestCase = (requestHeadersWADL,
+                                           List(checkHeadersMsgConfigDisableAnyMatch, checkHeadersMsgConfigDupsDisableAnyMatch),
+                                           List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderMsgNegHeaderTestsAll))
+
+  run(mixedReqHeadersMsgDisableAnyCase)
+
+
 
 
   val mixedReqHeadersNoRepeatCase : TestCase = (requestHeadersNoRepeatWADL,
@@ -1994,11 +3432,41 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
 
   run(mixedReqHeadersDefaultCase)
 
+
+  val mixedReqHeadersDefaultAllCase : TestCase = (requestHeadersAllMatchWADL,
+                                               List(checkHeadersDefaultsConfig, checkHeadersDefaultsConfigDups),
+                                               List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderDefaultHeaderTestsAll))
+
+  run(mixedReqHeadersDefaultAllCase)
+
+
+  val mixedReqHeadersDefaultAnyCase : TestCase = (requestHeadersWADL,
+                                               List(checkHeadersDefaultsConfigDisableAnyMatch, checkHeadersDefaultsConfigDupsDisableAnyMatch),
+                                               List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderDefaultHeaderTestsAll))
+
+  run(mixedReqHeadersDefaultAnyCase)
+
+
+
   val mixedReqHeadersMsgDefaultCase : TestCase = (requestHeadersWADL,
                                                   List(checkHeadersMsgDefaultsConfig, checkHeadersMsgDefaultsConfigDups),
                                                   List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedReqHeaderMsgDefaultHeaderTests))
 
   run(mixedReqHeadersMsgDefaultCase)
+
+
+  val mixedReqHeadersMsgDefaultAllCase : TestCase = (requestHeadersAllMatchWADL,
+                                                  List(checkHeadersMsgDefaultsConfig, checkHeadersMsgDefaultsConfigDups),
+                                                  List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderMsgDefaultHeaderTestsAll))
+
+  run(mixedReqHeadersMsgDefaultAllCase)
+
+
+  val mixedReqHeadersMsgDefaultAnyCase : TestCase = (requestHeadersWADL,
+                                                  List(checkHeadersMsgDefaultsConfigDisableAnyMatch, checkHeadersMsgDefaultsConfigDupsDisableAnyMatch),
+                                                  List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderMsgDefaultHeaderTestsAll))
+
+  run(mixedReqHeadersMsgDefaultAnyCase)
 
 
 

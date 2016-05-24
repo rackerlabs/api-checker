@@ -111,6 +111,7 @@
                 <alternative test="@type eq 'HEADERXSD_SINGLE'" type="chk:HeaderXSDSingleStep"/>
                 <alternative test="@type eq 'HEADER_ANY'" type="chk:HeaderAnyStep"/>
                 <alternative test="@type eq 'HEADERXSD_ANY'" type="chk:HeaderXSDAnyStep"/>
+                <alternative test="@type eq 'HEADER_ALL'" type="chk:HeaderAllStep"/>
                 <alternative test="@type eq 'JSON_SCHEMA'" type="chk:JsonSchemaStep"/>
             </element>
         </sequence>
@@ -425,6 +426,36 @@
         </annotation>
         <complexContent>
             <extension base="chk:HeaderStep"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="HeaderAllStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Like HeaderStep, except that all values must match
+                    at least one of the XSD types in the match
+                    attribute OR must match against the optional regex
+                    value.
+                </html:p>
+                <html:p>
+                    Although both match and matchRegEx are optional,
+                    at least one of those attributes should be
+                    specified.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:GenContentFailStep">
+                <attribute name="name" type="xsd:string" use="required"/>
+                <attribute name="match" type="chk:QNameList" use="optional"/>
+                <attribute name="matchRegEx" type="xsd:string" use="optional"/>
+                <attributeGroup ref="chk:MessageAttributes"/>
+                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
+                <assert test="@match or @matchRegEx"
+                        saxon:message="A HEADER_ALL step must contain a match or matchRegEx attribute."
+                        xerces:message="A HEADER_ALL step must contain a match or matchRegEx attribute."/>
+            </extension>
         </complexContent>
     </complexType>
 
@@ -753,6 +784,7 @@
             <enumeration value="HEADERXSD_ANY"/>
             <enumeration value="HEADER_SINGLE"/>
             <enumeration value="HEADERXSD_SINGLE"/>
+            <enumeration value="HEADER_ALL"/>
             <enumeration value="JSON_SCHEMA"/>
         </restriction>
     </simpleType>

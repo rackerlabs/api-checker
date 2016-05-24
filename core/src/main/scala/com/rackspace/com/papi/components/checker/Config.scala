@@ -243,6 +243,15 @@ class Config {
   var enableCaptureHeaderExtension : Boolean = true
 
   //
+  //  When rax:anyMatch boolean attribute is specificed on a
+  //  parameter, enable matching any value of a parameter when
+  //  multiple parameters of the same name are specificed.
+  //
+  @BeanProperty
+  @AffectsChecker
+  var enableAnyMatchExtension : Boolean = true
+
+  //
   //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,
   //  and Saxon. Note that Saxon is an XSL 2.0 engine, but most 1.0
   //  XSLs should work fine.

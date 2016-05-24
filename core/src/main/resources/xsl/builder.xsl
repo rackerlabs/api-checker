@@ -53,22 +53,30 @@
     <xsl:param name="user" as="xsd:string" select="'unknown'" />
     <xsl:param name="creator" as="xsd:string" select="'unknown'"/>
     <xsl:param name="configMetadata" as="node()">
-        <meta>
-            <config option="checkXSDGrammar"  value="false"/>
-            <config option="checkJSONGrammar" value="false"/>
-            <config option="checkWellFormed"  value="false"/>
-            <config option="checkElements"    value="false"/>
-            <config option="checkPlainParams" value="false"/>
-            <config option="checkHeaders"     value="false"/>
+        <params>
+          <meta>
+            <config option="enableIgnoreJSONSchemaExtension" value="true"/>
             <config option="setParamDefaults" value="false"/>
+            <config option="enableMessageExtension" value="true"/>
+            <config option="joinXPathChecks" value="false"/>
             <config option="doXSDGrammarTransform" value="false"/>
-            <config option="enablePreProcessExtension" value="false"/>
-            <config option="enableIgnoreXSDExtension" value="false"/>
-            <config option="enableIgnoreJSONSchemaExtension" value="false"/>
-            <config option="enableMessageExtension" value="false"/>
+            <config option="enablePreProcessExtension" value="true"/>
+            <config option="removeDups" value="false"/>
+            <config option="checkXSDGrammar" value="false"/>
+            <config option="enableCaptureHeaderExtension" value="true"/>
+            <config option="xpathVersion" value="1"/>
+            <config option="checkPlainParams" value="false"/>
+            <config option="checkWellFormed" value="false"/>
+            <config option="enableAnyMatchExtension" value="true"/>
+            <config option="enableIgnoreXSDExtension" value="true"/>
+            <config option="checkJSONGrammar" value="false"/>
+            <config option="checkElements" value="false"/>
+            <config option="preserveRequestBody" value="false"/>
+            <config option="checkHeaders" value="true"/>
             <config option="enableRaxRolesExtension" value="false"/>
-            <config option="enableCaptureHeaderExtension" value="false"/>
-        </meta>
+            <config option="maskRaxRoles403" value="false"/>
+          </meta>
+        </params>
     </xsl:param>
 
     <xsl:variable name="checkXSDGrammar"  as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'checkXSDGrammar'))"/>
@@ -85,6 +93,7 @@
     <xsl:variable name="enableMessageExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableMessageExtension'))"/>
     <xsl:variable name="enableRaxRolesExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRolesExtension'))"/>
     <xsl:variable name="enableCaptureHeaderExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableCaptureHeaderExtension'))"/>
+    <xsl:variable name="enableAnyMatchExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAnyMatchExtension'))"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -124,6 +133,8 @@
                           $checkPlainParams or $useJSONContentCheck"/>
     <xsl:variable name="useRaxRoles" as="xsd:boolean"
                   select="$enableRaxRolesExtension"/>
+    <xsl:variable name="useAnyMatchExtension" as="xsd:boolean"
+                 select="$enableAnyMatchExtension or $useRaxRoles"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
                   select="$checkHeaders or $useRaxRoles"/>
     <xsl:variable name="useParamDefaults" as="xsd:boolean"
@@ -371,7 +382,7 @@
     </xsl:template>
 
     <!-- Only the following methods need error states added -->
-    <xsl:template match="check:step[@type=('URL','URLXSD','START','HEADER','HEADERXSD','HEADER_ANY','HEADERXSD_ANY','HEADER_SINGLE','HEADERXSD_SINGLE') and not(@inRequest)]" mode="addErrorStates">
+    <xsl:template match="check:step[@type=('URL','URLXSD','START','HEADER','HEADERXSD','HEADER_ANY','HEADERXSD_ANY','HEADER_SINGLE','HEADERXSD_SINGLE','HEADER_ALL') and not(@inRequest)]" mode="addErrorStates">
         <xsl:variable name="myId" as="xsd:string" select="generate-id()"/>
         <xsl:variable name="nexts" as="xsd:string*" select="check:next(.)"/>
         <xsl:variable name="nextSteps" as="node()*" select="check:stepsByIds(..,$nexts)"/>
@@ -570,11 +581,10 @@
         <xsl:variable name="header_next" as="xsd:string*">
             <xsl:choose>
                 <xsl:when test="$headers">
-                    <xsl:value-of select="(for $h in $headers[@name = $names[1]] return check:HeaderID($h),
-                                          check:HeaderFailID($headers[@name = $names[1]][1]))"/>
+                    <xsl:sequence select="check:getNextHeaderLinksByName($headers, $headers[1]/@name)"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="$next"/>
+                    <xsl:sequence select="$next"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
@@ -602,61 +612,131 @@
           </xsl:for-each>
         </xsl:if>
         <xsl:for-each select="$names">
-          <xsl:variable name="pos" select="position()"/>
-          <xsl:variable name="last" select="last()"/>
-          <xsl:variable name="current" select="." as="xsd:string"/>
-          <xsl:variable name="multipleHeaders" as="xsd:boolean" select="count($headers[@name=$current]) gt 1" />
-          <xsl:for-each select="$headers[@name=$current]">
-            <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
-            <xsl:variable name="isFixed" as="xsd:boolean" select="exists(@fixed)"/>
-            <xsl:variable name="isRepeating" as="xsd:boolean" select="exists(@repeating) and xsd:boolean(@repeating)"/>
-                <step id="{check:HeaderID(.)}" name="{@name}">
-                    <xsl:call-template name="check:addMessageExtension"/>
-                    <xsl:call-template name="check:addCaptureHeaderExtension"/>
-                    <xsl:attribute name="type">
-                      <xsl:choose>
-                        <xsl:when test="$isRepeating">
-                          <xsl:choose>
-                            <xsl:when test="$isFixed">HEADER_ANY</xsl:when>
-                            <xsl:when test="$isXSD and $multipleHeaders">HEADERXSD_ANY</xsl:when>
-                            <xsl:when test="$isXSD">HEADERXSD</xsl:when>
-                            <xsl:when test="$multipleHeaders">HEADER_ANY</xsl:when>
-                            <xsl:otherwise>HEADER</xsl:otherwise>
-                          </xsl:choose>
-                        </xsl:when>
-                        <xsl:when test="$isXSD and not($isFixed)">HEADERXSD_SINGLE</xsl:when>
-                        <xsl:otherwise>HEADER_SINGLE</xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:attribute>
-                    <xsl:attribute name="match">
-                      <xsl:choose>
-                        <xsl:when test="$isFixed"><xsl:value-of select="check:toRegExEscaped(@fixed)"/></xsl:when>
-                        <xsl:otherwise><xsl:value-of select="check:getMatch(resolve-QName(@type,.))"/></xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:attribute>
-                    <xsl:if test="$useParamDefaults and @default and $isFixed">
-                      <xsl:if test="@fixed != @default">
-                        <xsl:message terminate="yes">[ERROR] In header param <xsl:value-of select="@name"/> @default value "<xsl:value-of select="@default"/>"
-                        does not match @fixed value "<xsl:value-of select="@fixed"/>".</xsl:message>
-                      </xsl:if>
-                    </xsl:if>
-                    <xsl:attribute name="next">
-                        <xsl:choose>
-                            <xsl:when test="$pos = $last">
-                                <xsl:value-of separator=" " select="$next"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of separator=" "
-                                              select="(for $h in $headers[@name = $names[$pos+1]] return check:HeaderID($h),
-                                                      check:HeaderFailID($headers[@name = $names[$pos+1]][1]))"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                    <xsl:if test="$inRequest">
-                        <xsl:attribute name="inRequest">true</xsl:attribute>
-                    </xsl:if>
-                </step>
+            <xsl:variable name="pos" select="position()"/>
+            <xsl:variable name="last" select="last()"/>
+            <xsl:variable name="current" select="." as="xsd:string"/>
+            <xsl:variable name="multipleHeaders" as="xsd:boolean" select="count($headers[@name=$current]) gt 1" />
+            <xsl:for-each select="$headers[@name=$current]">
+                <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
+                <xsl:variable name="isFixed" as="xsd:boolean" select="exists(@fixed)"/>
+                <xsl:variable name="isRepeating" as="xsd:boolean" select="exists(@repeating) and xsd:boolean(@repeating)"/>
+                <xsl:variable name="isHeaderAny" as="xsd:boolean" select="$useAnyMatchExtension and xsd:boolean(@rax:anyMatch)"/>
+                <xsl:choose>
+                    <xsl:when test="$isRepeating and not($isHeaderAny) and $multipleHeaders">
+                        <!-- This looks like HEADER_ALL with multiple matches which we process later -->
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <step id="{check:HeaderID(.)}" name="{@name}">
+                            <xsl:call-template name="check:addMessageExtension"/>
+                            <xsl:call-template name="check:addCaptureHeaderExtension"/>
+                            <xsl:attribute name="type">
+                                <xsl:choose>
+                                    <xsl:when test="$isRepeating">
+                                        <xsl:choose>
+                                            <xsl:when test="$isFixed">HEADER_ANY</xsl:when>
+                                            <xsl:when test="$isXSD and $multipleHeaders">HEADERXSD_ANY</xsl:when>
+                                            <xsl:when test="$isXSD">HEADERXSD</xsl:when>
+                                            <xsl:when test="$multipleHeaders">HEADER_ANY</xsl:when>
+                                            <xsl:otherwise>HEADER</xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:when>
+                                    <xsl:when test="$isXSD and not($isFixed)">HEADERXSD_SINGLE</xsl:when>
+                                    <xsl:otherwise>HEADER_SINGLE</xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:attribute>
+                            <xsl:attribute name="match">
+                                <xsl:choose>
+                                    <xsl:when test="$isFixed"><xsl:value-of select="check:toRegExEscaped(@fixed)"/></xsl:when>
+                                    <xsl:otherwise><xsl:value-of select="check:getMatch(resolve-QName(@type,.))"/></xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:attribute>
+                            <xsl:if test="$useParamDefaults and @default and $isFixed">
+                                <xsl:if test="@fixed != @default">
+                                    <xsl:message terminate="yes">[ERROR] In header param <xsl:value-of select="@name"/> @default value "<xsl:value-of select="@default"/>"
+                                    does not match @fixed value "<xsl:value-of select="@fixed"/>".</xsl:message>
+                                </xsl:if>
+                            </xsl:if>
+                            <xsl:attribute name="next">
+                                <xsl:choose>
+                                    <xsl:when test="$pos = $last">
+                                        <xsl:value-of separator=" " select="$next"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of separator=" "
+                                                      select="check:getNextHeaderLinksByName($headers,$names[$pos+1])"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:attribute>
+                            <xsl:if test="$inRequest">
+                                <xsl:attribute name="inRequest">true</xsl:attribute>
+                            </xsl:if>
+                        </step>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:for-each>
+            <xsl:variable name="allHeaders" as="node()*" select="if ($multipleHeaders) then
+                     if ($useAnyMatchExtension) then $headers[@name=$current and not(xsd:boolean(@rax:anyMatch)) and xsd:boolean(@repeating)]
+                     else $headers[@name=$current and xsd:boolean(@repeating)]
+                     else ()"/>
+            <xsl:if test="not(empty($allHeaders))">
+              <xsl:variable name="matches" as="xsd:string*">
+                <xsl:for-each select="$allHeaders">
+                  <xsl:choose>
+                    <xsl:when test="@fixed">
+                      <xsl:value-of select="check:toRegExEscaped(@fixed)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:variable name="typeQName" as="xsd:QName" select="resolve-QName(@type,.)"/>
+                      <xsl:if test="(namespace-uri-from-QName($typeQName) = $schemaNS) and (local-name-from-QName($typeQName) = 'string')">
+                        <xsl:value-of select="'.*'"/>
+                      </xsl:if>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
+              </xsl:variable>
+              <xsl:variable name="xsdMatches" as="xsd:string*">
+                <xsl:for-each select="$allHeaders">
+                  <xsl:if test="not(exists(@fixed))">
+                    <xsl:variable name="typeQName" as="xsd:QName" select="resolve-QName(@type,.)"/>
+                    <xsl:if test="not((namespace-uri-from-QName($typeQName) = $schemaNS) and (local-name-from-QName($typeQName) = 'string'))">
+                      <xsl:value-of select="check:normType($typeQName)"/>
+                    </xsl:if>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:variable>
+              <step type="HEADER_ALL" id="{check:HeaderID($allHeaders[1])}" name="{$current}">
+                <xsl:if test="not(empty($matches))">
+                  <xsl:attribute name="matchRegEx"><xsl:value-of select="distinct-values($matches)" separator="|"/></xsl:attribute>
+                </xsl:if>
+                <xsl:if test="not(empty($xsdMatches))">
+                  <xsl:attribute name="match"><xsl:value-of select="distinct-values($xsdMatches)" separator=" "/></xsl:attribute>
+                </xsl:if>
+                <xsl:for-each select="$allHeaders[@rax:message or @rax:code][1]">
+                  <!--
+                      grab extension form the header with the first message or code.
+                  -->
+                  <xsl:call-template name="check:addMessageExtension"/>
+                </xsl:for-each>
+                <xsl:for-each select="$allHeaders[@rax:captureHeader][1]">
+                  <!-- grab extension from first header that has it-->
+                  <xsl:call-template name="check:addCaptureHeaderExtension"/>
+                </xsl:for-each>
+                <xsl:attribute name="next">
+                  <xsl:choose>
+                    <xsl:when test="$pos = $last">
+                      <xsl:value-of separator=" " select="$next"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of separator=" "
+                                    select="check:getNextHeaderLinksByName($headers,$names[$pos+1])"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <xsl:if test="$inRequest">
+                  <xsl:attribute name="inRequest">true</xsl:attribute>
+                </xsl:if>
+              </step>
+            </xsl:if>
             <step type="CONTENT_FAIL" id="{check:HeaderFailID($headers[@name = $current][1])}"/>
         </xsl:for-each>
     </xsl:template>
@@ -1150,10 +1230,37 @@
           <xsl:value-of select="check:SetHeaderID($default[1])"/>
         </xsl:when>
         <xsl:when test="$headers">
-          <xsl:value-of select="(for $h in $headers[@name = $headers[1]/@name] return check:HeaderID($h), check:HeaderFailID($headers[1]))"/>
+          <xsl:value-of select="check:getNextHeaderLinksByName($headers,$headers[1]/@name)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="()"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="check:getNextHeaderLinksByName" as="xsd:string*">
+      <xsl:param name="headers" as="node()*"/> <!-- all headers -->
+      <xsl:param name="headerName" as="xsd:string"/>
+      <xsl:variable name="headersWithName" as="node()*" select="$headers[@name=$headerName]"/>
+      <xsl:choose>
+        <xsl:when test="empty($headersWithName)">
+          <xsl:value-of select="()"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="failID" as="xsd:string" select="check:HeaderFailID($headersWithName[1])"/>
+          <xsl:variable name="singleHeaders" as="xsd:string*"
+                        select="for $h in $headersWithName[not(xsd:boolean(@repeating))] return check:HeaderID($h)"/>
+          <xsl:choose>
+            <xsl:when test="$useAnyMatchExtension">
+              <xsl:variable name="anyHeaders" select="for $h in $headersWithName[xsd:boolean(@rax:anyMatch) and xsd:boolean(@repeating)] return check:HeaderID($h)"/>
+              <xsl:variable name="allHeaders" select="for $h in $headersWithName[not(xsd:boolean(@rax:anyMatch)) and xsd:boolean(@repeating)][1] return check:HeaderID($h)"/>
+              <xsl:sequence select="($singleHeaders, $anyHeaders, $allHeaders, $failID)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:variable name="allHeaders" select="for $h in $headersWithName[xsd:boolean(@repeating)][1] return check:HeaderID($h)"/>
+              <xsl:sequence select="($singleHeaders, $allHeaders, $failID)"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:function>

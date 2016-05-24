@@ -39,6 +39,7 @@
     <map type="HEADERXSD_SINGLE" priority="41000"/>
     <map type="HEADER_ANY"    priority="41000"/>
     <map type="HEADERXSD_ANY" priority="41000"/>
+    <map type="HEADER_ALL"    priority="41000"/>
     <map type="WELL_XML"      priority="41000"/>
     <map type="WELL_JSON"     priority="41000"/>
     <map type="XPATH"         priority="41000"/>
