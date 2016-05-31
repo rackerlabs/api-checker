@@ -20,6 +20,9 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.when
 import org.scalatest.junit.JUnitRunner
 
+import java.io.InputStreamReader
+import java.io.BufferedReader
+
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
@@ -145,5 +148,77 @@ class RequestResponseSuite extends BaseValidatorSuite {
     wrapper.addHeader("Moo", "Baz")
     val headers = wrapper.getHeaderNames
     assert(headers == null)
+  }
+
+  test("Ensure that cached XML is invalidated if getInputStream is called") {
+    val req = request("POST", "/foo", "application/xml", "<foo />", true)
+    val wrapper = new CheckerServletRequest(req)
+
+    //
+    //  First we assert that XML has been cached correctly...
+    //
+    assert(wrapper.parsedXML != null)
+
+    //
+    //  We assert it's actually the XML we input
+    //
+    assert(wrapper.parsedXML.getElementsByTagName("foo").getLength() == 1)
+
+    //
+    //  We now call getInputStream on the wrapper, and ensure we can
+    //  serialize the XML.
+    //
+    val builder = new StringBuilder
+    val reader = new BufferedReader( new InputStreamReader(wrapper.getInputStream()))
+    var read : String = null
+    do {
+      read = reader.readLine()
+      if (read != null) {
+        builder.append(read)
+      }
+    } while (read != null)
+    reader.close()
+    assert(builder.toString.contains("foo"))
+
+    //
+    // Finally, assert we killed the cached XML cus we called getInputStream
+    //
+    assert(wrapper.parsedXML == null)
+  }
+
+  test("Ensure that cached JSON is invalidated if getInputStream is called") {
+    val req = request("POST", "/foo", "application/json", "{\"foo\" : \"bar\"}", true);
+    val wrapper = new CheckerServletRequest(req)
+
+    //
+    // First we assert that the JSON has been cached correctly...
+    //
+    assert(wrapper.parsedJSON != null)
+
+    //
+    // We assert it's actually the JSON we input
+    //
+    assert(wrapper.parsedJSON.findValue("foo").asText() == "bar")
+
+    //
+    //  We now call getInputStream on the wrapper, and ensure we can
+    //  serialize the JSON.
+    //
+    val builder = new StringBuilder
+    val reader = new BufferedReader( new InputStreamReader(wrapper.getInputStream()))
+    var read : String = null
+    do {
+      read = reader.readLine()
+      if (read != null) {
+        builder.append(read)
+      }
+    } while (read != null)
+    reader.close()
+    assert(builder.toString.contains("foo"))
+
+    //
+    //  Finally, assert we killed the cached JSON cus we called getInputStream
+    //
+    assert(wrapper.parsedJSON == null)
   }
 }

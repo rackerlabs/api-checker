@@ -165,6 +165,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       } catch {
         case e : Exception => throw new IOException("Error while serializing!", e)
       } finally {
+        parsedXML = null
         returnTransformer(transformer)
       }
     } else if (parsedJSON != null) {
@@ -173,6 +174,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
         om = ObjectMapperPool.borrowParser
         new ByteArrayServletInputStream(om.writeValueAsBytes(parsedJSON))
       } finally {
+        parsedJSON = null
         if (om != null) {
           ObjectMapperPool.returnParser(om)
         }
