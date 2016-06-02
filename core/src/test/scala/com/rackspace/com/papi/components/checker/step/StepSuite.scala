@@ -41,6 +41,10 @@ import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 import scala.xml._
 
+import java.io.InputStreamReader
+import java.io.BufferedReader
+import java.nio.file.Files
+import java.nio.file.Paths
 
 @RunWith(classOf[JUnitRunner])
 class StepSuite extends BaseStepSuite with MockitoSugar {
@@ -660,6 +664,37 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     wfx.checkStep (req2, response, chain, 0)
 
     assert (req1.parsedXML != req2.parsedXML)
+  }
+
+  test("In a WellFormedXML step, parsed XML should be preserved and contian comments and process instructions") {
+    val wfx = new WellFormedXML("WFXML","WFXML", 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml",
+      new String(Files.readAllBytes(Paths.get("src/test/resources/xml/sample.xml")), "UTF-8"))
+
+    wfx.checkStep(req1, response, chain, 0)
+
+    assert (req1.parsedXML != null)
+    assert (req1.parsedXML.isInstanceOf[Document])
+
+    val builder = new StringBuilder
+    val reader = new BufferedReader( new InputStreamReader(req1.getInputStream()))
+    var read : String = null
+    do {
+      read = reader.readLine()
+      if (read != null) {
+        builder.append(read)
+      }
+    } while (read != null)
+    reader.close()
+
+    //
+    //  Assert that the parser preserved comments, processing
+    //  instructions, and relevent whitespace.
+    //
+    val pxml = builder.toString
+    assert(pxml.contains("<!-- He we have a comment -->"))
+    assert(pxml.contains("<?pr?>"))
+    assert(pxml.contains("Here     we have a processing instruction"))
   }
 
   ignore ("Since WellFormedXML steps are synchornous, the parser pool should contain only a single idle parser") {

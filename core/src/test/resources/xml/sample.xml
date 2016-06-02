@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xml xmlns="http://valid">
+  This is valid XML
+  Here     we have a processing instruction<?pr?>
+
+  <element att="1">
+    <!-- He we have a comment -->
+    <subElement />
+  </element>
+</xml>
