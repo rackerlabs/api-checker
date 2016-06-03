@@ -38,6 +38,7 @@ class WellFormedJSON(id : String, label : String, val priority : Long, next : Ar
     } catch {
       case e : Exception => req.contentError = e
                             req.contentErrorPriority = priority
+                            req.clearInputStream
     } finally {
       if (parser != null) returnParser(parser)
     }

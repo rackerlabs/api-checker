@@ -636,6 +636,21 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     assert (req1.contentErrorPriority == 150)
   }
 
+  test("In a WellFormedXML step, if the content is not well formed XML, you should still be able to open the input stream") {
+    val wfx = new WellFormedXML("WFXML", "WFXML", 150, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/xml", """<validXML xmlns='http://valid'>""")
+
+    wfx.checkStep (req1, response, chain, 0)
+    assert (req1.getInputStream.available == 0)
+    assert (req1.getInputStream.read == -1)
+
+    val req2 = request("PUT", "/a/b", "application/xml", """{ \"bla\" : 55 }""")
+
+    wfx.checkStep (req2, response, chain, 1)
+    assert (req2.getInputStream.available == 0)
+    assert (req2.getInputStream.read == -1)
+  }
+
   test("In a WellFormedXML step, XML in the same request should not be parsed twice") {
     val wfx = new WellFormedXML("WFXML", "WFXML", 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml", <validXML xmlns="http://valid"/>)
@@ -792,6 +807,20 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     assert (req2.contentError != null)
     assert (req2.contentError.isInstanceOf[JsonParseException])
   }
+
+  test("In a WellFormedJSON step, if the content contains JSON that is not well-formed, you should still be able to access the input stream") {
+    val wfj = new WellFormedJSON("WFJSON", "WFJSON", 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json", """ { "valid" : ture } """)
+    wfj.checkStep (req1, response, chain, 0)
+    assert (req1.getInputStream.available == 0)
+    assert (req1.getInputStream.read == -1)
+
+    val req2 = request("PUT", "/a/b", "application/json", """ <json /> """)
+    wfj.checkStep (req2, response, chain, 1)
+    assert (req2.getInputStream.available == 0)
+    assert (req2.getInputStream.read == -1)
+  }
+
 
   test("In a WellFormedJSON step, if the content contains JSON that is not well-formed, then the request should contain the correct contentErrorPriority") {
     val wfj = new WellFormedJSON("WFJSON", "WFJSON", 1000, Array[Step]())
