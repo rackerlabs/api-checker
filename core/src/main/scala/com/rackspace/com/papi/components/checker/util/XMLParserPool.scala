@@ -39,14 +39,16 @@ private class XMLParserFactory extends PoolableObjectFactory[DocumentBuilder] {
 
   //
   //  Setup the builder factory so that it works within the security
-  //  constraints of a webservice.
+  //  constraints of a webservice, but preserves comments and
+  //  whitespaces.
   //
   builderFactory.setCoalescing(true)
-  builderFactory.setIgnoringComments(true)
+  builderFactory.setIgnoringComments(false)
   builderFactory.setNamespaceAware(true)
   builderFactory.setValidating(false)
   builderFactory.setXIncludeAware(false)
   builderFactory.setExpandEntityReferences (false)
+  builderFactory.setIgnoringElementContentWhitespace(false)
   builderFactory.setFeature (FEATURE_SECURE_PROCESSING, true)
 
   def makeObject = builderFactory.newDocumentBuilder()
