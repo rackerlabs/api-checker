@@ -714,9 +714,9 @@ class WADLStepSpec extends BaseStepSpec {
         </application>
       When ("the wadl is translated")
       val step = builder.build (inWADL)
-      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI(".*"), Method("GET"), Accept)
-      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI(".*"), MethodFailMatch("GET"))
-      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI(".*"), URLFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI("(?s).*"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI("(?s).*"), MethodFailMatch("GET"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URI("(?s).*"), URLFail)
       assert(step, Start, URI("path"), URLFailMatch("to"))
       And("There should not be an URLFail node right before a catch any URI...")
       intercept[TestFailedException] {
@@ -742,9 +742,9 @@ class WADLStepSpec extends BaseStepSpec {
         </application>
       When ("the wadl is translated")
       val step = builder.build (inWADL)
-      assert(step, Start, URI("path"), URI("to"), URI("my"), URI(".*"), URI("resource"), Method("GET"), Accept)
-      assert(step, Start, URI("path"), URI("to"), URI("my"), URI(".*"), URI("resource"), MethodFailMatch("GET"))
-      assert(step, Start, URI("path"), URI("to"), URI("my"), URI(".*"), URI("resource"), URLFail)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("(?s).*"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("(?s).*"), URI("resource"), MethodFailMatch("GET"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("(?s).*"), URI("resource"), URLFail)
       assert(step, Start, URI("path"), URLFailMatch("to"))
       intercept[TestFailedException] {
         assert(step, Start, URI("path"), URI("to"), URI("my"), URLFail)

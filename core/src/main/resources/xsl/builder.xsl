@@ -152,9 +152,6 @@
     
     <!-- Useful namespaces -->
     <xsl:variable name="schemaNS" select="'http://www.w3.org/2001/XMLSchema'"/>
-    
-    <!-- Useful matches -->
-    <xsl:variable name="matchAll" select="'.*'"/>
 
     <!-- Default prefix -->
     <xsl:variable name="defaultPrefix" select="generate-id(/element()[1])"/>
@@ -688,7 +685,7 @@
                     <xsl:otherwise>
                       <xsl:variable name="typeQName" as="xsd:QName" select="resolve-QName(@type,.)"/>
                       <xsl:if test="(namespace-uri-from-QName($typeQName) = $schemaNS) and (local-name-from-QName($typeQName) = 'string')">
-                        <xsl:value-of select="'.*'"/>
+                        <xsl:value-of select="$matchAll"/>
                       </xsl:if>
                     </xsl:otherwise>
                   </xsl:choose>
@@ -1312,7 +1309,7 @@
             select="local-name-from-QName($type)"/>
         <xsl:choose>
             <xsl:when test="$name = 'string'">
-                <xsl:value-of select="'.*'"/>
+                <xsl:value-of select="$matchAll"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="check:normType($type)"/>

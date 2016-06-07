@@ -59,11 +59,11 @@
        *** Check URL and METHOD Steps ***
     -->
 
-    <xsl:template match="chk:step[@type=('URL', 'METHOD') and @match != '.*']">
+    <xsl:template match="chk:step[@type=('URL', 'METHOD') and @match != $matchAll]">
         <xsl:variable as="xs:string" name="myType" select="@type"/>
         <xsl:variable name="parents" as="node()*" select="key('checker-by-ref',@id, $checker)"/>
         <xsl:choose>
-            <xsl:when test="chk:stepsByIds($checker, chk:siblings($checker,.))[@type=$myType and @match='.*']">
+            <xsl:when test="chk:stepsByIds($checker, chk:siblings($checker,.))[@type=$myType and @match=$matchAll]">
                 <!--
                     If this step has siblings that match .*, then that's the same
                     as if this step matches .* from an error condition point of view.
@@ -85,7 +85,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="chk:allMatchURLMethod" match="chk:step[@type=('URL', 'METHOD') and @match = '.*']">
+    <xsl:template name="chk:allMatchURLMethod" match="chk:step[@type=('URL', 'METHOD') and @match = $matchAll]">
         <!--
             This is essestially a no-op.  If you match .* then you are not required to have a matching
             error step, since essentially this step will always accept. In other words, the error step
@@ -153,7 +153,7 @@
         <xsl:variable name="sibs" as="node()*" select="chk:stepsByIds($checker, chk:siblings($checker,.))"/>
         <xsl:variable name="qnameMatch" as="xs:QName" select="resolve-QName(@match, .)"/>
         <xsl:choose>
-            <xsl:when test="$sibs[@type='URL' and @match='.*']">
+            <xsl:when test="$sibs[@type='URL' and @match=$matchAll]">
                 <!--
                     If this step has siblings that match .*, then that's the same
                     as if this step matches .* from an error condition point of view.
