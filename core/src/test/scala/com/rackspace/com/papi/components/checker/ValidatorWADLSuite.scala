@@ -369,6 +369,39 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   }
 
   //
+  // validator_FIXED allows a GET on /a/FOO/c. That is, the 2nd URI
+  // component may be the value FOO, but foo is described as a FIXED
+  // string. The validator is used in the following tests.
+  //
+  val validator_FIXED = Validator(
+    <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="a/{foo}/c">
+                   <param name="foo" style="template" type="xsd:string" fixed="FOO"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+    </application>
+    , assertConfig)
+
+  test ("GET on /a/FOO/c should pass with validator_FOO") {
+    validator_FIXED.validate(request("GET","/a/FOO/c"), response, chain)
+  }
+
+  test ("GET on /a/foo/c should fail on validator_FOO") {
+    assertResultFailed(validator_FIXED.validate(request("GET","/a/foo/c"), response, chain), 404)
+  }
+
+  test ("GET on /a/bar/c should fail on validator_FOO") {
+    assertResultFailed(validator_FIXED.validate(request("GET","/a/bar/c"), response, chain), 404)
+  }
+
+  //
   // validator_RT allows:
   //
   // PUT /a/b with json and xml support
