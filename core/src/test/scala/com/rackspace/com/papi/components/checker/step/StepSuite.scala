@@ -4710,6 +4710,29 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     assert (newContext.get.requestHeaders.get("X-TEST").get == List("FOO", "BAR"),"The header should be set in the context with the correct value")
   }
 
+  test ("In a step header always step, if a header does not exist in the context it will be set when the step executes") {
+    val setHeaderAlways = new SetHeaderAlways("SET_HEADER_ALWAYS", "SET_HEADER_AWLAYS", "foo", "bar", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("OTHER"->List("FOOD", "BART")))
+    val context = StepContext()
+    val newContext = setHeaderAlways.checkStep(req, response, chain, context)
+    assert (newContext.get.requestHeaders.get("foo").get == List ("bar"), "The set header always header should be set.")
+  }
+
+  test ("In a step header always step, if a header exist in the context a new value should  when the step executes") {
+    val setHeaderAlways = new SetHeaderAlways("SET_HEADER_ALWAYS", "SET_HEADER_AWLAYS", "foo", "bar", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("OTHER"->List("FOOD", "BART")))
+    val context = StepContext(requestHeaders = (new HeaderMap).addHeaders("foo", List("broo")))
+    val newContext = setHeaderAlways.checkStep(req, response, chain, context)
+    assert (newContext.get.requestHeaders.get("foo").get == List ("broo","bar"), "The set header always header should be set.")
+  }
+
+  test ("In a step header always step, if a header exist in the context a new value should  when the step executes (case)") {
+    val setHeaderAlways = new SetHeaderAlways("SET_HEADER_ALWAYS", "SET_HEADER_AWLAYS", "foo", "bar", Array[Step]())
+    val req = request("GET", "/path/to/resource", "", "", false, Map("OTHER"->List("FOOD", "BART")))
+    val context = StepContext(requestHeaders = (new HeaderMap).addHeaders("fOO", List("broo")))
+    val newContext = setHeaderAlways.checkStep(req, response, chain, context)
+    assert (newContext.get.requestHeaders.get("foo").get == List ("broo","bar"), "The set header always header should be set.")
+  }
 
   test ("In a headerAll step, with a single RegEx value if the header is not avaliable the result of checkStep should be None") {
     val header = new HeaderAll("HEADER_ALL", "HEADER_ALL", "X-TEST-HEADER", None, None, Some("foo".r),  None, None, None, 12345, Array[Step]())

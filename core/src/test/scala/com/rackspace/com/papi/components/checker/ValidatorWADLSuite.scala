@@ -20,12 +20,17 @@ import java.util.{Date, UUID}
 
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.com.papi.components.checker.Converters._
+import com.rackspace.com.papi.components.checker.RunAssertionsHandler._
+import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
+import com.rackspace.com.papi.components.checker.step.results.Result
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.w3c.dom.Document
 
 import scala.util.Random
+
+import scala.collection.JavaConversions._
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorWADLSuite extends BaseValidatorSuite {
@@ -895,6 +900,15 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     validator_XSDContent.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
   }
 
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContent with valid XML1 a Warning header should not be set") {
+    val req = request("PUT","/a/b","application/xml", goodXML_XSD1, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == Nil)
+    })
+    validator_XSDContent.validate(req, response, chain)
+  }
+
+
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContent with valid XML2") {
     validator_XSDContent.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
   }
@@ -902,6 +916,15 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
   test ("POST on /a/b with application/xml should succeed on validator_XSDContent with valid XML1") {
     validator_XSDContent.validate(request("POST","/a/b","application/xml", goodXML_XSD1),response,chain)
   }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContent with valid XML1 a Warning header should not be set") {
+    val req = request("POST","/a/b","application/xml", goodXML_XSD1, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == Nil)
+    })
+    validator_XSDContent.validate(req,response,chain)
+  }
+
 
   test ("POST on /a/b with application/xml should succeed on validator_XSDContent with valid XML2") {
     validator_XSDContent.validate(request("POST","/a/b","application/xml", goodXML_XSD2),response,chain)
@@ -1161,6 +1184,14 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     validator_XSDContentT.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
   }
 
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentT with valid XML1 should set appropriate Warning") {
+    val req = request("PUT","/a/b","application/xml", goodXML_XSD1, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("Warning").toList == List("214 - \"Default values may have been filled in by XSD processor\""))
+    })
+    validator_XSDContentT.validate(req,response,chain)
+  }
+
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContentT with valid XML2") {
     validator_XSDContentT.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
   }
@@ -1180,6 +1211,14 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
     assert ((dom \ "stepType").text == "START")
     assert ((dom \ "even").text == "50")
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentT with valid XML1 should set appropriate Warning header") {
+    val req = request("POST","/a/b","application/xml", goodXML_XSD1, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("Warning").toList == List("214 - \"Default values may have been filled in by XSD processor\""))
+    })
+    validator_XSDContentT.validate(req,response,chain)
   }
 
   test ("POST on /a/b with application/xml should succeed on validator_XSDContentT with valid XML2, default values should be filled in") {
@@ -1868,6 +1907,131 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     </application>)
     , TestConfig(false, false, true, true, false, 1, false, true, true, "XalanC"))
 
+
+  //
+  // Like validatorXSDContentTT, but with a different warn agent...
+  //
+  val validator_XSDContentTTWA = {
+    val cfg = TestConfig(false, false, true, true, false, 1, false, true, true, "XalanC")
+    cfg.warnAgent = "Repose:9090"
+    Validator((localWADLURI,
+               <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api">
+               <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess href="src/test/resources/xsl/beginStart.xsl"/>
+                      </representation>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess href="src/test/resources/xsl/beginStart2.xsl"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>), cfg)
+  }
+
+  //
+  //  Like validatorXSDContentTT but with grammar transform disabled
+  //
+  val validator_XSDContentTTNG = Validator((localWADLURI,
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess href="src/test/resources/xsl/beginStart.xsl"/>
+                      </representation>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess href="src/test/resources/xsl/beginStart2.xsl"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>)
+    , TestConfig(false, false, true, true, false, 1, false, false, true, "XalanC"))
+
+  //
+  //  Like validator_XSDContentTTNG, but perform 2 transformations instead of 1
+  //
+
+  val validator_XSDContentTTNG2 = Validator((localWADLURI,
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+           <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess href="src/test/resources/xsl/beginStart.xsl"/>
+                          <rax:preprocess href="src/test/resources/xsl/beginStart2.xsl"/>
+                      </representation>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml">
+                          <rax:preprocess href="src/test/resources/xsl/beginStart2.xsl"/>
+                          <rax:preprocess href="src/test/resources/xsl/beginStart.xsl"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+        </resources>
+    </application>)
+    , TestConfig(false, false, true, true, false, 1, false, false, true, "XalanC"))
+
+
   //
   //  Like validator_XSDContentTT except it uses embeded XSLs
   //
@@ -2063,6 +2227,31 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     validator_XSDContentTT.validate(request("PUT","/a/b","application/xml", goodXML_XSD1),response,chain)
   }
 
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML1 should generate multiple warnings") {
+    val req = request("PUT","/a/b","application/xml", goodXML_XSD1, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == List("214 - \"Default values may have been filled in by XSD processor\"",
+                                                        "214 - \"Preprocess Transformation Applied\""))
+    })
+    validator_XSDContentTT.validate(req,response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTTNG with valid XML1 should generate a single warning") {
+    val req = request("PUT","/a/b","application/xml", goodXML_XSD1, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == List("214 - \"Preprocess Transformation Applied\""))
+    })
+    validator_XSDContentTTNG.validate(req,response,chain)
+  }
+
+  test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTTNG2 with valid XML1 should generate a single warning even though 2 tranforms apply...") {
+    val req = request("PUT","/a/b","application/xml", goodXML_XSD1, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == List("214 - \"Preprocess Transformation Applied\""))
+    })
+    validator_XSDContentTTNG2.validate(req,response,chain)
+  }
+
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML2") {
     validator_XSDContentTT.validate(request("PUT","/a/b","application/xml", goodXML_XSD2),response,chain)
   }
@@ -2096,6 +2285,57 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
 
   test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML2") {
     validator_XSDContentTT.validate(request("POST","/a/b","application/xml", goodXML_XSD2),response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML2 should generate multiple warnings") {
+    val req = request("POST","/a/b","application/xml", goodXML_XSD2, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == List("214 - \"Default values may have been filled in by XSD processor\"",
+                                                        "214 - \"Preprocess Transformation Applied\""))
+    })
+    validator_XSDContentTT.validate(req,response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML2 should generate multiple warnings, existing warnings should be preserved") {
+    val req = request("POST","/a/b","application/xml", goodXML_XSD2, false, Map[String,List[String]]("WARNING"->List("500 - \"Foo Warning\"")))
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == List("214 - \"Default values may have been filled in by XSD processor\"",
+                                                        "214 - \"Preprocess Transformation Applied\"",
+                                                        "500 - \"Foo Warning\""))
+    })
+    validator_XSDContentTT.validate(req,response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML2 should generate multiple warnings, existing warnings should be preserved (2)") {
+    val req = request("POST","/a/b","application/xml", goodXML_XSD2, false, Map[String,List[String]]("WARNING"->List("500 - \"Foo Warning\"",
+                                                                                                                     "510 - \"Foo2\"")))
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == List("214 - \"Default values may have been filled in by XSD processor\"",
+                                                        "214 - \"Preprocess Transformation Applied\"",
+                                                        "500 - \"Foo Warning\"",
+                                                        "510 - \"Foo2\""))
+    })
+    validator_XSDContentTT.validate(req,response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTTWA with valid XML2 should generate multiple warnings, existing warnings should be preserved (2) and the correct warn agent should be listed") {
+    val req = request("POST","/a/b","application/xml", goodXML_XSD2, false, Map[String,List[String]]("WARNING"->List("500 - \"Foo Warning\"",
+                                                                                                                     "510 - \"Foo2\"")))
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == List("214 Repose:9090 \"Default values may have been filled in by XSD processor\"",
+                                                        "214 Repose:9090 \"Preprocess Transformation Applied\"",
+                                                        "500 - \"Foo Warning\"",
+                                                        "510 - \"Foo2\""))
+    })
+    validator_XSDContentTTWA.validate(req,response,chain)
+  }
+
+  test ("POST on /a/b with application/xml should succeed on validator_XSDContentTTNG with valid XML2 should generate a single warning") {
+    val req = request("POST","/a/b","application/xml", goodXML_XSD2, false, Map[String,List[String]]())
+    req.setAttribute(ASSERT_FUNCTION, (csReq : CheckerServletRequest, csResp : CheckerServletResponse, res : Result) => {
+      assert(csReq.getHeaders("WARNING").toList == List("214 - \"Preprocess Transformation Applied\""))
+    })
+    validator_XSDContentTTNG.validate(req,response,chain)
   }
 
   test ("PUT on /a/b with application/json should succeed on validator_XSDContentTT with well formed JSON") {

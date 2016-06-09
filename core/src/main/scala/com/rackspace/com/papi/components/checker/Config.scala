@@ -313,6 +313,24 @@ class Config {
   @AffectsChecker
   var preserveRequestBody : Boolean = false
 
+  //
+  // The name of the agent used in WARNING headers. Can be a host:port
+  // or a pseudonym, using - as the name allowed when the name of the
+  // agent is unknown.
+  //
+  @BeanProperty
+  @AffectsChecker
+  var warnAgent : String = "-"
+
+  //
+  // Enable warning headers per RFC 7234. These warnings come into
+  // play when a transformation is applied to a message body, for
+  // example.
+  //
+  @BeanProperty
+  @AffectsChecker
+  var enableWarnHeaders : Boolean = true
+
   /**
    * Returns checker metadata (<meta/> element in checker format) for
    * the config options that affect the checker.

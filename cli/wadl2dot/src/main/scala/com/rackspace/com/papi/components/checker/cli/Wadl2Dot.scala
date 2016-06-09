@@ -88,6 +88,12 @@ object Wadl2Dot {
   val anyMatch  = parser.flag[Boolean] (List("a", "disable-any-match"),
                                             "Disable any match extension : false")
 
+  val warnHeaders = parser.flag[Boolean] (List("W", "disable-warn-headers"),
+                                          "Disable warn headers : false")
+
+  val warnAgent = parser.option[String] (List("A", "warn-agent"), "agent-name",
+                                            "The name of the agent used in WARNING headers. Default: -")
+
 
   val dontValidate = parser.flag[Boolean] (List("D", "dont-validate"),
                                        "Don't validate produced checker Default: false")
@@ -169,6 +175,9 @@ object Wadl2Dot {
         c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
         c.validateChecker = !dontValidate.value.getOrElse(false)
+        c.enableWarnHeaders = !warnHeaders.value.getOrElse(false)
+        c.warnAgent = warnAgent.value.getOrElse("-")
+
 
         new WADLDotBuilder().build(getSource, getResult,
           c,

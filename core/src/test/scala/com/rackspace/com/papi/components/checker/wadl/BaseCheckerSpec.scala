@@ -254,6 +254,15 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithType(checker, "SET_HEADER").filter (n => (n \ "@name").text == name).filter (n => (n \ "@value").text == value)
   }
 
+  def stepsWithSetHeaderAlways (checker : NodeSeq, name: String) : NodeSeq = {
+    stepsWithType(checker, "SET_HEADER_ALWAYS").filter(n => (n \ "@name").text ==name)
+  }
+
+  def stepsWithSetHeaderAlways (checker : NodeSeq, name: String, value : String) : NodeSeq = {
+    stepsWithType(checker, "SET_HEADER_ALWAYS").filter(n => (n \ "@name").text ==name).filter (n => (n \ "@value").text == value)
+  }
+
+
   def stepsWithHeaderAll(checker : NodeSeq, name : String) : NodeSeq = {
     stepsWithType(checker, "HEADER_ALL").filter (n => (n \ "@name").text == name)
   }
@@ -387,6 +396,8 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithHeaderAllValueMatchTypesMessageCode(_, name, headerMatch, matchTypes, message, code)
 
   def SetHeader(name : String, value : String) : (NodeSeq) => NodeSeq = stepsWithSetHeader(_, name, value)
+  def SetHeaderAlways(name : String) : (NodeSeq) => NodeSeq = stepsWithSetHeaderAlways(_, name)
+  def SetHeaderAlways(name : String, value : String) : (NodeSeq) => NodeSeq = stepsWithSetHeaderAlways(_, name, value)
 
   def assert (checker : NodeSeq, step_funs : ((NodeSeq) => NodeSeq)*) : Unit = {
 

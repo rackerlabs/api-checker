@@ -105,6 +105,7 @@
                 <alternative test="@type eq 'XPATH'" type="chk:XPathStep"/>
                 <alternative test="@type eq 'XSL'" type="chk:XSLStep"/>
                 <alternative test="@type eq 'SET_HEADER'" type="chk:SetHeaderStep"/>
+                <alternative test="@type eq 'SET_HEADER_ALWAYS'" type="chk:SetHeaderAlwaysStep"/>
                 <alternative test="@type eq 'HEADER'" type="chk:HeaderStep"/>
                 <alternative test="@type eq 'HEADERXSD'" type="chk:HeaderXSDStep"/>
                 <alternative test="@type eq 'HEADER_SINGLE'" type="chk:HeaderSingleStep"/>
@@ -365,6 +366,32 @@
                     added to the context with the given value. If a
                     header with the name already exist then no action
                     is taken.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+          <extension base="chk:ConnectedStep">
+            <attribute name="name"  type="xsd:string" use="required"/>
+            <attribute name="value" type="xsd:string" use="required"/>
+          </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="SetHeaderAlwaysStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Adds a header to the step context at this step,
+                    regardless of whether the header is already set.
+                </html:p>
+                <html:p>
+                    This step does not actually cause an assertion to
+                    occur, so the test never fails. If a header with
+                    the name does not exist, a new header will be
+                    added to the context with the given value. If a
+                    header with the name already exist then an
+                    additional header value will be set for that
+                    header.
                 </html:p>
             </documentation>
         </annotation>
@@ -778,6 +805,7 @@
             <enumeration value="XPATH"/>
             <enumeration value="XSL"/>
             <enumeration value="SET_HEADER"/>
+            <enumeration value="SET_HEADER_ALWAYS"/>
             <enumeration value="HEADER"/>
             <enumeration value="HEADERXSD"/>
             <enumeration value="HEADER_ANY"/>
