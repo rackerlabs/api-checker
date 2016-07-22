@@ -341,7 +341,7 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         When("The WADL is translated with captureHeaders disabled")
         val checker = builder.build(captureHeaderWADL, baseWithCaptureHeaders)
         Then("The checker should not contain captureHeader attributes")
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("GET"), HeaderWithCapture("MyHeader", ".*", "X-DEVICE-ID"),
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("GET"), HeaderWithCapture("MyHeader", "(?s).*", "X-DEVICE-ID"),
           HeaderXSD("OtherHeader", "xs:int"), Accept)
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("POST"), HeaderAnyWithCapture("MyHeader", "FOO", "X-DEVICE-ID"), Accept)
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("POST"), HeaderAnyWithCapture("MyHeader", "FAR", "X-DEVICE-ID"), Accept)
@@ -356,12 +356,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("PATCH"), HeaderAnyWithCapture("MyHeader", "2", ""), Accept)
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("PATCH"), HeaderAnyWithCapture("MyHeader", "3", ""), Accept)
 
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture(".*", "X-SUB-RESOURCE"),
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"),
           URLXSDWithCapture("xs:int", "X-SUB-RESOURCE2"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture(".*", "X-SUB-RESOURCE"),
-          URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"),
+          URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
 
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("POST"),
           ReqType("(application/xml)(;.*)?"), WellXML, XPathWithCapture("/tst:e/@foo2", ""), XPathWithCapture("/tst:e/@foo3", ""),
@@ -382,7 +382,7 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         val checker = builder.build(captureHeaderWADL, baseWithRemoveDups)
         Then("The checker should not contain captureHeader attributes")
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("GET"),
-          HeaderWithCapture("MyHeader", ".*", "X-DEVICE-ID"),
+          HeaderWithCapture("MyHeader", "(?s).*", "X-DEVICE-ID"),
           HeaderXSD("OtherHeader", "xs:int"), Accept)
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("POST"),
           HeaderAnyWithCapture("MyHeader", "FOO|FAR|OUT", "X-DEVICE-ID"), Accept)
@@ -397,12 +397,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("PATCH"),
           HeaderAnyWithCapture("MyHeader", "2|3", ""), Accept)
 
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture(".*", "X-SUB-RESOURCE"),
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"),
           URLXSDWithCapture("xs:int", "X-SUB-RESOURCE2"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture(".*", "X-SUB-RESOURCE"),
-          URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"),
+          URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
 
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("POST"),
           ReqType("(application/xml)(;.*)?"), WellXML, XPathWithCapture("/tst:e/@foo2", ""), XPathWithCapture("/tst:e/@foo3", ""),
@@ -423,7 +423,7 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         val checker = builder.build(captureHeaderWADL, baseWithJoinXPaths)
         Then("The checker should not contain captureHeader attributes")
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("GET"),
-          HeaderWithCapture("MyHeader", ".*", "X-DEVICE-ID"),
+          HeaderWithCapture("MyHeader", "(?s).*", "X-DEVICE-ID"),
           HeaderXSD("OtherHeader", "xs:int"), Accept)
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("POST"),
           HeaderAnyWithCapture("MyHeader", "FOO|FAR|OUT", "X-DEVICE-ID"), Accept)
@@ -438,12 +438,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("PATCH"),
           HeaderAnyWithCapture("MyHeader", "2|3", ""), Accept)
 
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture(".*", "X-SUB-RESOURCE"),
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"),
           URLXSDWithCapture("xs:int", "X-SUB-RESOURCE2"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture(".*", "X-SUB-RESOURCE"),
-          URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"),
+          URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
 
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("POST"),
           ReqType("(application/xml)(;.*)?"), XSL, XPathWithCapture("/tst:e/@foo", "X-FOO"), Accept)
@@ -462,7 +462,7 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         val checker = builder.build(captureHeaderWADL, baseWithJoinXPathsAndRemoveDups)
         Then("The checker should not contain captureHeader attributes")
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("GET"),
-          HeaderWithCapture("MyHeader", ".*", "X-DEVICE-ID"),
+          HeaderWithCapture("MyHeader", "(?s).*", "X-DEVICE-ID"),
           HeaderXSD("OtherHeader", "xs:int"), Accept)
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("POST"),
           HeaderAnyWithCapture("MyHeader", "FOO|FAR|OUT", "X-DEVICE-ID"), Accept)
@@ -477,12 +477,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource1", ""), Method("PATCH"),
           HeaderAnyWithCapture("MyHeader", "2|3", ""), Accept)
 
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture(".*", "X-SUB-RESOURCE"),
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource2", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"),
           URLXSDWithCapture("xs:int", "X-SUB-RESOURCE2"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
-        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture(".*", "X-SUB-RESOURCE"),
-          URLWithCapture(".*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource3", ""), URLWithCapture("(?s).*", "X-SUB-RESOURCE"),
+          URLWithCapture("(?s).*", "X-SUB-RESOURCE"), Method("GET"), Accept)
 
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("POST"),
           ReqType("(application/xml)(;.*)?"), XSL, XPathWithCapture("/tst:e/@foo", "X-FOO"), Accept)

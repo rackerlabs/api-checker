@@ -215,7 +215,7 @@ trait RaxRolesBehaviors {
       )
     )
     it should "fail with a 400 when " + method + " on " + path + " and no X-Auth-Token header" + " for " + conf in {
-      base.assertResultFailed(validator.validate(request, response, chain), 400, "Bad Content: Expecting an HTTP header X-Auth-Token to have a value matching .*")
+      base.assertResultFailed(validator.validate(request, response, chain), 400, List("Expecting","X-Auth-Token",".*"))
     }
   }
 
@@ -228,7 +228,7 @@ trait RaxRolesBehaviors {
       )
     )
     it should "fail with a 400 when " + method + " on " + path + " and no one X-Auth-Token header" + " for " + conf in {
-      base.assertResultFailed(validator.validate(request, response, chain), 400, "Bad Content: Expecting an HTTP header some-generic-header to have a value matching .*")
+      base.assertResultFailed(validator.validate(request, response, chain), 400, List("Expecting","some-generic-header",".*"))
     }
   }
 }

@@ -60,6 +60,9 @@
                                                                    'HEADER_SINGLE', 'HEADERXSD_SINGLE', 'HEADER_ALL',
                                                                    'JSON_SCHEMA')"/>
 
+    <!-- Useful matches -->
+    <xsl:variable name="matchAll" select="'(?s).*'"/>
+
     <!--
         Given a step, returns a collection of ids to
         the connected steps.

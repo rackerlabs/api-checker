@@ -49,19 +49,19 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndHeaderAssertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
 
@@ -72,20 +72,20 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
 
@@ -95,14 +95,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
 
@@ -299,29 +299,29 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"), HeaderSingle("X-TEST", ".*"),
-              HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"), HeaderSingle("X-TEST", "(?s).*"),
+              HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
 
@@ -332,14 +332,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
 
@@ -350,18 +350,18 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def reqTypeAndHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
 
@@ -371,31 +371,31 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def wellFormedAndHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
 
@@ -405,14 +405,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
 
@@ -424,19 +424,19 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def wellFormedAndHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
 
@@ -447,21 +447,21 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def xsdAndHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
     //
@@ -469,13 +469,13 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -487,36 +487,36 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def xsdAndHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
     def raxCodeHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The header states should have the appropriate header codes")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -527,64 +527,64 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def raxCodeHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The header states should have the appropriate header codes")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403),Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
 
     def raxMessageHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The header states should have the appropriate header codes")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -596,58 +596,58 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def raxMessageHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The header states should have the appropriate header codes")
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
+              HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
+              HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
+              HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
+              HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
+              HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
+              HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
               Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
+              HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","foo", "X-FOO,foo,bad"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "X-TEST, bad"),
-              HeaderSingle("X-TEST2", ".*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
+              HeaderSingle("X-TEST", "(?s).*", "X-TEST, bad"),
+              HeaderSingle("X-TEST2", "(?s).*", "X-TEST2, bad"), HeaderSingle("X-FOO","bar", "X-FOO,bar,bad"),
               Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
 
     def raxSameCodeHeaderDupsAssertion(checker : NodeSeq) : Unit = {
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 401),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 401),
               HeaderSingle("X-FOO","foo|bar", 401), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 401),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 401),
               HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 401),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 401),
               HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 401),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 401),
               HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -658,34 +658,34 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
 
     def raxSameCodeHeaderDupsAssertionWithDefaults(checker : NodeSeq) : Unit = {
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 401),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 401),
               HeaderSingle("X-FOO","foo|bar", 401), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 401),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 401),
               HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 401),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 401),
               HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 401),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 401),
               HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
 
     def raxSameMessageHeaderDupsAssertion(checker : NodeSeq) : Unit = {
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "No!"), HeaderSingle("X-TEST2", ".*", "No!"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "No!"), HeaderSingle("X-TEST2", "(?s).*", "No!"),
               HeaderSingle("X-FOO","foo|bar", "No!"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "No!"), HeaderSingle("X-TEST2", ".*", "No!"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "No!"), HeaderSingle("X-TEST2", "(?s).*", "No!"),
               HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "No!"), HeaderSingle("X-TEST2", ".*", "No!"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "No!"), HeaderSingle("X-TEST2", "(?s).*", "No!"),
               HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*", "No!"), HeaderSingle("X-TEST2", ".*", "No!"),
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*", "No!"), HeaderSingle("X-TEST2", "(?s).*", "No!"),
               HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -695,19 +695,19 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
 
     def raxSameMessageHeaderDupsAssertionWithDefaults(checker : NodeSeq) : Unit = {
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No!"), HeaderSingle("X-TEST2", ".*", "No!"),
+              HeaderSingle("X-TEST", "(?s).*", "No!"), HeaderSingle("X-TEST2", "(?s).*", "No!"),
               HeaderSingle("X-FOO","foo|bar", "No!"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No!"), HeaderSingle("X-TEST2", ".*", "No!"),
+              HeaderSingle("X-TEST", "(?s).*", "No!"), HeaderSingle("X-TEST2", "(?s).*", "No!"),
               HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No!"), HeaderSingle("X-TEST2", ".*", "No!"),
+              HeaderSingle("X-TEST", "(?s).*", "No!"), HeaderSingle("X-TEST2", "(?s).*", "No!"),
               HeaderSingle("X-FOO","foo|bar"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No!"), HeaderSingle("X-TEST2", ".*", "No!"),
+              HeaderSingle("X-TEST", "(?s).*", "No!"), HeaderSingle("X-TEST2", "(?s).*", "No!"),
               HeaderSingle("X-FOO","foo|bar"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -769,15 +769,15 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
 
@@ -789,14 +789,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
 
@@ -807,10 +807,10 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
     //
@@ -820,16 +820,16 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
     }
 
@@ -840,15 +840,15 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     }
@@ -860,10 +860,10 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
@@ -3464,18 +3464,18 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
@@ -3484,25 +3484,25 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def reqTypeAndReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
@@ -3513,14 +3513,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
@@ -3528,17 +3528,17 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def reqTypeAndReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"),  SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"))
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqTypeFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
@@ -3550,17 +3550,17 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"), WellJSON)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
@@ -3568,24 +3568,24 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def wellFormedAndReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"), WellJSON)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"), WellJSON)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
@@ -3595,13 +3595,13 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
@@ -3610,16 +3610,16 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def wellFormedAndReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), WellXML)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), WellJSON)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
@@ -3631,11 +3631,11 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndReqHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -3643,14 +3643,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def xsdAndReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","bar"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -3659,10 +3659,10 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
@@ -3670,28 +3670,28 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def xsdAndReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*"), HeaderSingle("X-TEST2", ".*"), HeaderSingle("X-FOO","foo|bar"),
+              HeaderSingle("X-TEST", "(?s).*"), HeaderSingle("X-TEST2", "(?s).*"), HeaderSingle("X-FOO","foo|bar"),
               ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
     def raxCodeReqHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain header assertions with correct error code")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -3700,20 +3700,20 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def raxCodeReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should contain header assertions with correct error code")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","foo", 402), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401), HeaderSingle("X-TEST2", ".*", 404),
+              HeaderSingle("X-TEST", "(?s).*", 401), HeaderSingle("X-TEST2", "(?s).*", 404),
               HeaderSingle("X-FOO","bar", 403), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -3721,12 +3721,12 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
 
     def raxCodeReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain header assertions with the correct error code")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", 401),
-              HeaderSingle("X-TEST2", ".*", 401), HeaderSingle("X-FOO","foo|bar", 401),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", 401),
+              HeaderSingle("X-TEST2", "(?s).*", 401), HeaderSingle("X-FOO","foo|bar", 401),
               ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", 401),
-              HeaderSingle("X-TEST2", ".*", 401), HeaderSingle("X-FOO","foo|bar", 401),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", 401),
+              HeaderSingle("X-TEST2", "(?s).*", 401), HeaderSingle("X-FOO","foo|bar", 401),
               ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
@@ -3734,25 +3734,25 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def raxCodeReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should cantain header assertions with the correct error code")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401),
-              HeaderSingle("X-TEST2", ".*", 401), HeaderSingle("X-FOO","foo|bar", 401),
+              HeaderSingle("X-TEST", "(?s).*", 401),
+              HeaderSingle("X-TEST2", "(?s).*", 401), HeaderSingle("X-FOO","foo|bar", 401),
               ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", 401),
-              HeaderSingle("X-TEST2", ".*", 401), HeaderSingle("X-FOO","foo|bar", 401),
+              HeaderSingle("X-TEST", "(?s).*", 401),
+              HeaderSingle("X-TEST2", "(?s).*", 401), HeaderSingle("X-FOO","foo|bar", 401),
               ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
     def raxMessageReqHeaderDupsOnAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain header assertions with the correct error code")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", "No!"),
-              HeaderSingle("X-TEST2", ".*", "No!"), HeaderSingle("X-FOO","foo|bar", "No!"),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", "No!"),
+              HeaderSingle("X-TEST2", "(?s).*", "No!"), HeaderSingle("X-FOO","foo|bar", "No!"),
               ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", "No!"),
-              HeaderSingle("X-TEST2", ".*", "No!"), HeaderSingle("X-FOO","foo|bar", "No!"),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", "No!"),
+              HeaderSingle("X-TEST2", "(?s).*", "No!"), HeaderSingle("X-FOO","foo|bar", "No!"),
               ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
@@ -3760,30 +3760,30 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def raxMessageReqHeaderDupsOnAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should cantain header assertions with the correct error code")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No!"),
-              HeaderSingle("X-TEST2", ".*", "No!"), HeaderSingle("X-FOO","foo|bar", "No!"),
+              HeaderSingle("X-TEST", "(?s).*", "No!"),
+              HeaderSingle("X-TEST2", "(?s).*", "No!"), HeaderSingle("X-FOO","foo|bar", "No!"),
               ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No!"),
-              HeaderSingle("X-TEST2", ".*", "No!"), HeaderSingle("X-FOO","foo|bar", "No!"),
+              HeaderSingle("X-TEST", "(?s).*", "No!"),
+              HeaderSingle("X-TEST2", "(?s).*", "No!"), HeaderSingle("X-FOO","foo|bar", "No!"),
               ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
     def raxMessageReqHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain header assertions with correct error code")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", "No1"), HeaderSingle("X-TEST2", ".*", "No4"),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", "No1"), HeaderSingle("X-TEST2", "(?s).*", "No4"),
               HeaderSingle("X-FOO","foo", "No2"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", "No1"), HeaderSingle("X-TEST2", ".*", "No4"),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", "No1"), HeaderSingle("X-TEST2", "(?s).*", "No4"),
               HeaderSingle("X-FOO","bar", "No3"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", "No1"), HeaderSingle("X-TEST2", ".*", "No4"),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", "No1"), HeaderSingle("X-TEST2", "(?s).*", "No4"),
               HeaderSingle("X-FOO","foo", "No2"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*", "No1"), HeaderSingle("X-TEST2", ".*", "No4"),
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*", "No1"), HeaderSingle("X-TEST2", "(?s).*", "No4"),
               HeaderSingle("X-FOO","bar", "No3"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -3792,20 +3792,20 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     def raxMessageReqHeaderAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should contain header assertions with correct error code")
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No1"), HeaderSingle("X-TEST2", ".*", "No4"),
+              HeaderSingle("X-TEST", "(?s).*", "No1"), HeaderSingle("X-TEST2", "(?s).*", "No4"),
               HeaderSingle("X-FOO","foo", "No2"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No1"), HeaderSingle("X-TEST2", ".*", "No4"),
+              HeaderSingle("X-TEST", "(?s).*", "No1"), HeaderSingle("X-TEST2", "(?s).*", "No4"),
               HeaderSingle("X-FOO","bar", "No3"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
 
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No1"), HeaderSingle("X-TEST2", ".*", "No4"),
+              HeaderSingle("X-TEST", "(?s).*", "No1"), HeaderSingle("X-TEST2", "(?s).*", "No4"),
               HeaderSingle("X-FOO","foo", "No2"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST", "FOO"), SetHeader("X-TEST2","BAR"), SetHeader("X-FOO","foo"),
-              HeaderSingle("X-TEST", ".*", "No1"), HeaderSingle("X-TEST2", ".*", "No4"),
+              HeaderSingle("X-TEST", "(?s).*", "No1"), HeaderSingle("X-TEST2", "(?s).*", "No4"),
               HeaderSingle("X-FOO","bar", "No3"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -3869,14 +3869,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqTypeFail)
     }
@@ -3889,13 +3889,13 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
@@ -3907,9 +3907,9 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndReqHeaderXSDHeaderAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }
 
@@ -3920,15 +3920,15 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqTypeFail)
     }
@@ -3940,14 +3940,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -3960,9 +3960,9 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndReqHeaderXSDHeader2Assertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -3975,30 +3975,30 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqTypeFail)
     }
 
     def reqTypeAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"))
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"))
       assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("GET"))
       And("ReqTypeFail states should be after PUT and POST states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqTypeFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqTypeFail)
       assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqTypeFail)
     }
@@ -4012,14 +4012,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -4028,16 +4028,16 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
 
     def wellFormedAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
               HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), WellJSON)
       assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
               HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/json)(;.*)?"), ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
       assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
               HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/json)(;.*)?"), ContentFail)
@@ -4054,9 +4054,9 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndReqHeaderXSDHeader2MixAssertions(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -4064,9 +4064,9 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
 
     def xsdAndReqHeaderXSDHeader2MixAssertionsWithDefaults(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), SetHeader("X-TEST-INT", "99"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert (checker, Start, URL("c"), SetHeader("X-TEST-INT", "999"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), SetHeader("X-TEST-OTHER", "2015-11-28"),
               HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
@@ -5944,8 +5944,8 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker : NodeSeq) : Unit = {
       Then("The machine should contain paths to all ReqTypes")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"))
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), Accept)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), Accept)
@@ -5962,14 +5962,14 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker : NodeSeq) : Unit = {
       And("The machine should contain paths to WellXML and WELLJSON types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), Accept)
       assert (checker, Start, URL("c"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Method("POST"), HeaderXSDSingle("X-TEST-OTHER", "xsd:date"), Accept)
       And("There should be content failed states")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     }
 
@@ -5980,7 +5980,7 @@ class WADLCheckerHeaderSingleSpec extends BaseCheckerSpec with LogAssertions {
     //
     def xsdAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker : NodeSeq) : Unit = {
       And("The machine should cantain paths to XSD types")
-      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", ".*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
+      assert (checker, Start, URL("a"), URL("b"), Method("PUT"), HeaderSingle("X-TEST", "(?s).*"), HeaderXSDSingle("X-TEST-INT", "xsd:int"), Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     }

@@ -1519,6 +1519,11 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     validator_AM.validate(request("GET","/%E3%83%84%E3%83%85%E3%83%8C%E3%82%A4/b"),response,chain)
   }
 
+  test ("GET on /something<NL>something/b should succeed validator_AM") {
+    validator_AM.validate(request("GET","/something%0Asomething/b"),response,chain)
+  }
+
+
   test ("GET on /<arrows>/b should succeed validator_AM") {
     validator_AM.validate(request("GET","/%E2%86%90%E2%86%91%E2%86%92%E2%86%93/b"),response,chain)
   }

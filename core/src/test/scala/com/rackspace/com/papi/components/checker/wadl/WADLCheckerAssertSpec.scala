@@ -333,7 +333,7 @@ val configAdvance = {
   <step type="URL" id="d47e9" match="again" next="SE1 SE0"/>
   <step type="URL" id="d47e10" match="other" next="d47e12 d47e11 d55e8m"/>
   <step type="METHOD" id="d47e11" match="GET" next="SA"/>
-  <step type="URL" id="d47e12" match=".*" label="stuff" next="d47e14 SE1 d55e10u"/>
+  <step type="URL" id="d47e12" match="(?s).*" label="stuff" next="d47e14 SE1 d55e10u"/>
   <step type="URL" id="d47e14" match="again" next="SE1 SE0"/>
   <step type="URL" id="d47e15" match="resource" next="d47e16 d47e17 d55e12m SE0"/>
   <step type="METHOD" id="d47e16" match="GET" next="SA"/>
@@ -400,7 +400,7 @@ val configAdvance = {
   <step type="URL" id="d47e9" match="again" next="SE1 SE0"/>
   <step type="URL" id="d47e10" match="other" next="d47e12 d47e11 d55e8m"/>
   <step type="METHOD" id="d47e11" match="GET" next="SA"/>
-  <step type="URL" id="d47e12" match=".*" label="stuff" next="d47e14 SE1 d55e10u"/>
+  <step type="URL" id="d47e12" match="(?s).*" label="stuff" next="d47e14 SE1 d55e10u"/>
   <step type="URL" id="d47e14" match="again" next="SE1 SE0"/>
   <step type="URL" id="d47e15" match="resource" next="d47e16 d47e17 d55e12m SE0"/>
   <step type="METHOD" id="d47e16" match="GET" next="SA"/>
@@ -467,7 +467,7 @@ val configAdvance = {
   <step type="URL" id="d47e9" match="again" next="SE1 SE0"/>
   <step type="URL" id="d47e10" match="other" next="d47e12 d47e11 d55e8m"/>
   <step type="METHOD" id="d47e11" match="GET" next="SA"/>
-  <step type="URL" id="d47e12" match=".*" label="stuff" next="d47e14 SE1 d55e10u"/>
+  <step type="URL" id="d47e12" match="(?s).*" label="stuff" next="d47e14 SE1 d55e10u"/>
   <step type="URL" id="d47e14" match="again" next="SE1 SE0"/>
   <step type="URL" id="d47e15" match="resource" next="d47e16 d47e17 d55e12m SE0"/>
   <step type="METHOD" id="d47e16" match="GET" next="SA"/>
@@ -546,7 +546,7 @@ val configAdvance = {
   <step type="URL" id="d47e16" match="foo" next="d47e17 SE1 d55e15u"/>
   <step type="URL" id="d47e17" match="again" next="d47e18 d55e16m SE0"/>
   <step type="METHOD" id="d47e18" match="POST" next="SA"/>
-  <step type="URL" id="d47e19" match=".*" label="stuff" next="d47e21 SE1 d55e18u"/>
+  <step type="URL" id="d47e19" match="(?s).*" label="stuff" next="d47e21 SE1 d55e18u"/>
   <step type="URL" id="d47e21" match="again" next="d47e22 d55e19m SE0"/>
   <step type="METHOD" id="d47e22" match="GET" next="SA"/>
   <step type="URL" id="d47e23" match="resource" next="d47e24 d47e25 d55e21m SE0"/>
@@ -627,7 +627,7 @@ val configAdvance = {
   <step type="URL" id="d47e16" match="foo" next="d47e17 SE1 d55e15u"/>
   <step type="URL" id="d47e17" match="again" next="d47e18 d55e16m SE0"/>
   <step type="METHOD" id="d47e18" match="POST" next="SA"/>
-  <step type="URL" id="d47e19" match=".*" label="stuff" next="d47e21 SE1 d55e18u"/>
+  <step type="URL" id="d47e19" match="(?s).*" label="stuff" next="d47e21 SE1 d55e18u"/>
   <step type="URL" id="d47e21" match="again" next="d47e22 d55e19m SE0"/>
   <step type="METHOD" id="d47e22" match="GET" next="SA"/>
   <step type="URL" id="d47e23" match="resource" next="d47e24 d47e25 d55e21m SE0"/>
@@ -708,7 +708,7 @@ val configAdvance = {
   <step type="URL" id="d47e16" match="foo" next="d47e17 SE1 d55e15u"/>
   <step type="URL" id="d47e17" match="again" next="d47e18 d55e16m SE0"/>
   <step type="METHOD" id="d47e18" match="POST" next="SA"/>
-  <step type="URL" id="d47e19" match=".*" label="stuff" next="d47e21 SE1 d55e18u"/>
+  <step type="URL" id="d47e19" match="(?s).*" label="stuff" next="d47e21 SE1 d55e18u"/>
   <step type="URL" id="d47e21" match="again" next="d47e22 d55e19m SE0"/>
   <step type="METHOD" id="d47e22" match="GET" next="SA"/>
   <step type="URL" id="d47e23" match="resource" next="d47e24 d47e25 d55e21m SE0"/>
@@ -789,7 +789,7 @@ val configAdvance = {
   <step type="URL" id="d47e16" match="foo" next="d47e17 SE1 d55e15u"/>
   <step type="URL" id="d47e17" match="again" next="d47e18 d55e16m SE0"/>
   <step type="METHOD" id="d47e18" match="POST" next="SA"/>
-  <step type="URL" id="d47e19" match=".*" label="stuff" next="d47e21 SE1 d55e18u"/>
+  <step type="URL" id="d47e19" match="(?s).*" label="stuff" next="d47e21 SE1 d55e18u"/>
   <step type="URL" id="d47e21" match="again" next="d47e22 d55e19m SE0"/>
   <step type="METHOD" id="d47e22" match="GET" next="SA"/>
   <step type="URL" id="d47e23" match="resource" next="d47e24 d47e25 d55e21m SE0"/>
@@ -870,7 +870,7 @@ val configAdvance = {
   <step type="URL" id="d47e16" match="foo" next="d47e17 SE1 d55e15u"/>
   <step type="URL" id="d47e17" match="again" next="d47e18 d55e16m SE0"/>
   <step type="METHOD" id="d47e18" match="POST" next="SA"/>
-  <step type="URL" id="d47e19" match=".*" label="stuff" next="d47e21 SE1 d55e18u"/>
+  <step type="URL" id="d47e19" match="(?s).*" label="stuff" next="d47e21 SE1 d55e18u"/>
   <step type="URL" id="d47e21" match="again" next="d47e22 d55e19m SE0"/>
   <step type="METHOD" id="d47e22" match="GET" next="SA"/>
   <step type="URL" id="d47e23" match="resource" next="d47e24 d47e25 d55e21m SE0"/>
@@ -1428,8 +1428,8 @@ val configAdvance = {
       assert(checkerLog, "URL")
     }
 
-    scenario ("URL steps matching .* should not require an URL_FAIL step") {
-      Given("A checker with URL steps matching .* and no sibling URL_FAIL step")
+    scenario ("URL steps matching (?s).* should not require an URL_FAIL step") {
+      Given("A checker with URL steps matching (?s).* and no sibling URL_FAIL step")
       val in = ("in.checker", <checker xmlns="http://www.rackspace.com/repose/wadl/checker"
                                        xmlns:json="http://json-schema.org/schema#"
                                        xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
@@ -1477,7 +1477,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e24 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -1488,7 +1488,7 @@ val configAdvance = {
   <step type="URL" id="d47e17" match="foo" next="d47e18 SE1 d55e15u"/>
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="SA"/>
-  <step type="URL" id="d47e20" match=".*" label="stuff" next="d47e22 SE1 d55e18u"/>
+  <step type="URL" id="d47e20" match="(?s).*" label="stuff" next="d47e22 SE1 d55e18u"/>
   <step type="URL" id="d47e22" match="again" next="d47e23 d55e19m SE0"/>
   <step type="METHOD" id="d47e23" match="GET" next="SA"/>
   <step type="URL" id="d47e24" match="resource" next="d47e25 d47e26 d55e21m SE0"/>
@@ -1553,7 +1553,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e30 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -1565,7 +1565,7 @@ val configAdvance = {
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="d47e23 d47e19rqt"/>
   <step type="REQ_TYPE" id="d47e23" match="(?i)(application/xml)(;.*)?" next="SA"/>
-  <step type="URL" id="d47e26" match=".*" label="stuff" next="d47e28 SE1 d55e20u"/>
+  <step type="URL" id="d47e26" match="(?s).*" label="stuff" next="d47e28 SE1 d55e20u"/>
   <step type="URL" id="d47e28" match="again" next="d47e29 d55e21m SE0"/>
   <step type="METHOD" id="d47e29" match="GET" next="SA"/>
   <step type="URL" id="d47e30" match="resource" next="d47e31 d47e32 d55e23m SE0"/>
@@ -1637,7 +1637,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e30 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -1649,7 +1649,7 @@ val configAdvance = {
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="d47e23 d47e19rqt"/>
   <step type="REQ_TYPE" id="d47e23" match="(?i)(application/xml)(;.*)?" next="SA"/>
-  <step type="URL" id="d47e26" match=".*" label="stuff" next="d47e28 SE1 d55e20u"/>
+  <step type="URL" id="d47e26" match="(?s).*" label="stuff" next="d47e28 SE1 d55e20u"/>
   <step type="URL" id="d47e28" match="again" next="d47e29 d55e21m SE0"/>
   <step type="METHOD" id="d47e29" match="GET" next="SA"/>
   <step type="URL" id="d47e30" match="resource" next="d47e31 d47e32 d55e23m SE0"/>
@@ -1722,7 +1722,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e30 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -1734,7 +1734,7 @@ val configAdvance = {
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="d47e23 d47e19rqt"/>
   <step type="REQ_TYPE" id="d47e23" match="(?i)(application/xml)(;.*)?" next="SA"/>
-  <step type="URL" id="d47e26" match=".*" label="stuff" next="d47e28 SE1 d55e20u"/>
+  <step type="URL" id="d47e26" match="(?s).*" label="stuff" next="d47e28 SE1 d55e20u"/>
   <step type="URL" id="d47e28" match="again" next="d47e29 d55e21m SE0"/>
   <step type="METHOD" id="d47e29" match="GET" next="SA"/>
   <step type="URL" id="d47e30" match="resource" next="d47e31 d47e32 d55e23m SE0"/>
@@ -1813,7 +1813,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e30 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -1825,7 +1825,7 @@ val configAdvance = {
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="d47e23 d47e19rqt"/>
   <step type="REQ_TYPE" id="d47e23" match="(?i)(application/xml)(;.*)?" next="d47e23W d47e23WF"/>
-  <step type="URL" id="d47e26" match=".*" label="stuff" next="d47e28 SE1 d55e22u"/>
+  <step type="URL" id="d47e26" match="(?s).*" label="stuff" next="d47e28 SE1 d55e22u"/>
   <step type="URL" id="d47e28" match="again" next="d47e29 d55e23m SE0"/>
   <step type="METHOD" id="d47e29" match="GET" next="SA"/>
   <step type="URL" id="d47e30" match="resource" next="d47e31 d47e32 d55e26m SE0"/>
@@ -1902,7 +1902,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e30 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -1914,7 +1914,7 @@ val configAdvance = {
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="d47e23 d47e19rqt"/>
   <step type="REQ_TYPE" id="d47e23" match="(?i)(application/xml)(;.*)?" next="d47e23W"/>
-  <step type="URL" id="d47e26" match=".*" label="stuff" next="d47e28 SE1 d55e22u"/>
+  <step type="URL" id="d47e26" match="(?s).*" label="stuff" next="d47e28 SE1 d55e22u"/>
   <step type="URL" id="d47e28" match="again" next="d47e29 d55e23m SE0"/>
   <step type="METHOD" id="d47e29" match="GET" next="SA"/>
   <step type="URL" id="d47e30" match="resource" next="d47e31 d47e32 d55e26m SE0"/>
@@ -1990,7 +1990,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e30 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -2002,7 +2002,7 @@ val configAdvance = {
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="d47e23 d47e19rqt"/>
   <step type="REQ_TYPE" id="d47e23" match="(?i)(application/xml)(;.*)?" next="d47e23W d47e23WF"/>
-  <step type="URL" id="d47e26" match=".*" label="stuff" next="d47e28 SE1 d55e22u"/>
+  <step type="URL" id="d47e26" match="(?s).*" label="stuff" next="d47e28 SE1 d55e22u"/>
   <step type="URL" id="d47e28" match="again" next="d47e29 d55e23m SE0"/>
   <step type="METHOD" id="d47e29" match="GET" next="SA"/>
   <step type="URL" id="d47e30" match="resource" next="d47e31 d47e32 d55e26m SE0"/>
@@ -2082,7 +2082,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e35 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -2094,7 +2094,7 @@ val configAdvance = {
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="d47e23 d47e19rqt"/>
   <step type="REQ_TYPE" id="d47e23" match="(?i)(application/xml)(;.*)?" next="d47e23W d47e23WF"/>
-  <step type="URL" id="d47e31" match=".*" label="stuff" next="d47e33 SE1 d55e24u"/>
+  <step type="URL" id="d47e31" match="(?s).*" label="stuff" next="d47e33 SE1 d55e24u"/>
   <step type="URL" id="d47e33" match="again" next="d47e34 d55e26m SE0"/>
   <step type="METHOD" id="d47e34" match="GET" next="SA"/>
   <step type="URL" id="d47e35" match="resource" next="d47e36 d47e37 d55e28m SE0"/>
@@ -2176,7 +2176,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e35 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -2188,7 +2188,7 @@ val configAdvance = {
   <step type="URL" id="d47e18" match="again" next="d47e19 d55e16m SE0"/>
   <step type="METHOD" id="d47e19" match="POST" next="d47e23 d47e19rqt"/>
   <step type="REQ_TYPE" id="d47e23" match="(?i)(application/xml)(;.*)?" next="d47e23W d47e23WF"/>
-  <step type="URL" id="d47e31" match=".*" label="stuff" next="d47e33 SE1 d55e24u"/>
+  <step type="URL" id="d47e31" match="(?s).*" label="stuff" next="d47e33 SE1 d55e24u"/>
   <step type="URL" id="d47e33" match="again" next="d47e34 d55e26m SE0"/>
   <step type="METHOD" id="d47e34" match="GET" next="SA"/>
   <step type="URL" id="d47e35" match="resource" next="d47e36 d47e37 d55e28m SE0"/>
@@ -2265,7 +2265,7 @@ val configAdvance = {
   <step id="d47e24" name="X-ROLE" type="HEADER_ANY" match="ROLE3" priority="41005" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e20HF" priority="40005"/>
   <step type="METHOD_FAIL" id="d55e12m" notMatch="GET" priority="20054"/>
-  <step id="d47e47" name="X-AUTH-TOKEN" type="HEADER" match=".*" priority="41004" next="d47e48 d47e55 d55e36m SE0"/>
+  <step id="d47e47" name="X-AUTH-TOKEN" type="HEADER" match="(?s).*" priority="41004" next="d47e48 d47e55 d55e36m SE0"/>
   <step id="d47e52" name="X-TIME" type="HEADERXSD" match="xs:time" priority="41006" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e52HF" priority="40006"/>
   <step type="WELL_XML" id="d47e59W" priority="41007" next="d47e590XPTH d47e59WF"/>
@@ -2281,7 +2281,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e46 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -2293,7 +2293,7 @@ val configAdvance = {
   <step type="URL" id="d47e28" match="again" next="d47e29 d47e29HF SE1 SE0"/>
   <step type="METHOD" id="d47e30" match="POST" next="d47e34 d47e30rqt"/>
   <step type="REQ_TYPE" id="d47e34" match="(?i)(application/xml)(;.*)?" next="d47e34W d47e34WF"/>
-  <step type="URL" id="d47e42" match=".*" label="stuff" next="d47e44 SE1 d55e32u"/>
+  <step type="URL" id="d47e42" match="(?s).*" label="stuff" next="d47e44 SE1 d55e32u"/>
   <step type="URL" id="d47e44" match="again" next="d47e45 d55e33m SE0"/>
   <step type="METHOD" id="d47e45" match="GET" next="SA"/>
   <step type="URL" id="d47e46" match="resource" next="d47e47 SE1"/>
@@ -2368,7 +2368,7 @@ val configAdvance = {
   <step id="d47e24" name="X-ROLE" type="HEADER_ANY" match="ROLE3" priority="41005" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e20HF" priority="40005"/>
   <step type="METHOD_FAIL" id="d55e12m" notMatch="GET" priority="20054"/>
-  <step id="d47e47" name="X-AUTH-TOKEN" type="HEADER" match=".*" priority="41004" next="d47e48 d47e55 d55e36m SE0"/>
+  <step id="d47e47" name="X-AUTH-TOKEN" type="HEADER" match="(?s).*" priority="41004" next="d47e48 d47e55 d55e36m SE0"/>
   <step id="d47e52" name="X-TIME" type="HEADERXSD" match="xs:time" priority="41006" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e52HF" priority="40006"/>
   <step type="WELL_XML" id="d47e59W" priority="41007" next="d47e590XPTH d47e59WF"/>
@@ -2385,7 +2385,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e46 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -2397,7 +2397,7 @@ val configAdvance = {
   <step type="URL" id="d47e28" match="again" next="d47e29 SE1 SE0"/>
   <step type="METHOD" id="d47e30" match="POST" next="d47e34 d47e30rqt"/>
   <step type="REQ_TYPE" id="d47e34" match="(?i)(application/xml)(;.*)?" next="d47e34W d47e34WF"/>
-  <step type="URL" id="d47e42" match=".*" label="stuff" next="d47e44 SE1 d55e32u"/>
+  <step type="URL" id="d47e42" match="(?s).*" label="stuff" next="d47e44 SE1 d55e32u"/>
   <step type="URL" id="d47e44" match="again" next="d47e45 d55e33m SE0"/>
   <step type="METHOD" id="d47e45" match="GET" next="SA"/>
   <step type="URL" id="d47e46" match="resource" next="d47e47 d47e47HF SE1"/>
@@ -2472,7 +2472,7 @@ val configAdvance = {
   <step id="d47e22" name="X-ROLE" type="HEADER_ANY" match="ROLE2" priority="41005" next="SA"/>
   <step id="d47e24" name="X-ROLE" type="HEADER_ANY" match="ROLE3" priority="41005" next="SA"/>
   <step type="METHOD_FAIL" id="d55e12m" notMatch="GET" priority="20054"/>
-  <step id="d47e47" name="X-AUTH-TOKEN" type="HEADER" match=".*" priority="41004" next="d47e48 d47e55 d55e36m SE0"/>
+  <step id="d47e47" name="X-AUTH-TOKEN" type="HEADER" match="(?s).*" priority="41004" next="d47e48 d47e55 d55e36m SE0"/>
   <step id="d47e52" name="X-TIME" type="HEADERXSD" match="xs:time" priority="41006" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e52HF" priority="40006"/>
   <step type="WELL_XML" id="d47e59W" priority="41007" next="d47e590XPTH d47e59WF"/>
@@ -2489,7 +2489,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e46 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -2501,7 +2501,7 @@ val configAdvance = {
   <step type="URL" id="d47e28" match="again" next="d47e29 d47e29HF SE1 SE0"/>
   <step type="METHOD" id="d47e30" match="POST" next="d47e34 d47e30rqt"/>
   <step type="REQ_TYPE" id="d47e34" match="(?i)(application/xml)(;.*)?" next="d47e34W d47e34WF"/>
-  <step type="URL" id="d47e42" match=".*" label="stuff" next="d47e44 SE1 d55e32u"/>
+  <step type="URL" id="d47e42" match="(?s).*" label="stuff" next="d47e44 SE1 d55e32u"/>
   <step type="URL" id="d47e44" match="again" next="d47e45 d55e33m SE0"/>
   <step type="METHOD" id="d47e45" match="GET" next="SA"/>
   <step type="URL" id="d47e46" match="resource" next="d47e47 d47e47HF SE1"/>
@@ -2598,7 +2598,7 @@ val configAdvance = {
   <step id="d47e24" name="X-ROLE" type="HEADER_ANY" match="ROLE3" priority="41005" next="d47e26 d47e16rqt"/>
   <step type="CONTENT_FAIL" id="d47e20HF" priority="40005"/>
   <step type="METHOD_FAIL" id="d55e12m" notMatch="GET" priority="20054"/>
-  <step id="d47e64" name="X-AUTH-TOKEN" type="HEADER" match=".*" priority="41004" next="d47e65 d47e72 d55e52m SE0"/>
+  <step id="d47e64" name="X-AUTH-TOKEN" type="HEADER" match="(?s).*" priority="41004" next="d47e65 d47e72 d55e52m SE0"/>
   <step id="d47e69" name="X-TIME" type="HEADERXSD" match="xs:time" priority="41006" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e69HF" priority="40006"/>
   <step type="WELL_XML" id="d47e76W" priority="41007" next="d47e760XPTH"/>
@@ -2614,7 +2614,7 @@ val configAdvance = {
   <step type="URL" id="d47e4" match="path" next="d47e5 SE1 d55e3u"/>
   <step type="URL" id="d47e5" match="to" next="d47e6 d47e15 d47e63 SE1 d55e4u"/>
   <step type="URL" id="d47e6" match="another" next="d47e7 d47e11 SE1"/>
-  <step type="URL" id="d47e7" match=".*" label="anything" next="d47e9 SE1 d55e6u"/>
+  <step type="URL" id="d47e7" match="(?s).*" label="anything" next="d47e9 SE1 d55e6u"/>
   <step type="URL" id="d47e9" match="again" next="d47e10 d55e7m SE0"/>
   <step type="METHOD" id="d47e10" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e11" match="xs:dateTime" label="time" next="d47e13 SE1 d55e9u"/>
@@ -2627,7 +2627,7 @@ val configAdvance = {
   <step type="URL" id="d47e45" match="again" next="d47e46 d47e46HF SE1 SE0"/>
   <step type="METHOD" id="d47e47" match="POST" next="d47e51 d47e47rqt"/>
   <step type="REQ_TYPE" id="d47e51" match="(?i)(application/xml)(;.*)?" next="d47e51W d47e51WF"/>
-  <step type="URL" id="d47e59" match=".*" label="stuff" next="d47e61 SE1 d55e48u"/>
+  <step type="URL" id="d47e59" match="(?s).*" label="stuff" next="d47e61 SE1 d55e48u"/>
   <step type="URL" id="d47e61" match="again" next="d47e62 d55e49m SE0"/>
   <step type="METHOD" id="d47e62" match="GET" next="SA"/>
   <step type="URL" id="d47e63" match="resource" next="d47e64 d47e64HF SE1"/>
@@ -2766,7 +2766,7 @@ val configAdvance = {
   <step id="d47e108" name="X-ROLE" type="HEADER_ANY" match="ROLE3" priority="41005" next="d47e110 d47e100rqt"/>
   <step type="CONTENT_FAIL" id="d47e104HF" priority="40005"/>
   <step type="METHOD_FAIL" id="d55e12m" notMatch="GET" priority="20054"/>
-  <step id="d47e148" name="X-AUTH-TOKEN" type="HEADER" match=".*" priority="41004" next="d47e149 d47e156 d55e54m SE0"/>
+  <step id="d47e148" name="X-AUTH-TOKEN" type="HEADER" match="(?s).*" priority="41004" next="d47e149 d47e156 d55e54m SE0"/>
   <step id="d47e153" name="X-TIME" type="HEADERXSD" match="xs:time" priority="41006" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e153HF" priority="40006"/>
   <step type="WELL_XML" id="d47e160W" priority="41007" next="d47e1600XPTH d47e160WF"/>
@@ -2793,7 +2793,7 @@ val configAdvance = {
   <step type="URL" id="d47e88" match="path" next="d47e89 SE1 d55e3u"/>
   <step type="URL" id="d47e89" match="to" next="d47e90 d47e99 d47e147 SE1 d55e4u"/>
   <step type="URL" id="d47e90" match="another" next="d47e91 d47e95 SE1"/>
-  <step type="URL" id="d47e91" match=".*" label="anything" next="d47e93 SE1 d55e6u"/>
+  <step type="URL" id="d47e91" match="(?s).*" label="anything" next="d47e93 SE1 d55e6u"/>
   <step type="URL" id="d47e93" match="again" next="d47e94 d55e7m SE0"/>
   <step type="METHOD" id="d47e94" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e95" match="xs:dateTime" label="time" next="d47e97 SE1 d55e9u"/>
@@ -2806,7 +2806,7 @@ val configAdvance = {
   <step type="URL" id="d47e129" match="again" next="d47e130 d47e130HF SE1 SE0"/>
   <step type="METHOD" id="d47e131" match="POST" next="d47e135 d47e131rqt"/>
   <step type="REQ_TYPE" id="d47e135" match="(?i)(application/xml)(;.*)?" next="d47e135W"/>
-  <step type="URL" id="d47e143" match=".*" label="stuff" next="d47e145 SE1 d55e50u"/>
+  <step type="URL" id="d47e143" match="(?s).*" label="stuff" next="d47e145 SE1 d55e50u"/>
   <step type="URL" id="d47e145" match="again" next="d47e146 d55e51m SE0"/>
   <step type="METHOD" id="d47e146" match="GET" next="SA"/>
   <step type="URL" id="d47e147" match="resource" next="d47e148 d47e148HF SE1"/>
@@ -2944,7 +2944,7 @@ val configAdvance = {
   <step id="d47e108" name="X-ROLE" type="HEADER_ANY" match="ROLE3" priority="41005" next="d47e110 d47e100rqt"/>
   <step type="CONTENT_FAIL" id="d47e104HF" priority="40005"/>
   <step type="METHOD_FAIL" id="d55e12m" notMatch="GET" priority="20054"/>
-  <step id="d47e148" name="X-AUTH-TOKEN" type="HEADER" match=".*" priority="41004" next="d47e149 d47e156 d55e54m SE0"/>
+  <step id="d47e148" name="X-AUTH-TOKEN" type="HEADER" match="(?s).*" priority="41004" next="d47e149 d47e156 d55e54m SE0"/>
   <step id="d47e153" name="X-TIME" type="HEADERXSD" match="xs:time" priority="41006" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e153HF" priority="40006"/>
   <step type="WELL_XML" id="d47e160W" priority="41007" next="d47e1600XPTH d47e160WF"/>
@@ -2971,7 +2971,7 @@ val configAdvance = {
   <step type="URL" id="d47e88" match="path" next="d47e89 SE1 d55e3u"/>
   <step type="URL" id="d47e89" match="to" next="d47e90 d47e99 d47e147 SE1 d55e4u"/>
   <step type="URL" id="d47e90" match="another" next="d47e91 d47e95 SE1"/>
-  <step type="URL" id="d47e91" match=".*" label="anything" next="d47e93 SE1 d55e6u"/>
+  <step type="URL" id="d47e91" match="(?s).*" label="anything" next="d47e93 SE1 d55e6u"/>
   <step type="URL" id="d47e93" match="again" next="d47e94 d55e7m SE0"/>
   <step type="METHOD" id="d47e94" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e95" match="xs:dateTime" label="time" next="d47e97 SE1 d55e9u"/>
@@ -2984,7 +2984,7 @@ val configAdvance = {
   <step type="URL" id="d47e129" match="again" next="d47e130 d47e130HF SE1 SE0"/>
   <step type="METHOD" id="d47e131" match="POST" next="d47e135 d47e131rqt"/>
   <step type="REQ_TYPE" id="d47e135" match="(?i)(application/xml)(;.*)?" next="d47e135W d47e135WF"/>
-  <step type="URL" id="d47e143" match=".*" label="stuff" next="d47e145 SE1 d55e50u"/>
+  <step type="URL" id="d47e143" match="(?s).*" label="stuff" next="d47e145 SE1 d55e50u"/>
   <step type="URL" id="d47e145" match="again" next="d47e146 d55e51m SE0"/>
   <step type="METHOD" id="d47e146" match="GET" next="SA"/>
   <step type="URL" id="d47e147" match="resource" next="d47e148 d47e148HF SE1"/>
@@ -3123,7 +3123,7 @@ val configAdvance = {
   <step id="d47e108" name="X-ROLE" type="HEADER_ANY" match="ROLE3" priority="41005" next="d47e110 d47e100rqt"/>
   <step type="CONTENT_FAIL" id="d47e104HF" priority="40005"/>
   <step type="METHOD_FAIL" id="d55e12m" notMatch="GET" priority="20054"/>
-  <step id="d47e148" name="X-AUTH-TOKEN" type="HEADER" match=".*" priority="41004" next="d47e149 d47e156 d55e54m SE0"/>
+  <step id="d47e148" name="X-AUTH-TOKEN" type="HEADER" match="(?s).*" priority="41004" next="d47e149 d47e156 d55e54m SE0"/>
   <step id="d47e153" name="X-TIME" type="HEADERXSD" match="xs:time" priority="41006" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e153HF" priority="40006"/>
   <step type="WELL_XML" id="d47e160W" priority="41007" next="d47e1600XPTH d47e160WF"/>
@@ -3151,7 +3151,7 @@ val configAdvance = {
   <step type="URL" id="d47e88" match="path" next="d47e89 SE1 d55e3u"/>
   <step type="URL" id="d47e89" match="to" next="d47e90 d47e99 d47e147 SE1 d55e4u"/>
   <step type="URL" id="d47e90" match="another" next="d47e91 d47e95 SE1"/>
-  <step type="URL" id="d47e91" match=".*" label="anything" next="d47e93 SE1 d55e6u"/>
+  <step type="URL" id="d47e91" match="(?s).*" label="anything" next="d47e93 SE1 d55e6u"/>
   <step type="URL" id="d47e93" match="again" next="d47e94 d55e7m SE0"/>
   <step type="METHOD" id="d47e94" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e95" match="xs:dateTime" label="time" next="d47e97 SE1 d55e9u"/>
@@ -3164,7 +3164,7 @@ val configAdvance = {
   <step type="URL" id="d47e129" match="again" next="d47e130 d47e130HF SE1 SE0"/>
   <step type="METHOD" id="d47e131" match="POST" next="d47e135 d47e131rqt"/>
   <step type="REQ_TYPE" id="d47e135" match="(?i)(application/xml)(;.*)?" next="d47e135W d47e135WF"/>
-  <step type="URL" id="d47e143" match=".*" label="stuff" next="d47e145 SE1 d55e50u"/>
+  <step type="URL" id="d47e143" match="(?s).*" label="stuff" next="d47e145 SE1 d55e50u"/>
   <step type="URL" id="d47e145" match="again" next="d47e146 d55e51m SE0"/>
   <step type="METHOD" id="d47e146" match="GET" next="SA"/>
   <step type="URL" id="d47e147" match="resource" next="d47e148 d47e148HF SE1"/>
@@ -3303,7 +3303,7 @@ val configAdvance = {
   <step id="d47e108" name="X-ROLE" type="HEADER_ANY" match="ROLE3" priority="41005" next="d47e110 d47e100rqt"/>
   <step type="CONTENT_FAIL" id="d47e104HF" priority="40005"/>
   <step type="METHOD_FAIL" id="d55e12m" notMatch="GET" priority="20054"/>
-  <step id="d47e148" name="X-AUTH-TOKEN" type="HEADER" match=".*" priority="41004" next="d47e149 d47e156 d55e54m SE0"/>
+  <step id="d47e148" name="X-AUTH-TOKEN" type="HEADER" match="(?s).*" priority="41004" next="d47e149 d47e156 d55e54m SE0"/>
   <step id="d47e153" name="X-TIME" type="HEADERXSD" match="xs:time" priority="41006" next="SA"/>
   <step type="CONTENT_FAIL" id="d47e153HF" priority="40006"/>
   <step type="WELL_XML" id="d47e160W" priority="41007" next="d47e1600XPTH d47e160WF"/>
@@ -3331,7 +3331,7 @@ val configAdvance = {
   <step type="URL" id="d47e88" match="path" next="d47e89 SE1 d55e3u"/>
   <step type="URL" id="d47e89" match="to" next="d47e90 d47e99 d47e147 SE1 d55e4u"/>
   <step type="URL" id="d47e90" match="another" next="d47e91 d47e95 SE1"/>
-  <step type="URL" id="d47e91" match=".*" label="anything" next="d47e93 SE1 d55e6u"/>
+  <step type="URL" id="d47e91" match="(?s).*" label="anything" next="d47e93 SE1 d55e6u"/>
   <step type="URL" id="d47e93" match="again" next="d47e94 d55e7m SE0"/>
   <step type="METHOD" id="d47e94" match="POST" next="SA"/>
   <step type="URLXSD" id="d47e95" match="xs:dateTime" label="time" next="d47e97 SE1 d55e9u"/>
@@ -3344,7 +3344,7 @@ val configAdvance = {
   <step type="URL" id="d47e129" match="again" next="d47e130 d47e130HF SE1 SE0"/>
   <step type="METHOD" id="d47e131" match="POST" next="d47e135 d47e131rqt"/>
   <step type="REQ_TYPE" id="d47e135" match="(?i)(application/xml)(;.*)?" next="d47e135W d47e135WF"/>
-  <step type="URL" id="d47e143" match=".*" label="stuff" next="d47e145 SE1 d55e50u"/>
+  <step type="URL" id="d47e143" match="(?s).*" label="stuff" next="d47e145 SE1 d55e50u"/>
   <step type="URL" id="d47e145" match="again" next="d47e146 d55e51m SE0"/>
   <step type="METHOD" id="d47e146" match="GET" next="SA"/>
   <step type="URL" id="d47e147" match="resource" next="d47e148 d47e148HF SE1"/>
@@ -3449,7 +3449,7 @@ val configAdvance = {
   <step id="d48e88_AnotherFoo" type="URL" match="path" next="d48e89_AnotherFoo d48e88UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e89_AnotherFoo" type="URL" match="to" next="d48e90_AnotherFoo d48e99_AnotherFoo d48e141_AnotherFoo d48e89UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e90_AnotherFoo" type="URL" match="another" next="d48e91_AnotherFoo d48e95_AnotherFoo d48e90UF_AnotherFoo S0MF_AnotherFoo"/>
-  <step id="d48e91_AnotherFoo" type="URL" match=".*" label="anything" next="d48e93_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
+  <step id="d48e91_AnotherFoo" type="URL" match="(?s).*" label="anything" next="d48e93_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e93_AnotherFoo" type="URL" match="again" next="d48e94_AnotherFoo d48e93UF_AnotherFoo d48e93MF_AnotherFoo"/>
   <step id="d48e94_AnotherFoo" type="METHOD" match="POST" next="SA d48e93UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e95_AnotherFoo" type="URLXSD" match="xs:dateTime" label="time" next="d48e93_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
@@ -3457,7 +3457,7 @@ val configAdvance = {
   <step id="d48e122_AnotherFoo" type="URL" match="foo" next="d48e123_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e123_AnotherFoo" type="URL" match="again" next="d48e124_AnotherFoo d48e93UF_AnotherFoo d48e93MF_AnotherFoo"/>
   <step id="d48e124_AnotherFoo" type="METHOD" match="POST" next="d48e129 d48e100rqt"/>
-  <step id="d48e137_AnotherFoo" type="URL" match=".*" label="stuff" next="d48e139_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
+  <step id="d48e137_AnotherFoo" type="URL" match="(?s).*" label="stuff" next="d48e139_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e139_AnotherFoo" type="URL" match="again" next="d48e140_AnotherFoo d48e93UF_AnotherFoo d48e99MF_AnotherFoo"/>
   <step id="d48e140_AnotherFoo" type="METHOD" match="GET" next="SA d48e93UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e100_AnotherFoo" type="METHOD" match="GET" next="d48e100rqt d48e104 d48e93UF_AnotherFoo S0MF_AnotherFoo"/>
@@ -3475,7 +3475,7 @@ val configAdvance = {
   <step id="S0MF_AnotherFoo" type="METHOD_FAIL" priority="20008"/>
   <step id="d48e93MF_AnotherFoo" type="METHOD_FAIL" notMatch="POST" priority="20057"/>
   <step id="d48e91UF_AnotherFoo" type="URL_FAIL" notMatch="again" priority="10056"/>
-  <step id="d48e90UF_AnotherFoo" type="URL_FAIL" notMatch=".*" notTypes="xs:dateTime" priority="10105"/>
+  <step id="d48e90UF_AnotherFoo" type="URL_FAIL" notMatch="(?s).*" notTypes="xs:dateTime" priority="10105"/>
   <step id="d89e0" type="WELL_XML" priority="41009" next="d97e0 d48e104WF"/>
   <step id="d97e0" type="XSL" version="1" priority="41010" next="d48e104XSD d48e104WF">
     <xsl:transform xmlns:check="http://www.rackspace.com/repose/wadl/checker" version="1.0" check:mergable="true">
@@ -3523,7 +3523,7 @@ val configAdvance = {
       </xsl:template>
     </xsl:stylesheet>
   </step>
-  <step id="d48e99UF_AnotherFoo" type="URL_FAIL" notMatch=".*|foo" priority="10105"/>
+  <step id="d48e99UF_AnotherFoo" type="URL_FAIL" notMatch="(?s).*|foo" priority="10105"/>
   <step type="REQ_TYPE_FAIL" id="d48e148rqt" notMatch="(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?" priority="30006"/>
   <step id="d89e2" type="WELL_XML" priority="41007" next="d89e2NS d48e104WF"/>
   <step id="d89e2NS" type="XSL" version="1" priority="41008" next="d48e1521PPROC">
@@ -3561,7 +3561,7 @@ val configAdvance = {
   <step id="d48e88UF_AnotherFoo" type="URL_FAIL" notMatch="to" priority="10053"/>
   <step id="S0UF_AnotherFoo" type="URL_FAIL" notMatch="path" priority="10052"/>
   <step id="S0_foo" type="HEADER_ANY" name="X-ROLES" match="foo" priority="5" next="d48e88_foo S0UF_AnotherFoo S0MF_AnotherFoo"/>
-  <step id="d48e99UF_foo" type="URL_FAIL" notMatch=".*" priority="10055"/>
+  <step id="d48e99UF_foo" type="URL_FAIL" notMatch="(?s).*" priority="10055"/>
   <step id="d48e141MF_foo" type="METHOD_FAIL" notMatch="GET|POST" priority="20105"/>
   <step id="d48e88_" type="URL" match="path" next="d48e89_ d48e88UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e89_" type="URL" match="to" next="d48e90_AnotherFoo d48e99_foo d48e141_AnotherFoo d48e89UF_AnotherFoo S0MF_AnotherFoo"/>
@@ -3662,7 +3662,7 @@ val configAdvance = {
   <step id="d48e88_AnotherFoo" type="URL" match="path" next="d48e89_AnotherFoo d48e88UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e89_AnotherFoo" type="URL" match="to" next="d48e90_AnotherFoo d48e99_AnotherFoo d48e141_AnotherFoo d48e89UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e90_AnotherFoo" type="URL" match="another" next="d48e91_AnotherFoo d48e95_AnotherFoo d48e90UF_AnotherFoo S0MF_AnotherFoo"/>
-  <step id="d48e91_AnotherFoo" type="URL" match=".*" label="anything" next="d48e93_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
+  <step id="d48e91_AnotherFoo" type="URL" match="(?s).*" label="anything" next="d48e93_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e93_AnotherFoo" type="URL" match="again" next="d48e94_AnotherFoo d48e93UF_AnotherFoo d48e93MF_AnotherFoo"/>
   <step id="d48e94_AnotherFoo" type="METHOD" match="POST" next="SA d48e93UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e95_AnotherFoo" type="URLXSD" match="xs:dateTime" label="time" next="d48e93_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
@@ -3670,7 +3670,7 @@ val configAdvance = {
   <step id="d48e122_AnotherFoo" type="URL" match="foo" next="d48e123_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e123_AnotherFoo" type="URL" match="again" next="d48e124_AnotherFoo d48e93UF_AnotherFoo d48e93MF_AnotherFoo"/>
   <step id="d48e124_AnotherFoo" type="METHOD" match="POST" next="d48e129 d48e100rqt"/>
-  <step id="d48e137_AnotherFoo" type="URL" match=".*" label="stuff" next="d48e139_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
+  <step id="d48e137_AnotherFoo" type="URL" match="(?s).*" label="stuff" next="d48e139_AnotherFoo d48e91UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e139_AnotherFoo" type="URL" match="again" next="d48e140_AnotherFoo d48e93UF_AnotherFoo d48e99MF_AnotherFoo"/>
   <step id="d48e140_AnotherFoo" type="METHOD" match="GET" next="SA d48e93UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e100_AnotherFoo" type="METHOD" match="GET" next="d48e100rqt d48e104 d48e93UF_AnotherFoo S0MF_AnotherFoo"/>
@@ -3688,7 +3688,7 @@ val configAdvance = {
   <step id="S0MF_AnotherFoo" type="METHOD_FAIL" priority="20008"/>
   <step id="d48e93MF_AnotherFoo" type="METHOD_FAIL" notMatch="POST" priority="20057"/>
   <step id="d48e91UF_AnotherFoo" type="URL_FAIL" notMatch="again" priority="10056"/>
-  <step id="d48e90UF_AnotherFoo" type="URL_FAIL" notMatch=".*" notTypes="xs:dateTime" priority="10105"/>
+  <step id="d48e90UF_AnotherFoo" type="URL_FAIL" notMatch="(?s).*" notTypes="xs:dateTime" priority="10105"/>
   <step id="d89e0" type="WELL_XML" priority="41009" next="d97e0 d48e104WF"/>
   <step id="d97e0" type="XSL" version="1" priority="41010" next="d48e104XSD d48e104WF">
     <xsl:transform xmlns:check="http://www.rackspace.com/repose/wadl/checker" version="1.0" check:mergable="true">
@@ -3736,7 +3736,7 @@ val configAdvance = {
       </xsl:template>
     </xsl:stylesheet>
   </step>
-  <step id="d48e99UF_AnotherFoo" type="URL_FAIL" notMatch=".*|foo" priority="10105"/>
+  <step id="d48e99UF_AnotherFoo" type="URL_FAIL" notMatch="(?s).*|foo" priority="10105"/>
   <step type="REQ_TYPE_FAIL" id="d48e148rqt" notMatch="(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?" priority="30006"/>
   <step id="d89e2" type="WELL_XML" priority="41007" next="d89e2NS d48e104WF"/>
   <step id="d89e2NS" type="XSL" version="1" priority="41008" next="d48e1521PPROC">
@@ -3774,7 +3774,7 @@ val configAdvance = {
   <step id="d48e88UF_AnotherFoo" type="URL_FAIL" notMatch="to" priority="10053"/>
   <step id="S0UF_AnotherFoo" type="URL_FAIL" notMatch="path" priority="10052"/>
   <step id="S0_foo" type="HEADER_ANY" name="X-ROLES" match="foo" priority="5" next="d48e88_foo S0UF_AnotherFoo S0MF_AnotherFoo"/>
-  <step id="d48e99UF_foo" type="URL_FAIL" notMatch=".*" priority="10055"/>
+  <step id="d48e99UF_foo" type="URL_FAIL" notMatch="(?s).*" priority="10055"/>
   <step id="d48e141MF_foo" type="METHOD_FAIL" notMatch="GET|POST" priority="20105"/>
   <step id="d48e88_" type="URL" match="path" next="d48e89_ d48e88UF_AnotherFoo S0MF_AnotherFoo"/>
   <step id="d48e89_" type="URL" match="to" next="d48e90_AnotherFoo d48e99_foo d48e141_AnotherFoo d48e89UF_AnotherFoo S0MF_AnotherFoo"/>
