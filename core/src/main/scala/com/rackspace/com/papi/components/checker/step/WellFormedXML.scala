@@ -41,6 +41,7 @@ class WellFormedXML(id : String, label : String, val priority : Long, next : Arr
     }catch {
       case e : Exception => req.contentError = e
                             req.contentErrorPriority = priority
+                            req.clearInputStream
     }
     finally {
       if (parser != null) returnParser(parser)

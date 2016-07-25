@@ -70,6 +70,12 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
                          Array[String]()
   }
 
+  private var clearInput = false
+
+  def clearInputStream : Unit = {
+    clearInput = true
+  }
+
   def pathToSegment(uriLevel : Int) : String = {
     "/" + URISegment.slice(0, uriLevel).reduceLeft( _ + "/" +_ )
   }
@@ -154,7 +160,9 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
 
   override def getInputStream : ServletInputStream = {
-    if (parsedXML != null) {
+    if (clearInput) {
+      new ByteArrayServletInputStream(Array[Byte]())
+    } else if (parsedXML != null) {
       var transformer : Transformer = null
       val bout = new ByteArrayOutputStream()
       try {
@@ -185,7 +193,9 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
 
   override def getReader : BufferedReader = {
-    if (parsedXML != null) {
+    if (clearInput) {
+      new BufferedReader(new InputStreamReader (getInputStream, "UTF-8"))
+    } else if (parsedXML != null) {
       new BufferedReader(new InputStreamReader (getInputStream, parsedXML.getInputEncoding))
     } else if (parsedJSON != null) {
       new BufferedReader(new InputStreamReader (getInputStream, "UTF-8"))
