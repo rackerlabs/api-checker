@@ -220,6 +220,56 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
       assert (checker, URL("element2"), MethodFail)
     }
 
+    scenario("The WADL contains a / path deeper in the URI structure (with sub elements one of which is a fixed template param)") {
+      Given("a WADL that contains a / path deeper in the URI structure")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="/">
+                <method name="GET">
+                    <response status="200"/>
+                </method>
+                <resource path="{elm}">
+                    <param name="elm" style="template" type="xsd:string" fixed="element"/>
+                    <resource path="/">
+                       <method name="GET">
+                          <response status="200"/>
+                       </method>
+                       <resource path="element2">
+                          <method name="POST">
+                            <response status="200"/>
+                          </method>
+                       </resource>
+                    </resource>
+                </resource>
+              </resource>
+           </resources>
+        </application>
+      val checker = builder.build (inWADL, stdConfig)
+      Then("The checker should contain an URL node and element2")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 2")
+      And ("The checker should contain two GET methods")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 2")
+      And ("The checker should contain a POST methods")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 1")
+      And ("The checker should NOT contian URL steps with a match == '/'")
+      assert (checker, "count(/chk:checker/chk:step[@type='URL' and @match='/']) = 0")
+      And ("The URL path should exist from Start to the element")
+      assert (checker, Start, URL("element"), Method("GET"))
+      And ("The URL path should exist from Start to the element2")
+      assert (checker, Start, URL("element"), URL("element2"), Method("POST"))
+      And ("The URL path should exist from START directly to GET method")
+      assert (checker, Start, Method("GET"))
+      And ("The Start state and each URL state should contain a path to MethodFail and URLFail")
+      assert (checker, Start, URLFail)
+      assert (checker, Start, MethodFail)
+      assert (checker, URL("element"), URLFail)
+      assert (checker, URL("element"), MethodFail)
+      assert (checker, URL("element2"), URLFail)
+      assert (checker, URL("element2"), MethodFail)
+    }
 
     scenario("The WADL contains a / path deeper in the URI structure (with sub elements and multiple nested '/')") {
       Given("a WADL that contains a / path deeper in the URI structure")

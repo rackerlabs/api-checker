@@ -464,10 +464,12 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="templatePath" select="starts-with(@path,'{')" as="xsd:boolean"/>
+        <xsl:variable name="templatePathFixedValue" as="xsd:string?"
+                      select="if ($templatePath) then check:paramForTemplatePath(.)/@fixed else ()"/>
         <step>
             <xsl:attribute name="type">
                 <xsl:choose>
-                    <xsl:when test="$templatePath and check:isXSDURL(.)">
+                    <xsl:when test="$templatePath and not($templatePathFixedValue) and check:isXSDURL(.)">
                         <xsl:text>URLXSD</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
@@ -478,6 +480,9 @@
             <xsl:attribute name="id" select="generate-id()"/>
             <xsl:attribute name="match">
                 <xsl:choose>
+                    <xsl:when test="$templatePathFixedValue">
+                        <xsl:value-of select="check:toRegExEscaped($templatePathFixedValue)"/>
+                    </xsl:when>
                     <xsl:when test="$templatePath">
                         <xsl:call-template name="check:getTemplateMatch"/>
                     </xsl:when>
