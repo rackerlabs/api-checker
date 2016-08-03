@@ -160,7 +160,7 @@ class WADLCheckerPreProcSpec extends BaseCheckerSpec {
         assert(checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 1")
         assert(checker, "count(/chk:checker/chk:step[@type='XSL']) = 1")
         assert(checker, Start, URL("a"), URL("b"), Method("POST"),
-               ReqType("(application/xml)(;.*)?"), WellXML, XSL, Accept)
+               ReqType("(application/xml)(;.*)?"), WellXML, XSL, SetHeaderAlways("Warning"), Accept)
       }
     }
 }

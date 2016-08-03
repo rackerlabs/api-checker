@@ -317,6 +317,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "HEADERXSD_ANY"  => addHeaderXSDAny(atts)
           case "HEADER_ALL" => addHeaderAll(atts)
           case "SET_HEADER"  => addSetHeader(atts)
+          case "SET_HEADER_ALWAYS"  => addSetHeaderAlways(atts)
           case "JSON_SCHEMA" => addJSONSchema(atts)
         }
       case "grammar" =>
@@ -914,6 +915,17 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new SetHeader(id, label, name, value, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addSetHeaderAlways(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val name : String = atts.getValue("name")
+    val value : String = atts.getValue("value")
+
+    next += (id -> nexts)
+    steps += (id -> new SetHeaderAlways(id, label, name, value, new Array[Step](nexts.length)))
   }
 
   private[this] def addMethod(atts : Attributes) : Unit = {

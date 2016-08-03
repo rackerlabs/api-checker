@@ -769,10 +769,35 @@
       4. [X] Validator
       5. [X] capture header
       6. [X] rax:roles and rax:roles masked with other header_all
-** TODO Document Breaking Changes [3/3]
+** DONE Document Breaking Changes [3/3]
    1. [X] Use of repeating with headers
    2. [X] Use of header_all and header_any
    3. [X] capture_header and message and code changes
+** DONE SetHeaderAlways Step and introduce WARNING headers [3/3]
+   1. [X] SetHeaderAlways [5/5]
+      1. [X] Extend XSD to support SetHeaderAlways
+      2. [X] Checker assertions related to set header always (not needed)
+      3. [X] Ensure that optimizations work with header always
+      4. [X] Create new step
+      5. [X] Update handler for new step
+   2. [X] Warning Headers [4/4]
+      1. [X] Add Warning header config options
+      2. [X] Update builder to add new Warning headers
+      3. [X] Update CLI tools to support new config options
+      4. [X] Ensure that wadl2dot correctly lists set header always
+   3. [X] Testing [5/5]
+      1. [X] Config option, meta tests
+      2. [X] Fix broken tests
+      3. [X] Step
+      4. [X] Builder
+      5. [X] Validator [7/7]
+         1. [X] XSD with no grammer should not set warning
+         2. [X] XSD with grammer should set warning
+         3. [X] Preprocess with XSD no grammar (1 warning)
+         4. [X] Preprocess with XSD grammer (2 warnings)
+         5. [X] Many preprocesses (1 warning)
+         6. [X] Existing warning preserved
+         7. [X] Warn Agent config takes effect
 ** TODO Compile Performance improvements
 ** TODO Assign CONTENT_FAIL to XSL steps in builder
 ** TODO Investigate whether there is an issue with rax:roles with other headers

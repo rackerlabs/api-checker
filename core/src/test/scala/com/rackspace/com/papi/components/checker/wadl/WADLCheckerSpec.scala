@@ -3097,6 +3097,18 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
   }
 
+  //
+  //  Like XSD assertions above, but take into account grammar transformation
+  //
+  def xsdGrammarTransformAssertions(checker : NodeSeq) : Unit = {
+    And("The machine should cantain paths to XSD types")
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, XSD,  SetHeaderAlways("Warning"), Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSD, SetHeaderAlways("Warning"), Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+  }
+
+
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
     val inWADL =
@@ -3314,10 +3326,10 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, false, false, false, 1, false, true))
+    Then("The following assertions should also hold:")
     reqTypeAssertions(checker)
     wellFormedAssertions(checker)
-    xsdAssertions(checker)
-    And("The following assertions should also hold:")
+    xsdGrammarTransformAssertions(checker)
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
     assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
@@ -3338,6 +3350,88 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 4")
   }
 
+
+  scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD (only grammar transform option is specified, warns disabled)") {
+    Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD (only grammar transform option is specified, warns disabled)")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="PUT">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml"/>
+                  </request>
+               </method>
+           </resource>
+           <resource path="/c">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/json"/>
+                  </request>
+               </method>
+               <method name="GET"/>
+           </resource>
+           <resource path="/any">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="*/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/text">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/*"/>
+                 </request>
+              </method>
+           </resource>
+           <resource path="/v">
+              <method name="POST">
+                 <request>
+                    <representation mediaType="text/plain;charset=UTF8"/>
+                 </request>
+              </method>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, false, false, false, 1, false, true)
+    config.enableWarnHeaders = false
+    val checker = builder.build (inWADL, config)
+    Then("The following assertions should also hold:")
+    reqTypeAssertions(checker)
+    wellFormedAssertions(checker)
+    xsdAssertions(checker)
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 5")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='PUT']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='GET']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/xml)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(application/json)(;.*)?']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE' and @match='(?i)(text/plain;charset=UTF8)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(.*)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/)(.*)']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(text/plain;charset=UTF8)()']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='REQ_TYPE_FAIL' and @notMatch='(?i)(application/xml)(;.*)?|(?i)(application/json)(;.*)?']) = 1")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_XML']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='WELL_JSON']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='XSD']) = 2")
+    assert (checker, "count(/chk:checker/chk:step[@type='CONTENT_FAIL']) = 4")
+  }
 
   scenario("The WADL contains PUT and POST operations accepting xml which must validate against an XSD, but no grammar is actually specified") {
     Given ("a WADL that contains multiple PUT and POST operation with XML that must validate against an XSD")
@@ -5461,6 +5555,61 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
+            XPath("/tst:a/@id"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, ContentFail)
+  }
+
+  scenario("The WADL contains a POST  operation accepting valid xml with elements specified and multiple required plain params, and a single XSL transform (disabled warn headers)") {
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform (disabled warn headers)")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:a">
+                         <param name="id" style="plain" path="/tst:a/@id" required="true"/>
+                         <param name="stepType" style="plain" path="/tst:a/@stepType" required="true"/>
+                         <rax:preprocess href="src/test/resources/xsl/testXSL1.xsl"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    register("test://app/src/test/resources/xsl/testXSL1.xsl",
+             XML.loadFile("src/test/resources/xsl/testXSL1.xsl"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, true, true, 1, true, true, true)
+    config.enableWarnHeaders = false
+    val checker = builder.build (inWADL, config)
+    Then("The following assertions should hold")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSD']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSL']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 3")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
             XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -5524,7 +5673,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success")
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success/@didIt")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
@@ -5587,7 +5736,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success")
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:stylesheet/xsl:template/tst:success/@didIt")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
@@ -5649,7 +5798,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "chk:checker/chk:step[@type='XSL']/xsl:transform/xsl:template/xsl:choose/xsl:when[@test = '/tst:a/@stepType']")
     assert(checker, "in-scope-prefixes(chk:checker/chk:step[@type='XSL']/xsl:transform/xsl:template/xsl:choose/xsl:when[@test = '/tst:a/@stepType']) = 'tst'")
     assert(checker, "namespace-uri-for-prefix('tst', chk:checker/chk:step[@type='XSL']/xsl:transform/xsl:template/xsl:choose/xsl:when[@test = '/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, ContentFail)
@@ -5702,7 +5851,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSL, XSD, Accept)
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
@@ -5762,9 +5911,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-           XSL, XSD, Accept)
+           XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
@@ -5829,9 +5978,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-           XSL, XSD, Accept)
+           XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
@@ -5884,9 +6033,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='1']) = 3")
     assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='2']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 0")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), XSL,
-           XSL, XSD, Accept)
+           XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), XSL, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -5931,9 +6080,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='1']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XSL' and @version='2']) = 3")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 0")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, XSD, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), XSL, XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), XSL,
-           XSL, XSD, Accept)
+           XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), XSL, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
@@ -5988,9 +6137,9 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, Accept)
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-           XSL, XSD, Accept)
+           XSL, XSD, SetHeaderAlways("Warning"), SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
@@ -6033,6 +6182,60 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     register("test://app/src/test/resources/xsl/testXSL1.xsl",
              XML.loadFile("src/test/resources/xsl/testXSL1.xsl"))
     val checker = builder.build (inWADL, TestConfig(false, false, true, false, true, 1, true, false, true))
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'tst'")
+    assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSD']) = 0")
+    assert(checker, "count(/chk:checker/chk:step[@type='XSL']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH']) = 3")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
+    assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, SetHeaderAlways("Warning"), Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
+            XPath("/tst:a/@id"), ContentFail)
+  }
+
+
+  scenario("The WADL contains a POST  operation accepting xml with elements specified and multiple required plain params, and a single XSL transform (warn disabled)") {
+    Given ("a WADL that contains a POST operation with elemets specified and multiple plain params and a single XSL transform")
+    val inWADL =
+      <application xmlns="http://wadl.dev.java.net/2009/02"
+                   xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+                   xmlns:rax="http://docs.rackspace.com/api">
+        <grammars>
+            <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+        </grammars>
+        <resources base="https://test.api.openstack.com">
+           <resource path="/a/b">
+               <method name="POST">
+                  <request>
+                      <representation mediaType="application/xml" element="tst:a">
+                         <param name="id" style="plain" path="/tst:a/@id" required="true"/>
+                         <param name="stepType" style="plain" path="/tst:a/@stepType" required="true"/>
+                         <rax:preprocess href="src/test/resources/xsl/testXSL1.xsl"/>
+                      </representation>
+                  </request>
+               </method>
+           </resource>
+        </resources>
+    </application>
+    register("test://app/src/test/resources/xsd/test-urlxsd.xsd",
+             XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
+    register("test://app/src/test/resources/xsl/testXSL1.xsl",
+             XML.loadFile("src/test/resources/xsl/testXSL1.xsl"))
+    When("the wadl is translated")
+    val config = TestConfig(false, false, true, false, true, 1, true, false, true)
+    config.enableWarnHeaders = false
+    val checker = builder.build (inWADL, config)
+    Then("The following assertions should hold")
     assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'tst'")
     assert(checker, "namespace-uri-for-prefix('tst', /chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 'http://www.rackspace.com/repose/wadl/checker/step/test'")
     assert(checker, "in-scope-prefixes(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 'tst'")
@@ -6095,7 +6298,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"),
-            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, Accept)
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a","Expecting the root element to be: tst:a"), ContentFail)
@@ -6142,7 +6345,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 1")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 1")
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML,
-            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, Accept)
+            XPath("/tst:a/@id"), XPath("/tst:a/@stepType"), XSL, SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XPath("/tst:a/@id"), ContentFail)
@@ -6182,7 +6385,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@id']) = 0")
     assert(checker, "count(/chk:checker/chk:step[@type='XPATH' and @match='/tst:a/@stepType']) = 0")
-    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSL, Accept)
+    assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, XSL, SetHeaderAlways("Warning"), Accept)
     assert (checker, Start, URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), ContentFail)
   }
 
@@ -7046,7 +7249,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -7107,7 +7310,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllAssertions(checker)
     wellFormedAndHeaderAllAssertions(checker)
@@ -7169,7 +7372,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-      true, true, true, "XalanC",
+      true, false, true, "XalanC",
       false, true)
     config.enableAnyMatchExtension = false
     val checker = builder.build (inWADL, config)
@@ -7232,7 +7435,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -7295,7 +7498,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val cfg = TestConfig(false, false, true, true, true, 1,
-                         true, true, true, "XalanC",
+                         true, false, true, "XalanC",
                          false, true)
     cfg.enableRaxRolesExtension  = true
     val checkerLog = log (Level.WARN) {
@@ -7365,7 +7568,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val cfg = TestConfig(false, false, true, true, true, 1,
-                         true, true, true, "XalanC",
+                         true, false, true, "XalanC",
                          false, true)
     cfg.enableRaxRolesExtension  = true
     val checkerLog = log (Level.WARN) {
@@ -7435,7 +7638,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val cfg = TestConfig(false, false, true, true, true, 1,
-                         true, true, true, "XalanC",
+                         true, false, true, "XalanC",
                          false, true)
     cfg.enableRaxRolesExtension  = true
     val checkerLog = log (Level.WARN) {
@@ -7508,7 +7711,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val cfg = TestConfig(false, false, true, true, true, 1,
-                         true, true, true, "XalanC",
+                         true, false, true, "XalanC",
                          false, true)
     cfg.enableRaxRolesExtension  = true
     val checkerLog = log (Level.WARN) {
@@ -7580,7 +7783,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val cfg = TestConfig(false, false, true, true, true, 1,
-                         true, true, true, "XalanC",
+                         true, false, true, "XalanC",
                          false, true)
     cfg.enableRaxRolesExtension  = true
     val checkerLog = log (Level.WARN) {
@@ -7648,7 +7851,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -7710,7 +7913,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -7772,7 +7975,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -7839,7 +8042,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     config.enableRaxRolesExtension=true
@@ -7909,7 +8112,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     When ("the WADL is translated")
@@ -7966,7 +8169,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     When ("the WADL is translated")
@@ -8022,7 +8225,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -8084,7 +8287,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllAssertions(checker)
     wellFormedAndHeaderAllAssertions(checker)
@@ -8146,7 +8349,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -8208,7 +8411,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-      true, true, true, "XalanC",
+      true, false, true, "XalanC",
       false, true)
     config.enableAnyMatchExtension = false
     val checker = builder.build (inWADL, config)
@@ -8272,7 +8475,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -8335,7 +8538,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllAssertions(checker)
     wellFormedAndHeaderAllAssertions(checker)
@@ -8398,7 +8601,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -8461,7 +8664,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -8526,7 +8729,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderDupsOnAssertions(checker)
     wellFormedAndHeaderDupsOnAssertions(checker)
@@ -8588,7 +8791,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllDupsOnAssertions(checker)
     wellFormedAndHeaderAllDupsOnAssertions(checker)
@@ -8650,7 +8853,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(true, false, true, true, true, 1,
-      true, true, true, "XalanC",
+      true, false, true, "XalanC",
       false, true)
     config.enableAnyMatchExtension = false
     val checker = builder.build (inWADL, config)
@@ -8718,7 +8921,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(true, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.enableRaxRolesExtension=true
     val checkerLog = log (Level.WARN) {
@@ -8786,7 +8989,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderDupsOnAssertions(checker)
     wellFormedAndHeaderDupsOnAssertions(checker)
@@ -8847,7 +9050,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(true, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -8914,7 +9117,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(true, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     config.enableRaxRolesExtension=true
@@ -8983,7 +9186,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderDupsOnAssertions(checker)
     wellFormedAndHeaderDupsOnAssertions(checker)
@@ -9045,7 +9248,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllDupsOnAssertions(checker)
     wellFormedAndHeaderAllDupsOnAssertions(checker)
@@ -9107,7 +9310,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderDupsOnAssertions(checker)
     wellFormedAndHeaderDupsOnAssertions(checker)
@@ -9170,7 +9373,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllDupsOnAssertions(checker)
     wellFormedAndHeaderAllDupsOnAssertions(checker)
@@ -9232,7 +9435,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderDupsOnAssertions(checker)
     wellFormedAndHeaderDupsOnAssertions(checker)
@@ -9296,7 +9499,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllDupsOnAssertions(checker)
     wellFormedAndHeaderAllDupsOnAssertions(checker)
@@ -9360,7 +9563,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderDupsOnAssertions(checker)
     wellFormedAndHeaderDupsOnAssertions(checker)
@@ -9423,7 +9626,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(true, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -9488,7 +9691,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -9550,7 +9753,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllAssertions(checker)
     wellFormedAndHeaderAllAssertions(checker)
@@ -9612,7 +9815,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -9675,7 +9878,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllAssertions(checker)
     wellFormedAndHeaderAllAssertions(checker)
@@ -9737,7 +9940,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -9801,7 +10004,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllAssertions(checker)
     wellFormedAndHeaderAllAssertions(checker)
@@ -9865,7 +10068,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -9929,7 +10132,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config =TestConfig(true, false, true, true, true, 1,
-                           true, true, true, "XalanC",
+                           true, false, true, "XalanC",
                            false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -9998,7 +10201,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAssertions(checker)
     wellFormedAndHeaderAssertions(checker)
@@ -10063,7 +10266,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderAllAssertions(checker)
     wellFormedAndHeaderAllAssertions(checker)
@@ -10122,7 +10325,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndXSDHeaderAssertions(checker)
     wellFormedAndXSDHeaderAssertions(checker)
@@ -10180,7 +10383,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndXSDHeaderAssertions(checker)
     wellFormedAndXSDHeaderAssertions(checker)
@@ -10239,7 +10442,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndXSDHeaderAssertions(checker)
     wellFormedAndXSDHeaderAssertions(checker)
@@ -10299,7 +10502,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndXSDHeaderAssertions(checker)
     wellFormedAndXSDHeaderAssertions(checker)
@@ -10359,7 +10562,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeaderAssertions(checker)
     wellFormedAndHeaderXSDHeaderAssertions(checker)
@@ -10419,7 +10622,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeaderAssertions(checker)
     wellFormedAndHeaderXSDHeaderAssertions(checker)
@@ -10481,7 +10684,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeaderAssertions(checker)
     wellFormedAndHeaderXSDHeaderAssertions(checker)
@@ -10542,7 +10745,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeaderAssertions(checker)
     wellFormedAndHeaderXSDHeaderAssertions(checker)
@@ -10604,7 +10807,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
@@ -10665,7 +10868,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
@@ -10729,7 +10932,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
@@ -10792,7 +10995,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
@@ -10853,7 +11056,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     true, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
@@ -10914,7 +11117,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     true, true))
     reqTypeAndHeaderXSDHeader2Assertions(checker)
     wellFormedAndHeaderXSDHeader2Assertions(checker)
@@ -11728,7 +11931,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -11790,7 +11993,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllAssertions(checker)
     wellFormedAndReqHeaderAllAssertions(checker)
@@ -11852,7 +12055,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -11913,7 +12116,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -11982,7 +12185,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -12048,7 +12251,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -12112,7 +12315,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -12174,7 +12377,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllAssertions(checker)
     wellFormedAndReqHeaderAllAssertions(checker)
@@ -12237,7 +12440,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -12299,7 +12502,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllAssertions(checker)
     wellFormedAndReqHeaderAllAssertions(checker)
@@ -12362,7 +12565,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -12425,7 +12628,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllAssertions(checker)
     wellFormedAndReqHeaderAllAssertions(checker)
@@ -12489,7 +12692,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -12555,7 +12758,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderDupsOnAssertions(checker)
     wellFormedAndReqHeaderDupsOnAssertions(checker)
@@ -12616,7 +12819,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllDupsOnAssertions(checker)
     wellFormedAndReqHeaderAllDupsOnAssertions(checker)
@@ -12679,7 +12882,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderDupsOnAssertions(checker)
     wellFormedAndReqHeaderDupsOnAssertions(checker)
@@ -12742,7 +12945,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllDupsOnAssertions(checker)
     wellFormedAndReqHeaderAllDupsOnAssertions(checker)
@@ -12805,7 +13008,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderDupsOnAssertions(checker)
     wellFormedAndReqHeaderDupsOnAssertions(checker)
@@ -12868,7 +13071,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllDupsOnAssertions(checker)
     wellFormedAndReqHeaderAllDupsOnAssertions(checker)
@@ -12931,7 +13134,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderDupsOnAssertions(checker)
     wellFormedAndReqHeaderDupsOnAssertions(checker)
@@ -12994,7 +13197,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllDupsOnAssertions(checker)
     wellFormedAndReqHeaderAllDupsOnAssertions(checker)
@@ -13058,7 +13261,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(true, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -13123,7 +13326,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -13185,7 +13388,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllAssertions(checker)
     wellFormedAndReqHeaderAllAssertions(checker)
@@ -13248,7 +13451,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -13311,7 +13514,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllAssertions(checker)
     wellFormedAndReqHeaderAllAssertions(checker)
@@ -13374,7 +13577,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -13438,7 +13641,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllAssertions(checker)
     wellFormedAndReqHeaderAllAssertions(checker)
@@ -13503,7 +13706,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(true, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -13572,7 +13775,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAssertions(checker)
     wellFormedAndReqHeaderAssertions(checker)
@@ -13636,7 +13839,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderAllAssertions(checker)
     wellFormedAndReqHeaderAllAssertions(checker)
@@ -13695,7 +13898,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqXSDHeaderAssertions(checker)
     wellFormedAndReqXSDHeaderAssertions(checker)
@@ -13753,7 +13956,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqXSDHeaderAssertions(checker)
     wellFormedAndReqXSDHeaderAssertions(checker)
@@ -13812,7 +14015,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqXSDHeaderAssertions(checker)
     wellFormedAndReqXSDHeaderAssertions(checker)
@@ -13871,7 +14074,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqXSDHeaderAssertions(checker)
     wellFormedAndReqXSDHeaderAssertions(checker)
@@ -13931,7 +14134,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeaderAssertions(checker)
     wellFormedAndReqHeaderXSDHeaderAssertions(checker)
@@ -13991,7 +14194,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeaderAssertions(checker)
     wellFormedAndReqHeaderXSDHeaderAssertions(checker)
@@ -14052,7 +14255,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeaderAssertions(checker)
     wellFormedAndReqHeaderXSDHeaderAssertions(checker)
@@ -14113,7 +14316,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeaderAssertions(checker)
     wellFormedAndReqHeaderXSDHeaderAssertions(checker)
@@ -14175,7 +14378,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
@@ -14236,7 +14439,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
@@ -14300,7 +14503,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
@@ -14364,7 +14567,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
@@ -14425,7 +14628,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     true, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
@@ -14487,7 +14690,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     true, true))
     reqTypeAndReqHeaderXSDHeader2Assertions(checker)
     wellFormedAndReqHeaderXSDHeader2Assertions(checker)
@@ -14549,7 +14752,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertions(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertions(checker)
@@ -14611,7 +14814,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertions(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertions(checker)
@@ -14674,7 +14877,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertions(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertions(checker)
@@ -14737,7 +14940,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val config = TestConfig(false, false, true, true, true, 1,
-                            true, true, true, "XalanC",
+                            true, false, true, "XalanC",
                             false, true)
     config.setParamDefaults=true
     val checker = builder.build (inWADL, config)
@@ -14804,7 +15007,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertions(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertions(checker)
@@ -14868,7 +15071,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertions(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertions(checker)
@@ -14977,7 +15180,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker)
@@ -15038,7 +15241,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqType(checker)
@@ -15301,7 +15504,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqTypeSameName(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqTypeSameName(checker)
@@ -15365,7 +15568,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(false, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqTypeSameNameAll(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqTypeSameNameAll(checker)
@@ -15430,7 +15633,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqTypeSameNameDups(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqTypeSameNameDups(checker)
@@ -15494,7 +15697,7 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
              XML.loadFile("src/test/resources/xsd/test-urlxsd.xsd"))
     When("the wadl is translated")
     val checker = builder.build (inWADL, TestConfig(true, false, true, true, true, 1,
-                                                    true, true, true, "XalanC",
+                                                    true, false, true, "XalanC",
                                                     false, true))
     reqTypeAndReqHeaderXSDHeader2MixAssertionsNoReqTypeSameNameDupsAll(checker)
     wellFormedAndReqHeaderXSDHeader2MixAssertionsNoReqTypeSameNameDupsAll(checker)

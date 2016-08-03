@@ -167,7 +167,7 @@
                                                  <xsl:text>ε (</xsl:text>
                                                  <xsl:choose>
                                                      <xsl:when test="$nextStep/@name">
-                                                         <xsl:value-of select="concat($nextStep/@name,':&#x2190;? ',$nextStep/@value)"/>
+                                                         <xsl:value-of select="concat($nextStep/@name,':&#x2190;? ',check:escapeRegex($nextStep/@value))"/>
                                                      </xsl:when>
                                                      <xsl:otherwise>
                                                          <xsl:value-of select="check:matchValue($nextStep)"/>
@@ -212,7 +212,7 @@
                          <xsl:value-of select="concat(@name,' : ',check:matchValue(.))"/>
                      </xsl:when>
                      <xsl:when test="@name and @value">
-                         <xsl:value-of select="concat(@name,':&#x2190;? ',@value)"/>
+                         <xsl:value-of select="concat(@name,':&#x2190;? ',check:escapeRegex(@value))"/>
                      </xsl:when>
                      <xsl:when test="@match or @matchRegEx">
                          <xsl:value-of select="check:matchValue(.)"/>
@@ -288,7 +288,8 @@
    </xsl:template>
    <xsl:function name="check:escapeRegex" as="xsd:string">
       <xsl:param name="in" as="xsd:string"/>
-      <xsl:value-of select="replace($in,'\\','\\\\')"/> 
+      <xsl:variable name="pass1" as="xsd:string" select="replace($in,'\\','\\\\')"/>
+      <xsl:value-of select="replace($pass1,'&quot;','\\&quot;')"/>
    </xsl:function>
    <xsl:function name="check:notMatchRegex" as="xsd:string">
        <xsl:param name="in" as="xsd:string*"/>

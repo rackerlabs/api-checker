@@ -75,6 +75,8 @@
             <config option="checkHeaders" value="true"/>
             <config option="enableRaxRolesExtension" value="false"/>
             <config option="maskRaxRoles403" value="false"/>
+            <config option="enableWarnHeaders" value="true"/>
+            <config option="warnAgent" value="-"/>
           </meta>
         </params>
     </xsl:param>
@@ -94,6 +96,8 @@
     <xsl:variable name="enableRaxRolesExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRolesExtension'))"/>
     <xsl:variable name="enableCaptureHeaderExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableCaptureHeaderExtension'))"/>
     <xsl:variable name="enableAnyMatchExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAnyMatchExtension'))"/>
+    <xsl:variable name="enableWarnHeaders" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableWarnHeaders'))"/>
+    <xsl:variable name="warnAgent" as="xsd:string" select="check:optionValue($configMetadata,'warnAgent')"/>
 
     <!-- Do we have an XSD? -->
     <xsl:variable name="WADLhasXSD" as="xsd:boolean"
@@ -143,6 +147,8 @@
                   select="$enableMessageExtension or $useRaxRoles"/>
     <xsl:variable name="useCaptureHeaderExtension" as="xsd:boolean"
                   select="$enableCaptureHeaderExtension"/>
+    <xsl:variable name="useWarnHeaders" as="xsd:boolean"
+                  select="$enableWarnHeaders and ($useXSDTransform or $usePreProcessExtension)"/>
 
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
@@ -893,6 +899,12 @@
         <xsl:value-of select="$in = 'application/json' or ends-with($in,'+json')"/>
     </xsl:function>
 
+    <xsl:function name="check:WarnID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:param name="number" as="xsd:integer"/>
+        <xsl:value-of select="concat(generate-id($context),'Wrn',$number)"/>
+    </xsl:function>
+
     <xsl:function name="check:WellFormID" as="xsd:string">
         <xsl:param name="context" as="node()"/>
         <xsl:value-of select="concat(generate-id($context),'W')"/>
@@ -987,6 +999,10 @@
                       select="check:XPathID(.,0)"/>
         <xsl:variable name="FAILID" as="xsd:string"
                       select="check:WellFormFailID(.)"/>
+        <xsl:variable name="TRANSFORM_PREID" as="xsd:string"
+                      select="check:WarnID(.,0)"/>
+        <xsl:variable name="TRANSFORM_XSDID" as="xsd:string"
+                      select="check:WarnID(.,1)"/>
         <step type="{$type}" id="{check:WellFormID(.)}">
             <xsl:choose>
                 <xsl:when test="$doElement">
@@ -1104,6 +1120,9 @@
                                     <xsl:attribute name="next" select="($XSDID, $FAILID)"
                                                    separator=" "/>
                                 </xsl:when>
+                                <xsl:when test="$useWarnHeaders">
+                                    <xsl:attribute name="next" select="$TRANSFORM_PREID"/>
+                                </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:attribute name="next" select="$ACCEPT"/>
                                 </xsl:otherwise>
@@ -1117,12 +1136,40 @@
                     <xsl:copy-of select="child::*"/>
                 </step>
             </xsl:for-each>
+            <xsl:if test="$useWarnHeaders">
+                <step type="SET_HEADER_ALWAYS" id="{$TRANSFORM_PREID}" name="Warning" value='214 {$warnAgent} "Preprocess Transformation Applied"' next="{$ACCEPT}"/>
+            </xsl:if>
         </xsl:if>
         <xsl:if test="$doJSON">
             <step type="JSON_SCHEMA" id="{$JSONID}" next="{$ACCEPT}"/>
         </xsl:if>
         <xsl:if test="$doXSD">
-            <step type="XSD" id="{$XSDID}" next="{$ACCEPT}"/>
+            <step type="XSD" id="{$XSDID}">
+                <xsl:choose>
+                    <xsl:when test="$useWarnHeaders and $useXSDTransform">
+                        <xsl:attribute name="next" select="$TRANSFORM_XSDID"/>
+                    </xsl:when>
+                    <xsl:when test="$useWarnHeaders and $doPreProcess">
+                        <xsl:attribute name="next" select="$TRANSFORM_PREID"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="next" select="$ACCEPT"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </step>
+            <xsl:if test="$useWarnHeaders and $useXSDTransform">
+                <step type="SET_HEADER_ALWAYS" id="{$TRANSFORM_XSDID}" name="Warning"
+                      value='214 {$warnAgent} "Default values may have been filled in by XSD processor"'>
+                    <xsl:choose>
+                        <xsl:when test="$doPreProcess">
+                            <xsl:attribute name="next" select="$TRANSFORM_PREID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="next" select="$ACCEPT"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </step>
+            </xsl:if>
         </xsl:if>
         <step type="CONTENT_FAIL" id="{$FAILID}"/>
     </xsl:template>

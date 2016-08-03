@@ -466,6 +466,7 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
       c.joinXPathChecks = false
       c.checkHeaders = false
       c.preserveRequestBody = false
+      c.enableWarnHeaders = false
 
       c
     }
@@ -510,7 +511,10 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
     val nonBoolTests :  MetaTests =
       List(
            checkConfigOptionMatch("xpathVersion","1",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=1}),
-           checkConfigOptionMatch("xpathVersion","2",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=2})
+           checkConfigOptionMatch("xpathVersion","2",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=2}),
+           checkConfigOptionMatch("warnAgent", "-", (c : Config) => {c.warnAgent="-"}),
+           checkConfigOptionMatch("warnAgent", "api-checker", (c : Config) => {c.warnAgent="api-checker"}),
+           checkConfigOptionMatch("warnAgent", "api-checker:8080", (c : Config) => {c.warnAgent="api-checker:8080"})
          )
 
     val optionTests : MetaTests = trueTests ++ falseTests ++ nonBoolTests

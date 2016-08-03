@@ -565,15 +565,15 @@ class WADLCheckerOptSpec extends BaseCheckerSpec {
 
       assert(checker,Start, URL("y"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
-             XPath("/foo:bar/@junk"), XSL, Accept)
+             XPath("/foo:bar/@junk"), XSL, SetHeaderAlways("Warning"), Accept)
 
       assert(checker,Start, URL("x"),  Method("POST"), Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
-             XPath("/foo:bar/@junk"), XSL, Accept)
+             XPath("/foo:bar/@junk"), XSL, SetHeaderAlways("Warning"), Accept)
 
       assert(checker,Start, URL("x"),  Method("POST"), Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
-             XPath("/foo:foo/@junk"), XSL, Accept)
+             XPath("/foo:foo/@junk"), XSL, SetHeaderAlways("Warning"), Accept)
 
       And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 4")
@@ -606,15 +606,15 @@ class WADLCheckerOptSpec extends BaseCheckerSpec {
 
       assert(checker,Start, URL("y"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
-             XPath("/foo:bar/@junk"), XSL, Accept)
+             XPath("/foo:bar/@junk"), XSL,  SetHeaderAlways("Warning"), Accept)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
-             XPath("/foo:bar/@junk"), XSL, Accept)
+             XPath("/foo:bar/@junk"), XSL,  SetHeaderAlways("Warning"), Accept)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
-             XPath("/foo:foo/@junk"), XSL, Accept)
+             XPath("/foo:foo/@junk"), XSL,  SetHeaderAlways("Warning"), Accept)
 
       And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
@@ -644,15 +644,15 @@ class WADLCheckerOptSpec extends BaseCheckerSpec {
       Then ("The following paths should hold")
 
       assert(checker,Start, URL("y"),  Method("POST"),
-             ReqType("(application/xml)(;.*)?"), XSL, Accept)
+             ReqType("(application/xml)(;.*)?"), XSL,  SetHeaderAlways("Warning"), Accept)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
-             XPath("/foo:bar/@junk"), XSL, Accept)
+             XPath("/foo:bar/@junk"), XSL,  SetHeaderAlways("Warning"), Accept)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
-             XPath("/foo:foo/@junk"), XSL, Accept)
+             XPath("/foo:foo/@junk"), XSL,  SetHeaderAlways("Warning"), Accept)
 
       And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")
@@ -686,21 +686,21 @@ class WADLCheckerOptSpec extends BaseCheckerSpec {
       Then ("The following paths should hold")
 
       assert(checker,Start, URL("y"),  Method("POST"),
-             ReqType("(application/xml)(;.*)?"), WellXML, XSL, Accept)
+             ReqType("(application/xml)(;.*)?"), WellXML, XSL,  SetHeaderAlways("Warning"), Accept)
 
       assert(checker,Start, URL("y"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:bar"),
-             XPath("/foo:bar/@junk"), XSL, Accept)
+             XPath("/foo:bar/@junk"), XSL,  SetHeaderAlways("Warning"), Accept)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
 
       assert(checker,Start, URL("x"),  Method("POST"),
              ReqType("(application/xml)(;.*)?"), WellXML, XPath("/foo:foo"),
-             XPath("/foo:foo/@junk"), XSL, Accept)
+             XPath("/foo:foo/@junk"), XSL,  SetHeaderAlways("Warning"), Accept)
 
       And ("The Following counts should hold")
       assert (checker, "count(/chk:checker/chk:step[@type='METHOD' and @match='POST']) = 2")

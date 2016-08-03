@@ -43,8 +43,8 @@
         Rule for HEADER_ALL.  Although both match and matchRegEx are
         optional at least one of these should be specified.
     </rule>
-    <rule types="SET_HEADER" required="next name value">
-        Rule for SET_HEADER.
+    <rule types="SET_HEADER SET_HEADER_ALWAYS" required="next name value">
+        Rule for SET_HEADER and SET_HEADER_ALWAYS.
     </rule>
     <rule types="METHOD REQ_TYPE" required="next match">
         Steps that simply contain a match.
