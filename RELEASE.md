@@ -1,5 +1,13 @@
 # Releases #
 
+## Release 2.0.1 (2016-08-06) ##
+1. Fixed a bug where a call to getInputStream was not invalidating cached XML/JSON.
+1. Fixed a bug where comments and spaces were not properly maintained in XML bodies when the XML was processed.
+1. Fixed a bug where including a new line in an URL caused validation to fail.
+1. Fixed a bug where an error in parsing XML or JSON resulted in the request input stream being closed.
+1. Fixed a bug where the ```fixed``` attribute in a template parameter was not being taken into account.
+1. API checker now follows RFC 7234 recommendation of adding a Warning header whenever it modifies a request body.  The feature can be disabled with the ```enableWarnHeaders``` configuration option.
+
 ## Release 2.0.0 (2016-05-24) ##
 This release introduces breaking changes. Refer to [BREAKING.md](BREAKING.md) for details.
 
