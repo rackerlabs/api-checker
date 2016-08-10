@@ -22,14 +22,15 @@ import javax.xml.transform.stream._
 
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.WADLNormalizer
+import com.rackspace.cloud.api.wadl.util.XSLErrorDispatcher
 import com.rackspace.com.papi.components.checker.Config
-import net.sf.saxon.Controller
+import net.sf.saxon.jaxp.TransformerImpl
 
 import scala.language.reflectiveCalls
 import scala.xml._
 
 
-class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
+class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends XSLErrorDispatcher {
 
   object Checker2DotXSLParams {
     val IGNORE_SINKS = "ignoreSinks"
@@ -53,9 +54,11 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
     val transformer = dotHandler.getTransformer
     transformer.setParameter (IGNORE_SINKS, ignoreSinks)
     transformer.setParameter (NFA_MODE, nfaMode)
-    transformer.asInstanceOf[Controller].addLogErrorListener
+    transformer.asInstanceOf[TransformerImpl].addLogErrorListener
 
-    transformer.transform (in, out)
+    handleXSLException({
+      transformer.transform (in, out)
+    })
   }
 
   def build (in : Source, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
@@ -64,9 +67,11 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) {
     dotHandler.setResult(out)
     transformer.setParameter (IGNORE_SINKS, ignoreSinks)
     transformer.setParameter (NFA_MODE, nfaMode)
-    transformer.asInstanceOf[Controller].addLogErrorListener
+    transformer.asInstanceOf[TransformerImpl].addLogErrorListener
 
-    checkerBuilder.build(in, new SAXResult(dotHandler), config)
+    handleXSLException({
+      checkerBuilder.build(in, new SAXResult(dotHandler), config)
+    })
   }
 
   def build(in : (String, InputStream), out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {

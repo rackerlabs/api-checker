@@ -110,7 +110,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       //  Enable Schema 1.1 support
       //
       case "SaxonEE" => {
-        sf = new com.saxonica.jaxp.SchemaFactoryImpl()
+        sf = new com.saxonica.ee.jaxp.SchemaFactoryImpl()
         sf.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
       }
     }
