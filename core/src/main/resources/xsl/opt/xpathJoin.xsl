@@ -39,14 +39,20 @@
     <xsl:import href="../util/join.xsl"/>
 
     <xsl:param name="configMetadata" as="node()">
-        <meta>
-            <config option="xpathVersion"  value="1"/>
-            <config option="preserveRequestBody" value="false"/>
-        </meta>
+        <params>
+            <meta>
+                <config option="xpathVersion"  value="10"/>
+                <config option="preserveRequestBody" value="false"/>
+                <config option="xslEngine" value="XalanC"/>
+            </meta>
+        </params>
     </xsl:param>
 
     <xsl:param name="xpathVersion" as="xsd:integer" select="xsd:integer(check:optionValue($configMetadata, 'xpathVersion'))"/>
     <xsl:param name="preserveRequestBody" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'preserveRequestBody'))"/>
+    <xsl:param name="xslEngine" as="xsd:string" select="string(check:optionValue($configMetadata,'xslEngine'))"/>
+
+    <xsl:variable name="XSLT3Engine" as="xsd:string" select="'SaxonEE'"/>
 
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
 
@@ -63,7 +69,7 @@
 
     <xsl:template match="check:step[@type='WELL_XML']" mode="targetJoins">
         <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[@type='XPATH' and not(@captureHeader)]"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[check:isMergableXPathStep(.)]"/>
         <xsl:if test="count($nextStep) = 1">
             <join type="{@type}" steps="{@id}">
                 <xsl:attribute name="mergeSteps">
@@ -76,7 +82,7 @@
     <xsl:template match="check:step[@type='XSL' and xsl:transform/@check:mergable]" mode="targetJoins">
         <xsl:param name="checker" as="node()"/>
         <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[(@type='XPATH' and not(@captureHeader)) or (@type='XSL' and xsl:transform/@check:mergable)]"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[check:isMergableXPathStep(.) or (@type='XSL' and xsl:transform/@check:mergable)]"/>
 
         <xsl:if test="count($nextStep) = 1">
             <join type="{@type}" steps="{@id}">
@@ -87,6 +93,13 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:function name="check:isMergableXPathStep" as="xsd:boolean">
+        <xsl:param name="step" as="node()"/>
+        <xsl:variable name="rightType" as="xsd:boolean" select="$step/@type='XPATH'"/>
+        <xsl:variable name="rightVersion" as="xsd:boolean" select="if ($xslEngine = $XSLT3Engine) then true() else ($step/@version &lt;= 20) or ($xpathVersion &lt;= 20)"/>
+        <xsl:variable name="noCaptureHeader" as="xsd:boolean" select="not($step/@captureHeader)"/>
+        <xsl:sequence select="$rightType and $rightVersion and $noCaptureHeader"/>
+    </xsl:function>
     <!--
         Produce joined steps
     -->
@@ -101,9 +114,11 @@
         <xsl:variable name="rootNext" as="node()*" select="check:stepsByIds($checker, check:next($root))"/>
         <xsl:variable name="version" as="xsd:integer">
             <xsl:choose>
-                <xsl:when test="$root/@type = 'XSL' and $root/@version='2'">2</xsl:when>
-                <xsl:when test="$steps[@version='2']">2</xsl:when>
-                <xsl:when test="$steps[not(@version)] and $xpathVersion=2">2</xsl:when>
+                <xsl:when test="$root/@type = 'XSL'"><xsl:value-of select="$root/@version"/></xsl:when>
+                <xsl:when test="$steps[@version=('2','20')]">2</xsl:when>
+                <xsl:when test="$steps[@version=('30','31')]">3</xsl:when>
+                <xsl:when test="$steps[not(@version)] and $xpathVersion=20">2</xsl:when>
+                <xsl:when test="$steps[not(@version)] and $xpathVersion=(30,31)">3</xsl:when>
                 <xsl:otherwise>1</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>

@@ -27,15 +27,15 @@ import scala.collection.mutable.{HashMap, MutableList, Map}
 object XPathExpressionPool extends Instrumented {
   private val xpathExpressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext), 
                                                                                                                          SoftReferenceObjectPool[XPathExpression]]
-  private val xpath2Expressions : Map[(String, NamespaceContext), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext),
+  private val xpathNExpressions : Map[(String, NamespaceContext, Int), SoftReferenceObjectPool[XPathExpression]] = new HashMap[(String, NamespaceContext, Int),
                                                                                                                           SoftReferenceObjectPool[XPathExpression]]
 
   private val activeGauges = new MutableList[Gauge[Int]]
   private val idleGauges = new MutableList[Gauge[Int]]
 
   private def addXPathPool(expression : String, nc : NamespaceContext, version : Int) : SoftReferenceObjectPool[XPathExpression] = {
-    val pool = new SoftReferenceObjectPool[XPathExpression](version match { case 1 => new XPathExpressionFactory(expression, nc)
-                                                                            case 2 => new XPath2ExpressionFactory(expression, nc)
+    val pool = new SoftReferenceObjectPool[XPathExpression](version match { case 10 => new XPathExpressionFactory(expression, nc)
+                                                                            case v : Int => new XPathNExpressionFactory(expression, nc, v)
                                                                          })
     val registryClassName = getRegistryClassName(getClass)
     val metricName = s"$expression ($version)"
@@ -46,31 +46,31 @@ object XPathExpressionPool extends Instrumented {
 
   def borrowExpression(expression : String, nc : NamespaceContext, version : Int) : XPathExpression = {
     version match {
-      case 1 =>
+      case 10 =>
         xpathExpressions.getOrElseUpdate((expression, nc), addXPathPool(expression, nc, version)).borrowObject()
-      case 2 =>
-        xpath2Expressions.getOrElseUpdate((expression, nc), addXPathPool(expression,nc,version)).borrowObject()
+      case _ =>
+        xpathNExpressions.getOrElseUpdate((expression, nc, version), addXPathPool(expression,nc,version)).borrowObject()
     }
   }
 
   def returnExpression(expression : String, nc : NamespaceContext, version : Int, xpathExpression : XPathExpression) : Unit = {
     version match {
-      case 1 => xpathExpressions((expression, nc)).returnObject(xpathExpression)
-      case 2 => xpath2Expressions((expression, nc)).returnObject(xpathExpression)
+      case 10 => xpathExpressions((expression, nc)).returnObject(xpathExpression)
+      case _ => xpathNExpressions((expression, nc, version)).returnObject(xpathExpression)
     }
   }
 
   def numActive (expression : String, nc : NamespaceContext, version : Int) : Int = {
     version match {
-      case 1 => xpathExpressions((expression, nc)).getNumActive
-      case 2 => xpath2Expressions((expression,nc)).getNumActive
+      case 10 => xpathExpressions((expression, nc)).getNumActive
+      case _ => xpathNExpressions((expression,nc, version)).getNumActive
     }
   }
 
   def numIdle (expression : String, nc : NamespaceContext, version : Int) : Int = {
     version match {
-      case 1 => xpathExpressions((expression, nc)).getNumIdle
-      case 2 => xpath2Expressions((expression, nc)).getNumIdle
+      case 10 => xpathExpressions((expression, nc)).getNumIdle
+      case _ => xpathNExpressions((expression, nc, version)).getNumIdle
     }
   }
 }
@@ -104,9 +104,10 @@ private class XPathExpressionFactory(private val expression : String, private va
 }
 
 
-private class XPath2ExpressionFactory(private val expression : String, private val nc : NamespaceContext) extends XPathExpressionFactory(expression, nc) {
+private class XPathNExpressionFactory(private val expression : String, private val nc : NamespaceContext, private val version : Int) extends XPathExpressionFactory(expression, nc) {
   override def makeObject = {
     val xpath = (new net.sf.saxon.xpath.XPathFactoryImpl()).newXPath()
+    xpath.asInstanceOf[net.sf.saxon.xpath.XPathEvaluator].getStaticContext().setXPathLanguageLevel(version)
     xpath.setNamespaceContext(nc)
     xpath.compile(expression)
   }

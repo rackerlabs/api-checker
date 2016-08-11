@@ -510,11 +510,17 @@ class WADLCheckerMetaSpec extends BaseCheckerSpec {
     //
     val nonBoolTests :  MetaTests =
       List(
-           checkConfigOptionMatch("xpathVersion","1",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=1}),
-           checkConfigOptionMatch("xpathVersion","2",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=2}),
+           checkConfigOptionMatch("xpathVersion","10",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=1}),
+           checkConfigOptionMatch("xpathVersion","20",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=2}),
+           checkConfigOptionMatch("xpathVersion","31",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=31}),
+           checkConfigOptionMatch("xpathVersion","30",(c : Config) => {c.joinXPathChecks=true; c.xpathVersion=30}),
            checkConfigOptionMatch("warnAgent", "-", (c : Config) => {c.warnAgent="-"}),
            checkConfigOptionMatch("warnAgent", "api-checker", (c : Config) => {c.warnAgent="api-checker"}),
-           checkConfigOptionMatch("warnAgent", "api-checker:8080", (c : Config) => {c.warnAgent="api-checker:8080"})
+           checkConfigOptionMatch("warnAgent", "api-checker:8080", (c : Config) => {c.warnAgent="api-checker:8080"}),
+           checkConfigOptionMatch("xslEngine", "XalanC", (c : Config) => {c.xslEngine="XalanC"}),
+           checkConfigOptionMatch("xslEngine", "Xalan", (c : Config) => {c.xslEngine="Xalan"}),
+           checkConfigOptionMatch("xslEngine", "SaxonHE", (c : Config) => {c.xslEngine="Saxon"}),
+           checkConfigOptionMatch("xslEngine", "SaxonEE", (c : Config) => {c.xslEngine="SaxonEE"})
          )
 
     val optionTests : MetaTests = trueTests ++ falseTests ++ nonBoolTests

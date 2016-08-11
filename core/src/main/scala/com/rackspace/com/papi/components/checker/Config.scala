@@ -22,6 +22,8 @@ import scala.beans.BeanProperty
 import scala.reflect.runtime.universe
 import scala.xml._
 
+import com.typesafe.scalalogging.slf4j.LazyLogging
+
 /**
  * If set the annotation states that the configuration option
  * affects the state machine in checker format, if not set the
@@ -42,7 +44,7 @@ object Config {
  * A license is required for any SaxonEE functionality.  SaxonEE can be declared in <code>xslEngine</code>
  * and <code>xsdEngine</code>.
  */
-class Config {
+class Config extends LazyLogging {
   //
   //  Setup appropriate factories.  We need these set to ensure config
   //  options work correctly.
@@ -162,20 +164,34 @@ class Config {
   var checkElements : Boolean = false
 
   //
-  //  XPath version used in the WADL.  Can be 1 or 2. If 1 is set the
-  //  Xalan implementation will be used, if 2 then Saxon will be used.
-  //  Note that XPath 2 with schema awareness requires a Saxon
-  //  license.
+  //  XPath version used in the WADL.
   //
-  private var xpv : Int = 1
+  //  Allowed values are:
+  //  1 or 10 for Version 1.0  (this is the default)
+  //  2 or 20 for Version 2.0
+  //  30 for Version 3.0
+  //  31 for Version 3.1
+  //
+  //  1 and 2 is specified for backward compatibility. You should use
+  //  20 or 30.
+  //
+  //  Note that XPath schema awareness, high order functions, expath
+  //  extensions and other fancy features require a Saxon license.
+  //
+  private val allowedVersions : Set[Int] = Set(1, 2, 10, 20, 30, 31)
+  private var xpv : Int = 10
 
   @AffectsChecker
   def xpathVersion : Int = xpv
 
   def xpathVersion_= (version : Int) : Unit = {
-    if ((version != 1) && (version != 2))
-      throw new IllegalArgumentException("XPath version can only be 1 or 2.")
-    xpv = version
+    if (!allowedVersions(version))
+      throw new IllegalArgumentException(s"XPath valid version values are $allowedVersions")
+    xpv = version match {
+      case 1 => logger.warn ("Use of 1 is deprecated to specify XPath version use 10 instead to specify 1.0") ; 10
+      case 2 => logger.warn ("Use of 2 is deprecated to specify XPath version use 20 instead to specify 2.0") ; 20
+      case v : Int => v
+    }
   }
 
   def setXPathVersion (version : Int) : Unit = { xpathVersion_=(version) }
@@ -260,6 +276,7 @@ class Config {
   private val supportedXSLEngines = Set("Xalan", "XalanC", "SaxonHE", "SaxonEE",
   "Saxon" )  // NOTE:  "Saxon" is deprecated as well, remove when removing depUseSaxonEEValidation
 
+  @AffectsChecker
   def xslEngine : String = xsle
   def xslEngine_= (engine : String) : Unit = {
 
@@ -269,7 +286,8 @@ class Config {
     }
 
     xsle =  engine match {
-      case "Saxon" => if (depUseSaxonEEValidation) "SaxonEE" else "SaxonHE"
+      case "Saxon" => logger.warn("Use of Saxon to specify XSL engine is depricated you should specify SaxonHE or SaxonEE")
+                      if (depUseSaxonEEValidation) "SaxonEE" else "SaxonHE"
       case _ => engine
     }
   }

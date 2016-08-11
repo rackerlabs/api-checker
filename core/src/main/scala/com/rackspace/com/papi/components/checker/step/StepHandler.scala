@@ -642,7 +642,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         if (href != null) {
           version match {
             case "1" => transformFactoryXSL1.newTemplates(new StreamSource(href))
-            case "2" => transformFactoryXSL2.newTemplates(new StreamSource(href))
+            case vr : String  if (vr == "2" || vr == "3") => transformFactoryXSL2.newTemplates(new StreamSource(href))
           }
         } else {
           null
@@ -669,7 +669,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         val xslDoc = currentXSLResult.getNode.asInstanceOf[Document]
         lastXSLVersion match {
           case "1" => transformFactoryXSL1.newTemplates(new DOMSource(xslDoc))
-          case "2" => transformFactoryXSL2.newTemplates(new DOMSource(xslDoc))
+          case vr : String if (vr == "2" || vr == "3")  => transformFactoryXSL2.newTemplates(new DOMSource(xslDoc))
         }
       }
 
@@ -755,7 +755,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       expression = XPathExpressionPool.borrowExpression(_match, context, version)
     } catch {
       case spe : SAXParseException => throw spe
-      case e : Exception => throw new SAXParseException ("Error while compiling XPath expression", locator, e)
+      case e : Exception => throw new SAXParseException ("Error while compiling XPath expression: "+e.getMessage(), locator, e)
     } finally {
       if (expression != null) XPathExpressionPool.returnExpression(_match, context, version, expression)
     }
