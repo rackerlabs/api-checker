@@ -1778,6 +1778,286 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     assert (req2.contentErrorPriority == 101)
   }
 
+  test ("In a JSONXPath test, if the XPath resolves to ture the uriLevel should stay the same") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?root)", None, None, context, 31, 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : false
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : true
+          }
+                       """, true)
+    assert (xpath.checkStep (req1, response, chain, StepContext()).get.uriLevel == 0)
+    assert (xpath.checkStep (req2, response, chain, StepContext(1)).get.uriLevel == 1)
+  }
+
+
+  test ("In a JSONXPath test, if the XPath resolves to ture the content error priority should be -1") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?root)", None, None, context, 31, 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : false
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : true
+          }
+                       """, true)
+    xpath.checkStep (req1, response, chain, StepContext())
+    xpath.checkStep (req2, response, chain, StepContext(1))
+
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
+
+  test ("In a JSONXPath test, if the XPath resolves to ture and there is a capture head then it should be set") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "string($_?root)", None, None, context, 31, Some("FOO"), 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : false
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : true
+          }
+                       """, true)
+    val ctx1 = xpath.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = xpath.checkStep (req2, response, chain, StepContext(1)).get
+
+    assert (ctx1.requestHeaders("FOO") == List("false"))
+    assert (ctx2.requestHeaders("FOO") == List("true"))
+  }
+
+
+  test ("In a JSONXPath test, if the XPath resolves to ture and there is a capture head then it should be set (multi-value)") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "string-join($_?root?*,', ')", None, None, context, 31, Some("FOO"), 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    val ctx1 = xpath.checkStep (req1, response, chain, StepContext()).get
+    val ctx2 = xpath.checkStep (req2, response, chain, StepContext(1)).get
+
+    assert (ctx1.requestHeaders("FOO") == List("3, 2, 1"))
+    assert (ctx2.requestHeaders("FOO") == List("5, 4, 3"))
+  }
+
+  test ("In a JSONXPath test, if the XPath resolves to false the context should be None") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?booga)", None, None, context, 31, Some("FOO"), 10, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    assert (xpath.checkStep (req1, response, chain, StepContext()).isEmpty)
+    assert (xpath.checkStep (req2, response, chain, StepContext(1)).isEmpty)
+  }
+
+  test ("In a JSONXPath test, if the XPath resolves to false the content error priority should be set") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?booga)", None, None, context, 31, 100, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    xpath.checkStep (req1, response, chain, StepContext())
+    xpath.checkStep (req2, response, chain, StepContext(1))
+
+    assert (req1.contentErrorPriority == 100)
+    assert (req2.contentErrorPriority == 100)
+  }
+
+
+  test ("In a JSONXPath test, if the XPath resolves to false the request should contain a SAXParseException") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?booga)", None, None, context, 31, 100, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    xpath.checkStep (req1, response, chain, StepContext())
+    xpath.checkStep (req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+  }
+
+
+  test ("In a JSONXPath test, if the XPath resolves to false the request should contain a SAXParseException, with a message of 'Expecting '+XPATH") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?booga)", None, None, context, 31, 100, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    xpath.checkStep (req1, response, chain, StepContext())
+    xpath.checkStep (req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting exists($_?booga)"))
+
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting exists($_?booga)"))
+  }
+
+
+  test ("In a JSONXPath test, if the XPath resolves to false the request should contain a SAXParseException, with set error code") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?booga)", None, Some(401), context, 31, 100, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    xpath.checkStep (req1, response, chain, StepContext())
+    xpath.checkStep (req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting exists($_?booga)"))
+    assert (req1.contentErrorCode == 401)
+
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting exists($_?booga)"))
+    assert (req1.contentErrorCode == 401)
+  }
+
+
+  test ("In a JSONXPath test, if the XPath resolves to false the request should contain a SAXParseException, set message") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?booga)", Some("booga was expected"), None, context, 31, 100, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    xpath.checkStep (req1, response, chain, StepContext())
+    xpath.checkStep (req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("booga was expected"))
+    assert (req1.contentErrorCode == 400)
+
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("booga was expected"))
+    assert (req1.contentErrorCode == 400)
+  }
+
+  test ("In a JSONXPath test, if the XPath resolves to false the request should contain a SAXParseException, set message, set code") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?booga)", Some("booga was expected"), Some(401), context, 31, 100, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    xpath.checkStep (req1, response, chain, StepContext())
+    xpath.checkStep (req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("booga was expected"))
+    assert (req1.contentErrorCode == 401)
+
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("booga was expected"))
+    assert (req2.contentErrorCode == 401)
+  }
+
+
+  test ("In a JSONXPath test, if the XPath resolves to false the request should contain a SAXParseException, set message, set code, set error priority") {
+    val context = ImmutableNamespaceContext(Map[String,String]())
+    val xpath = new JSONXPath("JSONXPath", "JSONXPath", "exists($_?booga)", Some("booga was expected"), Some(401), context, 31, 100, Array[Step]())
+    val req1 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [3, 2, 1]
+          }
+                       """, true)
+    val req2 = request("PUT", "/a/b", "application/json","""
+          {
+            "root" : [5, 4, 3]
+          }
+                       """, true)
+    xpath.checkStep (req1, response, chain, StepContext())
+    xpath.checkStep (req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("booga was expected"))
+    assert (req1.contentErrorCode == 401)
+    assert (req1.contentErrorPriority == 100)
+
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("booga was expected"))
+    assert (req2.contentErrorCode == 401)
+    assert (req2.contentErrorPriority == 100)
+  }
+
+
   test ("An XSL should correctly transfrom request XML (XSL 1.0)") {
     val xsl = new XSL("XSL", "XSL", xsl1Templates, 10, Array[Step]())
     val req = request("PUT", "/a/b", "application/xml",

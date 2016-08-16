@@ -319,6 +319,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "SET_HEADER"  => addSetHeader(atts)
           case "SET_HEADER_ALWAYS"  => addSetHeaderAlways(atts)
           case "JSON_SCHEMA" => addJSONSchema(atts)
+          case "JSON_XPATH" => addJSONXPath(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -763,6 +764,46 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     next += (id -> nexts)
     steps += (id -> new XPath(id, label, _match, message, code, context, version, captureHeader, priority, new Array[Step](nexts.length)))
   }
+
+  private[this] def addJSONXPath(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val captureHeader = getCaptureHeader(atts)
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
+    val context : NamespaceContext = ImmutableNamespaceContext(prefixes)
+    val version : Int = {
+      val sversion = atts.getValue("version")
+
+      if (sversion == null) {
+        config.xpathVersion
+      } else {
+        sversion.toInt
+      }
+    }
+    val priority = getPriority (atts)
+
+    //
+    //  Make an attempt to compile the XPath expression. Throw a
+    //  SAXParseException if something goes wrong.
+    //
+    var expression : XPathExpression = null
+    try {
+      expression = XPathExpressionPool.borrowExpression(_match, context, version)
+    } catch {
+      case spe : SAXParseException => throw spe
+      case e : Exception => throw new SAXParseException ("Error while compiling XPath expression: "+e.getMessage(), locator, e)
+    } finally {
+      if (expression != null) XPathExpressionPool.returnExpression(_match, context, version, expression)
+    }
+
+    next += (id -> nexts)
+    steps += (id -> new JSONXPath(id, label, _match, message, code, context, version, captureHeader, priority, new Array[Step](nexts.length)))
+  }
+
 
   private[this] def addURL(atts : Attributes) : Unit = {
     val nexts : Array[String] = atts.getValue("next").split(" ")

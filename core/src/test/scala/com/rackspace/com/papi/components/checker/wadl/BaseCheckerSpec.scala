@@ -101,7 +101,7 @@ class BaseCheckerSpec extends BaseWADLSpec {
     stepsWithURLXSDMatch (checker, urlMatch).filter(n => (n \ "@captureHeader").text == captureHeader)
   }
 
-  def stepsWithXPathMatch (checker : NodeSeq, xpathMatch : String) : NodeSeq = {
+    def stepsWithXPathMatch (checker : NodeSeq, xpathMatch : String) : NodeSeq = {
     stepsWithMatch (checker, xpathMatch).filter(n => (n \ "@type").text == "XPATH")
   }
 
@@ -119,6 +119,26 @@ class BaseCheckerSpec extends BaseWADLSpec {
 
   def stepsWithXPathMessageCodeMatch (checker : NodeSeq, xpathMatch : String, message : String, code : Int) : NodeSeq = {
     stepsWithXPathMessageMatch(checker, xpathMatch, message).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithJsonXPathMatch (checker : NodeSeq, xpathMatch : String) : NodeSeq = {
+    stepsWithMatch (checker, xpathMatch).filter(n => (n \ "@type").text == "JSON_XPATH")
+  }
+
+  def stepsWithJsonXPathMatchCapture (checker : NodeSeq, xpathMatch : String, captureHeader : String) : NodeSeq = {
+    stepsWithJsonXPathMatch (checker, xpathMatch).filter(n => (n \ "@captureHeader").text == captureHeader)
+  }
+
+  def stepsWithJsonXPathMessageMatch (checker : NodeSeq, xpathMatch : String, message : String) : NodeSeq = {
+    stepsWithJsonXPathMatch(checker, xpathMatch).filter (n => (n \ "@message").text == message)
+  }
+
+  def stepsWithJsonXPathCodeMatch (checker : NodeSeq, xpathMatch : String, code : Int) : NodeSeq = {
+    stepsWithJsonXPathMatch(checker, xpathMatch).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithJsonXPathMessageCodeMatch (checker : NodeSeq, xpathMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithJsonXPathMessageMatch(checker, xpathMatch, message).filter (n => (n \ "@code").text == code.toString)
   }
 
   def stepsWithMethodMatch (checker : NodeSeq, methodMatch  : String) : NodeSeq = {
@@ -348,6 +368,11 @@ class BaseCheckerSpec extends BaseWADLSpec {
   def XPath(expression: String, message : String) : (NodeSeq) => NodeSeq = stepsWithXPathMessageMatch(_, expression, message)
   def XPath(expression: String, code : Int) : (NodeSeq) => NodeSeq = stepsWithXPathCodeMatch(_, expression, code)
   def XPath(expression: String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithXPathMessageCodeMatch(_, expression, message, code)
+  def JsonXPath(expression : String) : (NodeSeq) => NodeSeq = stepsWithJsonXPathMatch (_, expression)
+  def JsonXPathWithCapture(expression : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithJsonXPathMatchCapture (_, expression, captureHeader)
+  def JsonXPath(expression: String, message : String) : (NodeSeq) => NodeSeq = stepsWithJsonXPathMessageMatch(_, expression, message)
+  def JsonXPath(expression: String, code : Int) : (NodeSeq) => NodeSeq = stepsWithJsonXPathCodeMatch(_, expression, code)
+  def JsonXPath(expression: String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithJsonXPathMessageCodeMatch(_, expression, message, code)
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
   def AnyReqType : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(.*)()")
   def HeaderWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatchCapture(_, name, headerMatch, captureHeader)

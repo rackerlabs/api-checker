@@ -33,7 +33,7 @@
         Rule for URI and URIXSDs.  These may optionally have a
         captureHeader.
     </rule>
-    <rule types="XPATH" required="next match" optional="captureHeader version code message">
+    <rule types="XPATH JSON_XPATH" required="next match" optional="captureHeader version code message">
         Rule for XPath states.
     </rule>
     <rule types="HEADER HEADERXSD HEADER_ANY HEADERXSD_ANY HEADER_SINGLE HEADERXSD_SINGLE" required="next name match" optional="captureHeader code message">

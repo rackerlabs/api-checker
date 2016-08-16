@@ -29,8 +29,10 @@ import com.netaporter.uri.encoding.PercentEncoder
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 import com.rackspace.com.papi.components.checker.util.{DateUtils, HeaderMap, ObjectMapperPool}
+import com.rackspace.com.papi.components.checker.util.JSONConverter
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.w3c.dom.Document
+import net.sf.saxon.om.Sequence
 
 import scala.collection.JavaConverters._
 
@@ -85,6 +87,18 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   def parsedJSON : JsonNode = request.getAttribute(PARSED_JSON).asInstanceOf[JsonNode]
   def parsedJSON_= (tb : JsonNode):Unit = request.setAttribute (PARSED_JSON, tb)
+
+  def parsedJSONSequence : Sequence = {
+    val seq = request.getAttribute(PARSED_JSON_SEQUENCE).asInstanceOf[Sequence]
+    if (seq == null && parsedJSON != null) {
+      val nseq = JSONConverter.convert(parsedJSON)
+      request.setAttribute (PARSED_JSON_SEQUENCE, nseq)
+      nseq
+    } else {
+      seq
+    }
+  }
+  def parsedJSONSequence_= (seq : Sequence) : Unit = request.setAttribute (PARSED_JSON_SEQUENCE, seq)
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
   def contentError_= (e : Exception):Unit = {
@@ -183,6 +197,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
         new ByteArrayServletInputStream(om.writeValueAsBytes(parsedJSON))
       } finally {
         parsedJSON = null
+        parsedJSONSequence = null
         if (om != null) {
           ObjectMapperPool.returnParser(om)
         }

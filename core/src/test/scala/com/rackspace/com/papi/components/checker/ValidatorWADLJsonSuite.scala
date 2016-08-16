@@ -47,7 +47,10 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
-                      <representation mediaType="application/json"/>
+                      <representation mediaType="application/json">
+                         <!-- only allow names that start with 'J' AND 'R' in post /j -->
+                         <param name="firstR" style="plain" path="substring($body?firstName,1,1) = ('J','R')" required="true"/>
+                      </representation>
                   </request>
                </method>
                <method name="POST">
@@ -68,7 +71,7 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     </application>)
     , TestConfig(removeDups = false, saxoneeValidation = false,
                  checkXSDGrammar = false,  checkElements = false,
-                 xpathVersion = 1, checkPlainParams = false,
+                 xpathVersion = 1, checkPlainParams = true,
                  doXSDGrammarTransform = false, enablePreProcessExtension = false,
                  xslEngine = "XalanC", joinXPathChecks = false,
                  checkHeaders = false, enableIgnoreXSDExtension = false,
@@ -91,6 +94,7 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     validator_JSONContent.validate(request("PUT","/a/b","application/json", goodJSON_Schema2),response,chain)
   }
 
+
   test ("POST on /c with application/json should succeed on validator_JSONContent with valid JSON1") {
     validator_JSONContent.validate(request("POST","/c","application/json", goodJSON_Schema1),response,chain)
   }
@@ -99,19 +103,31 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     validator_JSONContent.validate(request("POST","/c","application/json", goodJSON_Schema2),response,chain)
   }
 
+  test ("POST on /c with application/json should succeed on validator_JSONContent with valid JSON3") {
+    validator_JSONContent.validate(request("POST","/c","application/json", goodJSON_Schema3),response,chain)
+  }
+
+
   test ("GOT on /c should succeed on validator_JSONContent") {
     validator_JSONContent.validate(request("GET","/c"),response,chain)
   }
 
   test ("PUT on /a/b should fail with well formed JSON that does not match schema on validator_JSONContent") {
     assertResultFailed(validator_JSONContent.validate(request("PUT","/a/b", "application/json", goodJSON),response,chain), 400,
-                     List("missing","firstName", "lastName"))
+                     List("missing","lastName"))
   }
+
+  test ("PUT on /a/b should fail with well formed JSON when the name does not beging with J or R") {
+    assertResultFailed(validator_JSONContent.validate(request("PUT","/a/b", "application/json", goodJSON_Schema3),response,chain),
+                       400, List("Expecting", "substring($body?firstName,1,1) = ('J','R')"))
+  }
+
 
   test ("POST on /c should fail with well formed JSON that does not match schema on validator_JSONContent") {
     assertResultFailed(validator_JSONContent.validate(request("POST","/c", "application/json", goodJSON),response,chain), 400,
-                     List("missing","firstName", "lastName"))
+                     List("missing", "lastName"))
   }
+
 
   test ("POST on /c should fail with well formed JSON that does not validate against the schema (junk-1)") {
     assertResultFailed(validator_JSONContent.validate(request("POST","/c", "application/json",
@@ -208,7 +224,10 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
-                      <representation mediaType="application/json"/>
+                      <representation mediaType="application/json">
+                         <!-- only allow names that start with 'J' AND 'R' in post /j -->
+                         <param name="firstR" style="plain" path="substring($body?firstName,1,1) = ('J','R')" required="true"/>
+                      </representation>
                   </request>
                </method>
                <method name="POST">
@@ -229,7 +248,7 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     </application>)
     , TestConfig(removeDups = false, saxoneeValidation = false,
                  checkXSDGrammar = false,  checkElements = false,
-                 xpathVersion = 1, checkPlainParams = false,
+                 xpathVersion = 1, checkPlainParams = true,
                  doXSDGrammarTransform = false, enablePreProcessExtension = false,
                  xslEngine = "XalanC", joinXPathChecks = false,
                  checkHeaders = false, enableIgnoreXSDExtension = false,
@@ -260,18 +279,29 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     validator_JSONContentE.validate(request("POST","/c","application/json", goodJSON_Schema2),response,chain)
   }
 
+  test ("POST on /c with application/json should succeed on validator_JSONContentE with valid JSON3") {
+    validator_JSONContentE.validate(request("POST","/c","application/json", goodJSON_Schema3),response,chain)
+  }
+
+
   test ("GOT on /c should succeed on validator_JSONContentE") {
     validator_JSONContentE.validate(request("GET","/c"),response,chain)
   }
 
   test ("PUT on /a/b should fail with well formed JSON that does not match schema on validator_JSONContentE") {
     assertResultFailed(validator_JSONContentE.validate(request("PUT","/a/b", "application/json", goodJSON),response,chain), 400,
-                     List("missing","firstName", "lastName"))
+                     List("missing","lastName"))
   }
+
+  test ("PUT on /a/b should fail with well formed JSON when the name does not beging with J or R on validator_JSONContentE") {
+    assertResultFailed(validator_JSONContentE.validate(request("PUT","/a/b", "application/json", goodJSON_Schema3),response,chain),
+                       400, List("Expecting", "substring($body?firstName,1,1) = ('J','R')"))
+  }
+
 
   test ("POST on /c should fail with well formed JSON that does not match schema on validator_JSONContentE") {
     assertResultFailed(validator_JSONContentE.validate(request("POST","/c", "application/json", goodJSON),response,chain), 400,
-                     List("missing","firstName", "lastName"))
+                     List("missing", "lastName"))
   }
 
   test ("POST on /c should fail with well formed JSON that does not validate against the schema on validator_JSONContentE (junk-1)") {
@@ -347,7 +377,10 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
-                      <representation mediaType="application/json"/>
+                      <representation mediaType="application/json">
+                         <!-- only allow names that start with 'J' AND 'R' in post /j -->
+                         <param name="firstR" style="plain" path="substring($body?firstName,1,1) = ('J','R')" required="true"/>
+                      </representation>
                   </request>
                </method>
                <method name="POST">
@@ -368,7 +401,7 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     </application>)
     , TestConfig(removeDups = false, saxoneeValidation = false,
                  checkXSDGrammar = false,  checkElements = false,
-                 xpathVersion = 1, checkPlainParams = false,
+                 xpathVersion = 1, checkPlainParams = true,
                  doXSDGrammarTransform = false, enablePreProcessExtension = false,
                  xslEngine = "XalanC", joinXPathChecks = false,
                  checkHeaders = false, enableIgnoreXSDExtension = false,
@@ -399,6 +432,11 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     validator_JSONContentI.validate(request("POST","/c","application/json", goodJSON_Schema2),response,chain)
   }
 
+  test ("POST on /c with application/json should succeed on validator_JSONContentI with valid JSON3") {
+    validator_JSONContentI.validate(request("POST","/c","application/json", goodJSON_Schema3),response,chain)
+  }
+
+
   test ("POST on /c with application/json should succeed on validator_JSONContentI with well formed JSON content") {
     validator_JSONContentI.validate(request("POST","/c","application/json", goodJSON),response,chain)
   }
@@ -417,8 +455,14 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
   }
 
   test ("PUT on /a/b should fail with well formed JSON that does not match schema on validator_JSONContentI") {
-    assertResultFailed(validator_JSONContentI.validate(request("PUT","/a/b", "application/json", goodJSON),response,chain), 400, List("missing", "firstName", "lastName"))
+    assertResultFailed(validator_JSONContentI.validate(request("PUT","/a/b", "application/json", goodJSON),response,chain), 400, List("missing", "lastName"))
   }
+
+  test ("PUT on /a/b should fail with well formed JSON when the name does not beging with J or R on validator_JSONContentI") {
+    assertResultFailed(validator_JSONContentI.validate(request("PUT","/a/b", "application/json", goodJSON_Schema3),response,chain),
+                       400, List("Expecting", "substring($body?firstName,1,1) = ('J','R')"))
+  }
+
 
   //
   // Like validator_JSONContent, but also performes XSD checks.
@@ -434,7 +478,10 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml"/>
-                      <representation mediaType="application/json"/>
+                      <representation mediaType="application/json">
+                         <!-- only allow names that start with 'J' AND 'R' in post /j -->
+                         <param name="firstR" style="plain" path="substring($body?firstName,1,1) = ('J','R')" required="true"/>
+                      </representation>
                   </request>
                </method>
                <method name="POST">
@@ -455,7 +502,7 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     </application>)
     , TestConfig(removeDups = false, saxoneeValidation = false,
                  checkXSDGrammar = true,  checkElements = false,
-                 xpathVersion = 1, checkPlainParams = false,
+                 xpathVersion = 1, checkPlainParams = true,
                  doXSDGrammarTransform = false, enablePreProcessExtension = false,
                  xslEngine = "XalanC", joinXPathChecks = false,
                  checkHeaders = false, enableIgnoreXSDExtension = false,
@@ -494,19 +541,30 @@ class ValidatorWADLJsonSuite extends BaseValidatorSuite {
     validator_JSONXSDContent.validate(request("POST","/c","application/json", goodJSON_Schema2),response,chain)
   }
 
+  test ("POST on /c with application/json should succeed on validator_JSONXSDContent with valid JSON3") {
+    validator_JSONXSDContent.validate(request("POST","/c","application/json", goodJSON_Schema3),response,chain)
+  }
+
+
   test ("GOT on /c should succeed on validator_JSONXSDContent") {
     validator_JSONXSDContent.validate(request("GET","/c"),response,chain)
   }
 
   test ("PUT on /a/b should fail with well formed JSON that does not match schema on validator_JSONXSDContent") {
     assertResultFailed(validator_JSONXSDContent.validate(request("PUT","/a/b", "application/json", goodJSON),response,chain), 400,
-                     List("missing","firstName", "lastName"))
+                     List("missing", "lastName"))
   }
 
   test ("POST on /c should fail with well formed JSON that does not match schema on validator_JSONXSDContent") {
     assertResultFailed(validator_JSONXSDContent.validate(request("POST","/c", "application/json", goodJSON),response,chain), 400,
-                     List("missing","firstName", "lastName"))
+                     List("missing", "lastName"))
   }
+
+  test ("PUT on /a/b should fail with well formed JSON when the name does not beging with J or R on validator_JSONXSDContent") {
+    assertResultFailed(validator_JSONXSDContent.validate(request("PUT","/a/b", "application/json", goodJSON_Schema3),response,chain),
+                       400, List("Expecting", "substring($body?firstName,1,1) = ('J','R')"))
+  }
+
 
   test ("POST on /c should fail with well formed JSON that does not validate against the schema on validator_JSONXSDContent (junk-1)") {
     assertResultFailed(validator_JSONXSDContent.validate(request("POST","/c", "application/json",
