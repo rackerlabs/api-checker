@@ -22,97 +22,153 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
+
+import com.rackspace.cloud.api.wadl.test.XPathAssertions
+
+import scala.xml._
+
 @RunWith(classOf[JUnitRunner])
-class Wadl2CheckerSuite extends FunSuite {
+class Wadl2CheckerSuite extends FunSuite with XPathAssertions {
+
+  def withOutput(test : (ByteArrayOutputStream, ByteArrayOutputStream) => Unit) = {
+    val errStream = new ByteArrayOutputStream()
+    val printErrStream = new PrintStream(errStream)
+
+    val outStream = new ByteArrayOutputStream()
+    val printOutStream = new PrintStream(outStream)
+
+    this.synchronized {
+      val oldErr = System.err
+      val oldOut = System.out
+
+      try {
+        System.setErr(printErrStream)
+        System.setOut(printOutStream)
+
+        test(outStream, errStream)
+
+      } finally {
+        System.setErr(oldErr)
+        System.setOut(oldOut)
+      }
+    }
+  }
+
+  //
+  //  Register checker namespace.
+  //
+  register ("chk", "http://www.rackspace.com/repose/wadl/checker")
 
   test ("--help should generate usage info") {
-    Wadl2Checker.parser.reset()
-    intercept[ArgotUsageException] {
-      Wadl2Checker.handleArgs(Array("--help"))
-    }
-  }
+    withOutput ( (out, error) => {
+      Wadl2Checker.main(Array("--help", "src/test/resources/wadl/sharedXPath.wadl"))
+      assert(out.toString().isEmpty())
+      assert(error.toString().contains("Usage: wadl2checker"))
+  })}
 
-  test ("-h should generate usage info") {
-    Wadl2Checker.parser.reset()
-    intercept[ArgotUsageException] {
-      Wadl2Checker.handleArgs(Array("-h"))
-    }
-  }
+  test ("--version should generate usage info") {
+    withOutput ( (out, error) => {
+      Wadl2Checker.main(Array("--version", "src/test/resources/wadl/sharedXPath.wadl"))
+      //
+      //  Weird version format: can't actually detect version during
+      //  testing so we have null vnull.
+      //
+      assert(error.toString().contains("null vnull"))
+      assert(out.toString().isEmpty())
+  })}
 
   test ("-bad_data should generate usage info") {
-    Wadl2Checker.parser.reset()
-    intercept[ArgotUsageException] {
-      Wadl2Checker.handleArgs(Array("-bad_data"))
-    }
-  }
+    withOutput ( (out, error) => {
+      Wadl2Checker.main(Array("--bad_data", "src/test/resources/wadl/sharedXPath.wadl"))
+      assert(error.toString().contains("Usage: wadl2checker"))
+      assert(error.toString().contains("Unknown option: --bad_data"))
+      assert(out.toString().isEmpty())
+  })}
 
   test ("Too many params should generate usage info") {
-    Wadl2Checker.parser.reset()
-    intercept[ArgotUsageException] {
-      Wadl2Checker.handleArgs(Array("input","output","junk"))
-    }
-  }
+    withOutput ( (out, error) => {
+      Wadl2Checker.main(Array("input", "src/test/resources/wadl/sharedXPath.wadl", "junk"))
+      assert(error.toString().contains("Usage: wadl2checker"))
+      assert(error.toString().contains("Too many parameters."))
+      assert(out.toString().isEmpty())
+  })}
 
-  test ("-d should set removeDups") {
-    Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.removeDups.value.isEmpty)
-    Wadl2Checker.handleArgs(Array("-d"))
-    assert (Wadl2Checker.removeDups.value.get)
-  }
+  test ("Should generate checker xml to stdout") {
+    withOutput ( (out, error) => {
+      Wadl2Checker.main(Array("src/test/resources/wadl/sharedXPath.wadl"))
 
-  test ("--remove-dups should set removeDups") {
-    Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.removeDups.value.isEmpty)
-    Wadl2Checker.handleArgs(Array("--remove-dups"))
-    assert (Wadl2Checker.removeDups.value.get)
-  }
+      //  No err
+      assert(error.toString().isEmpty())
 
-  test ("-D should set validate") {
-    Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.dontValidate.value.isEmpty)
-    Wadl2Checker.handleArgs(Array("-D"))
-    assert (Wadl2Checker.dontValidate.value.get)
-  }
+      val outXML = XML.loadString(out.toString())
 
-  test ("--dont-validate should set validate") {
-    Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.dontValidate.value.isEmpty)
-    Wadl2Checker.handleArgs(Array("--dont-validate"))
-    assert (Wadl2Checker.dontValidate.value.get)
-  }
+      //  Just some basic asserts to make sure we're working, we'd
+      //  expect to see all of these things in the output
+      assert(outXML, "/chk:checker")
+      assert(outXML, "starts-with(/chk:checker/chk:meta/chk:created-by,'API Checker')")
+      assert(outXML, "/chk:checker/chk:meta/chk:config")
+      assert(outXML, "/chk:checker/chk:step[@type='START']")
+      assert(outXML, "/chk:checker/chk:step[@type='ACCEPT']")
+  })}
 
-  test ("-r should set raxRoles") {
-    Wadl2Checker.parser.reset()
-    assert (Wadl2Checker.raxRoles.value.isEmpty)
-    Wadl2Checker.handleArgs(Array("-r"))
-    assert (Wadl2Checker.raxRoles.value.get)
-  }
+  test ("Should generate checker xml to file") {
+    withOutput ( (out, error) => {
+      val outFile = "target/sharedXPath.checker"
 
-  test ("no params should set source and result with input/output stream"){
-    Wadl2Checker.parser.reset()
-    Wadl2Checker.handleArgs(Array())
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream != null)
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId == null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream != null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId == null)
-  }
+      Wadl2Checker.main(Array("src/test/resources/wadl/sharedXPath.wadl", outFile))
 
-  test ("one params should set source to systemid and result to stream"){
-    Wadl2Checker.parser.reset()
-    Wadl2Checker.handleArgs(Array("test.wadl"))
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream == null)
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId != null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream != null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId == null)
-  }
+      //  No err, noout
+      assert(error.toString().isEmpty())
+      assert(out.toString().isEmpty())
 
-  test ("two params should set source and result to systemid"){
-    Wadl2Checker.parser.reset()
-    Wadl2Checker.handleArgs(Array("test.wadl", "out.xml"))
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getInputStream == null)
-    assert (Wadl2Checker.getSource.asInstanceOf[StreamSource].getSystemId != null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getOutputStream == null)
-    assert (Wadl2Checker.getResult.asInstanceOf[StreamResult].getSystemId != null)
-  }
+      val outXML = XML.loadFile(outFile)
 
+      //  Just some basic asserts to make sure we're working, we'd
+      //  expect to see all of these things in the output
+      assert(outXML, "/chk:checker")
+      assert(outXML, "starts-with(/chk:checker/chk:meta/chk:created-by,'API Checker')")
+      assert(outXML, "/chk:checker/chk:meta/chk:config")
+      assert(outXML, "/chk:checker/chk:step[@type='START']")
+      assert(outXML, "/chk:checker/chk:step[@type='ACCEPT']")
+  })}
+
+  //
+  //  Some spot tests to make sure configs are working
+  //
+
+  //
+  //  Flag, to valid XPath
+  //
+  val argFlags : Map[String, String] =
+    Map("-d"->"/chk:checker/chk:meta/chk:config[@option='removeDups' and @value='true']",
+        "-r"->"/chk:checker/chk:meta/chk:config[@option='enableRaxRolesExtension' and @value='true']",
+        "-H"->"/chk:checker/chk:meta/chk:config[@option='checkHeaders' and @value='true']",
+        "--remove-dups"->"/chk:checker/chk:meta/chk:config[@option='removeDups' and @value='true']",
+        "--rax-roles"->"/chk:checker/chk:meta/chk:config[@option='enableRaxRolesExtension' and @value='true']",
+        "--header"->"/chk:checker/chk:meta/chk:config[@option='checkHeaders' and @value='true']",
+        "" -> """
+          /chk:checker/chk:meta/chk:config[@option='checkHeaders' and @value='false'] and
+          /chk:checker/chk:meta/chk:config[@option='removeDups' and @value='false'] and
+          /chk:checker/chk:meta/chk:config[@option='enableRaxRolesExtension' and @value='false']
+        """  // Check defaults
+       )
+
+  for ((arg, xpath) <- argFlags) {
+      test (s"Should correctly handle argument $arg") {
+        withOutput ( (out, error) => {
+          if (arg.isEmpty) {
+            Wadl2Checker.main(Array("src/test/resources/wadl/sharedXPath.wadl"))
+          } else {
+            Wadl2Checker.main(Array(arg,"src/test/resources/wadl/sharedXPath.wadl"))
+          }
+          //  No err
+          assert(error.toString().isEmpty())
+
+          val outXML = XML.loadString(out.toString())
+
+          assert(outXML, xpath)
+      })}
+  }
 }
