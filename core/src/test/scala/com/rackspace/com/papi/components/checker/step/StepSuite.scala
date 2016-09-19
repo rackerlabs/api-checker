@@ -1223,7 +1223,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1239,7 +1239,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same in the context") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1256,7 +1256,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true and there is a capture header, the capture header should be set") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 1, Some("Foo"), 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 10, Some("Foo"), 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test" bar="yum">
                          <child attribute="value"/>
@@ -1275,7 +1275,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true and there is a capture header, the capture header should be set (multi-value)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "//@bar", None, None, context, 1, Some("Foo"), 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "//@bar", None, None, context, 10, Some("Foo"), 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test" bar="yum">
                          <child attribute="value" bar="yum2"/>
@@ -1298,7 +1298,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true and there is a capture header, the capture header should be set (multi-value, version 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "string-join((//@bar), ', ')", None, None, context, 2, Some("Foo"), 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "string-join((//@bar), ', ')", None, None, context, 20, Some("Foo"), 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test" bar="yum">
                          <child attribute="value" bar="yum2"/>
@@ -1320,7 +1320,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true and there is a capture header, the capture header should be set (version 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 2, Some("Foo"), 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 20, Some("Foo"), 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test" bar="yum">
                          <child attribute="value"/>
@@ -1339,7 +1339,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath does not resolve context should be None.") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root/@bar", None, None, context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1355,7 +1355,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true the contentErrorPriority should be -1") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1374,7 +1374,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the uriLevel should be -1") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1391,7 +1391,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the contentErrorPriority should be set") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 1, 1000, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 10, 1000, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1410,7 +1410,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1431,7 +1431,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with a message of 'Expecting '+XPATH") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, None, context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1456,7 +1456,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with setErrorCode") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", None, Some(401), context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", None, Some(401), context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1481,7 +1481,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", Some("/tst:root was expected"), None, context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", Some("/tst:root was expected"), None, context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1506,7 +1506,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message and set code") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", Some("/tst:root was expected"), Some(401), context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", Some("/tst:root was expected"), Some(401), context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1531,7 +1531,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message, set code, and errorPriority") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "/tst:root", Some("/tst:root was expected"), Some(401), context, 1, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "/tst:root", Some("/tst:root was expected"), Some(401), context, 10, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1559,7 +1559,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true the uriLevel should stay the same (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 2, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 20, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1576,7 +1576,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to true the contentErrorPriority should be -1 (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 2, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 20, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <root xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1595,7 +1595,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the uriLevel should be -1 (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 2, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 20, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1611,7 +1611,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the contentErrorPriority should be set (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 2, 101, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 20, 101, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1630,7 +1630,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 2, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 20, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1653,7 +1653,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with a message of 'Expecting '+XPATH (XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 2, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, None, context, 20, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1678,7 +1678,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with a message of 'Expecting '+XPATH (XPath 2) with set code") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, Some(401), context, 2, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", None, Some(401), context, 20, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1703,7 +1703,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message(XPath 2)") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", Some("/tst:root was expected"), None, context, 2, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", Some("/tst:root was expected"), None, context, 20, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1728,7 +1728,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message(XPath 2) and setCode") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", Some("/tst:root was expected"), Some(401), context, 2, 10, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", Some("/tst:root was expected"), Some(401), context, 20, 10, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>
@@ -1753,7 +1753,7 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
   test("In an XPath test, if the XPath resolves to false the request should contain a SAXParseException, with set message(XPath 2), setCode, and setPriorityAssertion") {
     val context = ImmutableNamespaceContext(Map("tst"->"http://test.org/test"))
-    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", Some("/tst:root was expected"), Some(401), context, 2, 101, Array[Step]())
+    val xpath = new XPath("XPath", "XPath", "if (/tst:root) then true() else false()", Some("/tst:root was expected"), Some(401), context, 20, 101, Array[Step]())
     val req1 = request("PUT", "/a/b", "application/xml",
                        <foot xmlns="http://test.org/test">
                          <child attribute="value"/>

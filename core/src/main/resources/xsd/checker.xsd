@@ -281,7 +281,9 @@
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
                     Ensures that the XPATH evaluates to true() in the
-                    XML content. The match is an XPath expression.
+                    XML content. The match is an XPath expression.  If
+                    XPath version is not specified then the
+                    "configured" version will be used.
                 </html:p>
             </documentation>
         </annotation>
@@ -819,15 +821,18 @@
 
     <simpleType name="XPathVersion">
         <restriction base="xsd:byte">
-            <minInclusive value="1"/>
-            <maxInclusive value="2"/>
+            <enumeration value="10"/>
+            <enumeration value="20"/>
+            <enumeration value="30"/>
+            <enumeration value="31"/>
         </restriction>
     </simpleType>
 
     <simpleType name="XSLVersion">
         <restriction base="xsd:byte">
-            <minInclusive value="1"/>
-            <maxInclusive value="2"/>
+            <enumeration value="1"/>
+            <enumeration value="2"/>
+            <enumeration value="3"/>
         </restriction>
     </simpleType>
 

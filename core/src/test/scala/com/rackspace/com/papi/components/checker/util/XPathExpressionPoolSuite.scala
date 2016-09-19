@@ -26,8 +26,8 @@ import scala.collection.mutable.Map
 @RunWith(classOf[JUnitRunner])
 class XPathExpressionPoolSuite extends FunSuite {
 
-  val XPATH_VERSION_1 = 1
-  val XPATH_VERSION_2 = 2
+  val XPATH_VERSION_1 = 10
+  val XPATH_VERSION_2 = 20
 
   test ("The pool should successfully create an xpath expression") {
     val nsContext = ImmutableNamespaceContext(Map("ns" -> "http://my/namespace"))

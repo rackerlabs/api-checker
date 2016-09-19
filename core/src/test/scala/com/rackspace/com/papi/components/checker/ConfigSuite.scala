@@ -18,6 +18,7 @@ package com.rackspace.com.papi.components.checker
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.apache.logging.log4j.Level
 
 /**
  * Verifies that deprecated methods correctly set the new Config object.
@@ -25,7 +26,7 @@ import org.scalatest.junit.JUnitRunner
  * Delete this when the Config.useSaxonEEValidation related methods are deleted.
  */
 @RunWith(classOf[JUnitRunner])
-class ConfigSuite extends FunSuite {
+class ConfigSuite extends FunSuite with LogAssertions {
 
   test( "UseSaxonEEValidation == true : xsdEngine == SaxonEE, xslEngine == SaxonEE ") {
 
@@ -38,13 +39,15 @@ class ConfigSuite extends FunSuite {
   }
 
   test( "UseSaxonEEValidation == false, xslEngine == Saxon : xsdEngine == Xerces, xslEngine == SaxonHE") {
-
     val config = new Config
-    config.setUseSaxonEEValidation( false )
-    config.setXSLEngine( "Saxon" )
+    val configLog = log(Level.WARN) {
+      config.setUseSaxonEEValidation( false )
+      config.setXSLEngine( "Saxon" )
+    }
 
     assert( config.xsdEngine === "Xerces" )
     assert( config.xslEngine === "SaxonHE" )
+    assert(configLog, "Saxon to specify XSL engine is depricated")
   }
 
   test( "UseSaxonEEValidation == false : xsdEngine == Xerces, xslEngine == XalanC") {
@@ -53,5 +56,26 @@ class ConfigSuite extends FunSuite {
 
     assert( config.xsdEngine === "Xerces" )
     assert( config.xslEngine === "XalanC" )
+  }
+
+
+  test ("XPathVersion 1, should warn and set to 10") {
+    val config = new Config
+    val configLog = log(Level.WARN) {
+      config.xpathVersion = 1
+    }
+
+    assert (config.xpathVersion == 10)
+    assert (configLog, "1 is deprecated to specify XPath version")
+  }
+
+  test ("XPathVersion 2, should warn and set to 20") {
+    val config = new Config
+    val configLog = log(Level.WARN) {
+      config.xpathVersion = 2
+    }
+
+    assert (config.xpathVersion == 20)
+    assert (configLog, "2 is deprecated to specify XPath version")
   }
 }

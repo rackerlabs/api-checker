@@ -226,7 +226,17 @@ object TestConfig {
   def apply (removeDups : Boolean, saxoneeValidation : Boolean, wellFormed : Boolean,
              checkXSDGrammar : Boolean, checkElements : Boolean, xpathVersion : Int) : Config = {
     val config = apply(removeDups, saxoneeValidation, wellFormed, checkXSDGrammar, checkElements)
-    config.xpathVersion = xpathVersion
+
+    //
+    //  Convert version here to avoid WARNINGS on a lot of tests.  We
+    //  have tests elsewhere that ensure the version conversion occurs
+    //  currectly.
+    //
+    config.xpathVersion = xpathVersion match {
+      case 1 => 10
+      case 2 => 20
+      case _ => xpathVersion
+    }
 
     config
   }

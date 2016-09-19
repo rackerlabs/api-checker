@@ -101,6 +101,8 @@ object WadlTest {
   val warnAgent = parser.option[String] (List("A", "warn-agent"), "agent-name",
                                             "The name of the agent used in WARNING headers. Default: -")
 
+  val xslEngine = parser.option[String] (List("E", "xsl-engine"), "xsl-engine",
+                                            "The name of the XSLT engine to use. Possible names are Xalan, XalanC, SaxonHE, SaxonEE.  Default: XalanC")
 
   val dontValidate = parser.flag[Boolean] (List("D", "dont-validate"),
                                        "Don't validate produced checker Default: false")
@@ -122,7 +124,7 @@ object WadlTest {
                                    "Display usage.")
 
   val xpathVersion = parser.option[Int](List("t", "xpath-version"), "n",
-                                           "XPath version to use. Can be 1 or 2. Default: 1")
+                                           "XPath version to use. Can be 10, 20, 30, 31 for 1.0, 2.0, 3.0, and 3.1. Default: 10")
 
   val input = parser.parameter[String]("wadl",
                                        "WADL file/uri to read.  If not specified, stdin will be used.",
@@ -272,12 +274,13 @@ object WadlTest {
         c.enableMessageExtension = !message.value.getOrElse(false)
         c.enableCaptureHeaderExtension = !captureHeader.value.getOrElse(false)
         c.enableAnyMatchExtension = !anyMatch.value.getOrElse(false)
-        c.xpathVersion = xpathVersion.value.getOrElse(1)
+        c.xpathVersion = xpathVersion.value.getOrElse(10)
         c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
         c.validateChecker = !dontValidate.value.getOrElse(false)
         c.enableWarnHeaders = !warnHeaders.value.getOrElse(false)
         c.warnAgent = warnAgent.value.getOrElse("-")
+        c.xslEngine = xslEngine.value.getOrElse("XalanC")
 
 
         val dot = File.createTempFile("chk", ".dot")
