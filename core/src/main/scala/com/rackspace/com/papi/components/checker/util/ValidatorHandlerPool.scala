@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.validation.{Schema, ValidatorHandler}
 
 import com.codahale.metrics.{Gauge, MetricRegistry}
-import com.saxonica.jaxp.SchemaReference
+import com.saxonica.ee.jaxp.SchemaReference
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
 

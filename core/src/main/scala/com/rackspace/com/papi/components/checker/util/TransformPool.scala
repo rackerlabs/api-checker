@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.util
 import javax.xml.transform.{Templates, Transformer}
 
 import com.codahale.metrics.{Gauge, MetricRegistry}
-import net.sf.saxon.Controller
+import net.sf.saxon.jaxp.TransformerImpl
 import net.sf.saxon.serialize.MessageWarner
 import org.apache.commons.pool.PoolableObjectFactory
 import org.apache.commons.pool.impl.SoftReferenceObjectPool
@@ -61,8 +61,8 @@ private class XSLTransformerFactory(private val templates : Templates) extends P
     //
     //  Ask Saxon to behave like xalan when emitting messages.
     //
-    if (valid && trans.isInstanceOf[Controller]) {
-      trans.asInstanceOf[Controller].setMessageEmitter(new MessageWarner)
+    if (valid && trans.isInstanceOf[TransformerImpl]) {
+      trans.asInstanceOf[TransformerImpl].getUnderlyingController().setMessageEmitter(new MessageWarner)
     }
     valid
   }
