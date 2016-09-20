@@ -109,6 +109,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
                 <param id="foo" style="plain" required="true" path="/tst:e/@foo"
                        rax:captureHeader="X-FOO"/>
               </representation>
+              <representation mediaType="application/json">
+                <param id="foo2j" style="plain" required="true" path="$_?foo2"/>
+                <param id="foo3j" style="plain" required="true" path="$_?foo3"/>
+                <param id="fooj" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+              </representation>
             </request>
           </method>
           <method name="PUT" rax:roles="put:admin">
@@ -119,6 +125,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
                        rax:captureHeader="X-FOO"/>
                 <param id="foo3pu" style="plain" required="true" path="/tst:e/@foo3"/>
               </representation>
+              <representation mediaType="application/json">
+                <param id="foo2jpu" style="plain" required="true" path="$_?foo2"/>
+                <param id="foojpu" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+                <param id="foo3jpu" style="plain" required="true" path="$_?foo3"/>
+              </representation>
             </request>
           </method>
           <method name="PATCH">
@@ -128,6 +140,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
                        rax:captureHeader="X-FOO"/>
                 <param id="foo2pa" style="plain" required="true" path="/tst:e/@foo2"/>
                 <param id="foo3pa" style="plain" required="true" path="/tst:e/@foo3"/>
+              </representation>
+              <representation mediaType="application/json">
+                <param id="foojpa" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+                <param id="foo2jpa" style="plain" required="true" path="$_?foo2"/>
+                <param id="foo3jpa" style="plain" required="true" path="$_?foo3"/>
               </representation>
             </request>
           </method>
@@ -224,6 +242,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
                 <param id="foo" style="plain" required="true" path="/tst:e/@foo"
                        rax:captureHeader="X-FOO"/>
               </representation>
+              <representation mediaType="application/json">
+                <param id="foo2j" style="plain" required="true" path="$_?foo2"/>
+                <param id="foo3j" style="plain" required="true" path="$_?foo3"/>
+                <param id="fooj" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+              </representation>
             </request>
           </method>
           <method name="PUT" rax:roles="put:admin">
@@ -234,6 +258,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
                        rax:captureHeader="X-FOO"/>
                 <param id="foo3pu" style="plain" required="true" path="/tst:e/@foo3"/>
               </representation>
+              <representation mediaType="application/json">
+                <param id="foo2jpu" style="plain" required="true" path="$_?foo2"/>
+                <param id="foojpu" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+                <param id="foo3jpu" style="plain" required="true" path="$_?foo3"/>
+              </representation>
             </request>
           </method>
           <method name="PATCH">
@@ -243,6 +273,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
                        rax:captureHeader="X-FOO"/>
                 <param id="foo2pa" style="plain" required="true" path="/tst:e/@foo2"/>
                 <param id="foo3pa" style="plain" required="true" path="/tst:e/@foo3"/>
+              </representation>
+              <representation mediaType="application/json">
+                <param id="foojpa" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+                <param id="foo2jpa" style="plain" required="true" path="$_?foo2"/>
+                <param id="foo3jpa" style="plain" required="true" path="$_?foo3"/>
               </representation>
             </request>
           </method>
@@ -374,6 +410,19 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PATCH"),
           ReqType("(application/xml)(;.*)?"), WellXML, XPathWithCapture("/tst:e/@foo", "X-FOO"), XPathWithCapture("/tst:e/@foo2", ""),
           XPathWithCapture("/tst:e/@foo3", ""), Accept)
+
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("POST"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo2", ""), JsonXPathWithCapture("$_?foo3", ""),
+          JsonXPathWithCapture("$_?foo", "X-FOO"), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PUT"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo2", ""), JsonXPathWithCapture("$_?foo", "X-FOO"),
+          JsonXPathWithCapture("$_?foo3", ""), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PATCH"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo", "X-FOO"), JsonXPathWithCapture("$_?foo2", ""),
+          JsonXPathWithCapture("$_?foo3", ""), Accept)
       }
 
       scenario("A WADL with captureHeaders enabled should appropriately set captureHeader attributes (removeDups) " + attr) {
@@ -415,6 +464,18 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PATCH"),
           ReqType("(application/xml)(;.*)?"), WellXML, XPathWithCapture("/tst:e/@foo", "X-FOO"), XPathWithCapture("/tst:e/@foo2", ""),
           XPathWithCapture("/tst:e/@foo3", ""), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("POST"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo2", ""), JsonXPathWithCapture("$_?foo3", ""),
+          JsonXPathWithCapture("$_?foo", "X-FOO"), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PUT"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo2", ""), JsonXPathWithCapture("$_?foo", "X-FOO"),
+          JsonXPathWithCapture("$_?foo3", ""), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PATCH"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo", "X-FOO"), JsonXPathWithCapture("$_?foo2", ""),
+          JsonXPathWithCapture("$_?foo3", ""), Accept)
       }
 
       scenario("A WADL with captureHeaders enabled should appropriately set captureHeader attributes (joinXPath) " + attr) {
@@ -454,6 +515,18 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PATCH"),
           ReqType("(application/xml)(;.*)?"), WellXML, XPathWithCapture("/tst:e/@foo", "X-FOO"), XPathWithCapture("/tst:e/@foo2", ""),
           XPathWithCapture("/tst:e/@foo3", ""), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("POST"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo2", ""), JsonXPathWithCapture("$_?foo3", ""),
+          JsonXPathWithCapture("$_?foo", "X-FOO"), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PUT"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo2", ""), JsonXPathWithCapture("$_?foo", "X-FOO"),
+          JsonXPathWithCapture("$_?foo3", ""), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PATCH"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo", "X-FOO"), JsonXPathWithCapture("$_?foo2", ""),
+          JsonXPathWithCapture("$_?foo3", ""), Accept)
       }
 
       scenario("A WADL with captureHeaders enabled should appropriately set captureHeader attributes (removedups, joinXPath) " + attr) {
@@ -493,6 +566,19 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
         assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PATCH"),
           ReqType("(application/xml)(;.*)?"), WellXML, XPathWithCapture("/tst:e/@foo", "X-FOO"), XPathWithCapture("/tst:e/@foo2", ""),
           XPathWithCapture("/tst:e/@foo3", ""), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("POST"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo2", ""), JsonXPathWithCapture("$_?foo3", ""),
+          JsonXPathWithCapture("$_?foo", "X-FOO"), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PUT"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo2", ""), JsonXPathWithCapture("$_?foo", "X-FOO"),
+          JsonXPathWithCapture("$_?foo3", ""), Accept)
+
+        assert(checker, Start, URLWithCapture("path", ""), URLWithCapture("to", ""), URLWithCapture("resource4", ""), Method("PATCH"),
+          ReqType("(application/json)(;.*)?"), WellJSON, JsonXPathWithCapture("$_?foo", "X-FOO"), JsonXPathWithCapture("$_?foo2", ""),
+          JsonXPathWithCapture("$_?foo3", ""), Accept)
+
       }
     }
 
@@ -503,10 +589,12 @@ class WADLCheckerRaxCaptureHeaderSpec extends BaseCheckerSpec {
                                     xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
         <resources>
           <resource path="path/to/resource1">
-            <method name="GET">
+            <method name="POST">
               <request>
-                <param id="foo" style="plain" required="true" path="/tst:e/@foo"
+                <representation mediaType="application/xml">
+                    <param id="foo" style="plain" required="true" path="/tst:e/@foo"
                        rax:device="X-FOO"/>
+                </representation>
               </request>
             </method>
           </resource>

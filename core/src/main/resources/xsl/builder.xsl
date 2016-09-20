@@ -150,6 +150,9 @@
     <xsl:variable name="useWarnHeaders" as="xsd:boolean"
                   select="$enableWarnHeaders and ($useXSDTransform or $usePreProcessExtension)"/>
 
+    <!-- Version of XPath that supports JSON -->
+    <xsl:variable name="JSON_XPATH_VERSION" select="'31'"/>
+
     <!-- Defaults Steps -->
     <xsl:variable name="START"       select="'S0'"/>
     <xsl:variable name="URL_FAIL"    select="'SE0'"/>
@@ -329,11 +332,12 @@
         <xsl:apply-templates mode="ns"/>
     </xsl:template>
 
-    <xsl:template match="wadl:representation[@mediaType and check:isXML(@mediaType)]/wadl:param[(@style = 'plain') and @path]" priority="2" mode="ns">
+    <xsl:template match="wadl:representation[@mediaType and (check:isXML(@mediaType) or check:isJSON(@mediaType))]/wadl:param[(@style = 'plain') and @path]"
+                  priority="2" mode="ns">
         <!--
-            If we have an XPath param in an XML representation, then
-            copy all namespace nodes in that param. And enure that we
-            don't prune the namespaces.
+            If we have an XPath param in an XML or JSON
+            representation, then copy all namespace nodes in that
+            param. And enure that we don't prune the namespaces.
 
             A nicer thing to do would be to parse out the XPath,
             include only those namespaces referenced and allow for
@@ -990,7 +994,7 @@
         <xsl:variable name="doElement" as="xsd:boolean"
                       select="($type = 'WELL_XML') and $useElementCheck and @element"/>
         <xsl:variable name="doReqPlainParam" as="xsd:boolean"
-                      select="($type = 'WELL_XML') and $usePlainParamCheck and exists($defaultPlainParams)"/>
+                      select="($type = ('WELL_XML','WELL_JSON')) and $usePlainParamCheck and exists($defaultPlainParams)"/>
         <xsl:variable name="XSDID" as="xsd:string"
                       select="check:XSDID(.)"/>
         <xsl:variable name="JSONID" as="xsd:string"
@@ -1061,7 +1065,16 @@
         </xsl:if>
         <xsl:if test="$doReqPlainParam">
             <xsl:for-each select="$defaultPlainParams">
-                <step type="XPATH" id="{check:XPathID($this,position())}" match="{@path}">
+                <step id="{check:XPathID($this,position())}" match="{@path}">
+                    <xsl:attribute name="type">
+                        <xsl:choose>
+                            <xsl:when test="$type='WELL_XML'">XPATH</xsl:when>
+                            <xsl:when test="$type='WELL_JSON'">JSON_XPATH</xsl:when>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <xsl:if test="$type='WELL_JSON'">
+                        <xsl:attribute name="version" select="$JSON_XPATH_VERSION"/>
+                    </xsl:if>
                     <xsl:call-template name="check:addMessageExtension"/>
                     <xsl:call-template name="check:addCaptureHeaderExtension"/>
                     <xsl:choose>
@@ -1074,6 +1087,11 @@
                                 <xsl:when test="$doXSD">
                                     <xsl:attribute name="next"
                                                    select="($XSDID, $FAILID)"
+                                                   separator=" "/>
+                                </xsl:when>
+                                <xsl:when test="$doJSON">
+                                    <xsl:attribute name="next"
+                                                   select="($JSONID, $FAILID)"
                                                    separator=" "/>
                                 </xsl:when>
                                 <xsl:otherwise>

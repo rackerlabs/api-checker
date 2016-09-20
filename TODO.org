@@ -798,6 +798,37 @@
          5. [X] Many preprocesses (1 warning)
          6. [X] Existing warning preserved
          7. [X] Warn Agent config takes effect
+** DONE Add support for XPath on JSON bodies [4/4]
+   1. [X] Extend XPath pool to support handling XPaths with variables
+   2. [X] JSONPath Step [8/8]
+      1. [X] Extend XSD to support JSONPath Step
+      2. [X] Update builder to include JSONPath Step
+      3. [X] Add step to priority-map
+      4. [X] Checker assertions related to JSONPath Steps
+      5. [X] Ensure that optimizations work with the new step
+      6. [X] Create new Step
+      7. [X] Update handler for new step
+      8. [X] Update CLI tools to support new step
+   3. [X] Testing [4/4]
+      1. [X] Test XPath pool with vars
+      2. [X] Step
+      3. [X] Builder [2/2]
+         1. [X] General
+         2. [X] rax:capture header
+      4. [X] Validator [3/3]
+         1. [X] General [9/9]
+            1. [X] JSON as array  (with serialize, and capture header)
+            2. [X] JSON as object (with serialize, and capture header)
+            3. [X] JSON as simple types, int, string, boolean
+            4. [X] JSON as null
+            5. [X] RAX:Code
+            6. [X] RAX:Message
+            7. [X] RAX:Roles
+            8. [X] JoinOpt
+            9. [X] RemoveDups
+         2. [X] Capture header
+         3. [X] With JSON Schema
+   4. [X] Experiment with preparse optimization
 ** TODO Compile Performance improvements
 ** TODO Assign CONTENT_FAIL to XSL steps in builder
 ** TODO Investigate whether there is an issue with rax:roles with other headers
@@ -848,7 +879,7 @@
 ** TODO Expand checker to dot conversion in builder
 ** TODO Bring checker to dot conversion to cli
 ** TODO Better XSD tests
-  
+
 
 * Tests 10 Threads 5000 count
 |--------+---------+--------+----------------+-----------------+----------------------------------------------+----------------------------------------------|

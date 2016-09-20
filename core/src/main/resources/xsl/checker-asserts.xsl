@@ -236,7 +236,7 @@
         </xsl:choose>
         <!--
             Content dependecies:  XSD and XPATH require parent to be XSL, WELL_XML, XPATH
-                                  JSON_SCHEMA requires parent to be WELL_JSON
+                                  JSON_SCHEMA and JSON_XPATH requires parent to be WELL_JSON
          -->
         <xsl:choose>
             <xsl:when test="@type=('XSD', 'XPATH')">
@@ -244,9 +244,9 @@
                     <xsl:with-param name="parentTypes" select="('WELL_XML', 'XSL', 'XPATH')"/>
                 </xsl:call-template>
             </xsl:when>
-            <xsl:when test="@type='JSON_SCHEMA'">
+            <xsl:when test="@type=('JSON_SCHEMA', 'JSON_XPATH')">
                 <xsl:call-template name="chk:requireParentType">
-                    <xsl:with-param name="parentTypes" select="'WELL_JSON'"/>
+                    <xsl:with-param name="parentTypes" select="('WELL_JSON', 'JSON_XPATH')"/>
                 </xsl:call-template>
             </xsl:when>
         </xsl:choose>

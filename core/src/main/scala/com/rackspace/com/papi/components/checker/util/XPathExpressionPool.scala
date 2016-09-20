@@ -79,7 +79,7 @@ private class XPathExpressionFactory(private val expression : String, private va
   def makeObject = {
     val xpath = (new org.apache.xpath.jaxp.XPathFactoryImpl()).newXPath()
     xpath.setNamespaceContext(nc)
-    xpath.compile(expression)
+    VarXPathExpression.compile (xpath, expression)
   }
 
   def validateObject (xpath : XPathExpression) : Boolean = xpath != null
@@ -109,6 +109,6 @@ private class XPathNExpressionFactory(private val expression : String, private v
     val xpath = (new net.sf.saxon.xpath.XPathFactoryImpl()).newXPath()
     xpath.asInstanceOf[net.sf.saxon.xpath.XPathEvaluator].getStaticContext().setXPathLanguageLevel(version)
     xpath.setNamespaceContext(nc)
-    xpath.compile(expression)
+    VarXPathExpression.compile (xpath, expression)
   }
 }

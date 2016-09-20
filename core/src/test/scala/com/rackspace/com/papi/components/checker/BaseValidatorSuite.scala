@@ -53,10 +53,12 @@ class BaseValidatorSuite extends FunSuite {
 
   val goodJSON = """
        {
+           "firstName" : "RRRRR",
            "stuff" : {
              "thing" : true,
              "string" : "A String",
              "array" : [ 1, 2, 3, 4],
+             "array2" : [ 1.2, 2.3, 3.4, 4.5],
              "obj" : {
                "a" : "A",
                "b" : "B"
@@ -92,6 +94,15 @@ class BaseValidatorSuite extends FunSuite {
          "age" : 32
     }
   """
+
+  val goodJSON_Schema3 = """
+    {
+         "firstName" : "Britten",
+         "lastName" : "Williams",
+         "age" : 2
+    }
+  """
+
 
   val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString
 

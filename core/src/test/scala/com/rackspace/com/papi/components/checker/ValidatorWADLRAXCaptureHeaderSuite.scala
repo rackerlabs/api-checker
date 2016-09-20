@@ -230,6 +230,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
               <param id="foo" style="plain" required="true" path="/tst:e/@foo"
                      rax:captureHeader="X-FOO"/>
             </representation>
+             <representation mediaType="application/json">
+                <param id="foo2j" style="plain" required="true" path="$_?foo2"/>
+                <param id="foo3j" style="plain" required="true" path="$_?foo3"/>
+                <param id="fooj" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+             </representation>
           </request>
         </method>
         <method name="PUT" rax:roles="put:admin">
@@ -240,6 +246,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
                      rax:captureHeader="X-FOO"/>
               <param id="foo3pu" style="plain" required="true" path="/tst:e/@foo3"/>
             </representation>
+           <representation mediaType="application/json">
+                <param id="foo2jpu" style="plain" required="true" path="$_?foo2"/>
+                <param id="foojpu" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+                <param id="foo3jpu" style="plain" required="true" path="$_?foo3"/>
+              </representation>
           </request>
         </method>
         <method name="PATCH">
@@ -250,6 +262,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
               <param id="foo2pa" style="plain" required="true" path="/tst:e/@foo2"/>
               <param id="foo3pa" style="plain" required="true" path="/tst:e/@foo3"/>
             </representation>
+            <representation mediaType="application/json">
+                <param id="foojpa" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+                <param id="foo2jpa" style="plain" required="true" path="$_?foo2"/>
+                <param id="foo3jpa" style="plain" required="true" path="$_?foo3"/>
+             </representation>
           </request>
         </method>
       </resource>
@@ -345,6 +363,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
               <param id="foo" style="plain" required="true" path="/tst:e/@foo"
                      rax:captureHeader="X-FOO"/>
             </representation>
+             <representation mediaType="application/json">
+                <param id="foo2j" style="plain" required="true" path="$_?foo2"/>
+                <param id="foo3j" style="plain" required="true" path="$_?foo3"/>
+                <param id="fooj" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+             </representation>
           </request>
         </method>
         <method name="PUT" rax:roles="put:admin">
@@ -355,6 +379,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
                      rax:captureHeader="X-FOO"/>
               <param id="foo3pu" style="plain" required="true" path="/tst:e/@foo3"/>
             </representation>
+           <representation mediaType="application/json">
+                <param id="foo2jpu" style="plain" required="true" path="$_?foo2"/>
+                <param id="foojpu" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+                <param id="foo3jpu" style="plain" required="true" path="$_?foo3"/>
+              </representation>
           </request>
         </method>
         <method name="PATCH">
@@ -365,6 +395,12 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
               <param id="foo2pa" style="plain" required="true" path="/tst:e/@foo2"/>
               <param id="foo3pa" style="plain" required="true" path="/tst:e/@foo3"/>
             </representation>
+            <representation mediaType="application/json">
+                <param id="foojpa" style="plain" required="true" path="$_?foo"
+                       rax:captureHeader="X-FOO"/>
+                <param id="foo2jpa" style="plain" required="true" path="$_?foo2"/>
+                <param id="foo3jpa" style="plain" required="true" path="$_?foo3"/>
+             </representation>
           </request>
         </method>
       </resource>
@@ -1023,6 +1059,233 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         assertResultFailed(validator.validate(req, response, chain), 400, List("foo3"))
       }
 
+      test("A POST on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (bar) " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("bar"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+      test("A POST on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (foo) " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "foo",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("foo"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+      test("A POST on path/to/resource4 should fail with missing json attribute foo with 400 error code " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo"))
+      }
+
+      test("A POST on path/to/resource4 should fail with missing json attribute foo2 with 400 error code " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo2"))
+      }
+
+      test("A POST on path/to/resource4 should fail with missing json attribute foo3 with 400 error code " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo2" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo3"))
+      }
+
+      test("A PUT on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (bar) " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("bar"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+      test("A PUT on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (foo) " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "foo",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("foo"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+      test("A PUT on path/to/resource4 should fail with missing json attribute foo with 400 error code " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo"))
+      }
+
+      test("A PUT on path/to/resource4 should fail with missing json attribute foo2 with 400 error code " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo2"))
+      }
+
+      test("A PUT on path/to/resource4 should fail with missing json attribute foo3 with 400 error code " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo2" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo3"))
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (bar) " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("bar"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (foo) " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "foo",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("foo"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+      test("A PATCH on path/to/resource4 should fail with missing json attribute foo with 400 error code " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo"))
+      }
+
+      test("A PATCH on path/to/resource4 should fail with missing json attribute foo2 with 400 error code " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo2"))
+      }
+
+      test("A PATCH on path/to/resource4 should fail with missing json attribute foo3 with 400 error code " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo2" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo3"))
+      }
+
     }
 
     val captureHeaderRaxRolesConfigsAll = Map[String, Config]("raxroles config with captureHeaders" -> raxrolesWithCaptureHeaders,
@@ -1636,6 +1899,278 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         assertResultFailed(validator.validate(req, response, chain), 400, List("foo3"))
       }
 
+      test("A POST on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (bar) " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("bar"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+      test("A POST on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (foo) " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "foo",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("foo"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+      test("A POST on path/to/resource4 should fail with missing json attribute foo with 400 error code " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo"))
+      }
+
+      test("A POST on path/to/resource4 should fail with missing json attribute foo2 with 400 error code " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo2"))
+      }
+
+      test("A POST on path/to/resource4 should fail with missing json attribute foo3 with 400 error code " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo2" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo3"))
+      }
+
+      test("A PUT on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (bar) " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("bar"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+      test("A PUT on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (bar, put:admin) " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("put:admin")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("bar"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+      test("A PUT on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (foo) " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "foo",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("foo"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+      test("A PUT on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (foo, put:admin) " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "foo",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("put:admin")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("foo"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+
+
+      test("A PUT on path/to/resource4 should fail with missing json attribute foo with 400 error code " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo"))
+      }
+
+      test("A PUT on path/to/resource4 should fail with missing json attribute foo2 with 400 error code " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo2"))
+      }
+
+      test("A PUT on path/to/resource4 should fail with missing json attribute foo3 with 400 error code " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo2" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo3"))
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (bar) " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("bar"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate JSON should set X-FOO header with the value of $_?foo (foo) " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "foo",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+          // Correct headers should be set...
+          assert(csReq.getHeaders("X-FOO").toList == List("foo"))
+
+          //  Other capture headers should *not* be set
+          assert(csReq.getHeader("X-SUB-RESOURCE") == null)
+          assert(csReq.getHeader("X-SUB-RESOURCE2") == null)
+          assert(csReq.getHeader("X-DEVICE-ID") == null)
+        })
+        validator.validate(req, response, chain)
+      }
+
+      test("A PATCH on path/to/resource4 should fail with missing json attribute foo with 400 error code " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo"))
+      }
+
+      test("A PATCH on path/to/resource4 should fail with missing json attribute foo2 with 400 error code " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo2"))
+      }
+
+      test("A PATCH on path/to/resource4 should fail with missing json attribute foo3 with 400 error code " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo" : "hop",
+                "foo2" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("admin")))
+        assertResultFailed(validator.validate(req, response, chain), 400, List("foo3"))
+      }
+
     }
 
     val captureHeaderRaxRolesConfigs = Map[String, Config]("raxroles config without captureHeaders" -> raxrolesWithOutCaptureHeaders,
@@ -1733,6 +2268,103 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
           false, Map("MyHeader" -> List("3")))
         assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
       }
+
+      test("A POST on path/to/resource4 with appropriate json should fail if admin row is not set " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("subresourceRole")))
+        assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
+      }
+
+      test("A POST on path/to/resource4 with appropriate json should fail if admin row is not set (put:admin)" + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("put:admin")))
+        assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
+      }
+
+      test("A POST on path/to/resource4 with appropriate json should fail if no role header is set" + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
+      }
+
+      test("A PUT on path/to/resource4 with appropriate json should fail if admin row is not set " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("Admin")))
+        assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
+      }
+
+      test("A PUT on path/to/resource4 with appropriate json should fail if no role header is set" + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate json should fail if admin row is not set " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("subresourceRole")))
+        assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate json should fail if admin row is not set (put:admin)" + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("put:admin")))
+        assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate json should fail if no role header is set" + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 403, List("forbidden"))
+      }
+
     }
 
     val captureHeaderRaxRolesMaskConfigs = Map[String, Config]("raxroles mask config without captureHeaders" -> raxrolesMaskWithOutCaptureHeaders,
@@ -1827,6 +2459,102 @@ class ValidatorWADLRAXCaptureHeaderSuite extends BaseValidatorSuite {
         val req = request("PATCH", "/path/to/resource4", "application/xml",
             <e xmlns='http://www.rackspace.com/repose/wadl/checker/step/test'
                foo='bar' foo2='hop' foo3='yes'/>,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 404, List("not found"))
+      }
+
+      test("A POST on path/to/resource4 with appropriate json should fail if admin row is not set " + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("subresourceRole")))
+        assertResultFailed(validator.validate(req, response, chain), 404, List("not found"))
+      }
+
+      test("A POST on path/to/resource4 with appropriate json should fail if admin row is not set (put:admin)" + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("put:admin")))
+        assertResultFailed(validator.validate(req, response, chain), 405, List("PUT"))
+      }
+
+      test("A POST on path/to/resource4 with appropriate json should fail if no role header is set" + desc + attr) {
+        val req = request("POST", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 404, List("not found"))
+      }
+
+      test("A PUT on path/to/resource4 with appropriate json should fail if admin row is not set " + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("Admin")))
+        assertResultFailed(validator.validate(req, response, chain), 404, List("not found"))
+      }
+
+      test("A PUT on path/to/resource4 with appropriate json should fail if no role header is set" + desc + attr) {
+        val req = request("PUT", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3")))
+        assertResultFailed(validator.validate(req, response, chain), 404, List("not found"))
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate json should fail if admin row is not set " + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("subresourceRole")))
+        assertResultFailed(validator.validate(req, response, chain), 404, List("not found"))
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate json should fail if admin row is not set (put:admin)" + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
+          false, Map("MyHeader" -> List("3"), "X-ROLES" -> List("put:admin")))
+        assertResultFailed(validator.validate(req, response, chain), 405, List("PUT"))
+      }
+
+      test("A PATCH on path/to/resource4 with appropriate json should fail if no role header is set" + desc + attr) {
+        val req = request("PATCH", "/path/to/resource4", "application/json","""
+             {
+                "foo"  : "bar",
+                "foo2" : "hop",
+                "foo3" : "yes"
+             }
+            """,
           false, Map("MyHeader" -> List("3")))
         assertResultFailed(validator.validate(req, response, chain), 404, List("not found"))
       }

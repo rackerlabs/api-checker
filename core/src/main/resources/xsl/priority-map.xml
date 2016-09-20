@@ -43,6 +43,7 @@
     <map type="WELL_XML"      priority="41000"/>
     <map type="WELL_JSON"     priority="41000"/>
     <map type="XPATH"         priority="41000"/>
+    <map type="JSON_XPATH"    priority="41000"/>
     <map type="XSL"           priority="41000"/>
     <map type="XSD"           priority="45000"/>
     <map type="JSON_SCHEMA"   priority="45000"/>
