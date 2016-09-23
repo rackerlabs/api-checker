@@ -36,7 +36,23 @@ import net.sf.saxon.jaxp.TransformerImpl
 import scala.language.reflectiveCalls
 import scala.xml._
 
-class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends LazyLogging with XSLErrorDispatcher {
+
+object WADLCheckerBuilder {
+  private val _wadl = new WADLNormalizer // Static WADL normalizer used simply to build templates
+
+  private val raxMetaTransformTemplates: Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/meta-transform.xsl").toString))
+  private val raxRolesTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxRoles.xsl").toString))
+  private val raxDeviceTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxDevice.xsl").toString))
+  private val raxRolesMaskTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxRolesMask.xsl").toString))
+  private val buildTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/builder.xsl").toString))
+  private val dupsTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/removeDups.xsl").toString))
+  private val joinTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/commonJoin.xsl").toString))
+  private val joinHeaderTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/headerJoin.xsl").toString))
+  private val joinXPathTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/xpathJoin.xsl").toString))
+  private val priorityTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/priority.xsl").toString))
+  private val adjustNextTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/adjust-next-cont-error.xsl").toString))
+  private val metaCheckTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/meta-check.xsl").toString))
+  private val checkerAssertsTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/checker-asserts.xsl").toString))
 
   /**
    *  XSL Transformer parameters.
@@ -49,13 +65,6 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
     val CREATOR = "creator"
   }
 
-  import XSLParams._
-
-  if (wadl == null) {
-    wadl = new WADLNormalizer
-  }
-
-  def this() = this(null)
 
   val creatorString = {
     val title = getClass.getPackage.getImplementationTitle
@@ -70,27 +79,25 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   //
   schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
 
-  val checkerSchemaSource  = new Array[Source](2)
+  private val checkerSchemaSource  = new Array[Source](2)
 
   checkerSchemaSource(0) = new StreamSource(getClass.getResource("/xsd/transform.xsd").toString)
   checkerSchemaSource(1) = new StreamSource(getClass.getResource("/xsd/checker.xsd").toString)
 
-  val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
+  private val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
+}
 
+import WADLCheckerBuilder._
 
-  val raxMetaTransformTemplates: Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/meta-transform.xsl").toString))
-  val raxRolesTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxRoles.xsl").toString))
-  val raxDeviceTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxDevice.xsl").toString))
-  val raxRolesMaskTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxRolesMask.xsl").toString))
-  val buildTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/builder.xsl").toString))
-  val dupsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/removeDups.xsl").toString))
-  val joinTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/commonJoin.xsl").toString))
-  val joinHeaderTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/headerJoin.xsl").toString))
-  val joinXPathTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/xpathJoin.xsl").toString))
-  val priorityTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/priority.xsl").toString))
-  val adjustNextTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/adjust-next-cont-error.xsl").toString))
-  val metaCheckTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/meta-check.xsl").toString))
-  val checkerAssertsTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/checker-asserts.xsl").toString))
+class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends LazyLogging with XSLErrorDispatcher {
+
+  import XSLParams._
+
+  if (wadl == null) {
+    wadl = new WADLNormalizer
+  }
+
+  def this() = this(null)
 
   //
   //  We purposly do the identity transform using xalan instead of
@@ -98,6 +105,20 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   //
   private val idTransform = TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl",this.getClass.getClassLoader).newTransformer()
   idTransform.setErrorListener (new LogErrorListener)
+
+  //
+  //  Given Templates and an optional set of XSLT parameters, creates a TransformerHandler
+  //
+  private def getTransformerHandler (templates : Templates, params : Map[String, Object]=Map[String,Object]()) : TransformerHandler = {
+    val handler = wadl.saxTransformerFactory.newTransformerHandler(templates)
+    val transformer = handler.getTransformer
+    transformer.asInstanceOf[TransformerImpl].addLogErrorListener
+    transformer.setURIResolver(wadl.saxTransformerFactory.getURIResolver)
+    for ((param, value) <- params) {
+      transformer.setParameter(param, value)
+    }
+    handler
+  }
 
   private def buildFromWADL (in : Source, out: Result, config : Config) : Unit = {
     var c = config
@@ -108,19 +129,14 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
 
     try {
       handleXSLException({
-        val buildHandler = wadl.saxTransformerFactory.newTransformerHandler(buildTemplates)
-
-        buildHandler.getTransformer.setParameter (CONFIG_METADATA, new StreamSource(c.checkerMetaElem))
-        buildHandler.getTransformer.setParameter (USER, System.getProperty("user.name"))
-        buildHandler.getTransformer.setParameter (CREATOR, creatorString)
-        buildHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
+        val buildHandler = getTransformerHandler(buildTemplates,
+                                                 Map(CONFIG_METADATA -> new StreamSource(c.checkerMetaElem),
+                                                     USER -> System.getProperty("user.name"),
+                                                     CREATOR -> creatorString))
 
         val output = {
-          val priorityHandler = wadl.saxTransformerFactory.newTransformerHandler(priorityTemplates)
-          priorityHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
-
-          val adjustNextHandler = wadl.saxTransformerFactory.newTransformerHandler(adjustNextTemplates)
-          adjustNextHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
+          val priorityHandler = getTransformerHandler(priorityTemplates)
+          val adjustNextHandler = getTransformerHandler(adjustNextTemplates)
 
           priorityHandler.setResult(new SAXResult(adjustNextHandler))
 
@@ -128,8 +144,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
             val outHandler = wadl.saxTransformerFactory.newTransformerHandler()
             outHandler.setResult(out)
 
-            val assertHandler = wadl.saxTransformerFactory.newTransformerHandler(checkerAssertsTemplates)
-            assertHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
+            val assertHandler = getTransformerHandler(checkerAssertsTemplates)
             assertHandler.setResult(new SAXResult (outHandler))
 
             val schemaHandler = checkerSchema.newValidatorHandler()
@@ -144,9 +159,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
 
         val optInputHandler = {
           if (c.maskRaxRoles403) {
-            val raxRolesMaskHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesMaskTemplates)
+            val raxRolesMaskHandler = getTransformerHandler(raxRolesMaskTemplates)
             buildHandler.setResult(new SAXResult(raxRolesMaskHandler))
-            raxRolesMaskHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
             raxRolesMaskHandler
           } else {
             buildHandler
@@ -154,23 +168,17 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         }
 
         if (c.removeDups || c.joinXPathChecks) {
-          val dupsHandler = wadl.saxTransformerFactory.newTransformerHandler(dupsTemplates)
-          val joinHandler = wadl.saxTransformerFactory.newTransformerHandler(joinTemplates)
-          val joinHeaderHandler = wadl.saxTransformerFactory.newTransformerHandler(joinHeaderTemplates)
-
-          dupsHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
-          joinHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
-          joinHeaderHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
+          val dupsHandler = getTransformerHandler(dupsTemplates)
+          val joinHandler = getTransformerHandler(joinTemplates)
+          val joinHeaderHandler = getTransformerHandler(joinHeaderTemplates)
 
           optInputHandler.setResult (new SAXResult (joinHandler))
           joinHandler.setResult(new SAXResult(dupsHandler))
           dupsHandler.setResult(new SAXResult (joinHeaderHandler))
 
           if (c.joinXPathChecks) {
-            val xpathHandler = wadl.saxTransformerFactory.newTransformerHandler(joinXPathTemplates)
-
-            xpathHandler.getTransformer.setParameter(CONFIG_METADATA, new StreamSource(c.checkerMetaElem))
-            xpathHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
+            val xpathHandler = getTransformerHandler(joinXPathTemplates,
+                                                     Map(CONFIG_METADATA -> new StreamSource(c.checkerMetaElem)))
 
             joinHeaderHandler.setResult(new SAXResult(xpathHandler))
             xpathHandler.setResult(output)
@@ -180,15 +188,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         } else {
           optInputHandler.setResult (output)
         }
-        val deviceHandler = wadl.saxTransformerFactory.newTransformerHandler(raxDeviceTemplates)
+        val deviceHandler = getTransformerHandler(raxDeviceTemplates)
         deviceHandler.setResult(new SAXResult(buildHandler))
-        deviceHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
-        if(c.enableRaxRolesExtension){
-          val raxRolesHandler = wadl.saxTransformerFactory.newTransformerHandler(raxRolesTemplates)
-          val raxMetaTransformHandler = wadl.saxTransformerFactory.newTransformerHandler(raxMetaTransformTemplates)
 
-          raxRolesHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
-          raxMetaTransformHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
+        if(c.enableRaxRolesExtension){
+          val raxRolesHandler = getTransformerHandler(raxRolesTemplates)
+          val raxMetaTransformHandler = getTransformerHandler(raxMetaTransformTemplates)
 
           raxRolesHandler.setResult(new SAXResult(deviceHandler))
           raxMetaTransformHandler.setResult(new SAXResult(raxRolesHandler))
@@ -216,8 +221,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         val outHandler = wadl.saxTransformerFactory.newTransformerHandler()
         outHandler.setResult(out)
 
-        val assertHandler = wadl.saxTransformerFactory.newTransformerHandler(checkerAssertsTemplates)
-        assertHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
+        val assertHandler = getTransformerHandler(checkerAssertsTemplates)
         assertHandler.setResult(new SAXResult (outHandler))
 
         val schemaHandler = checkerSchema.newValidatorHandler()
@@ -229,11 +233,9 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
       }
     }
 
-    val metaHandler = wadl.saxTransformerFactory.newTransformerHandler(metaCheckTemplates)
-    metaHandler.getTransformer.setParameter (CONFIG_METADATA, new StreamSource(checkConfig.checkerMetaElem))
-    metaHandler.getTransformer.setParameter (CREATOR, creatorString)
-    metaHandler.getTransformer.asInstanceOf[TransformerImpl].addLogErrorListener
-
+    val metaHandler = getTransformerHandler(metaCheckTemplates,
+                                            Map(CONFIG_METADATA -> new StreamSource(checkConfig.checkerMetaElem),
+                                                CREATOR -> creatorString))
     metaHandler.setResult(vout)
 
     try {

@@ -30,12 +30,21 @@ import scala.language.reflectiveCalls
 import scala.xml._
 
 
-class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends XSLErrorDispatcher {
+object WADLDotBuilder {
+  private val _wadl = new WADLNormalizer // Static WADL normalizer used simply to build templates
+
+  private val dotTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/checker2dot.xsl").toString))
 
   object Checker2DotXSLParams {
     val IGNORE_SINKS = "ignoreSinks"
     val NFA_MODE     = "nfaMode"
   }
+
+}
+
+import WADLDotBuilder._
+
+class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends XSLErrorDispatcher {
 
   import Checker2DotXSLParams._
 
@@ -47,14 +56,13 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends XSLError
 
   def this() = this(null)
 
-  val dotTemplates : Templates = wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/checker2dot.xsl").toString))
-
   def buildFromChecker (in : Source, out: Result, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
     val transformer = dotHandler.getTransformer
     transformer.setParameter (IGNORE_SINKS, ignoreSinks)
     transformer.setParameter (NFA_MODE, nfaMode)
     transformer.asInstanceOf[TransformerImpl].addLogErrorListener
+    transformer.setURIResolver(wadl.saxTransformerFactory.getURIResolver)
 
     handleXSLException({
       transformer.transform (in, out)
@@ -68,6 +76,7 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends XSLError
     transformer.setParameter (IGNORE_SINKS, ignoreSinks)
     transformer.setParameter (NFA_MODE, nfaMode)
     transformer.asInstanceOf[TransformerImpl].addLogErrorListener
+    transformer.setURIResolver(wadl.saxTransformerFactory.getURIResolver)
 
     handleXSLException({
       checkerBuilder.build(in, new SAXResult(dotHandler), config)
