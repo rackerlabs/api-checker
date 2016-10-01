@@ -144,14 +144,17 @@ class Wadl2CheckerSuite extends FunSuite with XPathAssertions {
   val argFlags : Map[String, String] =
     Map("-d"->"/chk:checker/chk:meta/chk:config[@option='removeDups' and @value='true']",
         "-r"->"/chk:checker/chk:meta/chk:config[@option='enableRaxRolesExtension' and @value='true']",
+        "-u"->"/chk:checker/chk:meta/chk:config[@option='enableAuthenticatedByExtension' and @value='true']",
         "-H"->"/chk:checker/chk:meta/chk:config[@option='checkHeaders' and @value='true']",
         "--remove-dups"->"/chk:checker/chk:meta/chk:config[@option='removeDups' and @value='true']",
         "--rax-roles"->"/chk:checker/chk:meta/chk:config[@option='enableRaxRolesExtension' and @value='true']",
+        "--authenticated-by"->"/chk:checker/chk:meta/chk:config[@option='enableAuthenticatedByExtension' and @value='true']",
         "--header"->"/chk:checker/chk:meta/chk:config[@option='checkHeaders' and @value='true']",
         "" -> """
           /chk:checker/chk:meta/chk:config[@option='checkHeaders' and @value='false'] and
           /chk:checker/chk:meta/chk:config[@option='removeDups' and @value='false'] and
-          /chk:checker/chk:meta/chk:config[@option='enableRaxRolesExtension' and @value='false']
+          /chk:checker/chk:meta/chk:config[@option='enableRaxRolesExtension' and @value='false'] and
+          /chk:checker/chk:meta/chk:config[@option='enableAuthenticatedByExtension' and @value='false']
         """  // Check defaults
        )
 

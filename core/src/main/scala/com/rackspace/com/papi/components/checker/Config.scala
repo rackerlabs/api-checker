@@ -268,6 +268,16 @@ class Config extends LazyLogging {
   var enableAnyMatchExtension : Boolean = true
 
   //
+  //  When the rax:authenticatedBy attribute is specified on a
+  //  resource or method, requests are required to have an
+  //  X-Authenticated-By header with at least one of the values
+  //  specified.
+  //
+  @BeanProperty
+  @AffectsChecker
+  var enableAuthenticatedByExtension : Boolean = false
+
+  //
   //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,
   //  and Saxon. Note that Saxon is an XSL 2.0 engine, but most 1.0
   //  XSLs should work fine.

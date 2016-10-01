@@ -75,6 +75,7 @@
             <config option="checkHeaders" value="true"/>
             <config option="enableRaxRolesExtension" value="false"/>
             <config option="maskRaxRoles403" value="false"/>
+            <config option="enableAuthenticatedByExtension" value="false"/>
             <config option="enableWarnHeaders" value="true"/>
             <config option="warnAgent" value="-"/>
           </meta>
@@ -94,6 +95,7 @@
     <xsl:variable name="enableIgnoreJSONSchemaExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableIgnoreJSONSchemaExtension'))"/>
     <xsl:variable name="enableMessageExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableMessageExtension'))"/>
     <xsl:variable name="enableRaxRolesExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRolesExtension'))"/>
+    <xsl:variable name="enableAuthenticatedByExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAuthenticatedByExtension'))"/>
     <xsl:variable name="enableCaptureHeaderExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableCaptureHeaderExtension'))"/>
     <xsl:variable name="enableAnyMatchExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAnyMatchExtension'))"/>
     <xsl:variable name="enableWarnHeaders" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableWarnHeaders'))"/>
@@ -137,14 +139,16 @@
                           $checkPlainParams or $useJSONContentCheck"/>
     <xsl:variable name="useRaxRoles" as="xsd:boolean"
                   select="$enableRaxRolesExtension"/>
+    <xsl:variable name="useAuthenticatedBy" as="xsd:boolean"
+                  select="$enableAuthenticatedByExtension"/>
     <xsl:variable name="useAnyMatchExtension" as="xsd:boolean"
-                 select="$enableAnyMatchExtension or $useRaxRoles"/>
+                 select="$enableAnyMatchExtension or $useRaxRoles or $useAuthenticatedBy"/>
     <xsl:variable name="useHeaderCheck" as="xsd:boolean"
-                  select="$checkHeaders or $useRaxRoles"/>
+                  select="$checkHeaders or $useRaxRoles or $useAuthenticatedBy"/>
     <xsl:variable name="useParamDefaults" as="xsd:boolean"
                   select="$setParamDefaults"/>
     <xsl:variable name="useMessageExtension" as="xsd:boolean"
-                  select="$enableMessageExtension or $useRaxRoles"/>
+                  select="$enableMessageExtension or $useRaxRoles or $useAuthenticatedBy"/>
     <xsl:variable name="useCaptureHeaderExtension" as="xsd:boolean"
                   select="$enableCaptureHeaderExtension"/>
     <xsl:variable name="useWarnHeaders" as="xsd:boolean"
