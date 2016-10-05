@@ -1,8 +1,12 @@
 #!/bin/bash
 
 PROG=wadltest
+PROG_CLASS=com.rackspace.com.papi.components.checker.cli.WadlTest
 
-JAVA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=true  -Dcom.sun.management.jmxremote.authenticate=false "
-JAVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9292 -Djava.rmi.server.hostname=localhost"
+CHECKER_JAVA_OPTS+=" -server -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=true  -Dcom.sun.management.jmxremote.authenticate=false "
+CHECKER_JAVA_OPTS+=" -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9293 -Djava.rmi.server.hostname=localhost"
+
+NO_CHECKER_NAILGUN=1  # wadlTest is already a server so don't run it on nailgun!
+
 
 . runcli.sh

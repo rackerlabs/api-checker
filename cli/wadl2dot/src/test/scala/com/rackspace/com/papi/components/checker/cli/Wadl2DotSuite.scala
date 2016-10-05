@@ -22,125 +22,145 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
+
 @RunWith(classOf[JUnitRunner])
 class Wadl2DotSuite extends FunSuite {
 
-  test ("--help should generate usage info") {
-    Wadl2Dot.parser.reset()
-    intercept[ArgotUsageException] {
-      Wadl2Dot.handleArgs(Array("--help"))
+  def withOutput(test : (ByteArrayOutputStream, ByteArrayOutputStream) => Unit) = {
+    val errStream = new ByteArrayOutputStream()
+    val printErrStream = new PrintStream(errStream)
+
+    val outStream = new ByteArrayOutputStream()
+    val printOutStream = new PrintStream(outStream)
+
+    this.synchronized {
+      val oldErr = System.err
+      val oldOut = System.out
+
+      try {
+        System.setErr(printErrStream)
+        System.setOut(printOutStream)
+
+        test(outStream, errStream)
+
+      } finally {
+        System.setErr(oldErr)
+        System.setOut(oldOut)
+      }
     }
   }
 
-  test ("-h should generate usage info") {
-    Wadl2Dot.parser.reset()
-    intercept[ArgotUsageException] {
-      Wadl2Dot.handleArgs(Array("-h"))
-    }
-  }
+  test ("--help should generate usage info") {
+    withOutput( (outStream, errStream) =>  {
+      Wadl2Dot.main(Array("--help", "src/test/resources/wadl/sharedXPath.wadl"))
+      assert(errStream.toString().contains("Usage: wadl2dot"))
+      assert(outStream.toString().isEmpty())
+  })}
+
+  test ("--version should generate usage info") {
+    withOutput( (outStream, errStream) => {
+      Wadl2Dot.main(Array("--version", "src/test/resources/wadl/sharedXPath.wadl"))
+      //
+      //  Weird version format: can't actually detect version during
+      //  testing so we have null vnull.
+      //
+      assert(errStream.toString().contains("null vnull"))
+      assert(outStream.toString().isEmpty())
+  })}
+
 
   test ("-bad_data should generate usage info") {
-    Wadl2Dot.parser.reset()
-    intercept[ArgotUsageException] {
-      Wadl2Dot.handleArgs(Array("-bad_data"))
-    }
-  }
+    withOutput( (outStream, errStream) => {
+      Wadl2Dot.main(Array("--bad_data", "src/test/resources/wadl/sharedXPath.wadl"))
+      assert(errStream.toString().contains("Usage: wadl2dot"))
+      assert(errStream.toString().contains("Unknown option: --bad_data"))
+      assert(outStream.toString().isEmpty())
+  })}
 
   test ("Too many params should generate usage info") {
-    Wadl2Dot.parser.reset()
-    intercept[ArgotUsageException] {
-      Wadl2Dot.handleArgs(Array("input","output","junk"))
-    }
-  }
+    withOutput( (outStream, errStream) => {
+      Wadl2Dot.main(Array("input", "src/test/resources/wadl/sharedXPath.wadl", "junk"))
+      assert(errStream.toString().contains("Usage: wadl2dot"))
+      assert(errStream.toString().contains("Too many parameters."))
+      assert(outStream.toString().isEmpty())
+  })}
 
-  test ("-d should set removeDups") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.removeDups.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("-d"))
-    assert (Wadl2Dot.removeDups.value.get)
-  }
+  test ("Should generate dot to stdout") {
+    withOutput( (outStream, errStream) => {
+      Wadl2Dot.main(Array("src/test/resources/wadl/sharedXPath.wadl"))
 
-  test ("--remove-dups should set removeDups") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.removeDups.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("--remove-dups"))
-    assert (Wadl2Dot.removeDups.value.get)
-  }
+      //  No err
+      assert(errStream.toString().isEmpty())
 
-  test ("-D should set validate") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.dontValidate.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("-D"))
-    assert (Wadl2Dot.dontValidate.value.get)
-  }
+      val out = outStream.toString()
 
-  test ("--dont-validate should set validate") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.dontValidate.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("--dont-validate"))
-    assert (Wadl2Dot.dontValidate.value.get)
-  }
+      //  Just some basic asserts to make sure we're working, we'd
+      //  expect to see all of these things in the output
+      assert(out.contains("digraph Checker"))
+      assert(out.contains("rank=source"))
+      assert(out.contains("->"))
+      assert(!out.contains("SE0"))
+  })}
 
-  test ("-r should set raxRoles") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.raxRoles.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("-r"))
-    assert (Wadl2Dot.raxRoles.value.get)
-  }
+  test ("Should generate dot to file") {
+    withOutput( (outStream, errStream) => {
+      val outDot = "target/sharedXPath.dot"
 
-  test ("-e should show errors") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.showErrors.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("-e"))
-    assert (Wadl2Dot.showErrors.value.get)
-  }
+      Wadl2Dot.main(Array("src/test/resources/wadl/sharedXPath.wadl", outDot))
 
-  test ("--show-errors should set validate") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.showErrors.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("--show-errors"))
-    assert (Wadl2Dot.showErrors.value.get)
-  }
+      //  No err
+      assert(errStream.toString().isEmpty())
+      assert(outStream.toString().isEmpty())
 
-  test ("-n should enable nfaMode") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.nfaMode.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("-n"))
-    assert (Wadl2Dot.nfaMode.value.get)
-  }
+      val source = scala.io.Source.fromFile(outDot)
+      val out = try source.mkString finally source.close()
 
-  test ("--nfa-mode should enable nfaMode") {
-    Wadl2Dot.parser.reset()
-    assert (Wadl2Dot.nfaMode.value.isEmpty)
-    Wadl2Dot.handleArgs(Array("--nfa-mode"))
-    assert (Wadl2Dot.nfaMode.value.get)
-  }
+      //  Just some basic asserts to make sure we're working, we'd
+      //  expect to see all of these things in the output
 
-  test ("no params should set source and result with input/output stream"){
-    Wadl2Dot.parser.reset()
-    Wadl2Dot.handleArgs(Array())
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream != null)
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId == null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream != null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId == null)
-  }
+      assert(out.contains("digraph Checker"))
+      assert(out.contains("rank=source"))
+      assert(out.contains("->"))
+      assert(!out.contains("SE0"))
+  })}
 
-  test ("one params should set source to systemid and result to stream"){
-    Wadl2Dot.parser.reset()
-    Wadl2Dot.handleArgs(Array("test.wadl"))
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream == null)
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId != null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream != null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId == null)
-  }
+  //
+  //  Some spot tests to make sure that configs are passing through
+  //  correctly
+  //
+  test ("Should generate dot to stdout : test -n arg (nfa mode)") {
+    withOutput( (outStream, errStream) => {
+      Wadl2Dot.main(Array("-n","src/test/resources/wadl/sharedXPath.wadl"))
+      //  No err
+      assert(errStream.toString().isEmpty())
 
-  test ("two params should set source and result to systemid"){
-    Wadl2Dot.parser.reset()
-    Wadl2Dot.handleArgs(Array("test.wadl", "out.xml"))
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getInputStream == null)
-    assert (Wadl2Dot.getSource.asInstanceOf[StreamSource].getSystemId != null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getOutputStream == null)
-    assert (Wadl2Dot.getResult.asInstanceOf[StreamResult].getSystemId != null)
-  }
+      val out = outStream.toString()
+
+      //  Just some basic asserts to make sure we're working, we'd
+      //  expect to see all of these things in the output
+      assert(out.contains("digraph Checker"))
+      assert(out.contains("rank=source"))
+      assert(out.contains("->"))
+      assert(out.contains("SA[label=\"SA\", shape=doublecircle"))
+  })}
+
+  test ("Should generate dot to stdout : test -e arg (show error states)") {
+    withOutput( (outStream, errStream) => {
+      Wadl2Dot.main(Array("-e","src/test/resources/wadl/sharedXPath.wadl"))
+
+      //  No err
+      assert(errStream.toString().isEmpty())
+
+      val out = outStream.toString()
+
+      //  Just some basic asserts to make sure we're working, we'd
+      //  expect to see all of these things in the output
+      assert(out.contains("digraph Checker"))
+      assert(out.contains("rank=source"))
+      assert(out.contains("->"))
+      assert(out.contains("SE0"))
+  })}
 
 }

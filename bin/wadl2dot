@@ -1,7 +1,8 @@
 #!/bin/bash
 
 PROG=wadl2dot
+PROG_CLASS=com.rackspace.com.papi.components.checker.cli.Wadl2Dot
 
-JAVA_OPTS=
+CHECKER_JAVA_OPTS=$CHECKER_JAVA_OPTS
 
 . runcli.sh

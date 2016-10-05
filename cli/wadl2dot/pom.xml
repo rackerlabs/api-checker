@@ -16,6 +16,15 @@
         A command line utility to convert a WADL to dot format.
     </description>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.martiansoftware</groupId>
+            <artifactId>nailgun-server</artifactId>
+            <version>${nailgun.version}</version>
+        </dependency>
+    </dependencies>
+
+
     <build>
         <sourceDirectory>src/main/scala</sourceDirectory>
         <testSourceDirectory>src/test/scala</testSourceDirectory>

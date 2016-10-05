@@ -18,12 +18,15 @@
         <module>wadl2checker</module>
         <module>wadl2dot</module>
         <module>wadltest</module>
+        <module>nailgun-server</module>
+        <module>nailgun-client</module>
     </modules>
 
     <properties>
         <argot.version>1.0.4</argot.version>
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>2.1</log4j.version>
+        <nailgun.version>0.9.1</nailgun.version>
     </properties>
 
     <dependencies>

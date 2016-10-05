@@ -8,12 +8,12 @@
     </parent>
 
     <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
-    <artifactId>wadl2checker</artifactId>
+    <artifactId>checker-nailgun-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>API Checker WADL2Checker</name>
+    <name>API Checker Nailgun Server</name>
     <description>
-        A command line utility to convert a WADL to checker format.
+        A nailgun server application to launch api-checker cli tools.
     </description>
 
     <dependencies>
@@ -21,6 +21,16 @@
             <groupId>com.martiansoftware</groupId>
             <artifactId>nailgun-server</artifactId>
             <version>${nailgun.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
+            <artifactId>wadl2dot</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
+            <artifactId>wadl2checker</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -67,7 +77,7 @@
                             <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.rackspace.com.papi.components.checker.cli.Wadl2Checker</mainClass>
+                                    <mainClass>com.rackspace.com.papi.components.checker.cli.NailgunServer</mainClass>
                                 </transformer>
                             </transformers>
                             <filters>
