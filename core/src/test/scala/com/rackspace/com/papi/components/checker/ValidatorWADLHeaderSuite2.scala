@@ -190,6 +190,42 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                       </resources>
                                       </application>)
 
+  val resourceHeadersMixedCaseWADL : TestWADL = ("WADL with mixed same name headers (mixed case) at the resource level",
+                                            <application xmlns="http://wadl.dev.java.net/2009/02"
+                                              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                                              xmlns:rax="http://docs.rackspace.com/api"
+                                              xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                          <resources base="https://test.api.openstack.com">
+                                      <resource path="/a/b">
+                                        <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" default="foo!" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                        <param name="X-test" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                        <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                        <param name="X-test" style="header" type="xsd:date" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                        <param name="X-TESTO" style="header" type="xsd:int" required="true" repeating="true" default="42" rax:message="Bad Testo"/>
+                                        <method name="PUT">
+                                          <request>
+                                            <representation mediaType="application/xml" element="tst:a"/>
+                                            <representation mediaType="application/json"/>
+                                          </request>
+                                        </method>
+                                        <method name="POST">
+                                          <request>
+                                            <representation mediaType="application/xml" element="tst:e"/>
+                                          </request>
+                                        </method>
+                                      </resource>
+                                      <resource path="/c">
+                                        <method name="POST">
+                                          <request>
+                                            <representation mediaType="application/json"/>
+                                          </request>
+                                        </method>
+                                        <method name="GET"/>
+                                       </resource>
+                                      </resources>
+                                      </application>)
+
+
   val resourceHeadersAllMatchWADL : TestWADL = ("WADL with mixed same name headers at the resource level anyMatch=false",
                                             <application xmlns="http://wadl.dev.java.net/2009/02"
                                               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -281,6 +317,41 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                              <param name="X-TEST" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
                                              <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
                                              <param name="X-TEST" style="header" type="xsd:date" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                             <param name="X-TESTO" style="header" type="xsd:int" required="true" repeating="true" default="42" rax:message="Bad Testo"/>
+                                             <representation mediaType="application/xml" element="tst:e"/>
+                                          </request>
+                                        </method>
+                                      </resource>
+                                      <resource path="/c">
+                                        <method name="POST">
+                                          <request>
+                                            <representation mediaType="application/json"/>
+                                          </request>
+                                        </method>
+                                        <method name="GET"/>
+                                       </resource>
+                                      </resources>
+                                      </application>)
+
+  val requestHeadersMixedCaseWADL : TestWADL = ("WADL with mixed same name headers (mixed case) at the request level",
+                                            <application xmlns="http://wadl.dev.java.net/2009/02"
+                                              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                                              xmlns:rax="http://docs.rackspace.com/api"
+                                              xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+                                          <resources base="https://test.api.openstack.com">
+                                      <resource path="/a/b">
+                                        <method name="PUT">
+                                          <request>
+                                            <representation mediaType="application/xml" element="tst:a"/>
+                                            <representation mediaType="application/json"/>
+                                          </request>
+                                        </method>
+                                        <method name="POST">
+                                          <request>
+                                             <param name="X-TEST" style="header" type="xsd:string" fixed="foo!" required="true" repeating="true" default="foo!" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                             <param name="X-test" style="header" type="xsd:string" fixed="bar!" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                             <param name="X-TEST" style="header" type="xsd:dateTime" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
+                                             <param name="X-test" style="header" type="xsd:date" required="true" repeating="true" rax:code="401" rax:message="No!" rax:anyMatch="true"/>
                                              <param name="X-TESTO" style="header" type="xsd:int" required="true" repeating="true" default="42" rax:message="Bad Testo"/>
                                              <representation mediaType="application/xml" element="tst:e"/>
                                           </request>
@@ -3166,11 +3237,27 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedHeadersDisabledCase)
 
 
+  val mixedHeadersDisabledMixedCaseCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                     List(checkHeadersDisabledConfig, checkHeadersDisabledConfigDups),
+                                     List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
+
+  run(mixedHeadersDisabledMixedCaseCase)
+
+
+
   val mixedHeadersMsgDisabledCase : TestCase = (resourceHeadersWADL,
                                                 List(checkHeadersDisabledMsgConfig, checkHeadersDisabledMsgConfigDups),
                                                 List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
 
   run(mixedHeadersMsgDisabledCase)
+
+
+  val mixedHeadersMsgDisabledMixedCaseCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                                List(checkHeadersDisabledMsgConfig, checkHeadersDisabledMsgConfigDups),
+                                                List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
+
+  run(mixedHeadersMsgDisabledMixedCaseCase)
+
 
 
   val mixedHeadersAllMatchDisabledCase : TestCase = (resourceHeadersAllMatchWADL,
@@ -3211,6 +3298,14 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedHeadersCase)
 
 
+  val mixedHeadersMixedCaseCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                     List(checkHeadersConfig, checkHeadersConfigDups),
+                                     List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderNegHeaderTests))
+
+  run(mixedHeadersMixedCaseCase)
+
+
+
   val mixedHeadersAllCase : TestCase = (resourceHeadersAllMatchWADL,
                                      List(checkHeadersConfig, checkHeadersConfigDups),
                                      List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderNegHeaderTestsAll))
@@ -3225,12 +3320,28 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedHeadersDisableAnyCase)
 
 
+  val mixedHeadersDisableAnyMixedCaseCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                     List(checkHeadersConfigDisableAnyMatch, checkHeadersConfigDupsDisableAnyMatch),
+                                     List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderNegHeaderTestsAll))
+
+  run(mixedHeadersDisableAnyMixedCaseCase)
+
+
+
 
   val mixedHeadersMsgCase : TestCase = (resourceHeadersWADL,
                                      List(checkHeadersMsgConfig, checkHeadersMsgConfigDups),
                                      List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderMsgNegHeaderTests))
 
   run(mixedHeadersMsgCase)
+
+
+  val mixedHeadersMsgMixedCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                     List(checkHeadersMsgConfig, checkHeadersMsgConfigDups),
+                                     List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderMsgNegHeaderTests))
+
+  run(mixedHeadersMsgMixedCase)
+
 
 
   val mixedHeadersMsgAllCase : TestCase = (resourceHeadersAllMatchWADL,
@@ -3244,6 +3355,14 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
                                      List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderMsgNegHeaderTestsAll))
 
   run(mixedHeadersMsgDisableAnyCase)
+
+
+  val mixedHeadersMsgDisableAnyMixedCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                     List(checkHeadersMsgConfigDisableAnyMatch, checkHeadersMsgConfigDupsDisableAnyMatch),
+                                     List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderMsgNegHeaderTestsAll))
+
+  run(mixedHeadersMsgDisableAnyMixedCase)
+
 
 
 
@@ -3270,6 +3389,14 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedHeadersDefaultCase)
 
 
+  val mixedHeadersDefaultMixedCaseCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                            List(checkHeadersDefaultsConfig, checkHeadersDefaultsConfigDups),
+                                            List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDefaultHeaderTests))
+
+  run(mixedHeadersDefaultMixedCaseCase)
+
+
+
   val mixedHeadersDefaultAllCase : TestCase = (resourceHeadersAllMatchWADL,
                                             List(checkHeadersDefaultsConfig, checkHeadersDefaultsConfigDups),
                                             List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderDefaultHeaderTestsAll))
@@ -3284,12 +3411,28 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedHeadersDefaultDisableAnyCase)
 
 
+  val mixedHeadersDefaultDisableAnyMixedCaseCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                            List(checkHeadersDefaultsConfigDisableAnyMatch, checkHeadersDefaultsConfigDupsDisableAnyMatch),
+                                            List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderDefaultHeaderTestsAll))
+
+  run(mixedHeadersDefaultDisableAnyMixedCaseCase)
+
+
+
 
   val mixedHeadersMsgDefaultCase : TestCase = (resourceHeadersWADL,
                                                List(checkHeadersMsgDefaultsConfig, checkHeadersMsgDefaultsConfigDups),
                                                List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderMsgDefaultHeaderTests))
 
   run(mixedHeadersMsgDefaultCase)
+
+
+  val mixedHeadersMsgDefaultMixedCaseCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                               List(checkHeadersMsgDefaultsConfig, checkHeadersMsgDefaultsConfigDups),
+                                               List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderMsgDefaultHeaderTests))
+
+  run(mixedHeadersMsgDefaultMixedCaseCase)
+
 
 
   val mixedHeadersMsgDefaultAllCase : TestCase = (resourceHeadersAllMatchWADL,
@@ -3304,6 +3447,13 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
                                                           List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderMsgDefaultHeaderTestsAll))
 
   run(mixedHeadersMsgDefaultDisabledAnyCase)
+
+
+  val mixedHeadersMsgDefaultDisabledAnyMixedCaseCase : TestCase = (resourceHeadersMixedCaseWADL,
+                                                          List(checkHeadersMsgDefaultsConfigDisableAnyMatch, checkHeadersMsgDefaultsConfigDupsDisableAnyMatch),
+                                                          List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedHeaderMsgDefaultHeaderTestsAll))
+
+  run(mixedHeadersMsgDefaultDisabledAnyMixedCaseCase)
 
 
 
@@ -3329,12 +3479,28 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedReqHeadersDisabledCase)
 
 
+  val mixedReqHeadersDisabledMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                                List(checkHeadersDisabledConfig, checkHeadersDisabledConfigDups),
+                                                List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
+
+  run(mixedReqHeadersDisabledMixedCaseCase)
+
+
+
 
   val mixedReqHeadersMsgDisabledCase : TestCase = (requestHeadersWADL,
                                                    List(checkHeadersDisabledMsgConfig, checkHeadersDisabledMsgConfigDups),
                                                    List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
 
   run(mixedReqHeadersMsgDisabledCase)
+
+
+  val mixedReqHeadersMsgDisabledMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                                   List(checkHeadersDisabledMsgConfig, checkHeadersDisabledMsgConfigDups),
+                                                   List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedHeaderDisabledHeaderTests))
+
+  run(mixedReqHeadersMsgDisabledMixedCaseCase)
+
 
 
   val mixedReqHeadersAllMatchDisabledCase : TestCase = (requestHeadersAllMatchWADL,
@@ -3375,6 +3541,13 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedReqHeadersCase)
 
 
+  val mixedReqHeadersMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                        List(checkHeadersConfig, checkHeadersConfigDups),
+                                        List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedReqHeaderNegHeaderTests))
+
+  run(mixedReqHeadersMixedCaseCase)
+
+
   val mixedReqHeadersAllCase : TestCase = (requestHeadersAllMatchWADL,
                                         List(checkHeadersConfig, checkHeadersConfigDups),
                                         List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests,mixedReqHeaderNegHeaderTestsAll))
@@ -3389,11 +3562,27 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedReqHeadersDisableAnyCase)
 
 
+  val mixedReqHeadersDisableAnyMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                        List(checkHeadersConfigDisableAnyMatch, checkHeadersConfigDupsDisableAnyMatch),
+                                        List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderNegHeaderTestsAll))
+
+  run(mixedReqHeadersDisableAnyMixedCaseCase)
+
+
+
   val mixedReqHeadersMsgCase : TestCase = (requestHeadersWADL,
                                            List(checkHeadersMsgConfig, checkHeadersMsgConfigDups),
                                            List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedReqHeaderMsgNegHeaderTests))
 
   run(mixedReqHeadersMsgCase)
+
+
+  val mixedReqHeadersMsgMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                           List(checkHeadersMsgConfig, checkHeadersMsgConfigDups),
+                                           List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedReqHeaderMsgNegHeaderTests))
+
+  run(mixedReqHeadersMsgMixedCaseCase)
+
 
 
   val mixedReqHeadersMsgAllCase : TestCase = (requestHeadersAllMatchWADL,
@@ -3407,6 +3596,13 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
                                            List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderMsgNegHeaderTestsAll))
 
   run(mixedReqHeadersMsgDisableAnyCase)
+
+
+  val mixedReqHeadersMsgDisableAnyMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                           List(checkHeadersMsgConfigDisableAnyMatch, checkHeadersMsgConfigDupsDisableAnyMatch),
+                                           List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderMsgNegHeaderTestsAll))
+
+  run(mixedReqHeadersMsgDisableAnyMixedCaseCase)
 
 
 
@@ -3433,6 +3629,14 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
   run(mixedReqHeadersDefaultCase)
 
 
+  val mixedReqHeadersDefaultMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                               List(checkHeadersDefaultsConfig, checkHeadersDefaultsConfigDups),
+                                               List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedReqHeaderDefaultHeaderTests))
+
+  run(mixedReqHeadersDefaultMixedCaseCase)
+
+
+
   val mixedReqHeadersDefaultAllCase : TestCase = (requestHeadersAllMatchWADL,
                                                List(checkHeadersDefaultsConfig, checkHeadersDefaultsConfigDups),
                                                List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderDefaultHeaderTestsAll))
@@ -3448,11 +3652,25 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
 
 
 
+  val mixedReqHeadersDefaultAnyMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                               List(checkHeadersDefaultsConfigDisableAnyMatch, checkHeadersDefaultsConfigDupsDisableAnyMatch),
+                                               List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderDefaultHeaderTestsAll))
+
+  run(mixedReqHeadersDefaultAnyMixedCaseCase)
+
+
   val mixedReqHeadersMsgDefaultCase : TestCase = (requestHeadersWADL,
                                                   List(checkHeadersMsgDefaultsConfig, checkHeadersMsgDefaultsConfigDups),
                                                   List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedReqHeaderMsgDefaultHeaderTests))
 
   run(mixedReqHeadersMsgDefaultCase)
+
+
+  val mixedReqHeadersMsgDefaultMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                                  List(checkHeadersMsgDefaultsConfig, checkHeadersMsgDefaultsConfigDups),
+                                                  List(mixedHeaderHappyPathTests, mixedHeaderHappyNegTests, mixedReqHeaderMsgDefaultHeaderTests))
+
+  run(mixedReqHeadersMsgDefaultMixedCaseCase)
 
 
   val mixedReqHeadersMsgDefaultAllCase : TestCase = (requestHeadersAllMatchWADL,
@@ -3467,6 +3685,14 @@ def mixedHeaderMsgNegHeaderTestsAll (desc : String, validator : Validator) : Uni
                                                   List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderMsgDefaultHeaderTestsAll))
 
   run(mixedReqHeadersMsgDefaultAnyCase)
+
+
+
+  val mixedReqHeadersMsgDefaultAnyMixedCaseCase : TestCase = (requestHeadersMixedCaseWADL,
+                                                  List(checkHeadersMsgDefaultsConfigDisableAnyMatch, checkHeadersMsgDefaultsConfigDupsDisableAnyMatch),
+                                                  List(mixedHeaderHappyPathTestsAllMatch, mixedHeaderHappyNegTests, mixedReqHeaderMsgDefaultHeaderTestsAll))
+
+  run(mixedReqHeadersMsgDefaultAnyMixedCaseCase)
 
 
 

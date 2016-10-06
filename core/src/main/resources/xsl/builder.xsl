@@ -588,7 +588,7 @@
         <xsl:param name="from" as="node()" select="."/>
         <xsl:param name="inRequest" as="xsd:boolean" select="false()"/>
         <xsl:variable name="headers" select="check:getHeaders($from)" as="node()*"/>
-        <xsl:variable name="names" select="distinct-values(for $h in $headers return string($h/@name))"/>
+        <xsl:variable name="names" select="distinct-values(for $h in $headers return upper-case($h/@name))"/>
         <xsl:variable name="default_headers" select="$headers[@default]" as="node()*"/>
         <xsl:variable name="header_next" as="xsd:string*">
             <xsl:choose>
@@ -601,7 +601,7 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:if test="$useParamDefaults">
-          <xsl:for-each-group select="$headers" group-by="@name">
+          <xsl:for-each-group select="$headers" group-by="upper-case(@name)">
             <xsl:if test="count(current-group()[@default]) gt 1">
               <xsl:message terminate="yes">[ERROR] Multiple headers <xsl:value-of select="current-group()[1]/@name"/> have multiple @default vaules.
               Only one default value is allowed.</xsl:message>
@@ -627,8 +627,8 @@
             <xsl:variable name="pos" select="position()"/>
             <xsl:variable name="last" select="last()"/>
             <xsl:variable name="current" select="." as="xsd:string"/>
-            <xsl:variable name="multipleHeaders" as="xsd:boolean" select="count($headers[@name=$current]) gt 1" />
-            <xsl:for-each select="$headers[@name=$current]">
+            <xsl:variable name="multipleHeaders" as="xsd:boolean" select="count($headers[upper-case(@name)=$current]) gt 1" />
+            <xsl:for-each select="$headers[upper-case(@name)=$current]">
                 <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
                 <xsl:variable name="isFixed" as="xsd:boolean" select="exists(@fixed)"/>
                 <xsl:variable name="isRepeating" as="xsd:boolean" select="exists(@repeating) and xsd:boolean(@repeating)"/>
@@ -687,8 +687,8 @@
                 </xsl:choose>
             </xsl:for-each>
             <xsl:variable name="allHeaders" as="node()*" select="if ($multipleHeaders) then
-                     if ($useAnyMatchExtension) then $headers[@name=$current and not(xsd:boolean(@rax:anyMatch)) and xsd:boolean(@repeating)]
-                     else $headers[@name=$current and xsd:boolean(@repeating)]
+                     if ($useAnyMatchExtension) then $headers[upper-case(@name)=$current and not(xsd:boolean(@rax:anyMatch)) and xsd:boolean(@repeating)]
+                     else $headers[upper-case(@name)=$current and xsd:boolean(@repeating)]
                      else ()"/>
             <xsl:if test="not(empty($allHeaders))">
               <xsl:variable name="matches" as="xsd:string*">
@@ -749,7 +749,7 @@
                 </xsl:if>
               </step>
             </xsl:if>
-            <step type="CONTENT_FAIL" id="{check:HeaderFailID($headers[@name = $current][1])}"/>
+            <step type="CONTENT_FAIL" id="{check:HeaderFailID($headers[upper-case(@name) = $current][1])}"/>
         </xsl:for-each>
     </xsl:template>
     
@@ -1308,7 +1308,7 @@
     <xsl:function name="check:getNextHeaderLinksByName" as="xsd:string*">
       <xsl:param name="headers" as="node()*"/> <!-- all headers -->
       <xsl:param name="headerName" as="xsd:string"/>
-      <xsl:variable name="headersWithName" as="node()*" select="$headers[@name=$headerName]"/>
+      <xsl:variable name="headersWithName" as="node()*" select="$headers[upper-case(@name)=upper-case($headerName)]"/>
       <xsl:choose>
         <xsl:when test="empty($headersWithName)">
           <xsl:value-of select="()"/>
