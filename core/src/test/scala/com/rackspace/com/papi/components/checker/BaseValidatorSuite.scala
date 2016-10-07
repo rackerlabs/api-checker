@@ -331,7 +331,7 @@ class BaseValidatorSuite extends FunSuite {
       throw new TestFailedException(Some("Expected error code "+code+" but got "+result.code), None, 4)
     }
     message.foreach(m => {
-      if (!result.message.contains(m)) {
+      if (!result.message.toUpperCase().contains(m.toUpperCase())) {
         throw new TestFailedException(Some("Expected error string '"+m+"' in the result message, but it didn't have one. Actual result message: '"+result.message+"'"), None, 4)
       }
     })
