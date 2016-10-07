@@ -26,6 +26,11 @@ object HeaderUtil {
 
 
   /**
+   * Strips header parameters from a header value
+   */
+  def stripParams (headerValue : String) : String = headerValue.split(";")(0)
+
+  /**
    * Returns true if a header by the given name is available
    *
    * The context and the request are both seached.
@@ -52,7 +57,7 @@ object HeaderUtil {
 
     value match {
       case null => None
-      case _ =>  Some(value.split(",")(0).trim)
+      case _ =>  Some(stripParams(value.split(",")(0).trim))
     }
   }
 
@@ -77,7 +82,7 @@ object HeaderUtil {
 
     var list : List[String] = List()
     all_headers.foreach(i => list = list ++ i.split(",").map(j => j.trim))
-    list
+    list.map(stripParams)
   }
 
   /**
@@ -89,12 +94,12 @@ object HeaderUtil {
   def getNonSplitHeaders(context : StepContext, request : HttpServletRequest, name : String) : List[String] = {
     val req_headers = request.getHeaders(name) match {
       case null => List[String]()
-      case e : Enumeration[String] =>  e.toList
+      case e : Enumeration[String] =>  e.toList.map(stripParams)
     }
 
     context.requestHeaders.get(name) match {
       case Some(Nil) => req_headers
-      case Some(l) => l ++ req_headers
+      case Some(l) => l.map(stripParams) ++ req_headers
       case _ => req_headers
     }
   }
