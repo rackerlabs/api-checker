@@ -97,6 +97,27 @@ class WADLCheckerCompSpec extends BaseCheckerSpec with LogAssertions {
        assertEmpty(goodCheckerLog)
      }
 
+     scenario ("Load a plain checker document that ends with .checker extension (check XSDEngine)") {
+       Given("a plain checker document that ends in .checker")
+       val in = ("foo.checker", fooGETChecker)
+       When("the document is loaded...")
+       val goodCheckerLog = log (Level.DEBUG) {
+         val checker = builder.build (in,config)
+         assert(checker, "/chk:checker/chk:step[@type='START']/@next = 'F1 notFoo noMETHOD'")
+         assert(checker, "/chk:checker/chk:step[@type='URL']/@match = 'foo'")
+         assert(checker, "/chk:checker/chk:step[@type='URL']/@next = 'G1 noURL notGET'")
+         assert(checker, "/chk:checker/chk:step[@type='METHOD']/@next = 'A'")
+         assert(checker, "/chk:checker/chk:step[@type='METHOD']/@match = 'GET'")
+         assert(checker, "/chk:checker/chk:step[@type='ACCEPT']")
+         assert(checker, "/chk:checker/chk:step[@type='URL_FAIL']/@notMatch='foo'")
+         assert(checker, "/chk:checker/chk:step[@type='URL_FAIL' and not(@notMatch)]")
+         assert(checker, "/chk:checker/chk:step[@type='METHOD_FAIL']/@notMatch='GET'")
+         assert(checker, "/chk:checker/chk:step[@type='METHOD_FAIL' and not(@notMatch)]")
+       }
+       Then ("An appropriate DEBUG messages should be emmited.")
+       assert(goodCheckerLog,"Using Xerces for checker validation")
+     }
+
     scenario ("Should fail to load a plain checker document that *does not* end with a .checker extension") {
       Given ("a plain checker document that does not end in .checker")
       val in = ("foo.xml", fooGETChecker)

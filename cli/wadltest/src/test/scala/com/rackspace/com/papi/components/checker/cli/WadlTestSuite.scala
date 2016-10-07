@@ -22,8 +22,36 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
+
 @RunWith(classOf[JUnitRunner])
 class WadlTestSuite extends FunSuite {
+
+  def withOutput(test : (ByteArrayOutputStream, ByteArrayOutputStream) => Unit) = {
+    val errStream = new ByteArrayOutputStream()
+    val printErrStream = new PrintStream(errStream)
+
+    val outStream = new ByteArrayOutputStream()
+    val printOutStream = new PrintStream(outStream)
+
+    this.synchronized {
+      val oldErr = System.err
+      val oldOut = System.out
+
+      try {
+        System.setErr(printErrStream)
+        System.setOut(printOutStream)
+
+        test(outStream, errStream)
+
+      } finally {
+        System.setErr(oldErr)
+        System.setOut(oldOut)
+      }
+    }
+  }
+
 
   test ("--help should generate usage info") {
     WadlTest.parser.reset()
@@ -72,6 +100,31 @@ class WadlTestSuite extends FunSuite {
     assert (WadlTest.removeDups.value.isEmpty)
     WadlTest.handleArgs(Array("--remove-dups"))
     assert (WadlTest.removeDups.value.get)
+  }
+
+  test ("-S with bad parameter") {
+    WadlTest.parser.reset()
+    withOutput ( (outStream, errStream) => {
+      WadlTest.main(Array("-S", "foo", "input"))
+      assert(outStream.toString().contains("Unrecognized XSL engine"))
+      assert(outStream.toString().contains("foo"))
+      assert(outStream.toString().contains("Xerces, SaxonEE"))
+      assert(errStream.toString().isEmpty())
+    })
+  }
+
+  test ("-S with Xerces parameter") {
+    WadlTest.parser.reset()
+    assert (WadlTest.xsdEngine.value.isEmpty)
+    WadlTest.handleArgs(Array("-S","Xerces"))
+    assert (WadlTest.xsdEngine.value.get == "Xerces")
+  }
+
+  test ("-S with SaxonEE parameter") {
+    WadlTest.parser.reset()
+    assert (WadlTest.xsdEngine.value.isEmpty)
+    WadlTest.handleArgs(Array("-S","SaxonEE"))
+    assert (WadlTest.xsdEngine.value.get == "SaxonEE")
   }
 
   test ("-D should set validate") {

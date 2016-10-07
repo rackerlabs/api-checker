@@ -73,19 +73,31 @@ object WADLCheckerBuilder {
     s"$title ($version)"
   }
 
-  private val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
+  private lazy val checkerSchemaSource  = {
+    val src = new Array[Source](2)
 
-  //
-  //  Enable CTA full XPath2.0 checking in XSD 1.1
-  //
-  schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
+    src(0) = new StreamSource(getClass.getResource("/xsd/transform.xsd").toString)
+    src(1) = new StreamSource(getClass.getResource("/xsd/checker.xsd").toString)
+    src
+  }
 
-  private val checkerSchemaSource  = new Array[Source](2)
+  private lazy val checkerSchema = {
+    val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
 
-  checkerSchemaSource(0) = new StreamSource(getClass.getResource("/xsd/transform.xsd").toString)
-  checkerSchemaSource(1) = new StreamSource(getClass.getResource("/xsd/checker.xsd").toString)
+    //
+    //  Enable CTA full XPath2.0 checking in XSD 1.1
+    //
+    schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
 
-  private val checkerSchema = schemaFactory.newSchema(checkerSchemaSource)
+    schemaFactory.newSchema(checkerSchemaSource)
+  }
+
+  private lazy val checkerSchemaSaxon = {
+    val sf = new com.saxonica.ee.jaxp.SchemaFactoryImpl()
+    sf.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
+
+    sf.newSchema(checkerSchemaSource)
+  }
 }
 
 import WADLCheckerBuilder._
@@ -148,7 +160,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
             val assertHandler = getTransformerHandler(checkerAssertsTemplates)
             assertHandler.setResult(new SAXResult (outHandler))
 
-            val schemaHandler = checkerSchema.newValidatorHandler()
+            val schemaHandler = config.xsdEngine match {
+              case "SaxonEE" => logger.debug ("Using SaxonEE for checker validation")
+                                checkerSchemaSaxon.newValidatorHandler()
+              case xe : String => logger.debug (s"Using $xe for checker validation")
+                                  checkerSchema.newValidatorHandler()
+            }
             schemaHandler.setContentHandler(assertHandler)
 
             adjustNextHandler.setResult(new SAXResult(schemaHandler))
@@ -232,7 +249,15 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         val assertHandler = getTransformerHandler(checkerAssertsTemplates)
         assertHandler.setResult(new SAXResult (outHandler))
 
-        val schemaHandler = checkerSchema.newValidatorHandler()
+        val schemaHandler = config.xsdEngine match {
+          case "SaxonEE" => logger.debug ("Using SaxonEE for checker validation")
+                            checkerSchemaSaxon.newValidatorHandler()
+
+          case xe : String => logger.debug (s"Using $xe for checker validation")
+                            checkerSchema.newValidatorHandler()
+
+
+        }
         schemaHandler.setContentHandler(assertHandler)
 
         new SAXResult(schemaHandler)

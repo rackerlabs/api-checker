@@ -7,6 +7,9 @@
         <List name="api-coverage-listAppender"/>
     </Appenders>
     <Loggers>
+        <Logger name="com.rackspace.com.papi.components.checker.wadl" level="debug">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
         </Root>

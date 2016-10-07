@@ -95,6 +95,15 @@ class Wadl2CheckerSuite extends FunSuite with XPathAssertions {
       assert(out.toString().isEmpty())
   })}
 
+  test ("Bad XSD engine should generate an error") {
+    withOutput ( (out, error) => {
+      Wadl2Checker.main(Array("-S", "foo", "src/test/resources/wadl/sharedXPath.wadl"))
+      assert(error.toString().contains("Unrecognized XSL engine"))
+      assert(error.toString().contains("foo"))
+      assert(error.toString().contains("Xerces, SaxonEE"))
+      assert(out.toString().isEmpty())
+  })}
+
   test ("Should generate checker xml to stdout") {
     withOutput ( (out, error) => {
       Wadl2Checker.main(Array("src/test/resources/wadl/sharedXPath.wadl"))
@@ -106,6 +115,25 @@ class Wadl2CheckerSuite extends FunSuite with XPathAssertions {
 
       //  Just some basic asserts to make sure we're working, we'd
       //  expect to see all of these things in the output
+      assert(outXML, "/chk:checker")
+      assert(outXML, "starts-with(/chk:checker/chk:meta/chk:created-by,'API Checker')")
+      assert(outXML, "/chk:checker/chk:meta/chk:config")
+      assert(outXML, "/chk:checker/chk:step[@type='START']")
+      assert(outXML, "/chk:checker/chk:step[@type='ACCEPT']")
+  })}
+
+  test ("Should generate checker xml to stdout (xsd engine)") {
+    withOutput ( (out, error) => {
+      Wadl2Checker.main(Array("--xsd-engine","Xerces","src/test/resources/wadl/sharedXPath.wadl"))
+
+      //  No err
+      assert(error.toString().isEmpty())
+
+      val outXML = XML.loadString(out.toString())
+
+      //  Just some basic asserts to make sure we're working, we'd
+      //  expect to see all of these things in the output
+      //
       assert(outXML, "/chk:checker")
       assert(outXML, "starts-with(/chk:checker/chk:meta/chk:created-by,'API Checker')")
       assert(outXML, "/chk:checker/chk:meta/chk:config")
