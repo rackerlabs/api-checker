@@ -2,7 +2,8 @@
 <!--
    meta-transform.xsl
 
-   This stylesheet ...
+   This stylesheet rax:metadata into metadata resources with
+   appropriate rax:roles attributes.
 
    Copyright 2015 Rackspace US, Inc.
 
@@ -106,20 +107,19 @@
     </xsl:template>
     <xsl:template match="wadl:grammars">
         <xsl:copy>
-            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="@* | node()"/>
             <xsl:call-template name="addMetadataSchema">
                 <xsl:with-param name="metadata" select="../rax:metadata"/>
             </xsl:call-template>
-            <xsl:apply-templates/>
         </xsl:copy>
     </xsl:template>
     <xsl:template match="wadl:resource[@rax:useMetadata]">
         <xsl:copy>
             <xsl:apply-templates select="@*[not(name() = 'rax:useMetadata')]"/>
+            <xsl:apply-templates select="node()"/>
             <xsl:call-template name="addMetadataAPI">
                 <xsl:with-param name="useMetadata" select="@rax:useMetadata"/>
             </xsl:call-template>
-            <xsl:apply-templates select="node()"/>
         </xsl:copy>
     </xsl:template>
     <xsl:template match="rax:metadata"/>
