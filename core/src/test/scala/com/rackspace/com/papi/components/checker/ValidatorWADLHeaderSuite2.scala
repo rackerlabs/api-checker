@@ -508,6 +508,19 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                  Map("X-TEST"->List("foo!"), "X-TESTO"->List("23"))), response, chain)
     }
 
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=foo! and X-TESTO=23 and goodXML (header param)") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("foo!;q=1.0"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=foo! and X-TESTO=23 and goodXML (multiple header param)") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("foo!;q=1.0;rockit=true"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+
+
     test(s"$desc : should allow POST on /a/b with X-TEST=bar! and X-TESTO=23 and goodXML") {
       validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
                                  Map("X-TEST"->List("bar!"), "X-TESTO"->List("23"))), response, chain)
@@ -574,6 +587,17 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                  Map("X-TEST"->List("foo!", "2001-10-26", "2001-10-26T19:32:52Z", "bar!"), "X-TESTO"->List("23"))), response, chain)
     }
 
+    test(s"$desc : should allow PUT on /a/b with X-TEST=foo!, 2001-10-26,  2001-10-26T19:32:52Z, bar! and X-TESTO=23 and goodXML (with header params)") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!;q=1.0", "2001-10-26", "2001-10-26T19:32:52Z;q=0.5", "bar!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow PUT on /a/b with X-TEST=foo!, 2001-10-26,  2001-10-26T19:32:52Z, bar! and X-TESTO=23 and goodXML (with mulitiple header params)") {
+      validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
+                                 Map("X-TEST"->List("foo!;q=1.0;rockit=true", "2001-10-26;q=1", "2001-10-26T19:32:52Z;q=0.5;rockit=true", "bar!"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+
     test(s"$desc : should allow PUT on /a/b with X-TEST=bar!, 2001-10-26,  2001-10-26T19:32:52Z and X-TESTO=23 and goodXML") {
       validator.validate(request("PUT", "/a/b", "application/xml", goodXML_XSD2, false,
                                  Map("X-TEST"->List("bar!", "2001-10-26", "2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
@@ -604,6 +628,18 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
       validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
                                  Map("X-TEST"->List("foo!"), "X-TESTO"->List("23"))), response, chain)
     }
+
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=foo! and X-TESTO=23 and goodXML (header param)") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("foo!; q=1.0"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=foo! and X-TESTO=23 and goodXML (multiple header param)") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("foo!;q=1.0 ; rockit=true"), "X-TESTO"->List("23"))), response, chain)
+    }
+
 
     test(s"$desc : should allow POST on /a/b with X-TEST=bar! and X-TESTO=23 and goodXML") {
       validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
@@ -703,6 +739,16 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
                                  Map("X-TEST"->List("2001-10-26T19:32:52Z"), "X-TESTO"->List("23"))), response, chain)
     }
 
+    test(s"$desc : should allow POST on /a/b with X-TEST=2001-10-26T19:32:52Z and X-TESTO=23 and goodXML (header param)") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("2001-10-26T19:32:52Z;q=1.0"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST on /a/b with X-TEST=2001-10-26T19:32:52Z and X-TESTO=23 and goodXML (multiple header param)") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("2001-10-26T19:32:52Z;q=1.0;rockit=true"), "X-TESTO"->List("23"))), response, chain)
+    }
+
     test(s"$desc : should allow POST on /a/b with X-TEST=foo! and X-TESTO=32 and goodXML") {
       validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
                                  Map("X-TEST"->List("foo!"), "X-TESTO"->List("32"))), response, chain)
@@ -796,6 +842,17 @@ class ValidatorWADLHeaderSuite2 extends BaseValidatorSuite {
       validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
                                  Map("X-TEST"->List("baz", "bing"), "X-TESTO"->List("23"))), response, chain)
     }
+
+    test(s"$desc : should allow POST /a/b if X-TEST=baz, bing (header param)") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("baz;q=1.0", "bing;q=0.5"), "X-TESTO"->List("23"))), response, chain)
+    }
+
+    test(s"$desc : should allow POST /a/b if X-TEST=baz, bing (multiple header param)") {
+      validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
+                                 Map("X-TEST"->List("baz;q=1.0;rockit=true", "bing;q=0.5;rockit=false"), "X-TESTO"->List("23"))), response, chain)
+    }
+
 
     test(s"$desc : should allow POST /a/b if X-TESTO=foo") {
       validator.validate(request("POST", "/a/b", "application/xml", goodXML_XSD1, false,
