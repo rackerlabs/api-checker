@@ -112,6 +112,7 @@ class ValidatorWADLSuite2 extends BaseValidatorSuite {
        </resources>
        <method name="GET" id="TestGET">
          <doc title="TestGET"/>
+         <doc title="TestGETAltDoc"/>
          <response status="200">
              <representation mediaType="application/xml"/>
          </response>

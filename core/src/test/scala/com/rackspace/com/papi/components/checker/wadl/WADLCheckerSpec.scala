@@ -857,6 +857,57 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE' and @label='deleteResource']")
     }
 
+    scenario("The WADL contains method ids specifed in docs") {
+      Given ("a WADL with method IDs")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method id="getResource" name="GET">
+                      <doc title="Get My Resource"/>
+                      <response status="200 203"/>
+                   </method>
+                   <method id="deleteResource" name="DELETE">
+                      <response status="200"/>
+                   </method>
+              </resource>
+          </resources>
+        </application>
+      When("the wadl is translated")
+      val checker = builder.build (inWADL, stdConfig)
+      Then("The method nodes should contain a resource label with the id")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD']) = 2")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET' and @label='Get My Resource']")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE' and @label='deleteResource']")
+    }
+
+    scenario("The WADL contains method ids specifed in docs (multiple docs)") {
+      Given ("a WADL with method IDs")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method id="getResource" name="GET">
+                      <doc title="Get My Resource"/>
+                      <doc title="Alt get my resource"/>
+                      <response status="200 203"/>
+                   </method>
+                   <method id="deleteResource" name="DELETE">
+                      <response status="200"/>
+                   </method>
+              </resource>
+          </resources>
+        </application>
+      When("the wadl is translated")
+      val checker = builder.build (inWADL, stdConfig)
+      Then("The method nodes should contain a resource label with the id")
+      assert (checker, "count(/chk:checker/chk:step[@type='METHOD']) = 2")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET' and @label='Get My Resource']")
+      assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='DELETE' and @label='deleteResource']")
+    }
+
     scenario("The WADL contains an initial invisible node") {
       Given ("a WADL with an initial invisble node")
       val inWADL =

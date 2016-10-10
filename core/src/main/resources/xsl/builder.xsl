@@ -1212,7 +1212,7 @@
             <xsl:attribute name="label">
                 <xsl:choose>
                     <xsl:when test="wadl:doc/@title">
-                        <xsl:value-of select="normalize-space(wadl:doc/@title)"/>
+                        <xsl:value-of select="normalize-space(wadl:doc[1]/@title)"/>
                     </xsl:when>
                     <xsl:when test="@id">
                         <xsl:value-of select="normalize-space(@id)"/>
