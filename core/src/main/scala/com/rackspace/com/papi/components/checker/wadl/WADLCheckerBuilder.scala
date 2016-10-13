@@ -40,6 +40,7 @@ import scala.xml._
 object WADLCheckerBuilder {
   private val _wadl = new WADLNormalizer // Static WADL normalizer used simply to build templates
 
+  private val authenticatedByTemplates: Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/authenticated-by.xsl").toString))
   private val raxMetaTransformTemplates: Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/meta-transform.xsl").toString))
   private val raxRolesTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxRoles.xsl").toString))
   private val raxDeviceTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxDevice.xsl").toString))
@@ -191,17 +192,24 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         val deviceHandler = getTransformerHandler(raxDeviceTemplates)
         deviceHandler.setResult(new SAXResult(buildHandler))
 
-        if(c.enableRaxRolesExtension){
+        var firstHandler = deviceHandler
+
+        if (c.enableRaxRolesExtension) {
           val raxRolesHandler = getTransformerHandler(raxRolesTemplates)
           val raxMetaTransformHandler = getTransformerHandler(raxMetaTransformTemplates)
 
-          raxRolesHandler.setResult(new SAXResult(deviceHandler))
+          raxRolesHandler.setResult(new SAXResult(firstHandler))
           raxMetaTransformHandler.setResult(new SAXResult(raxRolesHandler))
-
-          wadl.normalize (in, new SAXResult(raxMetaTransformHandler), TREE, XSD11, false, KEEP, true)
-        }else{
-          wadl.normalize (in, new SAXResult(deviceHandler), TREE, XSD11, false, KEEP, true)
+          firstHandler = raxMetaTransformHandler
         }
+
+        if (c.enableAuthenticatedByExtension) {
+          val authByHandler = getTransformerHandler(authenticatedByTemplates)
+          authByHandler.setResult(new SAXResult(firstHandler))
+          firstHandler = authByHandler
+        }
+
+        wadl.normalize (in, new SAXResult(firstHandler), TREE, XSD11, false, KEEP, true)
       })
     } catch {
       case e : Exception => logger.error(e.getMessage)

@@ -95,6 +95,13 @@ class WadlTestSuite extends FunSuite {
     assert (WadlTest.raxRoles.value.get)
   }
 
+  test ("-u should set raxAuthenticatedBy") {
+    WadlTest.parser.reset()
+    assert (WadlTest.authenticatedBy.value.isEmpty)
+    WadlTest.handleArgs(Array("-u"))
+    assert (WadlTest.authenticatedBy.value.get)
+  }
+
   test ("no params should set source with input stream"){
     WadlTest.parser.reset()
     WadlTest.handleArgs(Array())
