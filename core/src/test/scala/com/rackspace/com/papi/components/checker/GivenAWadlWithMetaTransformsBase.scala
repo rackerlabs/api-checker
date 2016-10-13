@@ -26,9 +26,15 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
   val descriptionWithRaxRoles = description + " and RAX-Roles"
   val descriptionWithRaxRolesMasked = descriptionWithRaxRoles + " Masked"
 
-  val metadataWadl = <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api">
+  val metadataWadl = <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
+    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
+    <grammars>
+       <include href="src/test/resources/xsd/test-urlxsd.xsd"/>
+    </grammars>
     <resources base="https://resource.api.rackspace.com">
-      <resource id="standardResource" path="standard" rax:useMetadata="standardMeta"/>
+      <resource id="standardResource" path="standard/{id}" rax:useMetadata="standardMeta">
+            <param name="id" style="template" type="tst:UUID" required="true"/>
+      </resource>
       <resource id="customResource" path="custom" rax:useMetadata="customMeta"/>
     </resources>
     <rax:metadata id="standardMeta">
@@ -84,7 +90,7 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
 
     // Standard/Custom GET's, PUT's, DELETE's, and POST's are forbidden when RAX-Roles are not enabled.
     val validator = Validator((localWADLURI, metadataWadl), createConfigWithRaxRoles(false, false, useSaxon))
-    List(("standard", targetsStandard), ("custom", targetsCustom)).foreach { case (style, targets) =>
+    List(("standard/55679674-8e21-11e6-bf0c-28cfe92134e7", targetsStandard), ("custom", targetsCustom)).foreach { case (style, targets) =>
       List(methodGet, methodPut, methodDel, methodPst).foreach { method =>
         targets.foreach { target =>
           rolesList.foreach { roles =>
@@ -103,7 +109,7 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
       } else {
         descriptionWithRaxRoles
       }
-      List(("standard", targetsStandard), ("custom", targetsCustom)).foreach { case (style, targets) =>
+      List(("standard/1a34564a-8e22-11e6-8e61-28cfe92134e7", targetsStandard), ("custom", targetsCustom)).foreach { case (style, targets) =>
         // Standard/Custom GET's are allowed regardless of roles.
         targets.foreach { target =>
           rolesList.foreach { roles =>
@@ -130,17 +136,17 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
             // THEN access should be allowed;
             // ELSE access should be not allowed/forbidden.
             if (targetInRoles(target, roles, List("admin"))) {
-              it should behave like accessIsAllowed(validator, method, s"/standard/metadata/${target}foo", roles, desc)
+              it should behave like accessIsAllowed(validator, method, s"/standard/2cb1be7a-8e22-11e6-a152-28cfe92134e7/metadata/${target}foo", roles, desc)
             } else if (masked) {
-              it should behave like methodNotAllowed(validator, method, s"/standard/metadata/${target}foo", roles, desc)
+              it should behave like methodNotAllowed(validator, method, s"/standard/2cb1be7a-8e22-11e6-a152-28cfe92134e7/metadata/${target}foo", roles, desc)
             } else {
-              it should behave like accessIsForbidden(validator, method, s"/standard/metadata/${target}foo", roles, desc)
+              it should behave like accessIsForbidden(validator, method, s"/standard/2cb1be7a-8e22-11e6-a152-28cfe92134e7/metadata/${target}foo", roles, desc)
             }
           }
           if (masked) {
-            it should behave like methodNotAllowedWhenNoXRoles(validator, method, s"/standard/metadata/${target}foo", desc)
+            it should behave like methodNotAllowedWhenNoXRoles(validator, method, s"/standard/2cb1be7a-8e22-11e6-a152-28cfe92134e7/metadata/${target}foo", desc)
           } else {
-            it should behave like accessIsForbiddenWhenNoXRoles(validator, method, s"/standard/metadata/${target}foo", desc)
+            it should behave like accessIsForbiddenWhenNoXRoles(validator, method, s"/standard/2cb1be7a-8e22-11e6-a152-28cfe92134e7/metadata/${target}foo", desc)
           }
         }
       }
