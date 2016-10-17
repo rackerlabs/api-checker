@@ -1,5 +1,19 @@
 # Releases #
-## In Progress Work ##
+## Release 2.0.2 (2016-10-17) ##
+1. Updated Dependencies
+   1. saxon: 9.5.1-8 → 9.7.0-8
+   1. wadl-tools: 1.0.32 → 1.0.33
+   1. jackson-databind: 2.2.3 → 2.8.1
+1. Added ```rax:authenticatedBy``` extension, the extension works exactly like ```rax:roles``` but allows the specification of an authentication method (```PASSCODE```, ```PASSWORD```, etc) rather than a role.
+1. XPath 3.1 is now supported in ```plain``` parameters.
+1. It is now possible to specify ```plain``` parameters on JSON media types via XPath 3.1. The variables ```$_``` or ```$body``` can be used to specify the content body.
+1. The config item ```xsdEngine``` now applies when validating checker format, so that SaxonEE can be used to pre-validate a state machine before loading it.
+1. Clean up: We now compile XSLs one time at startup instead of every time a Validator is created.
+1. Integrated with [Nailgun](http://www.martiansoftware.com/nailgun/) to speed up startup performance of CLI utilities.
+1. Fixed a bug where header parameters were incorrectly treated as case sensitive in a WADL.
+1. Fixed a bug where header quality (and other parameters) were preventing matches of header values.
+1. Fixed a bug where multiple ```wadl:doc``` elements on a single method were causing the processing of a WADL to fail.
+1. Fixed a bug where metadata extension (```rax:metadata```) was inadvertently introducing invalid WADLs in the pipeline.
 
 ## Release 2.0.1 (2016-08-06) ##
 1. Fixed a bug where a call to getInputStream was not invalidating cached XML/JSON.
