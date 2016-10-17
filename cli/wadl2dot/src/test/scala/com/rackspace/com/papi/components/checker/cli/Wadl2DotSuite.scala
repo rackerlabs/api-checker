@@ -87,9 +87,35 @@ class Wadl2DotSuite extends FunSuite {
       assert(outStream.toString().isEmpty())
   })}
 
+  test ("Bad XSD engine s hould generate an error") {
+    withOutput( (outStream, errStream) => {
+      Wadl2Dot.main(Array("-S", "foo", "src/test/resources/wadl/sharedXPath.wadl"))
+      assert(errStream.toString().contains("Unrecognized XSL engine"))
+      assert(errStream.toString().contains("foo"))
+      assert(errStream.toString().contains("Xerces, SaxonEE"))
+      assert(outStream.toString().isEmpty())
+  })}
+
   test ("Should generate dot to stdout") {
     withOutput( (outStream, errStream) => {
       Wadl2Dot.main(Array("src/test/resources/wadl/sharedXPath.wadl"))
+
+      //  No err
+      assert(errStream.toString().isEmpty())
+
+      val out = outStream.toString()
+
+      //  Just some basic asserts to make sure we're working, we'd
+      //  expect to see all of these things in the output
+      assert(out.contains("digraph Checker"))
+      assert(out.contains("rank=source"))
+      assert(out.contains("->"))
+      assert(!out.contains("SE0"))
+  })}
+
+  test ("Should generate dot to stdout (xsdEngine)") {
+    withOutput( (outStream, errStream) => {
+      Wadl2Dot.main(Array("--xsd-engine","Xerces","src/test/resources/wadl/sharedXPath.wadl"))
 
       //  No err
       assert(errStream.toString().isEmpty())

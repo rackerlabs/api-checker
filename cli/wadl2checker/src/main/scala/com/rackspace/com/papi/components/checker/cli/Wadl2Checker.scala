@@ -132,6 +132,9 @@ object Wadl2Checker {
     val xslEngine = parser.option[String] (List("E", "xsl-engine"), "xsl-engine",
                                            "The name of the XSLT engine to use. Possible names are Xalan, XalanC, SaxonHE, SaxonEE.  Default: XalanC")
 
+    val xsdEngine = parser.option[String] (List("S", "xsd-engine"), "xsd-engine",
+                                           "The name of the XSD engine to use. Possible names are Xerces, SaxonEE.  Default: Xerces")
+
     val dontValidate = parser.flag[Boolean] (List("D", "dont-validate"),
                                              "Don't validate produced checker Default: false")
 
@@ -179,12 +182,15 @@ object Wadl2Checker {
         c.enableWarnHeaders = !warnHeaders.value.getOrElse(false)
         c.warnAgent = warnAgent.value.getOrElse("-")
         c.xslEngine = xslEngine.value.getOrElse("XalanC")
+        c.xsdEngine = xsdEngine.value.getOrElse("Xerces")
 
         Some((source, result, c))
       }
     } catch {
       case e: ArgotUsageException => err.println(e.message)
                                      None
+      case iae : IllegalArgumentException => err.println(iae.getMessage)
+                                             None
     }
   }
 
