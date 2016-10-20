@@ -52,6 +52,7 @@
     <!-- Paramenters -->
     <xsl:param name="user" as="xsd:string" select="'unknown'" />
     <xsl:param name="creator" as="xsd:string" select="'unknown'"/>
+    <xsl:param name="schematronOutput" as="node()"/>
     <xsl:param name="configMetadata" as="node()">
         <params>
           <meta>
@@ -290,7 +291,7 @@
 
     <xsl:template name="check:addMetadata">
         <xsl:variable name="created-from" as="node()*">
-            <xsl:apply-templates mode="addCreatedFrom"/>
+            <xsl:apply-templates mode="addCreatedFrom" select="$schematronOutput"/>
         </xsl:variable>
         <meta>
             <xsl:if test="$user"><built-by><xsl:value-of select="$user"/></built-by></xsl:if>

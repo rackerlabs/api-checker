@@ -1,5 +1,5 @@
 /***
- *   Copyright 2014 Rackspace US, Inc.
+ *   Copyright 2017 Rackspace US, Inc.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -19,41 +19,115 @@ import java.io.{ByteArrayOutputStream, InputStream, Reader}
 import java.net.{URI, URISyntaxException}
 import javax.xml.transform._
 import javax.xml.transform.sax._
+import javax.xml.transform.dom._
 import javax.xml.transform.stream._
 import javax.xml.validation._
+
+import org.xml.sax.XMLReader
 
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.RType._
 import com.rackspace.cloud.api.wadl.WADLFormat._
 import com.rackspace.cloud.api.wadl.WADLNormalizer
 import com.rackspace.cloud.api.wadl.XSDVersion._
+import com.rackspace.cloud.api.wadl.util.EntityCatcher
 import com.rackspace.cloud.api.wadl.util.LogErrorListener
 import com.rackspace.cloud.api.wadl.util.XSLErrorDispatcher
+
 import com.rackspace.com.papi.components.checker.Config
+import com.rackspace.com.papi.components.checker.macros.TimeFunction._
+
 import com.typesafe.scalalogging.slf4j.LazyLogging
-import net.sf.saxon.jaxp.TransformerImpl
 
 import scala.language.reflectiveCalls
 import scala.xml._
+import scala.collection.JavaConversions._
 
+import net.sf.saxon.serialize.MessageWarner
+
+import net.sf.saxon.s9api.Processor
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XsltExecutable
+import net.sf.saxon.s9api.XsltTransformer
+import net.sf.saxon.s9api.XPathExecutable
+import net.sf.saxon.s9api.XdmDestination
+import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmItem
+import net.sf.saxon.s9api.DOMDestination
+import net.sf.saxon.s9api.SAXDestination
+import net.sf.saxon.s9api.DocumentBuilder
+import net.sf.saxon.s9api.BuildingContentHandler
+import net.sf.saxon.lib.FeatureKeys
+import net.sf.saxon.lib.AugmentedSource
+import net.sf.saxon.lib.ParseOptions
+
+import net.sf.saxon.om.NodeInfo
+
+import net.sf.saxon.dom.NodeOverNodeInfo
+
+import BuilderHelper._
 
 object WADLCheckerBuilder {
-  private val _wadl = new WADLNormalizer // Static WADL normalizer used simply to build templates
+  private val xpathCompiler = processor.newXPathCompiler
 
-  private val authenticatedByTemplates: Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/authenticated-by.xsl").toString))
-  private val raxMetaTransformTemplates: Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/meta-transform.xsl").toString))
-  private val raxRolesTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxRoles.xsl").toString))
-  private val raxDeviceTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxDevice.xsl").toString))
-  private val raxRolesMaskTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/raxRolesMask.xsl").toString))
-  private val buildTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/builder.xsl").toString))
-  private val dupsTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/removeDups.xsl").toString))
-  private val joinTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/commonJoin.xsl").toString))
-  private val joinHeaderTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/headerJoin.xsl").toString))
-  private val joinXPathTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/opt/xpathJoin.xsl").toString))
-  private val priorityTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/priority.xsl").toString))
-  private val adjustNextTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/adjust-next-cont-error.xsl").toString))
-  private val metaCheckTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/meta-check.xsl").toString))
-  private val checkerAssertsTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/checker-asserts.xsl").toString))
+  xpathCompiler.declareNamespace ("svrl", "http://purl.oclc.org/dsdl/svrl")
+
+  private lazy val normalizeWadlXsltExec : XsltExecutable = timeFunction ("compile /xsl/normalizeWadl.xsl",
+                                                                        compiler.compile(new StreamSource(Class.forName("com.rackspace.cloud.api.wadl.WADLNormalizer").getResource("/xsl/normalizeWadl.xsl").toString)))
+
+
+  private lazy val schematronXsltExec : XsltExecutable = timeFunction ("compile /xsl/wadl-links.xsl",
+                                                                        compiler.compile(new StreamSource(Class.forName("com.rackspace.cloud.api.wadl.WADLNormalizer").getResource("/xsl/wadl-links.xsl").toString)))
+
+  private lazy val svrlHandlerXsltExec : XsltExecutable = timeFunction ("compile /xsl/svrl-handler.xsl",
+                                                                        compiler.compile(new StreamSource(Class.forName("com.rackspace.cloud.api.wadl.WADLNormalizer").getResource("/xsl/svrl-handler.xsl").toString)))
+
+
+  private lazy val authenticatedByXsltExec: XsltExecutable = timeFunction ("compile /xsl/authenticated-by.xsl",
+                                                                           compiler.compile(new StreamSource(getClass.getResource("/xsl/authenticated-by.xsl").toString)))
+
+  private lazy val raxMetaTransformXsltExec: XsltExecutable = timeFunction ("compile /xsl/meta-transform.xsl",
+                                                                            compiler.compile(new StreamSource(getClass.getResource("/xsl/meta-transform.xsl").toString)))
+
+  private lazy val raxRolesXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxRoles.xsl",
+                                                                     compiler.compile(new StreamSource(getClass.getResource("/xsl/raxRoles.xsl").toString)))
+
+  private lazy val raxDeviceXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxDevice.xsl",
+                                                                      compiler.compile(new StreamSource(getClass.getResource("/xsl/raxDevice.xsl").toString)))
+
+  private lazy val raxRolesMaskXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxRolesMask.xsl",
+                                                                         compiler.compile(new StreamSource(getClass.getResource("/xsl/raxRolesMask.xsl").toString)))
+
+  private lazy val buildXsltExec : XsltExecutable = timeFunction ("compile /xsl/builder.xsl",
+                                                                  compiler.compile(new StreamSource(getClass.getResource("/xsl/builder.xsl").toString)))
+
+  private lazy val dupsXsltExec : XsltExecutable = timeFunction ("compile /xsl/opt/removeDups.xsl",
+                                                                 compiler.compile(new StreamSource(getClass.getResource("/xsl/opt/removeDups.xsl").toString)))
+
+  private lazy val joinXsltExec : XsltExecutable = timeFunction ("compile /xsl/opt/commonJoin.xsl",
+                                                                 compiler.compile(new StreamSource(getClass.getResource("/xsl/opt/commonJoin.xsl").toString)))
+
+  private lazy val joinHeaderXsltExec : XsltExecutable = timeFunction ("compile /xsl/opt/headerJoin.xsl",
+                                                                       compiler.compile(new StreamSource(getClass.getResource("/xsl/opt/headerJoin.xsl").toString)))
+
+  private lazy val joinXPathXsltExec : XsltExecutable = timeFunction ("compile /xsl/opt/xpathJoin.xsl",
+                                                                      compiler.compile(new StreamSource(getClass.getResource("/xsl/opt/xpathJoin.xsl").toString)))
+
+  private lazy val priorityXsltExec : XsltExecutable = timeFunction ("compile /xsl/priority.xsl",
+                                                                     compiler.compile(new StreamSource(getClass.getResource("/xsl/priority.xsl").toString)))
+
+  private lazy val adjustNextXsltExec : XsltExecutable = timeFunction ("compile /xsl/adjust-next-cont-error.xsl",
+                                                                       compiler.compile(new StreamSource(getClass.getResource("/xsl/adjust-next-cont-error.xsl").toString)))
+
+  private lazy val metaCheckXsltExec : XsltExecutable = timeFunction ("compile /xsl/meta-check.xsl",
+                                                                      compiler.compile(new StreamSource(getClass.getResource("/xsl/meta-check.xsl").toString)))
+
+  private lazy val checkerAssertsXsltExec : XsltExecutable = timeFunction ("compile /xsl/checker-asserts.xsl",
+                                                                           compiler.compile(new StreamSource(getClass.getResource("/xsl/checker-asserts.xsl").toString)))
+
+  private lazy val svrlCheckXPathExec : XPathExecutable = timeFunction ("compile XVRLCheck XPath",
+                                                                        xpathCompiler.compile("/svrl:schematron-output/svrl:successful-report[@role='checkReference']/svrl:text"))
 
   /**
    *  XSL Transformer parameters.
@@ -64,6 +138,7 @@ object WADLCheckerBuilder {
     val CONFIG_METADATA = "configMetadata"
     val USER    = "user"
     val CREATOR = "creator"
+    val SCHEMATRON_OUT = "schematronOutput"
   }
 
 
@@ -81,7 +156,7 @@ object WADLCheckerBuilder {
     src
   }
 
-  private lazy val checkerSchema = {
+  private lazy val checkerSchema = timeFunction("Xerces schema compile",{
     val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1")
 
     //
@@ -90,14 +165,41 @@ object WADLCheckerBuilder {
     schemaFactory.setFeature ("http://apache.org/xml/features/validation/cta-full-xpath-checking", true)
 
     schemaFactory.newSchema(checkerSchemaSource)
-  }
+  })
 
-  private lazy val checkerSchemaSaxon = {
-    val sf = new com.saxonica.ee.jaxp.SchemaFactoryImpl()
-    sf.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
+  private lazy val checkerSchemaManager = timeFunction ("SaxonEE schema compile", {
+    processor.setConfigurationProperty(FeatureKeys.MULTIPLE_SCHEMA_IMPORTS, true)
 
-    sf.newSchema(checkerSchemaSource)
-  }
+
+    val sm = processor.getSchemaManager
+
+    sm.setXsdVersion("1.1")
+    sm.setErrorListener(new LogErrorListener)
+
+    checkerSchemaSource.foreach(sm.load)
+    sm
+  })
+
+  private lazy val wadlSchemaSource = new StreamSource(Class.forName("com.rackspace.cloud.api.wadl.WADLNormalizer").getResource("/xsd/wadl.xsd").toString)
+
+  private lazy val wadlSchema = timeFunction("Xerces wadl schema compile", {
+    val schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema")
+    schemaFactory.newSchema(wadlSchemaSource)
+  })
+
+  private lazy val wadlSchemaManager = timeFunction("SaxonEE wadl schema compile", {
+    val proc = new Processor(true)
+    proc.setConfigurationProperty(FeatureKeys.MULTIPLE_SCHEMA_IMPORTS, true)
+
+
+    val sm = proc.getSchemaManager
+
+    sm.setXsdVersion("1.0")
+    sm.setErrorListener(new LogErrorListener)
+
+    sm.load(wadlSchemaSource)
+    sm
+  })
 }
 
 import WADLCheckerBuilder._
@@ -112,26 +214,368 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
 
   def this() = this(null)
 
-  //
-  //  We purposly do the identity transform using xalan instead of
-  //  Saxon, because of SaxonEE license issue.
-  //
-  private val idTransform = TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl",this.getClass.getClassLoader).newTransformer()
-  idTransform.setErrorListener (new LogErrorListener)
 
   //
-  //  Given Templates and an optional set of XSLT parameters, creates a TransformerHandler
+  //  Our version of transform which gets the resolver from the
+  //  WADLNormalizer.
   //
-  private def getTransformerHandler (templates : Templates, params : Map[String, Object]=Map[String,Object]()) : TransformerHandler = {
-    val handler = wadl.saxTransformerFactory.newTransformerHandler(templates)
-    val transformer = handler.getTransformer
-    transformer.asInstanceOf[TransformerImpl].addLogErrorListener
-    transformer.setURIResolver(wadl.saxTransformerFactory.getURIResolver)
-    for ((param, value) <- params) {
-      transformer.setParameter(param, value)
-    }
-    handler
+  private def getXsltTransformer (xsltExec : XsltExecutable, params : Map[QName, XdmValue]=Map[QName, XdmValue]()) : XsltTransformer = {
+    BuilderHelper.getXsltTransformer (xsltExec, wadl.saxTransformerFactory.getURIResolver, params)
   }
+
+  //------------------------
+  //  Transform Functions
+  //------------------------
+
+  //
+  //  Initial parse WADL
+  //
+  private def parseWADL (in : Source, c : Config) : Source = timeFunction ("parseWADL",{
+    if (!in.isInstanceOf[AugmentedSource])
+      throw new SAXParseException("That's strange expected an augmented source with an entity catcher! Please report this error.",
+                                  null)
+    val augSource    = in.asInstanceOf[AugmentedSource]
+    val parseOptions = augSource.getParseOptions
+    val docBuilder = new net.sf.saxon.dom.DocumentBuilderImpl
+    docBuilder.setParseOptions (parseOptions)
+
+    val inputSource = augSource.getContainedSource match {
+      case saxSource    : SAXSource => saxSource.getInputSource
+      case streamSource : StreamSource => {
+        val is = new InputSource(streamSource.getInputStream)
+        is.setSystemId(streamSource.getSystemId)
+        is
+      }
+      case ni : NodeInfo => return ni.asInstanceOf[Source] // entities already resolved!
+      case domSource : DOMSource => return domSource  // entities already resolved!
+      case s : Source => new InputSource(s.getSystemId)
+    }
+
+    //
+    //  Although this call is depricated it, we use it to avoid
+    //  parsing the wadl twice. The issue: standard document builder
+    //  (which builds tinytree) doesn't take an entity resolver which
+    //  we need to find entities.
+    //
+    //  This call takes a resolver, but creates a standard DOM node
+    //  which wraps a tinytree. We unwrap the tiny tree NodeInfo and
+    //  return it.
+    //
+    //  The alternative is to parse twice -- once to find the entities
+    //  and then again to get the DOM in the right format.
+    //
+    val doc = docBuilder.parse(inputSource)
+    doc.asInstanceOf[NodeOverNodeInfo].getUnderlyingNodeInfo
+  })
+
+  //
+  //  Schematron checks on the WADL
+  //
+  private def schematronWADL (in : Source, c : Config) : Source = timeFunction ("schematronWADL",{
+    if (!in.isInstanceOf[AugmentedSource])
+      throw new SAXParseException("That's strange expected an augmented source with an entity catcher! Please report this error.",
+                                  null)
+    val augSource    = in.asInstanceOf[AugmentedSource]
+    val parseOptions = augSource.getParseOptions
+    val schematronTrans = getXsltTransformer(schematronXsltExec)
+    val out = new XdmDestination
+    schematronTrans.setURIResolver(new Object() with URIResolver {
+      val origSCHURIResolver = schematronTrans.getURIResolver
+      def resolve(href : String, base : String) = {
+        BuilderHelper.Source(origSCHURIResolver.resolve(href, base), Option(parseOptions.getEntityResolver))
+      }
+    })
+    schematronTrans.setSource(in)
+    schematronTrans.setDestination(out)
+    schematronTrans.transform
+    out.getXdmNode.asSource
+  })
+
+  //
+  //  Check schematron report for errors
+  //
+  private def svrlHandler (in : Source, c : Config) : Source = timeFunction ("svrlHandler",{
+    if (!in.isInstanceOf[AugmentedSource])
+      throw new SAXParseException("That's strange expected an augmented source with an entity catcher! Please report this error.",
+                                  null)
+    val augSource    = in.asInstanceOf[AugmentedSource]
+    val parseOptions = augSource.getParseOptions
+    val entityCatcher = parseOptions.getEntityResolver.asInstanceOf[EntityCatcher]
+    val svrlHandlerTrans = getXsltTransformer(svrlHandlerXsltExec,
+                                              Map(new QName("systemIds")-> new XdmValue(entityCatcher.systemIds.map(new XdmAtomicValue(_)))))
+    val out = new XdmDestination
+    svrlHandlerTrans.setSource(in)
+    svrlHandlerTrans.setDestination(out)
+    svrlHandlerTrans.transform
+    out.getXdmNode.asSource
+  })
+
+
+  //
+  //  Normalize the WADL
+  //
+  private def normalizeWADL (in : Source, c : Config) : Source = timeFunction ("normalizeWADL2", {
+    if (!in.isInstanceOf[AugmentedSource])
+      throw new SAXParseException("That's strange expected an augmented source with an entity catcher! Please report this error.",
+                                  null)
+    val augSource    = in.asInstanceOf[AugmentedSource]
+    val parseOptions = augSource.getParseOptions
+    val normTransformer = getXsltTransformer(normalizeWadlXsltExec,
+                                             Map(new QName("format") -> new XdmAtomicValue("tree-format"),
+                                                 new QName("xsdVersion") -> new XdmAtomicValue("1.1"),
+                                                 new QName("resource_types") -> new XdmAtomicValue("keep"),
+                                                 new QName("flattenXsds") -> new XdmAtomicValue("false")))
+
+    normTransformer.setURIResolver(new Object() with URIResolver {
+      val origResolver = normTransformer.getURIResolver
+      def resolve(href : String, base : String) = {
+        BuilderHelper.Source(origResolver.resolve(href, base), Option(parseOptions.getEntityResolver))
+      }
+    })
+    val out = new XdmDestination
+    normTransformer.setSource(in)
+    normTransformer.setDestination(out)
+    normTransformer.transform
+    out.getXdmNode.asSource
+  })
+
+  //
+  //  Validates the wadl against schema
+  //
+  private def validateWADL (in : Source, c : Config) : Source = timeFunction("validateWADL", {
+    val docBuilder = processor.newDocumentBuilder
+
+    docBuilder.setBaseURI(new java.net.URI(in.getSystemId))
+
+    val bch = docBuilder.newBuildingContentHandler
+
+    if (c.xsdEngine == "SaxonEE") {
+      logger.debug ("Using SaxonEE for WADL validation")
+      val schemaValidator = wadlSchemaManager.newSchemaValidator
+      schemaValidator.setDestination(new SAXDestination(bch))
+      schemaValidator.validate(in)
+    } else {
+      logger.debug ("Using Xerces for WADL validation")
+      val schemaHandler = wadlSchema.newValidatorHandler
+      schemaHandler.setContentHandler(bch)
+      idTransform.transform(in, new SAXResult(schemaHandler))
+    }
+    bch.getDocumentNode.asSource
+  })
+
+  //
+  // AuthBy transform, handles authenticatedBy extension
+  //
+  private def authenticatedBy (in : Source, c : Config) : Source = timeFunction ("authenticatedBy", {
+    if (c.enableAuthenticatedByExtension) {
+      val authByTrans = getXsltTransformer(authenticatedByXsltExec)
+      val out = new XdmDestination
+      authByTrans.setSource(in)
+      authByTrans.setDestination(out)
+      authByTrans.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
+  //  Handles the metadata and raxRoles extensions
+  //
+  private def raxRoles(in : Source, c : Config) : Source = timeFunction("raxRoles", {
+    if (c.enableRaxRolesExtension) {
+      val raxMetaTransform = getXsltTransformer(raxMetaTransformXsltExec)
+      val raxRolesTransform = getXsltTransformer(raxRolesXsltExec)
+      val out = new XdmDestination
+
+      raxMetaTransform.setSource(in)
+      raxMetaTransform.setDestination(raxRolesTransform)
+      raxRolesTransform.setDestination(out)
+      raxMetaTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
+  //  Handles the device extension and converts WADL to checker format
+  //
+  private def buildChecker(schematronOut : Source, in : Source, c : Config) : Source = timeFunction("buildChecker", {
+    val builder = processor.newDocumentBuilder
+    val deviceTransform  = getXsltTransformer(raxDeviceXsltExec)
+    val buildTransformer = getXsltTransformer(buildXsltExec,
+                                              Map(new QName(CONFIG_METADATA) -> builder.build(new StreamSource(c.checkerMetaElem)),
+                                                  new QName(USER) -> new XdmAtomicValue(System.getProperty("user.name")),
+                                                  new QName(CREATOR) -> new XdmAtomicValue(creatorString),
+                                                  new QName(SCHEMATRON_OUT)-> builder.build(schematronOut)))
+    val out = new XdmDestination
+    deviceTransform.setSource(in)
+    deviceTransform.setDestination(buildTransformer)
+    buildTransformer.setDestination(out)
+    deviceTransform.transform
+    out.getXdmNode.asSource
+  })
+
+  //
+  //  Handles the raxRolesMask extension
+  //
+  private def raxRolesMask(in : Source, c : Config) : Source = timeFunction("raxRolesMask", {
+    if (c.maskRaxRoles403) {
+      val raxRolesMaskTransformer = getXsltTransformer(raxRolesMaskXsltExec)
+      val out = new XdmDestination
+      raxRolesMaskTransformer.setSource(in)
+      raxRolesMaskTransformer.setDestination(out)
+      raxRolesMaskTransformer.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
+  //  Perform the join optimization
+  //
+  private def joinOpt(in : Source, c : Config) : Source = timeFunction("joinOpt", {
+    if (c.removeDups || c.joinXPathChecks) {
+      val joinTransform = getXsltTransformer(joinXsltExec)
+      val out = new XdmDestination
+      joinTransform.setSource(in)
+      joinTransform.setDestination(out)
+      joinTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
+  //  Perform Dups Optimization
+  //
+  private def dupsOpt(in : Source, c : Config) : Source = timeFunction("dupsOpt", {
+    if (c.removeDups || c.joinXPathChecks) {
+      val dupsTransform = getXsltTransformer(dupsXsltExec)
+      val out = new XdmDestination
+      dupsTransform.setSource(in)
+      dupsTransform.setDestination(out)
+      dupsTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
+  //  Perform join header optimization
+  //
+  private def joinHeaderOpt(in : Source, c : Config) : Source = timeFunction("joinHeaderOpt", {
+    if (c.removeDups || c.joinXPathChecks) {
+      val joinHeaderTransform = getXsltTransformer(joinHeaderXsltExec)
+      val out = new XdmDestination
+      joinHeaderTransform.setSource(in)
+      joinHeaderTransform.setDestination(out)
+      joinHeaderTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
+  //  Perform join XPath optimization
+  //
+  private def joinXPathOpt(in : Source, c : Config) : Source = timeFunction("joinXPathOpt", {
+    if ((c.removeDups || c.joinXPathChecks) && c.joinXPathChecks) {
+      val joinXPathTransform = getXsltTransformer(joinXPathXsltExec,
+                                                  Map(new QName(CONFIG_METADATA) -> processor.newDocumentBuilder.build(new StreamSource(c.checkerMetaElem))))
+      val out = new XdmDestination
+      joinXPathTransform.setSource(in)
+      joinXPathTransform.setDestination(out)
+      joinXPathTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
+  //  Performs transforms related to error priority
+  //
+  private def adjustNext(in : Source, c : Config) : Source = timeFunction("adjustNext", {
+    val priorityTransform = getXsltTransformer(priorityXsltExec)
+    val adjustTransform = getXsltTransformer(adjustNextXsltExec)
+    val out = new XdmDestination
+    priorityTransform.setSource(in)
+    priorityTransform.setDestination(adjustTransform)
+    adjustTransform.setDestination(out)
+    priorityTransform.transform
+    out.getXdmNode.asSource
+  })
+
+  //
+  //  Validates the checker format against schema and other assertions
+  //
+  private def validateChecker (in : Source, c : Config) : Source = timeFunction("validateChecker", {
+    if (c.validateChecker) {
+      val assertTransform = getXsltTransformer(checkerAssertsXsltExec)
+      val out = new XdmDestination
+      assertTransform.setDestination(out)
+      if (c.xsdEngine == "SaxonEE") {
+        logger.debug ("Using SaxonEE for checker validation")
+        val schemaValidator = checkerSchemaManager.newSchemaValidator
+        schemaValidator.validate(in)
+        assertTransform.setSource(in)
+      } else {
+        logger.debug ("Using Xerces for checker validation")
+        val schemaHandler = checkerSchema.newValidatorHandler
+        val buildingHandler = processor.newDocumentBuilder.newBuildingContentHandler
+        schemaHandler.setContentHandler(buildingHandler)
+        idTransform.transform(in, new SAXResult(schemaHandler))
+        assertTransform.setSource(buildingHandler.getDocumentNode.asSource)
+      }
+      assertTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
+  //  Compares checker metadata with current settings and warns if they dont match
+  //
+  private def metaCheck (in : Source, c : Config) : Source = timeFunction("metaCheck", {
+    val metaCheckTransform = getXsltTransformer(metaCheckXsltExec,
+                                                Map(new QName(CONFIG_METADATA) -> processor.newDocumentBuilder.build(new StreamSource(c.checkerMetaElem)),
+                                                    new QName(CREATOR) -> new XdmAtomicValue(creatorString)))
+    val out = new XdmDestination
+    metaCheckTransform.setSource(in)
+    metaCheckTransform.setDestination(out)
+    metaCheckTransform.transform
+    out.getXdmNode.asSource
+  })
+
+  //
+  //  Given an SVRL report, check refences that didn't look right in
+  //  order to generate accurate error messages, we simply run each of
+  //  these references through the XML parser to check them.
+  //
+  private def checkAdditionalSVRLReports (in : Source) : Unit = timeFunction("Check Additional SRVL Reports", {
+    val xpathSelector = svrlCheckXPathExec.load
+    xpathSelector.setContextItem(processor.newDocumentBuilder.build(in))
+    xpathSelector.iterator.map (_.getStringValue.trim).toSet.foreach((inDoc : String) => {
+      try {
+        val reader = BuilderHelper.XMLReader(None)
+        reader.parse(inDoc)
+        logger.warn (s"This is strange document $inDoc was reported for further checking, but looks good. Ignoring.")
+      } catch {
+        case spe : SAXParseException => logger.error (spe.toString())
+                                        throw new SAXParseException(spe.toString(), null, spe)
+        case e : Exception => logger.error (inDoc+" : "+e.getMessage())
+                              throw new SAXParseException(inDoc+" : "+e.getMessage(), null, e)
+      }
+    })
+  })
+
 
   private def buildFromWADL (in : Source, out: Result, config : Config) : Unit = {
     var c = config
@@ -142,91 +586,46 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
 
     try {
       handleXSLException({
-        val buildHandler = getTransformerHandler(buildTemplates,
-                                                 Map(CONFIG_METADATA -> new StreamSource(c.checkerMetaElem),
-                                                     USER -> System.getProperty("user.name"),
-                                                     CREATOR -> creatorString))
+        //
+        //  Used to Catch entities so we can treat them as dependencies
+        //
+        val entityCatcher = new EntityCatcher
+        val parseOptions = new ParseOptions
+        parseOptions.setEntityResolver (entityCatcher)
+        parseOptions.setXIncludeAware(true)
 
-        val output = {
-          val priorityHandler = getTransformerHandler(priorityTemplates)
-          val adjustNextHandler = getTransformerHandler(adjustNextTemplates)
+        //
+        //  Get the WADL as a tinytree source
+        //
+        val wadlSource = parseWADL (new AugmentedSource(in, parseOptions), c)
 
-          priorityHandler.setResult(new SAXResult(adjustNextHandler))
+        //
+        //  Get Schematron report, with entityCatcher, then check to
+        //  make sure all dependecies are present. This validates all
+        //  WADL dependecies.
+        //
+        val schematronReport = schematronWADL(new AugmentedSource(wadlSource, parseOptions), c)
+        val entityDoc = svrlHandler(new AugmentedSource(schematronReport, parseOptions), c)
 
-          if (c.validateChecker) {
-            val outHandler = wadl.saxTransformerFactory.newTransformerHandler()
-            outHandler.setResult(out)
+        checkAdditionalSVRLReports(entityDoc)
 
-            val assertHandler = getTransformerHandler(checkerAssertsTemplates)
-            assertHandler.setResult(new SAXResult (outHandler))
+        val valWadl  = validateWADL(new AugmentedSource(wadlSource, parseOptions), c)
+        val normWADL = normalizeWADL(new AugmentedSource(valWadl, parseOptions), c)
 
-            val schemaHandler = config.xsdEngine match {
-              case "SaxonEE" => logger.debug ("Using SaxonEE for checker validation")
-                                checkerSchemaSaxon.newValidatorHandler()
-              case xe : String => logger.debug (s"Using $xe for checker validation")
-                                  checkerSchema.newValidatorHandler()
-            }
-            schemaHandler.setContentHandler(assertHandler)
+        //
+        //  The build transformations listed in the order that they'll
+        //  be applied.
+        //
+        val buildSteps : List[CheckerTransform] =
+          List(authenticatedBy, raxRoles, buildChecker(entityDoc, _, _),
+               raxRolesMask, joinOpt, dupsOpt,
+               joinHeaderOpt, joinXPathOpt, adjustNext, validateChecker)
 
-            adjustNextHandler.setResult(new SAXResult(schemaHandler))
-          } else {
-            adjustNextHandler.setResult(out)
-          }
-          new SAXResult(priorityHandler)
-        }
-
-        val optInputHandler = {
-          if (c.maskRaxRoles403) {
-            val raxRolesMaskHandler = getTransformerHandler(raxRolesMaskTemplates)
-            buildHandler.setResult(new SAXResult(raxRolesMaskHandler))
-            raxRolesMaskHandler
-          } else {
-            buildHandler
-          }
-        }
-
-        if (c.removeDups || c.joinXPathChecks) {
-          val dupsHandler = getTransformerHandler(dupsTemplates)
-          val joinHandler = getTransformerHandler(joinTemplates)
-          val joinHeaderHandler = getTransformerHandler(joinHeaderTemplates)
-
-          optInputHandler.setResult (new SAXResult (joinHandler))
-          joinHandler.setResult(new SAXResult(dupsHandler))
-          dupsHandler.setResult(new SAXResult (joinHeaderHandler))
-
-          if (c.joinXPathChecks) {
-            val xpathHandler = getTransformerHandler(joinXPathTemplates,
-                                                     Map(CONFIG_METADATA -> new StreamSource(c.checkerMetaElem)))
-
-            joinHeaderHandler.setResult(new SAXResult(xpathHandler))
-            xpathHandler.setResult(output)
-          } else {
-            joinHeaderHandler.setResult(output)
-          }
-        } else {
-          optInputHandler.setResult (output)
-        }
-        val deviceHandler = getTransformerHandler(raxDeviceTemplates)
-        deviceHandler.setResult(new SAXResult(buildHandler))
-
-        var firstHandler = deviceHandler
-
-        if (c.enableRaxRolesExtension) {
-          val raxRolesHandler = getTransformerHandler(raxRolesTemplates)
-          val raxMetaTransformHandler = getTransformerHandler(raxMetaTransformTemplates)
-
-          raxRolesHandler.setResult(new SAXResult(firstHandler))
-          raxMetaTransformHandler.setResult(new SAXResult(raxRolesHandler))
-          firstHandler = raxMetaTransformHandler
-        }
-
-        if (c.enableAuthenticatedByExtension) {
-          val authByHandler = getTransformerHandler(authenticatedByTemplates)
-          authByHandler.setResult(new SAXResult(firstHandler))
-          firstHandler = authByHandler
-        }
-
-        wadl.normalize (in, new SAXResult(firstHandler), TREE, XSD11, false, KEEP, true)
+        //
+        //  Apply the transformations and send results to out
+        //
+        val stepsSource = applyBuildSteps(buildSteps, normWADL, c)
+        timeFunction("convert", idTransform.transform(stepsSource, out))
       })
     } catch {
       case e : Exception => logger.error(e.getMessage)
@@ -235,44 +634,23 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   }
 
   private def buildFromChecker (in : Source, out : Result, config : Config) : Unit = {
-    val configSet = config == null
-    val checkConfig = config match {
-      case null => new Config
-      case _ => config
+    var c = config
+
+    if (c == null) {
+      c = new Config()
     }
-
-    val vout = {
-      if (config.validateChecker) {
-        val outHandler = wadl.saxTransformerFactory.newTransformerHandler()
-        outHandler.setResult(out)
-
-        val assertHandler = getTransformerHandler(checkerAssertsTemplates)
-        assertHandler.setResult(new SAXResult (outHandler))
-
-        val schemaHandler = config.xsdEngine match {
-          case "SaxonEE" => logger.debug ("Using SaxonEE for checker validation")
-                            checkerSchemaSaxon.newValidatorHandler()
-
-          case xe : String => logger.debug (s"Using $xe for checker validation")
-                            checkerSchema.newValidatorHandler()
-
-
-        }
-        schemaHandler.setContentHandler(assertHandler)
-
-        new SAXResult(schemaHandler)
-      } else {
-        out
-      }
-    }
-
-    val metaHandler = getTransformerHandler(metaCheckTemplates,
-                                            Map(CONFIG_METADATA -> new StreamSource(checkConfig.checkerMetaElem),
-                                                CREATOR -> creatorString))
-    metaHandler.setResult(vout)
 
     try {
-      idTransform.transform (in, new SAXResult(metaHandler))
+      handleXSLException({
+        //
+        //  The build transformations listed in the order that they'll
+        //  be applied.
+        //
+        val buildSteps : List[CheckerTransform] = List(metaCheck, validateChecker)
+
+        val stepsSource = applyBuildSteps(buildSteps, in, c)
+        timeFunction("convert", idTransform.transform (stepsSource, out))
+      })
     } catch {
       case e : Exception => logger.error(e.getMessage)
                             throw new WADLException ("WADL Processing Error: "+e.getMessage, e)
@@ -340,4 +718,3 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
     build (("test://app/mywadl.wadl",in), config)
   }
 }
-

@@ -37,7 +37,7 @@ object Wadl2Dot {
   val version = getClass.getPackage.getImplementationVersion
 
   def parseArgs(args: Array[String], base : String,
-                in : InputStream, out : PrintStream, err : PrintStream) : Option[(Source, Result, Config, Boolean, Boolean)] = {
+                in : InputStream, out : PrintStream, err : PrintStream) : Option[(Source, StreamResult, Config, Boolean, Boolean)] = {
 
     val parser = new ArgotParser("wadl2dot", preUsage=Some(s"$title v$version"))
 
@@ -54,8 +54,8 @@ object Wadl2Dot {
 
     def source: Source = new StreamSource(URLResolver.toAbsoluteSystemId(input.value.get, base))
 
-    def result: Result = {
-      var r: Result = null
+    def result: StreamResult = {
+      var r: StreamResult = null
       if (output.value.isEmpty) {
         r = new StreamResult(out)
       } else {
@@ -211,7 +211,7 @@ object Wadl2Dot {
   def main(args : Array[String]) = {
     parseArgs (args, getBaseFromWorkingDir(System.getProperty("user.dir")),
                System.in, System.out, System.err) match {
-      case Some((source : Source, result : Result, config : Config,
+      case Some((source : Source, result : StreamResult, config : Config,
                  ignoreSinks : Boolean, nfaMode : Boolean)) =>
                    new WADLDotBuilder().build(source, result,
                                               config, ignoreSinks, nfaMode)
@@ -225,7 +225,7 @@ object Wadl2Dot {
   def nailMain(context : NGContext) = {
     parseArgs (context.getArgs, getBaseFromWorkingDir(context.getWorkingDirectory),
                context.in, context.out, context.err) match {
-      case Some((source : Source, result : Result, config : Config,
+      case Some((source : Source, result : StreamResult, config : Config,
                  ignoreSinks : Boolean, nfaMode : Boolean)) =>
                    new WADLDotBuilder().build(source, result,
                                               config, ignoreSinks, nfaMode)
