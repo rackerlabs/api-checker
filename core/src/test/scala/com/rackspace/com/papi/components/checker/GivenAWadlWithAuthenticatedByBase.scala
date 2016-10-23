@@ -518,7 +518,7 @@ object GivenAWadlWithAuthenticatedByBase {
     List(EnableRaxRoles),
     List(EnableCaptureHeadersExt),
     List(EnableRaxRoles, EnableCaptureHeadersExt),
-    List(EnableRaxRoles, EnableMaskRaxRoles403, EnableCaptureHeadersExt),
+    List(EnableRaxRoles, EnableMaskRaxRoles403, EnableRemoveDups, EnableCaptureHeadersExt),
     List(EnableRaxRoles, EnableMaskRaxRoles403, EnableRemoveDups, EnableJoinXPathChecks, EnableCaptureHeadersExt))
 
   // get all of the possible combinations, e.g. Set(a, b) => List(List(), List(a), List(b), List(a, b))
