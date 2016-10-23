@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Clean up: Optimized the configuration for one of the unit tests to improve build times.
+
 ## Release 2.0.2 (2016-10-17) ##
 1. Updated Dependencies
    1. saxon: 9.5.1-8 → 9.7.0-8
