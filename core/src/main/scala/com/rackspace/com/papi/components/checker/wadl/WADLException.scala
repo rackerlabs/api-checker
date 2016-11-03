@@ -15,9 +15,7 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import scala.language.reflectiveCalls
-
 /**
- * An exception when transating the WADL into a checker.
+ * An exception when translating the WADL into a checker.
  */
-class WADLException(private val msg : String, private val cause : Throwable) extends Throwable(msg, cause) {}
+class WADLException(msg : String, cause : Throwable) extends RuntimeException(msg, cause) {}

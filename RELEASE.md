@@ -1,4 +1,7 @@
 # Releases #
+## Release IN PROGRESS (2016-11-??) ##
+1. Clean up : Convert ```Throwable``` to more restrictive ```RuntimeException```
+
 ## Release 2.0.2 (2016-10-17) ##
 1. Updated Dependencies
    1. saxon: 9.5.1-8 → 9.7.0-8
