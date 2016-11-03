@@ -15,4 +15,7 @@
  */
 package com.rackspace.com.papi.components.checker
 
-class ValidatorException(msg : String, cause : Throwable) extends Throwable(msg, cause) {}
+/**
+ * A generic exception for when something unrecoverable occurs.
+ */
+class ValidatorException(msg : String, cause : Throwable) extends RuntimeException(msg, cause) {}
