@@ -1,5 +1,5 @@
 # Releases #
-## Release IN PROGRESS (2016-11-??) ##
+## Release 2.0.3 (2016-11-18) ##
 1. Clean up : Convert ```Throwable``` to more restrictive ```RuntimeException```
 
 ## Release 2.0.2 (2016-10-17) ##
