@@ -12,6 +12,7 @@
     </description>
 
     <modules>
+        <module>util</module>
         <module>core</module>
         <module>cli</module>
     </modules>

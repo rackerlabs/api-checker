@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Clean up : Move reusable utility classes into a separate project (checker-util).
+
 ## Release 2.0.3 (2016-11-18) ##
 1. Clean up : Convert ```Throwable``` to more restrictive ```RuntimeException```
 

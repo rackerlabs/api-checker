@@ -1,26 +1,31 @@
 package com.rackspace.com.papi.components.checker.util
 
-import com.codahale.metrics.{Gauge, Metric, MetricFilter, MetricRegistry}
-import com.rackspace.com.papi.components.checker.Validator
+import com.codahale.metrics.{Gauge, Metric, MetricFilter, MetricRegistry, JmxReporter}
 import com.typesafe.scalalogging.slf4j.LazyLogging
 
 import scala.language.existentials
+
+object Instrumented {
+  val metricRegistry = new MetricRegistry()
+  val metricDomain = "com.rackspace.com.papi.components.checker"
+  val reporter = JmxReporter
+    .forRegistry(metricRegistry)
+    .inDomain(metricDomain)
+    .createsObjectNamesWith(new JmxObjectNameFactory())
+    .build()
+  reporter.start()
+}
+
+import Instrumented._
 
 /**
   * @see nl.grons.metrics.scala.InstrumentedBuilder
   */
 trait Instrumented extends LazyLogging {
-  /** The base name for all metrics created from this builder. */
-  val metricBaseName = Validator.metricDomain
-
-  /**
-    * The MetricRegistry where created metrics are registered.
-    */
-  val metricRegistry: MetricRegistry = Validator.metricRegistry
 
   def getRegistryClassName(clazz: Class[_]): String = {
     clazz.getName
-      .replace(metricBaseName, "")
+      .replace(metricDomain,"")
       // @see nl.grons.metrics.scala.MetricName
       .replaceAllLiterally("$$anonfun", ".")
       .replaceAllLiterally("$apply", ".")

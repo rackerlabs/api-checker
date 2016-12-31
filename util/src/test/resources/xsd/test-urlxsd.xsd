@@ -1,0 +1,71 @@
+<!--
+   Copyright 2014 Rackspace US, Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<schema
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
+    targetNamespace="http://www.rackspace.com/repose/wadl/checker/step/test">
+
+    <element name="e" type="tst:SampleElement"/>
+    <element name="a" type="tst:SampleAttribute"/>
+
+    <complexType name="SampleElement">
+        <sequence>
+            <element name="id" type="tst:UUID"/>
+            <element name="stepType" type="tst:StepType" default="START" minOccurs="0"/>
+            <element name="even" type="tst:EvenInt100" default="50" minOccurs="0"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="SampleAttribute">
+        <attribute name="id" type="tst:UUID" use="required"/>
+        <attribute name="stepType" type="tst:StepType" use="optional" default="START"/>
+        <attribute name="even" type="tst:EvenInt100" use="optional" default="50"/>
+    </complexType>
+
+    <!-- A simple enumeration -->
+    <simpleType name="StepType">
+        <restriction base="xsd:string">
+            <enumeration value="START"/>
+            <enumeration value="URL_FAIL"/>
+            <enumeration value="METHOD_FAIL"/>
+            <enumeration value="ACCEPT"/>
+            <enumeration value="URL"/>
+            <enumeration value="METHOD"/>
+            <enumeration value="URLXSD"/>
+        </restriction>
+    </simpleType>
+
+    <!-- A pattern -->
+    <simpleType name="UUID">
+        <restriction base="xsd:string">
+            <length value="36" fixed="true"/>
+            <pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+        </restriction>
+    </simpleType>
+
+    <!-- XSD 1.1 assert -->
+    <simpleType name="EvenInt100">
+        <restriction base="xsd:integer">
+           <minInclusive value="0" />
+           <maxInclusive value="100" />
+           <assertion test="$value mod 2 = 0" />
+        </restriction>
+    </simpleType>
+
+</schema>
