@@ -1,5 +1,5 @@
 # Releases #
-## In Progress Work ##
+## Release 2.1.0 (2017-01-09) ##
 1. Clean up : Move reusable utility classes into a separate project (checker-util).
 
 ## Release 2.0.3 (2016-11-18) ##
