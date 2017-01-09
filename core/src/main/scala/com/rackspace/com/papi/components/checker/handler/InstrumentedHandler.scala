@@ -29,6 +29,9 @@ import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, M
 import com.rackspace.com.papi.components.checker.util.Instrumented
 import org.w3c.dom.{Document, Element}
 
+
+import com.rackspace.com.papi.components.checker.Validator._
+
 class InstrumentedHandler extends ResultHandler with Instrumented with InstrumentedHandlerMBean {
 
   private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer
@@ -66,7 +69,7 @@ class InstrumentedHandler extends ResultHandler with Instrumented with Instrumen
     //
     // Register the MBean
     //
-    latestFailMBeanName = Some(new ObjectName(s"$metricBaseName:type=handler.InstrumentedHandler,scope=${validator.name},name=latestFails"))
+    latestFailMBeanName = Some(new ObjectName(s"$metricDomain:type=handler.InstrumentedHandler,scope=${validator.name},name=latestFails"))
     platformMBeanServer.registerMBean(this,latestFailMBeanName.get)
   }
 

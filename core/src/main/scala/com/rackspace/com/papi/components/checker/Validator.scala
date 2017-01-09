@@ -99,6 +99,8 @@ object Validator {
   def apply (in : InputStream, config : Config) : Validator = apply (null, in, config)
 }
 
+import Validator._
+
 class Validator private (private val _name : String, val startStep : Step, val config : Config, val checker : Option[Document] = None) extends Instrumented with ValidatorMBean {
 
   val name = _name match {
@@ -108,7 +110,7 @@ class Validator private (private val _name : String, val startStep : Step, val c
 
 
   private val platformMBeanServer = ManagementFactory.getPlatformMBeanServer
-  private val objectName = new ObjectName(s"$metricBaseName:type=Validator,scope=$name,name=checker")
+  private val objectName = new ObjectName(s"$metricDomain:type=Validator,scope=$name,name=checker")
 
   private val TIMER_NAME       = "validation-timer"
   private val FAIL_METER_NAME  = "fail-meter"
