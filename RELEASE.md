@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Fixed a bug where a resource file needed by checker-util was kept in checker-core
+
 ## Release 2.1.0 (2017-01-09) ##
 1. Clean up : Move reusable utility classes into a separate project (checker-util).
 
