@@ -1,4 +1,10 @@
 # Releases #
+## In Progress Work ##
+1. Updated Dependencies
+   1. saxon: 9.7.0-8 → 9.7.0-15
+   1. wadl-tools: 1.0.33 → 1.0.34
+
+
 ## Release 2.1.1 (2017-01-27) ##
 1. Fixed a bug where a resource file needed by checker-util was kept in checker-core
 
