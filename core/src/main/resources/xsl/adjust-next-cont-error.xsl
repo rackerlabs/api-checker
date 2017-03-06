@@ -45,7 +45,7 @@
                 Only bother sorting if we have more than one
                 cont-error-type in the list.
             -->
-            <xsl:when test="count($nexts[@type=$cont-error-types]) gt 1">
+            <xsl:when test="$nexts[@type=$cont-error-types]">
                 <xsl:variable name="other" as="xs:string*" select="$nexts[not(@type = $cont-error-types) and not(@type = $sink-types)]/@id"/>
                 <xsl:variable name="sink" as="xs:string*" select="$nexts[@type=$sink-types]/@id"/>
                 <!--

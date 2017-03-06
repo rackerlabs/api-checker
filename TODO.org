@@ -848,6 +848,56 @@
        3. [X] Correct handling --version --help
        4. [X] Spot testing on setting options
    14. [X] Document.
+** DONE Add support for assertions at resource and method level [2/2]
+   1. [X] Assertion Step [13/13]
+      1. [X] Extend XSD to support Assert Step
+      2. [X] Implement raxAssert.xsl to correctly place assertions
+      3. [X] Add config item to enable/disable rax:assert
+      4. [X] add raxAssert to checker bulider
+      5. [X] Update CLI tools to support the new step
+      6. [X] Update builder to include Assert Step [3/3]
+         1. [X] Handle in method/request
+         2. [X] In representation other than XML or JSON
+            (wadl:request/wadl:representation[@mediaType] template)
+         3. [X] In representation with XML or JSON (in
+            check:addWellForm template)
+      7. [X] Handle situation where wadl:representation has no media
+         type...by extending raxAssert.xsl to move asserts up to
+         wadl:request.
+      8. [X] Add step to priority-map
+      9. [X] Check assertions related to Assert Step
+      10. [X] Ensure optimizations work with the new step
+      11. [X] Create new step
+      12. [X] Update handler for new step
+      13. [X] Enhancements [10/10]
+          1. [X] Avoid wrapping XdmValue, DOMSource in checkStep
+          2. [X] Ensure we appropriatly cache request
+          3. [X] Submit step context and take into account
+          4. [X] Ability to specify header split in header functions
+          5. [X] Change namespace to center around request (req
+             instead of chk)
+          6. [X] Rewrite var access make prefix optional for $_ and
+             $body for compatibility with plain asserts.
+          7. [X] Cleanup assert.xq (don't do extra work)
+          8. [X] Properlly log Assert
+          9. [X] Cleanup imports!
+          10. [X] Clean up docs
+   2. [X] Testing [3/3]
+      1. [X] Step
+      2. [X] Builder
+      3. [X] Validator [10/10]
+         1. [X] At resource level
+         2. [X] At method level
+         3. [X] First assertion fail, 2nd, 3rd
+         4. [X] No representation
+         5. [X] XML / JSON Representation
+         6. [X] Media types other than XML or JSON
+         7. [X] rax:code
+         8. [X] rax:message
+         9. [X] JoinOpt
+         10. [X] RemoveDups
+** TODO Use Saxon Compile Lib feature to compile shared module.
+   - This requires Saxon-EEQ
 ** TODO Compile Performance improvements
 ** TODO Assign CONTENT_FAIL to XSL steps in builder
 ** TODO Investigate whether there is an issue with rax:roles with other headers

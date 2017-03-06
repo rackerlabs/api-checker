@@ -90,6 +90,10 @@ object WADLCheckerBuilder {
   private lazy val raxMetaTransformXsltExec: XsltExecutable = timeFunction ("compile /xsl/meta-transform.xsl",
                                                                             compiler.compile(new StreamSource(getClass.getResource("/xsl/meta-transform.xsl").toString)))
 
+  private lazy val raxAssertXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxAssert.xsl",
+                                                                      compiler.compile(new StreamSource(getClass.getResource("/xsl/raxAssert.xsl").toString)))
+
+
   private lazy val raxRolesXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxRoles.xsl",
                                                                      compiler.compile(new StreamSource(getClass.getResource("/xsl/raxRoles.xsl").toString)))
 
@@ -380,6 +384,22 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   })
 
   //
+  // Handles the rax:assert extension
+  //
+  private def raxAssert(in : Source, c : Config) : Source = timeFunction("raxAssert", {
+    if (c.enableAssertExtension) {
+      val raxAssertTransform = getXsltTransformer(raxAssertXsltExec)
+      val out = new XdmDestination
+      raxAssertTransform.setSource(in)
+      raxAssertTransform.setDestination(out)
+      raxAssertTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+  //
   //  Handles the metadata and raxRoles extensions
   //
   private def raxRoles(in : Source, c : Config) : Source = timeFunction("raxRoles", {
@@ -617,7 +637,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         //  be applied.
         //
         val buildSteps : List[CheckerTransform] =
-          List(authenticatedBy, raxRoles, buildChecker(entityDoc, _, _),
+          List(raxAssert, authenticatedBy, raxRoles,
+               buildChecker(entityDoc, _, _),
                raxRolesMask, joinOpt, dupsOpt,
                joinHeaderOpt, joinXPathOpt, adjustNext, validateChecker)
 

@@ -229,8 +229,9 @@
             <xsl:when test="every $parent in $parents satisfies $parent/@type = $cont-error-types"/>
             <xsl:when test="(@type='HEADER_ANY') and (every $parent in $parents satisfies $parent/@type = 'START')"/>
             <xsl:otherwise>
-                <xsl:call-template name="chk:mustReferenceByType">
-                    <xsl:with-param name="refTypes" select="'CONTENT_FAIL'"/>
+                <xsl:call-template name="chk:requireParentOrSiblingType">
+                    <xsl:with-param name="parentTypes" select="$cont-error-types"/>
+                    <xsl:with-param name="siblingTypes" select="'CONTENT_FAIL'"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
@@ -373,6 +374,32 @@
                 Step <xsl:value-of select="@id"/> requires all parent steps to be of type <xsl:value-of select="$parentTypes" separator=" or "/>
             </xsl:message>
         </xsl:if>
+    </xsl:template>
+
+    <!--
+        Assert that the parent or a sibling must be of certain types
+     -->
+    <xsl:template name="chk:requireParentOrSiblingType">
+        <xsl:param name="parentTypes" as ="xs:string*"/>
+        <xsl:param name="siblingTypes" as="xs:string*"/>
+        <xsl:variable name="thisStep" as="node()" select="."/>
+        <xsl:variable name="parents" as="node()*" select="key('checker-by-ref',@id,$checker)"/>
+        <xsl:for-each select="$parents">
+            <xsl:variable name="parent" as="node()" select="."/>
+            <xsl:choose>
+                <xsl:when test="$parent/@type = $parentTypes"/>
+                <xsl:when test="some $s in
+                        for $sib in chk:stepsByIds($checker, chk:next($parent)) return
+                          if ($sib/@id = $thisStep/@id) then () else $sib
+                        satisfies $s/@type=$siblingTypes"/>
+                <xsl:otherwise>
+                    <xsl:message terminate="yes">
+                        Step <xsl:value-of select="$thisStep/@id"/> requires all parents to be of type <xsl:value-of select="$parentTypes" separator=" or "/>
+                        OR requires that it has at least one sibling of type <xsl:value-of select="$siblingTypes" separator=" or "/>
+                    </xsl:message>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:for-each>
     </xsl:template>
 
     <!--

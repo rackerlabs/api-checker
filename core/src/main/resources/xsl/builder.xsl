@@ -70,6 +70,7 @@
             <config option="checkWellFormed" value="false"/>
             <config option="enableAnyMatchExtension" value="true"/>
             <config option="enableIgnoreXSDExtension" value="true"/>
+            <config option="enableAssertExtension" value="true"/>
             <config option="checkJSONGrammar" value="false"/>
             <config option="checkElements" value="false"/>
             <config option="preserveRequestBody" value="false"/>
@@ -100,6 +101,7 @@
     <xsl:variable name="enableCaptureHeaderExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableCaptureHeaderExtension'))"/>
     <xsl:variable name="enableAnyMatchExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAnyMatchExtension'))"/>
     <xsl:variable name="enableWarnHeaders" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableWarnHeaders'))"/>
+    <xsl:variable name="enableAssertExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAssertExtension'))"/>
     <xsl:variable name="warnAgent" as="xsd:string" select="check:optionValue($configMetadata,'warnAgent')"/>
 
     <!-- Do we have an XSD? -->
@@ -152,6 +154,7 @@
                   select="$enableMessageExtension or $useRaxRoles or $useAuthenticatedBy"/>
     <xsl:variable name="useCaptureHeaderExtension" as="xsd:boolean"
                   select="$enableCaptureHeaderExtension"/>
+    <xsl:variable name="useAssert" as="xsd:boolean" select="$enableAssertExtension"/>
     <xsl:variable name="useWarnHeaders" as="xsd:boolean"
                   select="$enableWarnHeaders and ($useXSDTransform or $usePreProcessExtension)"/>
 
@@ -587,7 +590,28 @@
             </xsl:if>
         </xsl:for-each-group>
     </xsl:template>
-
+    <xsl:template name="check:addAssertSteps">
+        <xsl:param name="next" as="xsd:string*"/>
+        <xsl:param name="from" as="node()" select="."/>
+        <xsl:variable name="asserts" select="check:getAsserts($from)" as="node()*"/>
+        <step type="CONTENT_FAIL" id="{check:assertFailID($asserts[1])}"/>
+        <xsl:for-each select="$asserts">
+            <xsl:variable name="pos" select="position()"/>
+            <step id="{check:assertID(.)}" type="ASSERT" match="{@test}">
+                <xsl:copy-of select="(@message, @code)"/>
+                <xsl:attribute name="next">
+                    <xsl:choose>
+                        <xsl:when test="$pos = last()">
+                            <xsl:value-of separator=" " select="$next"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="check:assertID($asserts[position() = ($pos+1)])"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+            </step>
+        </xsl:for-each>
+    </xsl:template>
     <xsl:template name="check:addHeaderSteps">
         <xsl:param name="next" as="xsd:string*"/>
         <xsl:param name="from" as="node()" select="."/>
@@ -761,13 +785,19 @@
     <xsl:template match="wadl:method">
         <xsl:variable name="haveHeaders" as="xsd:boolean"
                       select="wadl:request and check:haveHeaders(wadl:request)"/>
+        <xsl:variable name="haveAsserts" as="xsd:boolean"
+                      select="wadl:request and check:haveAsserts(wadl:request)"/>
         <xsl:variable name="nextSteps" as="xsd:string*">
             <xsl:sequence select="check:getNextReqTypeLinks(.)"/>
         </xsl:variable>
+        <xsl:variable name="nextAsserts" as="xsd:string*" select="check:getNextAssertLinks(wadl:request)"/>
         <xsl:variable name="links" as="xsd:string*">
             <xsl:choose>
                 <xsl:when test="$haveHeaders">
                     <xsl:sequence select="check:getNextHeaderLinks(wadl:request)"/>
+                </xsl:when>
+                <xsl:when test="$haveAsserts">
+                    <xsl:sequence select="$nextAsserts"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:sequence select="$nextSteps"/>
@@ -803,6 +833,9 @@
                 <xsl:call-template name="check:addHeaderSteps">
                     <xsl:with-param name="next">
                         <xsl:choose>
+                            <xsl:when test="$haveAsserts">
+                                <xsl:value-of select="$nextAsserts"/>
+                            </xsl:when>
                             <xsl:when test="count($nextSteps) &gt; 0">
                                 <xsl:value-of select="$nextSteps"/>
                             </xsl:when>
@@ -815,14 +848,31 @@
                     <xsl:with-param name="inRequest" select="true()"/>
                 </xsl:call-template>
             </xsl:if>
+            <xsl:if test="$haveAsserts">
+                <xsl:call-template name="check:addAssertSteps">
+                    <xsl:with-param name="next">
+                        <xsl:choose>
+                            <xsl:when test="count($nextSteps) &gt; 0">
+                                <xsl:sequence select="$nextSteps"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="($ACCEPT)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:with-param>
+                    <xsl:with-param name="from" select="wadl:request"/>
+                </xsl:call-template>
+            </xsl:if>
         </xsl:if>
         <xsl:apply-templates/>
     </xsl:template>
 
     <xsl:template match="wadl:request/wadl:representation[@mediaType]">
         <xsl:variable name="defaultNext" select="$ACCEPT"/>
+        <xsl:variable name="haveAsserts" as="xsd:boolean" select="check:haveAsserts(.)"/>
         <xsl:variable name="doUseWellFormCheck" as="xsd:boolean"
-                      select="$useWellFormCheck or ($usePreProcessExtension and exists(rax:preprocess))"/>
+                      select="$useWellFormCheck or ($usePreProcessExtension and exists(rax:preprocess))
+                              or $haveAsserts"/>
         <step type="REQ_TYPE">
             <xsl:attribute name="id" select="generate-id()"/>
             <!-- Note that matches on the media type are always case insensitive -->
@@ -832,6 +882,11 @@
                     <xsl:choose>
                         <xsl:when test="check:isXML(@mediaType) or check:isJSON(@mediaType)">
                             <xsl:call-template name="check:addWellFormNext"/>
+                        </xsl:when>
+                        <xsl:when test="$haveAsserts">
+                            <xsl:attribute name="next">
+                                <xsl:value-of select="check:getNextAssertLinks(.)" separator=" "/>
+                            </xsl:attribute>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:attribute name="next" select="$defaultNext"/>
@@ -854,6 +909,12 @@
                 <xsl:when test="check:isJSON(@mediaType)">
                     <xsl:call-template name="check:addWellForm">
                         <xsl:with-param name="type" select="'WELL_JSON'"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="$haveAsserts">
+                    <xsl:call-template name="check:addAssertSteps">
+                        <xsl:with-param name="next" select="$defaultNext"/>
+                        <xsl:with-param name="from" select="."/>
                     </xsl:call-template>
                 </xsl:when>
             </xsl:choose>
@@ -939,6 +1000,16 @@
         <xsl:value-of select="concat(check:HeaderID($context), 'HF')"/>
     </xsl:function>
 
+    <xsl:function name="check:assertID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="generate-id($context)"/>
+    </xsl:function>
+
+    <xsl:function name="check:assertFailID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(check:assertID($context), 'AF')"/>
+    </xsl:function>
+
     <xsl:function name="check:XSDID" as="xsd:string">
         <xsl:param name="context" as="node()"/>
         <xsl:value-of select="concat(generate-id($context),'XSD')"/>
@@ -1000,6 +1071,7 @@
                       select="($type = 'WELL_XML') and $useElementCheck and @element"/>
         <xsl:variable name="doReqPlainParam" as="xsd:boolean"
                       select="($type = ('WELL_XML','WELL_JSON')) and $usePlainParamCheck and exists($defaultPlainParams)"/>
+        <xsl:variable name="haveAsserts" as="xsd:boolean" select="check:haveAsserts(.)"/>
         <xsl:variable name="XSDID" as="xsd:string"
                       select="check:XSDID(.)"/>
         <xsl:variable name="JSONID" as="xsd:string"
@@ -1012,6 +1084,8 @@
                       select="check:WarnID(.,0)"/>
         <xsl:variable name="TRANSFORM_XSDID" as="xsd:string"
                       select="check:WarnID(.,1)"/>
+        <xsl:variable name="assertNext" as="xsd:string"
+                      select="string-join(check:getNextAssertLinks(.),' ')"/>
         <step type="{$type}" id="{check:WellFormID(.)}">
             <xsl:choose>
                 <xsl:when test="$doElement">
@@ -1038,6 +1112,11 @@
                                    select="($JSONID, $FAILID)"
                                    separator=" "/>
                 </xsl:when>
+                <xsl:when test="$haveAsserts">
+                    <xsl:attribute name="next"
+                        select="$assertNext"
+                        separator=" "/>
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="next" select="$ACCEPT"/>
                 </xsl:otherwise>
@@ -1059,6 +1138,11 @@
                         <xsl:attribute name="next"
                                        select="($XSDID, $FAILID)"
                                        separator=" "/>
+                    </xsl:when>
+                    <xsl:when test="$haveAsserts">
+                        <xsl:attribute name="next"
+                            select="$assertNext"
+                            separator=" "/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:attribute name="next" select="$ACCEPT"/>
@@ -1098,6 +1182,11 @@
                                     <xsl:attribute name="next"
                                                    select="($JSONID, $FAILID)"
                                                    separator=" "/>
+                                </xsl:when>
+                                <xsl:when test="$haveAsserts">
+                                    <xsl:attribute name="next"
+                                        select="$assertNext"
+                                        separator=" "/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:attribute name="next" select="$ACCEPT"/>
@@ -1146,6 +1235,11 @@
                                 <xsl:when test="$useWarnHeaders">
                                     <xsl:attribute name="next" select="$TRANSFORM_PREID"/>
                                 </xsl:when>
+                                <xsl:when test="$haveAsserts">
+                                    <xsl:attribute name="next"
+                                        select="$assertNext"
+                                        separator=" "/>
+                                </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:attribute name="next" select="$ACCEPT"/>
                                 </xsl:otherwise>
@@ -1160,11 +1254,33 @@
                 </step>
             </xsl:for-each>
             <xsl:if test="$useWarnHeaders">
-                <step type="SET_HEADER_ALWAYS" id="{$TRANSFORM_PREID}" name="Warning" value='214 {$warnAgent} "Preprocess Transformation Applied"' next="{$ACCEPT}"/>
+                <step type="SET_HEADER_ALWAYS" id="{$TRANSFORM_PREID}" name="Warning" value='214 {$warnAgent} "Preprocess Transformation Applied"'>
+                       <xsl:choose>
+                          <xsl:when test="$haveAsserts">
+                              <xsl:attribute name="next"
+                                  select="$assertNext"
+                                  separator=" "/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                              <xsl:attribute name="next" select="$ACCEPT"/>
+                          </xsl:otherwise>
+                      </xsl:choose>
+                </step>
             </xsl:if>
         </xsl:if>
         <xsl:if test="$doJSON">
-            <step type="JSON_SCHEMA" id="{$JSONID}" next="{$ACCEPT}"/>
+            <step type="JSON_SCHEMA" id="{$JSONID}">
+                    <xsl:choose>
+                        <xsl:when test="$haveAsserts">
+                            <xsl:attribute name="next"
+                                select="$assertNext"
+                                separator=" "/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="next" select="$ACCEPT"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+            </step>
         </xsl:if>
         <xsl:if test="$doXSD">
             <step type="XSD" id="{$XSDID}">
@@ -1174,6 +1290,11 @@
                     </xsl:when>
                     <xsl:when test="$useWarnHeaders and $doPreProcess">
                         <xsl:attribute name="next" select="$TRANSFORM_PREID"/>
+                    </xsl:when>
+                    <xsl:when test="$haveAsserts">
+                        <xsl:attribute name="next"
+                            select="$assertNext"
+                            separator=" "/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:attribute name="next" select="$ACCEPT"/>
@@ -1187,12 +1308,23 @@
                         <xsl:when test="$doPreProcess">
                             <xsl:attribute name="next" select="$TRANSFORM_PREID"/>
                         </xsl:when>
+                        <xsl:when test="$haveAsserts">
+                            <xsl:attribute name="next"
+                                select="$assertNext"
+                                separator=" "/>
+                        </xsl:when>
                         <xsl:otherwise>
                             <xsl:attribute name="next" select="$ACCEPT"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </step>
             </xsl:if>
+        </xsl:if>
+        <xsl:if test="$haveAsserts">
+            <xsl:call-template name="check:addAssertSteps">
+                <xsl:with-param name="next" select="$ACCEPT"/>
+                <xsl:with-param name="from" select="."/>
+            </xsl:call-template>
         </xsl:if>
         <step type="CONTENT_FAIL" id="{$FAILID}"/>
     </xsl:template>
@@ -1345,6 +1477,29 @@
     <xsl:function name="check:getHeaders" as="node()*">
       <xsl:param name="from" as="node()"/>
       <xsl:sequence select="$from/wadl:param[@style='header' and @required='true']"/>
+    </xsl:function>
+
+    <xsl:function name="check:getNextAssertLinks" as="xsd:string*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:choose>
+            <xsl:when test="check:haveAsserts($from)">
+                <xsl:variable name="firstAssert" as="node()" select="check:getAsserts($from)[1]"/>
+                <xsl:sequence select="(check:assertFailID($firstAssert), check:assertID($firstAssert))"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:sequence select="()"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="check:haveAsserts" as="xsd:boolean">
+        <xsl:param name="from" as="node()"/>
+        <xsl:value-of select="$useAssert and $from/rax:assert"/>
+    </xsl:function>
+
+    <xsl:function name="check:getAsserts" as="node()*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:sequence select="$from/rax:assert"/>
     </xsl:function>
     
     <xsl:function name="check:getNextMethodLinks" as="xsd:string*">

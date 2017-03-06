@@ -27,7 +27,7 @@ class HeaderMap private (val headers : TreeMap[String, List[String]])
   def this() = this(new TreeMap[String, List[String]]()(CaseInsensitiveStringOrdering))
 
   def addHeader (name : String, value : String) : HeaderMap = {
-    new HeaderMap(headers + (name -> (headers.getOrElse(name, List()) :+ value)))
+    new HeaderMap(headers + (name.toLowerCase -> (headers.getOrElse(name, List()) :+ value)))
   }
 
   def removeHeader (name : String, value : String) : HeaderMap = {
@@ -41,7 +41,7 @@ class HeaderMap private (val headers : TreeMap[String, List[String]])
   }
 
   def addHeaders (name : String, values : List[String]) : HeaderMap = {
-    new HeaderMap(headers + (name -> (headers.getOrElse(name, List()) ::: values)))
+    new HeaderMap(headers + (name.toLowerCase -> (headers.getOrElse(name, List()) ::: values)))
   }
 
   def addHeaders (otherHeaders : HeaderMap) : HeaderMap = {

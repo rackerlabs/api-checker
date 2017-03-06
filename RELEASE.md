@@ -2,8 +2,9 @@
 ## In Progress Work ##
 1. Updated Dependencies
    1. saxon: 9.7.0-8 → 9.7.0-15
-   1. wadl-tools: 1.0.33 → 1.0.35
+   1. wadl-tools: 1.0.33 → 1.0.36
       1. Fixed a bug where under rare circumstances a WADL was generated with two attributes with the same name.
+      1. Fixed a bug where extensions under the resources element were being lost
    1. io.dropwizard.metrics:metrics-core: 3.1.2 → 3.2.0
 1. Clean up : Complete rewrite of WADLCheckerBuilder and WADLDotBuilder
    1. We now use Saxon API instead of JAX-P XSLT API, this allows finer grained control over options and cleaner code.
@@ -11,7 +12,8 @@
    1. Lazy XSLT / XSD compilation : We now compile a style sheet or an XSD only when it needs to be used - no startup cost for unused features.
    1. Instrumented pipeline : Compiling the project with ```-Dchecker.timeFunctions``` will cause timing information on each step of the pipeline to print to ```stderr``` at run time.
    1. WADLDotBuilder has always only worked with ```StreamResult```s (other ```Result``` types failed) this is now made explicit with the interface.
-
+1. Added support for ```rax:assert```, this allows setting XPath 3.1 assertions at the method request, representation, resource, and resources level.
+   These assertions can simultaneously introspect headers, uri, methods, and body content (xml or json).
 
 ## Release 2.1.1 (2017-01-27) ##
 1. Fixed a bug where a resource file needed by checker-util was kept in checker-core

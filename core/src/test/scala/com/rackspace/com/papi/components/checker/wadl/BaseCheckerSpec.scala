@@ -142,6 +142,22 @@ class BaseCheckerSpec extends BaseWADLSpec with LazyLogging {
     stepsWithJsonXPathMessageMatch(checker, xpathMatch, message).filter (n => (n \ "@code").text == code.toString)
   }
 
+  def stepsWithAssertMatch (checker : NodeSeq, xpathMatch : String) : NodeSeq = {
+    stepsWithMatch (checker, xpathMatch).filter(n => (n \ "@type").text == "ASSERT")
+  }
+
+  def stepsWithAssertMessageMatch (checker : NodeSeq, xpathMatch : String, message : String) : NodeSeq = {
+    stepsWithAssertMatch(checker, xpathMatch).filter (n => (n \ "@message").text == message)
+  }
+
+  def stepsWithAssertCodeMatch (checker : NodeSeq, xpathMatch : String, code : Int) : NodeSeq = {
+    stepsWithAssertMatch(checker, xpathMatch).filter (n => (n \ "@code").text == code.toString)
+  }
+
+  def stepsWithAssertMessageCodeMatch (checker : NodeSeq, xpathMatch : String, message : String, code : Int) : NodeSeq = {
+    stepsWithAssertMessageMatch(checker, xpathMatch, message).filter (n => (n \ "@code").text == code.toString)
+  }
+
   def stepsWithMethodMatch (checker : NodeSeq, methodMatch  : String) : NodeSeq = {
     stepsWithMatch (checker, methodMatch).filter(n => (n \ "@type").text == "METHOD")
   }
@@ -374,6 +390,10 @@ class BaseCheckerSpec extends BaseWADLSpec with LazyLogging {
   def JsonXPath(expression: String, message : String) : (NodeSeq) => NodeSeq = stepsWithJsonXPathMessageMatch(_, expression, message)
   def JsonXPath(expression: String, code : Int) : (NodeSeq) => NodeSeq = stepsWithJsonXPathCodeMatch(_, expression, code)
   def JsonXPath(expression: String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithJsonXPathMessageCodeMatch(_, expression, message, code)
+  def RaxAssert(expression : String) : (NodeSeq) => NodeSeq = stepsWithAssertMatch(_, expression)
+  def RaxAssert(expression : String, message : String) : (NodeSeq) => NodeSeq = stepsWithAssertMessageMatch(_, expression, message)
+  def RaxAssert(expression : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithAssertCodeMatch(_, expression, code)
+  def RaxAssert(expression : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithAssertMessageCodeMatch(_, expression, message, code)
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
   def AnyReqType : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(.*)()")
   def HeaderWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatchCapture(_, name, headerMatch, captureHeader)

@@ -21,6 +21,7 @@ import java.util
 import javax.servlet.ServletInputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import javax.xml.transform.Transformer
+import javax.xml.transform.Source
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
@@ -33,6 +34,9 @@ import com.rackspace.com.papi.components.checker.util.JSONConverter
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.w3c.dom.Document
 import net.sf.saxon.om.Sequence
+import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.Configuration
+import net.sf.saxon.expr.JPConverter
 
 import scala.collection.JavaConverters._
 
@@ -85,6 +89,18 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   def parsedXML : Document = request.getAttribute(PARSED_XML).asInstanceOf[Document]
   def parsedXML_= (doc : Document):Unit = request.setAttribute (PARSED_XML, doc)
 
+  def parsedXMLSource : Source = {
+    val src = request.getAttribute(PARSED_XML_SOURCE).asInstanceOf[Source]
+    if (src == null && parsedXML != null) {
+      val nsrc = new DOMSource(parsedXML)
+      request.setAttribute (PARSED_XML_SOURCE, nsrc)
+      nsrc
+    } else {
+      src
+    }
+  }
+  def parsedXMLSource_= (src : Source) : Unit = request.setAttribute(PARSED_XML_SOURCE, src)
+
   def parsedJSON : JsonNode = request.getAttribute(PARSED_JSON).asInstanceOf[JsonNode]
   def parsedJSON_= (tb : JsonNode):Unit = request.setAttribute (PARSED_JSON, tb)
 
@@ -99,6 +115,20 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
     }
   }
   def parsedJSONSequence_= (seq : Sequence) : Unit = request.setAttribute (PARSED_JSON_SEQUENCE, seq)
+
+  def parsedJSONXdmValue : XdmValue = {
+    val xdmVal = request.getAttribute(PARSED_JSON_XDM_VALUE).asInstanceOf[XdmValue]
+    if (xdmVal == null && parsedJSONSequence != null) {
+      val nxdmVal = XdmValue.wrap(parsedJSONSequence)
+      request.setAttribute(PARSED_JSON_XDM_VALUE, nxdmVal)
+      nxdmVal
+    } else {
+      xdmVal
+    }
+  }
+
+  def parsedJSONXdmValue_= (xdmVal : XdmValue) : Unit = request.setAttribute(PARSED_JSON_XDM_VALUE, xdmVal)
+
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
   def contentError_= (e : Exception):Unit = {
@@ -119,9 +149,22 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
   def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
 
-  def addHeader(name: String, value: String): Unit = auxiliaryHeaders = auxiliaryHeaders.addHeader(name, value)
+  def asXdmValue(c : Configuration) : XdmValue = request.getAttribute(REQUEST_XDM_VALUE) match {
+    case reqValue : XdmValue => reqValue
+    case null => val rv = XdmValue.wrap(JPConverter.FromMap.INSTANCE.convert(new HttpServletRequestMap(this),c.getConversionContext))
+                 request.setAttribute(REQUEST_XDM_VALUE, rv)
+                 rv
+  }
 
-  def addHeaders(hm : HeaderMap) : Unit = auxiliaryHeaders = auxiliaryHeaders.addHeaders(hm)
+  def addHeader(name: String, value: String): Unit = {
+    auxiliaryHeaders = auxiliaryHeaders.addHeader(name, value)
+    request.setAttribute(REQUEST_XDM_VALUE, null) //invalidate our xdm value cache
+  }
+
+  def addHeaders(hm : HeaderMap) : Unit = {
+    auxiliaryHeaders = auxiliaryHeaders.addHeaders(hm)
+    request.setAttribute(REQUEST_XDM_VALUE, null) //invalidate our xdm value cache
+  }
 
   override def getDateHeader(name: String): Long = {
     Option(getHeader(name)) match {

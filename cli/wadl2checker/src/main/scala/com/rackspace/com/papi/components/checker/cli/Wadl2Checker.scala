@@ -123,6 +123,9 @@ object Wadl2Checker {
     val anyMatch  = parser.flag[Boolean] (List("a", "disable-any-match"),
                                           "Disable any match extension : false")
 
+    val raxAssert = parser.flag[Boolean] (List("k", "disable-rax-assert"),
+                                          "Disable Rax-Assert extension : false")
+
     val warnHeaders = parser.flag[Boolean] (List("W", "disable-warn-headers"),
                                             "Disable warn headers : false")
 
@@ -175,6 +178,7 @@ object Wadl2Checker {
         c.enableMessageExtension = !message.value.getOrElse(false)
         c.enableCaptureHeaderExtension = !captureHeader.value.getOrElse(false)
         c.enableAnyMatchExtension = !anyMatch.value.getOrElse(false)
+        c.enableAssertExtension = !raxAssert.value.getOrElse(false)
         c.xpathVersion = xpathVersion.value.getOrElse(10)
         c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
