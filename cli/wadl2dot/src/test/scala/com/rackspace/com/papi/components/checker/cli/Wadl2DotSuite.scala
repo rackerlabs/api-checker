@@ -100,9 +100,6 @@ class Wadl2DotSuite extends FunSuite {
     withOutput( (outStream, errStream) => {
       Wadl2Dot.main(Array("src/test/resources/wadl/sharedXPath.wadl"))
 
-      //  No err
-      assert(errStream.toString().isEmpty())
-
       val out = outStream.toString()
 
       //  Just some basic asserts to make sure we're working, we'd
@@ -116,9 +113,6 @@ class Wadl2DotSuite extends FunSuite {
   test ("Should generate dot to stdout (xsdEngine)") {
     withOutput( (outStream, errStream) => {
       Wadl2Dot.main(Array("--xsd-engine","Xerces","src/test/resources/wadl/sharedXPath.wadl"))
-
-      //  No err
-      assert(errStream.toString().isEmpty())
 
       val out = outStream.toString()
 
@@ -136,8 +130,6 @@ class Wadl2DotSuite extends FunSuite {
 
       Wadl2Dot.main(Array("src/test/resources/wadl/sharedXPath.wadl", outDot))
 
-      //  No err
-      assert(errStream.toString().isEmpty())
       assert(outStream.toString().isEmpty())
 
       val source = scala.io.Source.fromFile(outDot)
@@ -159,8 +151,6 @@ class Wadl2DotSuite extends FunSuite {
   test ("Should generate dot to stdout : test -n arg (nfa mode)") {
     withOutput( (outStream, errStream) => {
       Wadl2Dot.main(Array("-n","src/test/resources/wadl/sharedXPath.wadl"))
-      //  No err
-      assert(errStream.toString().isEmpty())
 
       val out = outStream.toString()
 
@@ -175,9 +165,6 @@ class Wadl2DotSuite extends FunSuite {
   test ("Should generate dot to stdout : test -e arg (show error states)") {
     withOutput( (outStream, errStream) => {
       Wadl2Dot.main(Array("-e","src/test/resources/wadl/sharedXPath.wadl"))
-
-      //  No err
-      assert(errStream.toString().isEmpty())
 
       val out = outStream.toString()
 

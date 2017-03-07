@@ -18,7 +18,13 @@
         <dependency>
             <groupId>com.rackspace.papi.components.api-checker</groupId>
             <artifactId>checker-util</artifactId>
-            <version>2.1.2-SNAPSHOT</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rackspace.papi.components.api-checker.macros</groupId>
+            <artifactId>checker-macros</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope> <!-- don't want macros in the jar -->
         </dependency>
     </dependencies>
 

@@ -2,7 +2,14 @@
 ## In Progress Work ##
 1. Updated Dependencies
    1. saxon: 9.7.0-8 → 9.7.0-15
-   1. wadl-tools: 1.0.33 → 1.0.34
+   1. wadl-tools: 1.0.33 → 1.0.35
+      1. Fixed a bug where under rare circumstances a WADL was generated with two attributes with the same name.
+1. Clean up : Complete rewrite of WADLCheckerBuilder and WADLDotBuilder
+   1. We now use Saxon API instead of JAX-P XSLT API, this allows finer grained control over options and cleaner code.
+   1. Interact with wadl-tools via XSLT integration rather than Scala integration, again better options and control over execution.
+   1. Lazy XSLT / XSD compilation : We now compile a style sheet or an XSD only when it needs to be used - no startup cost for unused features.
+   1. Instrumented pipeline : Compiling the project with ```-Dchecker.timeFunctions``` will cause timing information on each step of the pipeline to print to ```stderr``` at run time.
+   1. WADLDotBuilder has always only worked with ```StreamResult```s (other ```Result``` types failed) this is now made explicit with the interface.
 
 
 ## Release 2.1.1 (2017-01-27) ##

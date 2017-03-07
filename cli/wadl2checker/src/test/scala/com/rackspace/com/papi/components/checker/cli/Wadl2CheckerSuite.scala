@@ -108,9 +108,6 @@ class Wadl2CheckerSuite extends FunSuite with XPathAssertions {
     withOutput ( (out, error) => {
       Wadl2Checker.main(Array("src/test/resources/wadl/sharedXPath.wadl"))
 
-      //  No err
-      assert(error.toString().isEmpty())
-
       val outXML = XML.loadString(out.toString())
 
       //  Just some basic asserts to make sure we're working, we'd
@@ -125,9 +122,6 @@ class Wadl2CheckerSuite extends FunSuite with XPathAssertions {
   test ("Should generate checker xml to stdout (xsd engine)") {
     withOutput ( (out, error) => {
       Wadl2Checker.main(Array("--xsd-engine","Xerces","src/test/resources/wadl/sharedXPath.wadl"))
-
-      //  No err
-      assert(error.toString().isEmpty())
 
       val outXML = XML.loadString(out.toString())
 
@@ -147,8 +141,6 @@ class Wadl2CheckerSuite extends FunSuite with XPathAssertions {
 
       Wadl2Checker.main(Array("src/test/resources/wadl/sharedXPath.wadl", outFile))
 
-      //  No err, noout
-      assert(error.toString().isEmpty())
       assert(out.toString().isEmpty())
 
       val outXML = XML.loadFile(outFile)
@@ -194,8 +186,6 @@ class Wadl2CheckerSuite extends FunSuite with XPathAssertions {
           } else {
             Wadl2Checker.main(Array(arg,"src/test/resources/wadl/sharedXPath.wadl"))
           }
-          //  No err
-          assert(error.toString().isEmpty())
 
           val outXML = XML.loadString(out.toString())
 

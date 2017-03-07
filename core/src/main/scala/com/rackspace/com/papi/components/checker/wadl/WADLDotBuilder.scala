@@ -1,5 +1,5 @@
 /***
- *   Copyright 2014 Rackspace US, Inc.
+ *   Copyright 2017 Rackspace US, Inc.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -15,25 +15,34 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import java.io.{ByteArrayOutputStream, InputStream, Reader}
+import java.io.{ByteArrayOutputStream, InputStream, Reader, File}
+import java.net.URI
+
 import javax.xml.transform._
-import javax.xml.transform.sax._
 import javax.xml.transform.stream._
 
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.WADLNormalizer
 import com.rackspace.cloud.api.wadl.util.XSLErrorDispatcher
 import com.rackspace.com.papi.components.checker.Config
-import net.sf.saxon.jaxp.TransformerImpl
+import com.rackspace.com.papi.components.checker.macros.TimeFunction._
 
 import scala.language.reflectiveCalls
 import scala.xml._
 
+import com.typesafe.scalalogging.slf4j.LazyLogging
+
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XsltExecutable
+import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmDestination
+import net.sf.saxon.s9api.Destination
+
+import BuilderHelper._
 
 object WADLDotBuilder {
-  private val _wadl = new WADLNormalizer // Static WADL normalizer used simply to build templates
-
-  private val dotTemplates : Templates = _wadl.saxTransformerFactory.newTemplates(new StreamSource(getClass.getResource("/xsl/checker2dot.xsl").toString))
+  private lazy val dotXsltExec : XsltExecutable = timeFunction ("compile /xsl/checker2dot.xsl",
+                                                                compiler.compile(new StreamSource(getClass.getResource("/xsl/checker2dot.xsl").toString)))
 
   object Checker2DotXSLParams {
     val IGNORE_SINKS = "ignoreSinks"
@@ -44,7 +53,7 @@ object WADLDotBuilder {
 
 import WADLDotBuilder._
 
-class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends XSLErrorDispatcher {
+class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends LazyLogging with XSLErrorDispatcher {
 
   import Checker2DotXSLParams._
 
@@ -56,46 +65,53 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends XSLError
 
   def this() = this(null)
 
-  def buildFromChecker (in : Source, out: Result, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
-    val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
-    val transformer = dotHandler.getTransformer
-    transformer.setParameter (IGNORE_SINKS, ignoreSinks)
-    transformer.setParameter (NFA_MODE, nfaMode)
-    transformer.asInstanceOf[TransformerImpl].addLogErrorListener
-    transformer.setURIResolver(wadl.saxTransformerFactory.getURIResolver)
+  def buildFromChecker (in : Source, out: StreamResult, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = timeFunction ("checker2dot", {
 
-    handleXSLException({
-      transformer.transform (in, out)
-    })
+    val dest : Destination = {
+      if (out.getOutputStream != null) {
+        processor.newSerializer(out.getOutputStream)
+      } else if (out.getWriter != null) {
+        processor.newSerializer(out.getWriter)
+      } else {
+        processor.newSerializer(new File(new URI(out.getSystemId)))
+      }
+    }
+
+    val dotTransformer = getXsltTransformer(dotXsltExec, wadl.saxTransformerFactory.getURIResolver,
+                                            Map(new QName(IGNORE_SINKS)->new XdmAtomicValue(ignoreSinks),
+                                                new QName(NFA_MODE)->new XdmAtomicValue(nfaMode)))
+    try {
+      handleXSLException({
+        dotTransformer.setSource(in)
+        dotTransformer.setDestination(dest)
+        dotTransformer.transform
+      })
+    } catch {
+      case e : Exception => logger.error(e.getMessage)
+                            throw new WADLException ("Checker2Dot Processing Error: "+e.getMessage, e)
+    }
+  })
+
+  def build (in : Source, out: StreamResult, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+    val outChecker = new XdmDestination
+
+    checkerBuilder.build(in, outChecker.getReceiver(processor.getUnderlyingConfiguration), config)
+    buildFromChecker(outChecker.getXdmNode.asSource, out, ignoreSinks, nfaMode)
   }
 
-  def build (in : Source, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
-    val dotHandler = wadl.saxTransformerFactory.newTransformerHandler(dotTemplates)
-    val transformer = dotHandler.getTransformer
-    dotHandler.setResult(out)
-    transformer.setParameter (IGNORE_SINKS, ignoreSinks)
-    transformer.setParameter (NFA_MODE, nfaMode)
-    transformer.asInstanceOf[TransformerImpl].addLogErrorListener
-    transformer.setURIResolver(wadl.saxTransformerFactory.getURIResolver)
-
-    handleXSLException({
-      checkerBuilder.build(in, new SAXResult(dotHandler), config)
-    })
-  }
-
-  def build(in : (String, InputStream), out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build(in : (String, InputStream), out: StreamResult, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     build(new StreamSource(in._2,in._1), out, config, ignoreSinks, nfaMode)
   }
 
-  def build(in : InputStream, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build(in : InputStream, out: StreamResult, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     build (("test://mywadl.wadl",in), out, config, ignoreSinks, nfaMode)
   }
 
-  def build(in : Reader, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build(in : Reader, out: StreamResult, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     build(new StreamSource(in), out, config, ignoreSinks, nfaMode)
   }
 
-  def build(in : String, out: Result, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build(in : String, out: StreamResult, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     build(new StreamSource(in), out, config, ignoreSinks, nfaMode)
   }
 
