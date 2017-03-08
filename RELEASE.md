@@ -4,6 +4,7 @@
    1. saxon: 9.7.0-8 → 9.7.0-15
    1. wadl-tools: 1.0.33 → 1.0.35
       1. Fixed a bug where under rare circumstances a WADL was generated with two attributes with the same name.
+   1. io.dropwizard.metrics:metrics-core: 3.1.2 → 3.2.0
 1. Clean up : Complete rewrite of WADLCheckerBuilder and WADLDotBuilder
    1. We now use Saxon API instead of JAX-P XSLT API, this allows finer grained control over options and cleaner code.
    1. Interact with wadl-tools via XSLT integration rather than Scala integration, again better options and control over execution.
