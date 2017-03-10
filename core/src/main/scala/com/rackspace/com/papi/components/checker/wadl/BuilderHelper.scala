@@ -19,6 +19,7 @@ import scala.annotation.tailrec
 
 import javax.xml.transform.Source
 import javax.xml.transform.sax.SAXSource
+import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.URIResolver
 
 import org.xml.sax.XMLReader
@@ -30,6 +31,7 @@ import org.xml.sax.helpers.XMLReaderFactory
 import com.rackspace.cloud.api.wadl.util.LogErrorListener
 
 import com.rackspace.com.papi.components.checker.Config
+import com.rackspace.com.papi.components.checker.macros.TimeFunction._
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 
@@ -127,4 +129,15 @@ protected object BuilderHelper extends LazyLogging {
     case transform :: transforms => applyBuildSteps(transforms, transform(current, config), config)
     case _ => current
   }
+
+  //
+  //  Serializes on standard error the input source then pass it
+  //  along.  This is a helpful debuging CheckerTransform you can
+  //  place it between steps in applyBuildSteps to see what's going
+  //  on.
+  //
+  def serialize (in : Source, c : Config) : Source = timeFunction("serialize", {
+    idTransform.transform(in, new StreamResult(System.err))
+    in
+  })
 }
