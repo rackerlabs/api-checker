@@ -64,9 +64,9 @@ class WADLCheckerOptSpecSaxonEE extends BaseCheckerSpec {
       assert(checker,Start, URL("servers"), URL("entries"),
              Method("POST"),
              ReqType("(application/atom\\+xml)(;.*)?"), XSL,
-             XPath("/atom:entry/w_ns16:usage"),
-             XPath("/atom:entry/w_ns16:usage/w_ns16:up"),
-             XPath("/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down"),
+             XPath("/atom:entry/w_ns17:usage"),
+             XPath("/atom:entry/w_ns17:usage/w_ns17:up"),
+             XPath("/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down"),
              XPath("/atom:entry/@only_usage_up_down"), Accept)
 
       assert(checker,Start, URL("servers"), URL("entries"),
@@ -79,9 +79,9 @@ class WADLCheckerOptSpecSaxonEE extends BaseCheckerSpec {
       assert(checker,Start, URL("nova"), URL("entries"),
              Method("POST"),
              ReqType("(application/atom\\+xml)(;.*)?"), XSL,
-             XPath("/atom:entry/w_ns17:usage"),
-             XPath("/atom:entry/w_ns17:usage/w_ns17:up"),
-             XPath("/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down"),
+             XPath("/atom:entry/w_ns16:usage"),
+             XPath("/atom:entry/w_ns16:usage/w_ns16:up"),
+             XPath("/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down"),
              XPath("/atom:entry/@only_usage_up_down"), Accept)
 
       assert(checker,Start, URL("nova"), URL("entries"),
@@ -118,9 +118,9 @@ class WADLCheckerOptSpecSaxonEE extends BaseCheckerSpec {
       assert(checker,Start, URL("servers"), URL("entries"),
              Method("POST"),
              ReqType("(application/atom\\+xml)(;.*)?"), XSL,
-             XPath("/atom:entry/w_ns16:usage"),
-             XPath("/atom:entry/w_ns16:usage/w_ns16:up"),
-             XPath("/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down"),
+             XPath("/atom:entry/w_ns17:usage"),
+             XPath("/atom:entry/w_ns17:usage/w_ns17:up"),
+             XPath("/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down"),
              XPath("/atom:entry/@only_usage_up_down"), Accept)
 
       assert(checker,Start, URL("servers"), URL("entries"),
@@ -133,9 +133,9 @@ class WADLCheckerOptSpecSaxonEE extends BaseCheckerSpec {
       assert(checker,Start, URL("nova"), URL("entries"),
              Method("POST"),
              ReqType("(application/atom\\+xml)(;.*)?"), XSL,
-             XPath("/atom:entry/w_ns17:usage"),
-             XPath("/atom:entry/w_ns17:usage/w_ns17:up"),
-             XPath("/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down"),
+             XPath("/atom:entry/w_ns16:usage"),
+             XPath("/atom:entry/w_ns16:usage/w_ns16:up"),
+             XPath("/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down"),
              XPath("/atom:entry/@only_usage_up_down"), Accept)
 
       assert(checker,Start, URL("nova"), URL("entries"),
@@ -175,9 +175,9 @@ class WADLCheckerOptSpecSaxonEE extends BaseCheckerSpec {
       assert(checker,Start, URL("servers"), URL("entries"),
              Method("POST"),
              ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XSL,
-             XPath("/atom:entry/w_ns16:usage"),
-             XPath("/atom:entry/w_ns16:usage/w_ns16:up"),
-             XPath("/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down"),
+             XPath("/atom:entry/w_ns17:usage"),
+             XPath("/atom:entry/w_ns17:usage/w_ns17:up"),
+             XPath("/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down"),
              XPath("/atom:entry/@only_usage_up_down"), Accept)
 
       assert(checker,Start, URL("servers"), URL("entries"),
@@ -194,9 +194,9 @@ class WADLCheckerOptSpecSaxonEE extends BaseCheckerSpec {
       assert(checker,Start, URL("nova"), URL("entries"),
              Method("POST"),
              ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XSL,
-             XPath("/atom:entry/w_ns17:usage"),
-             XPath("/atom:entry/w_ns17:usage/w_ns17:up"),
-             XPath("/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down"),
+             XPath("/atom:entry/w_ns16:usage"),
+             XPath("/atom:entry/w_ns16:usage/w_ns16:up"),
+             XPath("/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down"),
              XPath("/atom:entry/@only_usage_up_down"), Accept)
 
       assert(checker,Start, URL("nova"), URL("entries"),
@@ -241,9 +241,9 @@ class WADLCheckerOptSpecSaxonEE extends BaseCheckerSpec {
       assert(checker,Start, URL("servers"), URL("entries"),
              Method("POST"),
              ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XSL,
-             XPath("/atom:entry/w_ns16:usage"),
-             XPath("/atom:entry/w_ns16:usage/w_ns16:up"),
-             XPath("/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down"),
+             XPath("/atom:entry/w_ns17:usage"),
+             XPath("/atom:entry/w_ns17:usage/w_ns17:up"),
+             XPath("/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down"),
              XPath("/atom:entry/@only_usage_up_down"), Accept)
 
       assert(checker,Start, URL("servers"), URL("entries"),
@@ -260,9 +260,9 @@ class WADLCheckerOptSpecSaxonEE extends BaseCheckerSpec {
       assert(checker,Start, URL("nova"), URL("entries"),
              Method("POST"),
              ReqType("(application/atom\\+xml)(;.*)?"), WellXML, XSL,
-             XPath("/atom:entry/w_ns17:usage"),
-             XPath("/atom:entry/w_ns17:usage/w_ns17:up"),
-             XPath("/atom:entry/w_ns17:usage/w_ns17:up/w_ns17:down"),
+             XPath("/atom:entry/w_ns16:usage"),
+             XPath("/atom:entry/w_ns16:usage/w_ns16:up"),
+             XPath("/atom:entry/w_ns16:usage/w_ns16:up/w_ns16:down"),
              XPath("/atom:entry/@only_usage_up_down"), Accept)
 
       assert(checker,Start, URL("nova"), URL("entries"),

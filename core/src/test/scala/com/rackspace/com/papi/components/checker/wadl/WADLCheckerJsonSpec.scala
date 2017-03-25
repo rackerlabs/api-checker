@@ -1029,7 +1029,7 @@ class WADLCheckerJsonSpec extends BaseCheckerSpec {
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON, JSONSchema, Accept)
       assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON, Accept)
       assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ReqType("(application/json)(;.*)?"), WellJSON, ContentFail)
-      assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON, ContentFail)
+      assert (checker, Start, URL("c"), Method("POST"), ReqType("(application/json)(;.*)?"), ContentFail)
     }
 
     scenario("The WADL contains PUT and POST operations accepting JSON which must validate against an JSON Schema (with dups on)") {

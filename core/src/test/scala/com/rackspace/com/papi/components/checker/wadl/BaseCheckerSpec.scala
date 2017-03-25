@@ -22,10 +22,11 @@ import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
 import com.rackspace.com.papi.components.checker.Config
 import org.scalatest.exceptions.TestFailedException
+import com.typesafe.scalalogging.slf4j.LazyLogging
 
 import scala.xml._
 
-class BaseCheckerSpec extends BaseWADLSpec {
+class BaseCheckerSpec extends BaseWADLSpec with LazyLogging {
   val localWADLURI = (new File(System.getProperty("user.dir"),"mywadl.wadl")).toURI.toString
 
   val builder = new WADLCheckerBuilder(wadl)
@@ -428,28 +429,27 @@ class BaseCheckerSpec extends BaseWADLSpec {
 
     if (step_funs.isEmpty) throw new TestFailedException("Path assertion should contain at least one step!",4)
 
-    def followPath(step : NodeSeq, nextSteps : Seq[NodeSeq]) : Boolean = {
-      if (nextSteps.isEmpty) return true
-      val next = nextSteps(0)
-      step.foreach(n =>
-        (n \ "@next").text.split(" ").foreach(m => next.foreach (o =>
-          if ((o \ "@id").text == m) {
-            if (followPath (next, nextSteps.drop(1))) return true
-          })))
-      false
+
+    def getNext(step : Node) : NodeSeq = {
+      (step \ "@next").text.split(" ").map(id => { (checker \\ "step").filter (ns => { (ns \ "@id").text == id}) }).fold(NodeSeq.Empty)(_ ++ _)
     }
 
-    val steps = step_funs.map (n => n(checker))
-
-    //
-    //  Check to make sure all the steps are available...
-    //
-    steps.foreach (s => if (s.isEmpty) throw new TestFailedException("A step in the path could not be found", 4))
+    def followPath(steps : NodeSeq, stepFuns : List[(NodeSeq) => NodeSeq]) : Boolean = stepFuns match {
+      case Nil => true
+      case stepFun :: nextFuns =>
+        val matchSteps = stepFun(steps)
+        logger.trace ("Match Steps "+matchSteps)
+        matchSteps.map(s => {
+          val nextSteps = getNext(s)
+          logger.trace ("next steps for "+s +" :: "+nextSteps)
+          followPath(nextSteps, nextFuns)
+        }).fold(false)(_ || _)
+    }
 
     //
     //  Try to follow the path
     //
-    if (!followPath(steps(0), steps.drop(1))) {
+    if (!followPath((checker \\ "step"), step_funs.toList)) {
       throw new TestFailedException("Could not follow path", 4)
     }
   }
