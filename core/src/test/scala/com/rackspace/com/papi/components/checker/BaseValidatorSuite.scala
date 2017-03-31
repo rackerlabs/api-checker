@@ -160,7 +160,11 @@ class BaseValidatorSuite extends FunSuite {
   def request(method : String, url : String, contentType : String, content : String) : HttpServletRequest = {
     val req = request(method, url, contentType)
 
-    when(req.getInputStream).thenReturn(new ByteArrayServletInputStream(content))
+    if (content == null) {
+      when(req.getInputStream).thenReturn(null)
+    } else {
+      when(req.getInputStream).thenReturn(new ByteArrayServletInputStream(content))
+    }
 
     req
   }

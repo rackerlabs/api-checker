@@ -320,6 +320,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "SET_HEADER_ALWAYS"  => addSetHeaderAlways(atts)
           case "JSON_SCHEMA" => addJSONSchema(atts)
           case "JSON_XPATH" => addJSONXPath(atts)
+          case "ASSERT"     => addAssert(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -802,6 +803,42 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new JSONXPath(id, label, _match, message, code, context, version, captureHeader, priority, new Array[Step](nexts.length)))
+  }
+
+
+  private[this] def addAssert(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val _match : String = atts.getValue("match")
+    val mc = getMessageCode(atts)
+    val message = mc._1
+    val code = mc._2
+    val context : ImmutableNamespaceContext = ImmutableNamespaceContext(prefixes)
+    val version : Int = {
+      val sversion = atts.getValue("version")
+
+      if (sversion == null) {
+        Config.RAX_ASSERT_XPATH_VERSION
+      } else {
+        sversion.toInt
+      }
+    }
+    val priority = getPriority (atts)
+
+    //
+    //  Make an attempt to parse the XPath expression. Throw a
+    //  SAXParseException if something goes wrong.
+    //
+    try {
+      Assert.parseXPath(_match, context, version)
+    } catch {
+      case spe : SAXParseException => throw spe
+      case e : Exception => throw new SAXParseException ("Error while compiling assert XPath expression: "+e.getMessage(), locator, e)
+    }
+
+    next += (id -> nexts)
+    steps += (id -> new Assert(id, label, _match, message, code, context, version, priority, new Array[Step](nexts.length)))
   }
 
 

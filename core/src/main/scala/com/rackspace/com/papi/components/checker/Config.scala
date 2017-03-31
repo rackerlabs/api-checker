@@ -36,6 +36,13 @@ object Config {
     val affectsCheckerType = universe.typeOf[AffectsChecker]
     universe.typeOf[Config].members.filter(i => i.annotations.map(a => a.tree.tpe).contains(affectsCheckerType))
   }
+
+  //
+  //  The default version of XPath to use for rax:assert XPath
+  //  statements.  Currently, the version is fixed.
+  //
+  val RAX_ASSERT_XPATH_VERSION = 31
+  val RAX_ASSERT_XPATH_VERSION_STRING = "3.1"
 }
 
 /**
@@ -276,6 +283,27 @@ class Config extends LazyLogging {
   @BeanProperty
   @AffectsChecker
   var enableAuthenticatedByExtension : Boolean = false
+
+  //
+  //  Enables rax:assert extensions which allows specifying an
+  //  XPath3.1 assertion.  The assertion works similar to XSD 1.1
+  //  assertion and supports @message, @code for reporting errors.
+  //
+  //  The assertion may look at the uri ($req:uri), method ($req:method),
+  //  request body ($_ or $body), and headers (with a call to
+  //  req:header or req:headers).  The extension may be placed in a
+  //  wadl:method/wadl:request,
+  //  wadl:method/wadl:request/wadl:representation.  The extension may
+  //  also be placed in wadl:resources where it applies to all methods
+  //  globally or on wadl:resource which applies to all methods of
+  //  that resource and if @applyToChildren is set to true then it
+  //  will also apply to all subresources as well.
+  //
+  //  Note that having an assertion on a wadl:representation will
+  //  enable wellformed checks.
+  @BeanProperty
+  @AffectsChecker
+  var enableAssertExtension : Boolean = true
 
   //
   //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,

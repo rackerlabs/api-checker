@@ -115,6 +115,7 @@
                 <alternative test="@type eq 'HEADER_ALL'" type="chk:HeaderAllStep"/>
                 <alternative test="@type eq 'JSON_SCHEMA'" type="chk:JsonSchemaStep"/>
                 <alternative test="@type eq 'JSON_XPATH'" type="chk:JsonXPathStep"/>
+                <alternative test="@type eq 'ASSERT'" type="chk:AssertStep"/>
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
@@ -326,6 +327,77 @@
         </complexContent>
     </complexType>
 
+    <complexType name="AssertStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    This is almost exactly like an XPathStep and
+                    JsonXPathStep, except that:
+                    <html:ol>
+                        <html:li>
+                            The request uri, method, and other
+                            attributes are passed as XPath parameters
+                            ($req:uri, $req:method, $req:headerNames).
+                        </html:li>
+                        <html:li>
+                            There are two xpath functions to retrive
+                            headers: req:header and req:headers.  The
+                            first call returns only the first header
+                            value, the 2nd retrives all header values.
+                            The name of available headers is stored in
+                            the sequence $req:headerNames. There is an
+                            optional boolean value to the header
+                            functions that denotes that header values
+                            should be seperated by commas, if
+                            unspecified it is assumed that the values
+                            are not comma seperated.
+                        </html:li>
+                        <html:li>
+                            The body is stored in the $req:body variable
+                            or in $req:_ (which can also be denoted as
+                            simply $body and $_).  Note that these
+                            variables may point to a map, array,
+                            xs:boolean, xs:string, xs:double, the
+                            empty sequence to denote null or a
+                            document node if the body is XML.
+                            Additionally, if the body is XML then the
+                            XPath context will also be pointing at the
+                            XML document otherwise the context will be
+                            an empty document.  Only XML and JSON is
+                            currently supported the variables will
+                            return an empty sequence if the format is
+                            not XML or JSON.
+                        </html:li>
+                        <html:li>
+                            This step does not support
+                            rax:captureHeader extension, since the
+                            intent here is only to assert a t/f XPath
+                            assertion.
+                        </html:li>
+                    </html:ol>
+                </html:p>
+                <html:p>
+                    Currentlty the XPath version is fixed to be 3.1
+                    since it's the only version that supports json.
+                </html:p>
+                <html:p>
+                    In future versions we may depricate using XPath
+                    and JsonXPath steps for performing assertions, as
+                    this step is more appropriate.  Instead, we may
+                    focus those steps to check types assocated with
+                    the body and to capture parts of the body as
+                    headers.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:GenContentFailStep">
+                <attribute name="match" type="xsd:string" use="required"/>
+                <attribute name="version" type="chk:XPathVersion" fixed="31" use="optional"/>
+                <attributeGroup ref="chk:MessageAttributes"/>
+            </extension>
+        </complexContent>
+    </complexType>
 
     <complexType name="JsonSchemaStep">
         <annotation>
@@ -847,6 +919,7 @@
             <enumeration value="HEADER_ALL"/>
             <enumeration value="JSON_SCHEMA"/>
             <enumeration value="JSON_XPATH" />
+            <enumeration value="ASSERT"/>
         </restriction>
     </simpleType>
 

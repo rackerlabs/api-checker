@@ -27,9 +27,7 @@ import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.om.Sequence
 
 
-import org.apache.commons.pool.PoolableObjectFactory
-import org.apache.commons.pool.impl.SoftReferenceObjectPool
-
+import XQueryEvaluatorPool._
 
 object JSONConverter {
   private val mapper = new ObjectMapper
@@ -39,8 +37,9 @@ object JSONConverter {
     c.setLanguageVersion("3.1")
     c
   }
-  private val executable  = compiler.compile(getClass.getResourceAsStream("/xq/load-json.xq"))
-  private val pool = new SoftReferenceObjectPool[XQueryEvaluator](new JSONParseEvaluatorFactory(executable))
+  private val query = "/xq/load-json.xq"
+  private val executable  = compiler.compile(getClass.getResourceAsStream(query))
+
 
   /**
    * Convert a Jackson JsonNode into a Sequence that can be used by Saxon.
@@ -59,19 +58,11 @@ object JSONConverter {
     //
     var evaluator : XQueryEvaluator = null;
     try {
-      evaluator = pool.borrowObject()
+      evaluator = borrowEvaluator(query, executable)
       evaluator.setExternalVariable(new QName("__JSON__"), new XdmAtomicValue(mapper.writeValueAsString(node)))
       evaluator.evaluate().getUnderlyingValue()
     } finally {
-      if (evaluator != null) pool.returnObject(evaluator)
+      if (evaluator != null) returnEvaluator(query, evaluator)
     }
   }
-}
-
-private class JSONParseEvaluatorFactory(val executable : XQueryExecutable)  extends PoolableObjectFactory[XQueryEvaluator] {
-  def makeObject = executable.load()
-  def validateObject  (xe : XQueryEvaluator) : Boolean = xe != null
-  def passivateObject (xe : XQueryEvaluator) : Unit = { /* Ignore */ }
-  def activateObject (xe : XQueryEvaluator) : Unit = { /* Ignore */ }
-  def destroyObject (xe : XQueryEvaluator) : Unit = { /* Ignore */ }
 }

@@ -20,9 +20,12 @@ package com.rackspace.com.papi.components.checker.servlet
 //
 object RequestAttributes {
   val PARSED_XML    = "com.rackspace.com.papi.components.checker.servlet.ParsedXML"
+  val PARSED_XML_SOURCE = "com.rackspace.com.papi.components.checker.servlet.ParsedXMLSource"
   val PARSED_JSON   = "com.rackspace.com.papi.components.checker.servlet.ParsedJSONTokens"
-  val PARSED_JSON_SEQUENCE = "com.rackspace.com.papi.components.checker.servlet.ParsedJSONSequence"
+  val PARSED_JSON_SEQUENCE  = "com.rackspace.com.papi.components.checker.servlet.ParsedJSONSequence"
+  val PARSED_JSON_XDM_VALUE = "com.rackspace.com.papi.components.checker.servlet.ParsedJSONXDMValue"
   val CONTENT_ERROR = "com.rackspace.com.papi.components.checker.servlet.ContentError"
   val CONTENT_ERROR_CODE = "com.rackspace.com.papi.components.checker.servlet.ContentErrorCode"
   val CONTENT_ERROR_PRIORITY = "com.rackspace.com.papi.components.checker.servlet.ContentErrorPriority"
+  val REQUEST_XDM_VALUE = "com.rackspace.com.papi.components.checker.servlet.RequestAsXdmValue"
 }

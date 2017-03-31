@@ -58,7 +58,7 @@
                                                                    'XPATH', 'XSL', 'HEADER',
                                                                    'HEADERXSD', 'HEADER_ANY', 'HEADERXSD_ANY',
                                                                    'HEADER_SINGLE', 'HEADERXSD_SINGLE', 'HEADER_ALL',
-                                                                   'JSON_SCHEMA', 'JSON_XPATH')"/>
+                                                                   'JSON_SCHEMA', 'JSON_XPATH', 'ASSERT')"/>
 
     <!-- Useful matches -->
     <xsl:variable name="matchAll" select="'(?s).*'"/>

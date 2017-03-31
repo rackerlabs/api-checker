@@ -136,8 +136,8 @@ class RequestResponseSuite extends BaseValidatorSuite {
     wrapper.addHeader("Foo", "Baz")
     wrapper.addHeader("Moo", "Baz")
     val headers = wrapper.getHeaderNames
-    assert(headers.nextElement() == "Foo")
-    assert(headers.nextElement() == "Moo")
+    assert(headers.nextElement() == "foo")
+    assert(headers.nextElement() == "moo")
   }
 
   test("Ensure getHeaderNames continues to send null if the original request sends null because of security") {

@@ -89,6 +89,8 @@ class ImmutableNamespaceContext private (private val inputNS : scala.collection.
     }
   }
 
+  def getAllPrefixes = prefixToURI.keySet
+
   //
   //  Borrow toString, hashCode, and equals from our immutable
   //  namespace map.

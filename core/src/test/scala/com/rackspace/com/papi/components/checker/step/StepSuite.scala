@@ -6815,4 +6815,179 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     assert (!req2.contentError.getMessage.contains("\n"))
   }
 
+  test ("In an Assert test if an XPath validates then a step context should be returned (checking method)") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", None, None, nsContext, 31, 10, Array[Step]())
+    val req1 = request("GET", "/a/b")
+    val req2 = request("GET", "/a/c")
+
+    assert(assertStep.checkStep(req1, response, chain, StepContext()).isDefined)
+    assert(assertStep.checkStep(req2, response, chain, StepContext(1)).isDefined)
+  }
+
+  test ("In an Assert test if an XPath validates then a the content error priorisy should be -1") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", None, None, nsContext, 31, 10, Array[Step]())
+    val req1 = request("GET", "/a/b")
+    val req2 = request("GET", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentErrorPriority == -1)
+    assert (req2.contentErrorPriority == -1)
+  }
+
+  test ("In an Assert test if an XPath does not validates then a step context should be empty (checking method)") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", None, None, nsContext, 31, 10, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assert(assertStep.checkStep(req1, response, chain, StepContext()).isEmpty)
+    assert(assertStep.checkStep(req2, response, chain, StepContext(1)).isEmpty)
+  }
+
+  test ("In an Assert test if an XPath does not validates then the error priority should be set (checking method)") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", None, None, nsContext, 31, 10, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentErrorPriority == 10)
+    assert (req2.contentErrorPriority == 10)
+  }
+
+  test ("In an Assert test if an XPath does not validate then the request should contain a SAXParseException") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", None, None, nsContext, 31, 10, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+  }
+
+
+  test ("In an Assert test if an XPath does not validate then the request should contain a SAXParseException with message of 'Expecting '+XPath") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", None, None, nsContext, 31, 10, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting $req:method = 'GET'"))
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting $req:method = 'GET'"))
+  }
+
+  test ("In an Assert test if an XPath does not validate then the request should contain an error code = 400") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", None, None, nsContext, 31, 10, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting $req:method = 'GET'"))
+    assert (req1.contentErrorCode == 400)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting $req:method = 'GET'"))
+    assert (req2.contentErrorCode == 400)
+  }
+
+  test ("In an Assert test if an XPath does not validate then the request should contain a SAXParseException with message of setMessage") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", Some("Expecting a GET Method"), None, nsContext, 31, 10, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting a GET Method"))
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting a GET Method"))
+  }
+
+
+  test ("In an Assert test if an XPath does not validate then the request should contain an error code of setError Code") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", None, Some(401), nsContext, 31, 10, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting $req:method = 'GET'"))
+    assert (req1.contentErrorCode == 401)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting $req:method = 'GET'"))
+    assert (req2.contentErrorCode == 401)
+  }
+
+
+  test ("In an Assert test if an XPath does not validate then the request should contain an error message of setMessage  and an code of setError Code") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", Some("Expecting GET Method"), Some(401), nsContext, 31, 10, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting GET Method"))
+    assert (req1.contentErrorCode == 401)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting GET Method"))
+    assert (req2.contentErrorCode == 401)
+  }
+
+  test ("In an Assert test if an XPath does not validate then the request should contain an error message of setMessage  and an code of setError Code,  setPriority") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val assertStep = new Assert("Assert","Assert", "$req:method = 'GET'", Some("Expecting GET Method"), Some(401), nsContext, 31, 50, Array[Step]())
+    val req1 = request("DELETE", "/a/b")
+    val req2 = request("PUT", "/a/c")
+
+    assertStep.checkStep(req1, response, chain, StepContext())
+    assertStep.checkStep(req2, response, chain, StepContext(1))
+
+    assert (req1.contentError != null)
+    assert (req1.contentError.isInstanceOf[SAXParseException])
+    assert (req1.contentError.getMessage.contains("Expecting GET Method"))
+    assert (req1.contentErrorCode == 401)
+    assert (req1.contentErrorPriority == 50)
+    assert (req2.contentError != null)
+    assert (req2.contentError.isInstanceOf[SAXParseException])
+    assert (req2.contentError.getMessage.contains("Expecting GET Method"))
+    assert (req2.contentErrorCode == 401)
+    assert (req2.contentErrorPriority == 50)
+  }
 }
