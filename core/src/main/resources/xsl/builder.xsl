@@ -368,6 +368,30 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:template match="rax:assert" mode="ns">
+        <!--
+            If we have an assert then copy all namespace nodes in that
+            param. And enure that we don't prune the namespaces.
+
+            A nicer thing to do would be to parse out the XPath,
+            include only those namespaces referenced and allow for
+            pruning...
+        -->
+        <xsl:if test="$useAssert">
+            <xsl:variable name="this" as="node()" select="."/>
+            <xsl:variable name="test" as="xsd:string" select="@test"/>
+            <xsl:for-each select="in-scope-prefixes($this)">
+                <xsl:if test="contains($test,concat(.,':'))">
+                    <xsl:call-template name="check:printns">
+                        <xsl:with-param name="pfix" select="."/>
+                        <xsl:with-param name="uri" select="namespace-uri-for-prefix(.,$this)"/>
+                    </xsl:call-template>
+                </xsl:if>
+            </xsl:for-each>
+            <dont_prune/>
+        </xsl:if>
+    </xsl:template>
+
     <xsl:template name="check:printns">
         <xsl:param name="pfix" as="xsd:string" />
         <xsl:param name="uri" as="xsd:string"/>
