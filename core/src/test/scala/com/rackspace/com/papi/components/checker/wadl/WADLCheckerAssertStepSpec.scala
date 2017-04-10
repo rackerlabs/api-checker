@@ -226,12 +226,16 @@ class WADLCheckerAssertStepSpec extends BaseCheckerSpec with LogAssertions {
 
   val assertAtResourceLevelApplyChildrenTrueRepAsserts =
         <application xmlns="http://wadl.dev.java.net/2009/02"
-                     xmlns:rax="http://docs.rackspace.com/api">
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:test="http://test/foo"
+                     >
          <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
                <method name="POST">
                   <request>
-                    <representation mediaType="application/xml"/>
+                    <representation mediaType="application/xml">
+                      <rax:assert test="/test:test/@foo == 'bar'"/>
+                    </representation>
                     <representation mediaType="application/json"/>
                     <representation mediaType="text/x-yaml">
                       <rax:assert test="'text/x-yaml' = req:headers('Accept', true())"/>
@@ -273,12 +277,15 @@ class WADLCheckerAssertStepSpec extends BaseCheckerSpec with LogAssertions {
 
   val assertAtResourceLevelApplyChildrenTrueRepResourcesAsserts =
         <application xmlns="http://wadl.dev.java.net/2009/02"
-                     xmlns:rax="http://docs.rackspace.com/api">
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:test="http://test/foo">
          <resources base="https://test.api.openstack.com">
            <resource path="/a/b">
                <method name="POST">
                   <request>
-                    <representation mediaType="application/xml"/>
+                    <representation mediaType="application/xml">
+                      <rax:assert test="/test:test/@foo == 'bar'"/>
+                    </representation>
                     <representation mediaType="application/json"/>
                     <representation mediaType="text/x-yaml">
                       <rax:assert test="'text/x-yaml' = req:headers('Accept', true())"/>
@@ -745,10 +752,11 @@ class WADLCheckerAssertStepSpec extends BaseCheckerSpec with LogAssertions {
       When("the wadl is translated")
       val checker = builder.build (inWADL, assertEnabled)
       Then ("The following assertions should hold")
-      assert(checker,"count(/chk:checker/chk:step[@type='ASSERT']) = 18")
-
-      assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, RaxAssert("req:header('X-AUTH') = 'foo!'"),
-             RaxAssert("contains($req:uri,'/a')"), Accept)
+      assert(checker, "count(/chk:checker/chk:step[@type='ASSERT']) = 19")
+      assert(checker, "in-scope-prefixes(/chk:checker/chk:step[contains(@match,'test:')]) = 'test'")
+      assert(checker, "namespace-uri-for-prefix('test', /chk:checker/chk:step[contains(@match,'test:')]) = 'http://test/foo'")
+      assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, RaxAssert("/test:test/@foo == 'bar'"),
+             RaxAssert("req:header('X-AUTH') = 'foo!'"), RaxAssert("contains($req:uri,'/a')"), Accept)
       assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON, RaxAssert("req:header('X-AUTH') = 'foo!'"),
              RaxAssert("contains($req:uri,'/a')"), Accept)
@@ -789,9 +797,11 @@ class WADLCheckerAssertStepSpec extends BaseCheckerSpec with LogAssertions {
       When("the wadl is translated")
       val checker = builder.build (inWADL, assertEnabledRemoveDups)
       Then ("The following assertions should hold")
-      assert(checker,"count(/chk:checker/chk:step[@type='ASSERT']) = 4")
-
-      assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, RaxAssert("req:header('X-AUTH') = 'foo!'"),
+      assert(checker,"count(/chk:checker/chk:step[@type='ASSERT']) = 5")
+      assert(checker, "in-scope-prefixes(/chk:checker/chk:step[contains(@match,'test:')]) = 'test'")
+      assert(checker, "namespace-uri-for-prefix('test', /chk:checker/chk:step[contains(@match,'test:')]) = 'http://test/foo'")
+      assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, RaxAssert("/test:test/@foo == 'bar'"),
+             RaxAssert("req:header('X-AUTH') = 'foo!'"),
              RaxAssert("contains($req:uri,'/a')"), Accept)
       assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
       assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/json)(;.*)?"), WellJSON, RaxAssert("req:header('X-AUTH') = 'foo!'"),
@@ -855,9 +865,10 @@ class WADLCheckerAssertStepSpec extends BaseCheckerSpec with LogAssertions {
       When("the wadl is translated")
       val checker = builder.build (inWADL, assertEnabled)
       Then ("The following assertions should hold")
-      assert(checker,"count(/chk:checker/chk:step[@type='ASSERT']) = 31")
-
-      assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML,
+      assert(checker,"count(/chk:checker/chk:step[@type='ASSERT']) = 32")
+      assert(checker, "in-scope-prefixes(/chk:checker/chk:step[contains(@match,'test:')]) = 'test'")
+      assert(checker, "namespace-uri-for-prefix('test', /chk:checker/chk:step[contains(@match,'test:')]) = 'http://test/foo'")
+      assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, RaxAssert("/test:test/@foo == 'bar'"),
              RaxAssert("req:header('X-AUTH') = 'foo!'","Not auth to send X-AUTH unless it's 'foo!'", 403),
              RaxAssert("contains($req:uri,'/a')"), RaxAssert("not(empty($req:uri))"), Accept)
       assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
@@ -911,9 +922,10 @@ class WADLCheckerAssertStepSpec extends BaseCheckerSpec with LogAssertions {
       When("the wadl is translated")
       val checker = builder.build (inWADL, assertEnabledRemoveDups)
       Then ("The following assertions should hold")
-      assert(checker,"count(/chk:checker/chk:step[@type='ASSERT']) = 5")
-
-      assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML,
+      assert(checker,"count(/chk:checker/chk:step[@type='ASSERT']) = 6")
+      assert(checker, "in-scope-prefixes(/chk:checker/chk:step[contains(@match,'test:')]) = 'test'")
+      assert(checker, "namespace-uri-for-prefix('test', /chk:checker/chk:step[contains(@match,'test:')]) = 'http://test/foo'")
+      assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, RaxAssert("/test:test/@foo == 'bar'"),
              RaxAssert("req:header('X-AUTH') = 'foo!'","Not auth to send X-AUTH unless it's 'foo!'", 403),
              RaxAssert("contains($req:uri,'/a')"), RaxAssert("not(empty($req:uri))"), Accept)
       assert(checker, Start,URL("a"), URL("b"), Method("POST"), ReqType("(application/xml)(;.*)?"), WellXML, ContentFail)
