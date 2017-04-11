@@ -31,7 +31,6 @@
 <priority-map xmlns="http://www.rackspace.com/repose/wadl/checker/priority">
     <map type="URL_FAIL"      priority="10000" attributeMultipliers="notMatch notTypes" multValue="50"/>
     <map type="METHOD_FAIL"   priority="20000" attributeMultipliers="notMatch" multValue="50"/>
-    <map type="REQ_TYPE_FAIL" priority="30000"/>
     <map type="CONTENT_FAIL"  priority="40000"/>
     <map type="HEADER"        priority="41000"/>
     <map type="HEADERXSD"     priority="41000"/>
@@ -40,13 +39,14 @@
     <map type="HEADER_ANY"    priority="41000"/>
     <map type="HEADERXSD_ANY" priority="41000"/>
     <map type="HEADER_ALL"    priority="41000"/>
-    <map type="WELL_XML"      priority="41000"/>
-    <map type="WELL_JSON"     priority="41000"/>
-    <map type="XPATH"         priority="41000"/>
-    <map type="JSON_XPATH"    priority="41000"/>
-    <map type="XSL"           priority="41000"/>
-    <map type="ASSERT"        priority="41000"/>
-    <map type="XSD"           priority="45000"/>
-    <map type="JSON_SCHEMA"   priority="45000"/>
+    <map type="REQ_TYPE_FAIL" priority="45000"/>
+    <map type="WELL_XML"      priority="50000"/>
+    <map type="WELL_JSON"     priority="50000"/>
+    <map type="XPATH"         priority="50000"/>
+    <map type="JSON_XPATH"    priority="50000"/>
+    <map type="XSL"           priority="50000"/>
+    <map type="ASSERT"        priority="50000"/>
+    <map type="XSD"           priority="55000"/>
+    <map type="JSON_SCHEMA"   priority="55000"/>
     <map type="ACCEPT"        priority="100000"/>
 </priority-map>

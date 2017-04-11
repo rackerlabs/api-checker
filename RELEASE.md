@@ -14,6 +14,7 @@
    1. WADLDotBuilder has always only worked with ```StreamResult```s (other ```Result``` types failed) this is now made explicit with the interface.
 1. Added support for ```rax:assert```, this allows setting XPath 3.1 assertions at the method request, representation, resource, and resources level.
    These assertions can simultaneously introspect headers, uri, methods, and body content (xml or json).
+1. Adjusted the priority of content type error steps to ensure content type errors are reported correctly.
 
 ## Release 2.1.1 (2017-01-27) ##
 1. Fixed a bug where a resource file needed by checker-util was kept in checker-core
