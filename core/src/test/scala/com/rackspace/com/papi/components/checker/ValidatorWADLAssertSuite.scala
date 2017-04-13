@@ -1,5 +1,5 @@
 /***
- *   Copyright 2016 Rackspace US, Inc.
+ *   Copyright 2017 Rackspace US, Inc.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -318,6 +318,23 @@ val WADL_withAsserts = <application xmlns="http://wadl.dev.java.net/2009/02"
                     </request>
                 </method>
             </resource>
+            <resource path="z">
+              <method name="PATCH">
+                <request>
+                    <representation mediaType="application/xml" element="tst2:a">
+                        <param name="test2" style="plain" path="tst2:a/@id" required="true" rax:message="Expecting an id attribute"/>
+                        <rax:assert test="$req:method='PATCH' and $req:uri='/a' and /tst2:a" message="This assertion should never fire!!" code="500"/>
+                    </representation>
+                </request>
+              </method>
+              <method name="PATCH" rax:roles="#all">
+                <request>
+                    <representation mediaType="application/json" rax:roles="#all">
+                        <param name="test3" style="plain" path="$_?firstName" required="true" rax:message="Need a first name" rax:code="403"/>
+                    </representation>
+                </request>
+              </method>
+            </resource>
             <!-- This assertion applies to all requests in the resource /a -->
             <rax:assert test="$req:uri='/a'" message="The request path should be /a" code="400"/>
             <rax:assert test="$req:uriLevel = 1" message="Bad URL Level this shouldn't happen" code="500"/>
@@ -396,6 +413,23 @@ val WADL_withAsserts2 = <application xmlns="http://wadl.dev.java.net/2009/02"
                         <rax:assert test="$req:uri='/a/b'" message="The request path should be /a/b" code="400"/>
                     </request>
                 </method>
+            </resource>
+            <resource path="z">
+              <method name="PATCH">
+                <request>
+                    <representation mediaType="application/xml" element="tst2:a">
+                        <param name="test2" style="plain" path="tst2:a/@id" required="true" rax:message="Expecting an id attribute"/>
+                        <rax:assert test="$req:method='PATCH' and $req:uri='/a' and /tst2:a" message="This assertion should never fire!!" code="500"/>
+                    </representation>
+                </request>
+              </method>
+              <method name="PATCH" rax:roles="#all">
+                <request>
+                    <representation mediaType="application/json" rax:roles="#all">
+                        <param name="test3" style="plain" path="$_?firstName" required="true" rax:message="Need a first name" rax:code="403"/>
+                    </representation>
+                </request>
+              </method>
             </resource>
             <!-- This assertion applies to all requests in the resource /a -->
             <rax:assert test="$req:uri='/a'" message="The request path should be /a" code="400"/>
@@ -626,16 +660,26 @@ val WADL_withAsserts2 = <application xmlns="http://wadl.dev.java.net/2009/02"
                          405, List("Method", "POST", "PUT"))
     }
 
-
     test (s"A POST on /a/b/c should fail with a 404 on $wadlDesc with $configDesc") {
       assertResultFailed(validator.validate(request("POST", "/a/b/c", "application/xml",goodXML, false,
                                                     Map[String,List[String]]("a"->List("abba"),
                                                                              "b"->List("ababa"),
                                                                              "X-Auth"->List("foo!"),
                                                                              "X-Roles"->List("user"))), response, chain),
-                         404, List("not found","{c}"))
+                         404, List("not found"))
     }
 
+    test (s"Plain text PATCH should fail on /a/z $wadlDesc with $configDesc when X-ROLES is user") {
+      assertResultFailed(validator.validate(request("PATCH","/a/z","plain/text","hello!", false,
+                                                    Map[String,List[String]]("X-Roles"->List("user"))), response, chain),
+                         415, List("content type","did not match"))
+    }
+
+    test (s"Plain text PATCH should fail on /a/z $wadlDesc with $configDesc when X-ROLES is foo") {
+      assertResultFailed(validator.validate(request("PATCH","/a/z","plain/text","hello!", false,
+                                                    Map[String,List[String]]("X-Roles"->List("foo"))), response, chain),
+                         415, List("content type","did not match"))
+    }
   }
 
   def sadWhenAssertionsAreEnabled(validator : Validator, wadlDesc : String, configDesc : String) {
@@ -935,7 +979,7 @@ val WADL_withAsserts2 = <application xmlns="http://wadl.dev.java.net/2009/02"
                                                     Map[String,List[String]]("a"->List("abba"),
                                                                              "b"->List("ababa"),
                                                                              "X-Auth"->List("foo!"))), response, chain),
-                         404, List("Resource not found"))
+                         405, List("PUT"))
      }
 
      test (s"A PUT on /a should validate with goodXML and an unknown role on $wadlDesc with $configDesc") {
