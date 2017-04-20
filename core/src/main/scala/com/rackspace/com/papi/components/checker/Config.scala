@@ -240,7 +240,15 @@ class Config extends LazyLogging {
   var enableMessageExtension : Boolean = true
 
   //
-  //  Enable rax-roles extension
+  //  Enable rax-roles extension.
+  //
+  //  Note that enabling rax-roles will also enable the following:
+  //
+  //  1. The rax:anyMatch extension
+  //  2. The rax:assert extension
+  //  3. Header Checks
+  //
+  //  ...these features are required to implement rax:roles.
   //
   @BeanProperty
   @AffectsChecker

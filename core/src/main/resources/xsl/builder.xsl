@@ -154,7 +154,7 @@
                   select="$enableMessageExtension or $useRaxRoles or $useAuthenticatedBy"/>
     <xsl:variable name="useCaptureHeaderExtension" as="xsd:boolean"
                   select="$enableCaptureHeaderExtension"/>
-    <xsl:variable name="useAssert" as="xsd:boolean" select="$enableAssertExtension"/>
+    <xsl:variable name="useAssert" as="xsd:boolean" select="$enableAssertExtension or $useRaxRoles"/>
     <xsl:variable name="useWarnHeaders" as="xsd:boolean"
                   select="$enableWarnHeaders and ($useXSDTransform or $usePreProcessExtension)"/>
 
