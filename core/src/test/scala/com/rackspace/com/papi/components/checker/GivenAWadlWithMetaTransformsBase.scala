@@ -25,6 +25,11 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
   val descriptionWithoutRaxRoles = description + " and Without RAX-Roles"
   val descriptionWithRaxRoles = description + " and RAX-Roles"
   val descriptionWithRaxRolesMasked = descriptionWithRaxRoles + " Masked"
+  val bulk ="bulk"
+  val descriptionWithoutRaxRolesBulk = description + " and Without RAX-Roles "+bulk
+  val descriptionWithRaxRolesBulk = description + " and RAX-Roles "+bulk
+  val descriptionWithRaxRolesMaskedBulk = descriptionWithRaxRoles + " Masked "+bulk
+
 
   val metadataWadl = <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
     xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -61,6 +66,10 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
                The pattern is not a regEx |||: is simply treated as a string.
           -->
       <rax:metaRole name="???" pattern="|||:"/>
+
+      <!-- Here's another weird edge case patterns contain quotes -->
+      <rax:metaRole name="customer:quote" pattern="ap'o's:"/>
+      <rax:metaRole name="customer:quote" pattern='quo"t"e:'/>
     </rax:metadata>
   </application>
 
@@ -79,11 +88,14 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
     "",
     "customer:role:",
     "service:",
-    "%7C%7C%7C:" //java.net.URLEncoder.encode("|||:", "UTF-8")
+    "%7C%7C%7C:",  //java.net.URLEncoder.encode("|||:", "UTF-8")
+    "ap%27o%27s:", //java.net.URLEncoder.encode("ap'o's:", "UTF-8")
+    "quo%22t%22e:" //java.net.URLEncoder.encode("quo\"t\"e:", "UTF-8")
   )
 
   // http://stackoverflow.com/questions/13109720/how-to-create-all-possible-combinations-from-the-elements-of-a-list
-  val rolesSet = Set("admin", "billing:role", "service:role", "superAdmin", "customer:role", "another_role", "???")
+
+  val rolesSet = Set("admin", "billing:role", "service:role", "superAdmin", "customer:role", "another_role", "???", "customer:quote")
   val rolesList = rolesSet.subsets.map(_.toList).toList
 
   def createTests(useSaxon: Boolean) {
@@ -94,13 +106,23 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
       List(methodGet, methodPut, methodDel, methodPst).foreach { method =>
         targets.foreach { target =>
           rolesList.foreach { roles =>
-            // Access should be forbidden.
+            // Access should be not found
             it should behave like resourceNotFound(validator, method, s"/$style/metadata/${target}foo", roles, descriptionWithoutRaxRoles)
           }
           it should behave like resourceNotFoundWhenNoXRoles(validator, method, s"/$style/metadata/${target}foo", descriptionWithoutRaxRoles)
         }
       }
     }
+
+    List(("standard/55679674-8e21-11e6-bf0c-28cfe92134e7", targetsStandard), ("custom", targetsCustom)).foreach { case (style, targets) =>
+      List(methodGet, methodPut, methodDel, methodPst).foreach { method =>
+          rolesList.foreach { roles =>
+            // Access should be not found
+            it should behave like resourceNotFound(validator, method, s"/$style/metadata", roles, descriptionWithoutRaxRolesBulk)
+          }
+       it should behave like resourceNotFoundWhenNoXRoles(validator, method, s"/$style/metadata", descriptionWithoutRaxRolesBulk)
+     }
+   }
 
     List((true, false), (true, true)).foreach { case (enabled, masked) =>
       val validator = Validator((localWADLURI, metadataWadl), createConfigWithRaxRoles(enabled, masked, useSaxon))
@@ -117,6 +139,22 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
           }
           it should behave like accessIsAllowedWhenNoXRoles(validator, methodGet, s"/$style/metadata/${target}foo", desc)
         }
+
+        //
+        // Gets to full metadata should be allowed regardless of role
+        //
+        rolesList.foreach { roles =>
+          it should behave like accessIsAllowed(validator, methodGet, s"/$style/metadata", roles, desc)
+        }
+        it should behave like accessIsAllowedWhenNoXRoles(validator, methodGet, s"/$style/metadata", desc)
+
+        //
+        // POSTs to full metadata should be disallowed regardless of role
+        //
+        rolesList.foreach { roles =>
+          it should behave like methodNotAllowed(validator, methodPst, s"/$style/metadata", roles, desc)
+        }
+        it should behave like methodNotAllowedWhenNoXRoles(validator, methodPst, s"/$style/metadata", desc)
 
         // Standard/Custom POST's are not allowed regardless of roles.
         targets.foreach { target =>
@@ -168,6 +206,8 @@ abstract class GivenAWadlWithMetaTransformsBase extends FlatSpec with RaxRolesBe
             if (targetInRoles(target, roles, List("admin", "superAdmin"))
               || (target.equals("service:") && targetInRoles("another_role", roles, List.empty))
               || (target.equals("%7C%7C%7C:") && targetInRoles("???", roles, List.empty))
+              || (target.equals("ap%27o%27s:") && targetInRoles("customer:quote", roles, List.empty))
+              || (target.equals("quo%22t%22e:") && targetInRoles("customer:quote", roles, List.empty))
             ) {
               it should behave like accessIsAllowed(validator, method, s"/custom/metadata/${target}foo", roles, desc)
             } else if (masked) {
