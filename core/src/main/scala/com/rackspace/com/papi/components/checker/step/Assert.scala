@@ -48,7 +48,6 @@ import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.query.XQueryFunctionLibrary
 import net.sf.saxon.query.XQueryFunction
 
-
 import net.sf.saxon.value.SequenceType
 import net.sf.saxon.functions.FunctionLibraryList
 import net.sf.saxon.`type`.BuiltInAtomicType
@@ -59,7 +58,13 @@ object Assert {
   //
   //  The saxon processor, xquery compiler
   //
-  protected val processor = new Processor(true)
+  protected val processor = {
+    val p = new Processor(true)
+    val dynLoader = p.getUnderlyingConfiguration.getDynamicLoader
+    dynLoader.setClassLoader(getClass.getClassLoader)
+    p
+  }
+
   protected val saxonConfig = {
     val conf = processor.getUnderlyingConfiguration
     conf.getDynamicLoader.setClassLoader(getClass.getClassLoader)

@@ -192,7 +192,7 @@ object WADLCheckerBuilder {
   })
 
   private lazy val wadlSchemaManager = timeFunction("SaxonEE wadl schema compile", {
-    val proc = new Processor(true)
+    val proc = newProcessor(true)
     proc.setConfigurationProperty(FeatureKeys.MULTIPLE_SCHEMA_IMPORTS, true)
 
 
