@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Fixed a bug where we were not correctly setting the classloader.
+
 ## Release 2.2.0 (2017-05-12) ##
 1. Updated Dependencies
    1. saxon: 9.7.0-8 → 9.7.0-15

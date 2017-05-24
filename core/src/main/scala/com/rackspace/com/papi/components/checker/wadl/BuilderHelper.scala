@@ -47,7 +47,7 @@ import net.sf.saxon.serialize.MessageWarner
 
 protected object BuilderHelper extends LazyLogging {
 
-  val processor = new Processor(true)
+  val processor = newProcessor(true)
   val compiler = processor.newXsltCompiler
 
   compiler.setErrorListener(new LogErrorListener)
@@ -58,6 +58,13 @@ protected object BuilderHelper extends LazyLogging {
     val idt = transformerFactory.newTransformer()
     idt.setErrorListener (new LogErrorListener)
     idt
+  }
+
+  def newProcessor (licensedEdition : Boolean) : Processor = {
+    val p = new Processor(licensedEdition)
+    val dynLoader = p.getUnderlyingConfiguration.getDynamicLoader
+    dynLoader.setClassLoader(getClass.getClassLoader)
+    p
   }
 
   //
