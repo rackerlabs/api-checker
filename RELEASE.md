@@ -1,5 +1,5 @@
 # Releases #
-## In Progress Work ##
+## Release 2.2.1 (2017-05-24) ##
 1. Fixed a bug where we were not correctly setting the classloader.
 
 ## Release 2.2.0 (2017-05-12) ##
