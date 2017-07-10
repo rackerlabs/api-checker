@@ -6990,4 +6990,56 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
     assert (req2.contentErrorCode == 401)
     assert (req2.contentErrorPriority == 50)
   }
+
+  test("In Capture Header step, we should be able to capture method of the request") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val captureHeaderStep = new CaptureHeader("CaptureHeader", "CaptureHeader", "X-METHOD", "$req:method", nsContext, 31, Array[Step]())
+
+    val newCTX1 = captureHeaderStep.checkStep(request("GET", "/foo/bar"), response, chain, StepContext())
+    val newCTX2 = captureHeaderStep.checkStep(request("POST", "/bar/foo"), response, chain, StepContext())
+
+    assert(newCTX1.get.requestHeaders("X-METHOD") == List("GET"));
+    assert(newCTX2.get.requestHeaders("X-METHOD") == List("POST"));
+  }
+
+
+  test("In Capture Header step, we should be able to capture method of the request (Existing context header)") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val captureHeaderStep = new CaptureHeader("CaptureHeader", "CaptureHeader", "X-METHOD", "$req:method", nsContext, 31, Array[Step]())
+
+    val header1 = new HeaderMap()
+    val newCTX1 = captureHeaderStep.checkStep(request("GET", "/foo/bar"), response, chain, StepContext(requestHeaders=header1.addHeader("X-METHOD","FAZZ")))
+    val header2 = new HeaderMap()
+    val newCTX2 = captureHeaderStep.checkStep(request("POST", "/bar/foo"), response, chain, StepContext(requestHeaders=header1.addHeaders("X-METHOD",List("FAZZ","FIZZ"))))
+
+    assert(newCTX1.get.requestHeaders("X-METHOD") == List("FAZZ","GET"));
+    assert(newCTX2.get.requestHeaders("X-METHOD") == List("FAZZ", "FIZZ", "POST"));
+  }
+
+
+  test("In Capture Header step, a sequence should be split into multiple header values") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val captureHeaderStep = new CaptureHeader("CaptureHeader", "CaptureHeader", "X-VALUES", "(1, 23, 38839, $req:uriLevel)", nsContext, 31, Array[Step]())
+
+    val newCTX1 = captureHeaderStep.checkStep(request("GET", "/foo/bar"), response, chain, StepContext())
+    val newCTX2 = captureHeaderStep.checkStep(request("POST", "/bar/foo"), response, chain, StepContext(5))
+
+    assert(newCTX1.get.requestHeaders("X-VALUES") == List("1","23","38839","0"));
+    assert(newCTX2.get.requestHeaders("X-VALUES") == List("1","23","38839","5"));
+  }
+
+
+  test("In Capture Header step, an empty sequence should be okay") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val captureHeaderStep = new CaptureHeader("CaptureHeader", "CaptureHeader", "X-METHOD", "()", nsContext, 31, Array[Step]())
+
+    val header1 = new HeaderMap()
+    val newCTX1 = captureHeaderStep.checkStep(request("GET", "/foo/bar"), response, chain, StepContext(requestHeaders=header1.addHeader("X-METHOD","FAZZ")))
+    val header2 = new HeaderMap()
+    val newCTX2 = captureHeaderStep.checkStep(request("POST", "/bar/foo"), response, chain, StepContext(requestHeaders=header1.addHeaders("X-METHOD",List("FAZZ","FIZZ"))))
+
+    assert(newCTX1.get.requestHeaders("X-METHOD") == List("FAZZ"));
+    assert(newCTX2.get.requestHeaders("X-METHOD") == List("FAZZ", "FIZZ"));
+  }
+
 }

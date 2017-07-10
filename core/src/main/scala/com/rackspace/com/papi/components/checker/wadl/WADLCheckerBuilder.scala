@@ -90,8 +90,8 @@ object WADLCheckerBuilder {
   private lazy val raxMetaTransformXsltExec: XsltExecutable = timeFunction ("compile /xsl/meta-transform.xsl",
                                                                             compiler.compile(new StreamSource(getClass.getResource("/xsl/meta-transform.xsl").toString)))
 
-  private lazy val raxAssertXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxAssert.xsl",
-                                                                      compiler.compile(new StreamSource(getClass.getResource("/xsl/raxAssert.xsl").toString)))
+  private lazy val raxGlobalExtnXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxGlobalExtn.xsl",
+                                                                      compiler.compile(new StreamSource(getClass.getResource("/xsl/raxGlobalExtn.xsl").toString)))
 
 
   private lazy val raxRolesXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxRoles.xsl",
@@ -384,15 +384,15 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   })
 
   //
-  // Handles the rax:assert extension
+  // Handles global element extensions (rax:assert, rax:captureHeader) extension
   //
-  private def raxAssert(in : Source, c : Config) : Source = timeFunction("raxAssert", {
-    if (c.enableAssertExtension) {
-      val raxAssertTransform = getXsltTransformer(raxAssertXsltExec)
+  private def raxGlobalExtn(in : Source, c : Config) : Source = timeFunction("raxGlobalExtn", {
+    if (c.enableAssertExtension | c.enableCaptureHeaderExtension) {
+      val raxExtnTransform = getXsltTransformer(raxGlobalExtnXsltExec)
       val out = new XdmDestination
-      raxAssertTransform.setSource(in)
-      raxAssertTransform.setDestination(out)
-      raxAssertTransform.transform
+      raxExtnTransform.setSource(in)
+      raxExtnTransform.setDestination(out)
+      raxExtnTransform.transform
       out.getXdmNode.asSource
     } else {
       in
@@ -637,7 +637,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         //  be applied.
         //
         val buildSteps : List[CheckerTransform] =
-          List(raxAssert, authenticatedBy, raxRoles,
+          List(raxGlobalExtn, authenticatedBy, raxRoles,
                buildChecker(entityDoc, _, _),
                raxRolesMask, joinOpt, dupsOpt,
                joinHeaderOpt, joinXPathOpt, adjustNext, validateChecker)

@@ -265,10 +265,17 @@ class Config extends LazyLogging {
   var maskRaxRoles403 : Boolean = false
 
   //
-  //  Enable capture header extension.  This extension allows
-  //  capturing the contents of a WADL parameter to a request
-  //  header. Currently works with template, header, and XML plain
-  //  parameters.
+  //  Enable rax:captureHeader extension attribute.  This extension
+  //  allows capturing the contents of a WADL parameter to a request
+  //  header. Currently works with template, header, XML, and JSON
+  //  plain parameters.
+  //
+  //  Additionally, this enables the <rax:captureHeader/> element
+  //  which allows capturing a header based on an XPath 3.1. The XPath
+  //  follows the same rules as Assert XPath (see
+  //  enableAssertExtension), but expects a sequence of strings (which
+  //  are stored as header values) rather than a boolean.
+  //
   @BeanProperty
   @AffectsChecker
   var enableCaptureHeaderExtension : Boolean = true

@@ -74,7 +74,7 @@ class BaseValidatorSuite extends FunSuite {
                         <even>22</even>
                      </e>
 
-  val goodXML_XSD2 = <a xmlns="http://www.rackspace.com/repose/wadl/checker/step/test"
+  val goodXML_XSD2 = <tst:a xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test"
                         id="21f1fcf6-bf38-11e1-878e-133ab65fcec3"
                         stepType="ACCEPT"
                         even="22"/>
