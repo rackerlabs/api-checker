@@ -30,37 +30,37 @@ trait RaxRolesBehaviors {
   def localWADLURI = (new File(System.getProperty("user.dir"), "mywadl.wadl")).toURI.toString
 
   def configWithRolesEnabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, true)
 
   def configWithRolesEnabledDupsRemoved =
-    TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true)
+    TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, true)
 
   def configWithRolesMaskedEnabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, false, true)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, false, true, true)
 
   def configWithRolesMaskedEnabledDupsRemoved =
-    TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, false, true)
+    TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, false, true, true)
 
   def configWithRolesDisabledMaskedEnabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, false, false, true)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, false, false, true, true)
 
   def configWithRolesDisabledHeaderCheckEnabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, false)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, false, true)
 
   def configWithRolesDisabledHeaderCheckDisabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, false, true, true, false, false, false)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, false, true, true, false, false, false, true)
 
   def configWithRolesEnabledHeaderCheckDisabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, false, true, true, false, false, true)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, false, true, true, false, false, true, true)
 
   def configWithRolesMaskedEnabledHeaderCheckDisabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, false, true, true, false, false, true, false, true)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, false, true, true, false, false, true, false, true, true)
 
   def configWithRolesEnabledMessageExtDisabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, false, false, false, true)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, false, false, false, true, true)
 
   def configWithRolesMaskedEnabledMessageExtDisabled =
-    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, false, false, false, true, false, true)
+    TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, false, false, false, true, false, true, true)
 
   def configWithRaxRolesEnabledDefaultsEnabled = {
     val cfg = configWithRolesEnabled

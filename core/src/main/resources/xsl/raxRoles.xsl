@@ -113,15 +113,26 @@
 
     <xsl:template name="generateRoles">
         <xsl:param name="roles" as="xsd:string*" select="()"/>
-        <xsl:if test="not('#all' = $roles)">
-            <xsl:for-each select="$roles">
-                <wadl:param name="X-ROLES" style="header" rax:code="403" rax:anyMatch="true"
-                            rax:message="You are forbidden to perform the operation" type="xsd:string"
-                            required="true" repeating="true">
-                    <xsl:attribute name="fixed" select="rax:transformNBSP(.)"/>
-                </wadl:param>
-            </xsl:for-each>
-        </xsl:if>
+        <xsl:choose>
+            <xsl:when test="not('#all' = $roles)">
+                <xsl:variable name="escaped" as="xsd:string*" select="for $r in $roles return replace($r, '&apos;&apos;', '&apos;&apos;&apos;&apos;')"/>
+                <xsl:variable name="quoted" as="xsd:string*" select="for $r in $escaped return concat('&apos;&apos;', rax:transformNBSP($r), '&apos;&apos;')"/>
+                <xsl:variable name="ordered" as="xsd:string*"><xsl:perform-sort select="$quoted"><xsl:sort/></xsl:perform-sort></xsl:variable>
+                <xsl:variable name="sequence" as="xsd:string"><xsl:value-of select="$ordered" separator=", "/></xsl:variable>
+                <rax:captureHeader name="X-RELEVANT-ROLES" path="for $h in req:headers('X-ROLES', true()) return if ($h = ({$sequence})) then $h else ()" />
+                <xsl:for-each select="$roles">
+                    <wadl:param name="X-ROLES" style="header" rax:code="403" rax:anyMatch="true"
+                                rax:message="You are forbidden to perform the operation" type="xsd:string"
+                                required="true" repeating="true">
+                        <xsl:attribute name="fixed" select="rax:transformNBSP(.)"/>
+                    </wadl:param>
+                </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+                <rax:captureHeader name="X-RELEVANT-ROLES"
+                                   path="req:headers('X-ROLES', true())"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:function name="rax:transformNBSP" as="xsd:string">
