@@ -89,7 +89,8 @@
                   select="('URL',
                           'URLXSD','METHOD','HEADER','HEADER_ANY',
                           'HEADERXSD','HEADERXSD_ANY', 'HEADER_ALL',
-                          'HEADER_SINGLE', 'HEADERXSD_SINGLE')"
+                          'HEADER_SINGLE', 'HEADERXSD_SINGLE',
+                          'SET_HEADER','SET_HEADER_ALWAYS')"
                   as="xs:string*"/>
 
     <xsl:template match="/">
