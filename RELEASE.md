@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Fixed a bug where rax:roles were not masked correctly if default headers were set.
+
 ## Release 2.2.1 (2017-05-24) ##
 1. Fixed a bug where we were not correctly setting the classloader.
 

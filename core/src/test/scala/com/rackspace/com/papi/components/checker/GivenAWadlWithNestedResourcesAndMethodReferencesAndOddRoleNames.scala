@@ -61,6 +61,7 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNames extends Fl
             </resource>
             <resource path="{yn}" rax:roles="a:admin-foo">
               <param name="yn" style="template" type="tst:yesno"/>
+              <param name="X-INT" style="header" type="xsd:string" required="true" default="999"/>
               <method href="#yn"/>
             </resource>
           </resource>
@@ -115,20 +116,20 @@ class GivenAWadlWithNestedResourcesAndMethodReferencesAndOddRoleNames extends Fl
     it should behave like accessIsForbiddenWhenNoXRoles(validator, "DELETE", "/a/b", description)
 
     // GET on /a/yes, /a/no, /a/foo
-    it should behave like accessIsAllowed(validator, "GET", "/a/yes", List("a:admin-foo"), description)
-    it should behave like accessIsAllowed(validator, "GET", "/a/no", List("a:admin-foo"), description)
-    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:admin-foo"), description, List("'b'","yes","no"))
-    it should behave like accessIsAllowed(validator, "GET", "/a/yes", List("a:admin-foo", "a:observer%"), description)
-    it should behave like accessIsAllowed(validator, "GET", "/a/no", List("a:admin-foo", "a:observer%"), description)
-    it should behave like accessIsAllowed(validator, "GET", "/a/yes", List("a:admin-foo", "a:observer wsp"), description)
-    it should behave like accessIsAllowed(validator, "GET", "/a/no", List("a:admin-foo", "a:observer wsp"), description)
-    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:admin-foo", "a:observer%"), description, List("'b'","yes","no"))
-    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:admin-foo", "a:observer wsp"), description, List("'b'","yes","no"))
-    it should behave like accessIsForbidden(validator, "GET", "/a/yes", List("a:observer%"), description)
-    it should behave like accessIsForbidden(validator, "GET", "/a/no", List("a:observer%"), description)
-    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:observer%"), description, List("'b'","yes","no"))
-    it should behave like accessIsForbidden(validator, "GET", "/a/yes", List("a:observer wsp"), description)
-    it should behave like accessIsForbidden(validator, "GET", "/a/no", List("a:observer wsp"), description)
-    it should behave like resourceNotFound(validator, "GET", "/a/foo", List("a:observer wsp"), description, List("'b'","yes","no"))
+    it should behave like accessIsAllowedWithHeader(validator, "GET", "/a/yes", List("a:admin-foo"), description)
+    it should behave like accessIsAllowedWithHeader(validator, "GET", "/a/no", List("a:admin-foo"), description)
+    it should behave like resourceNotFoundWithHeader(validator, "GET", "/a/foo", List("a:admin-foo"), description, List("'b'","yes","no"))
+    it should behave like accessIsAllowedWithHeader(validator, "GET", "/a/yes", List("a:admin-foo", "a:observer%"), description)
+    it should behave like accessIsAllowedWithHeader(validator, "GET", "/a/no", List("a:admin-foo", "a:observer%"), description)
+    it should behave like accessIsAllowedWithHeader(validator, "GET", "/a/yes", List("a:admin-foo", "a:observer wsp"), description)
+    it should behave like accessIsAllowedWithHeader(validator, "GET", "/a/no", List("a:admin-foo", "a:observer wsp"), description)
+    it should behave like resourceNotFoundWithHeader(validator, "GET", "/a/foo", List("a:admin-foo", "a:observer%"), description, List("'b'","yes","no"))
+    it should behave like resourceNotFoundWithHeader(validator, "GET", "/a/foo", List("a:admin-foo", "a:observer wsp"), description, List("'b'","yes","no"))
+    it should behave like accessIsForbiddenWithHeader(validator, "GET", "/a/yes", List("a:observer%"), description)
+    it should behave like accessIsForbiddenWithHeader(validator, "GET", "/a/no", List("a:observer%"), description)
+    it should behave like resourceNotFoundWithHeader(validator, "GET", "/a/foo", List("a:observer%"), description, List("'b'","yes","no"))
+    it should behave like accessIsForbiddenWithHeader(validator, "GET", "/a/yes", List("a:observer wsp"), description)
+    it should behave like accessIsForbiddenWithHeader(validator, "GET", "/a/no", List("a:observer wsp"), description)
+    it should behave like resourceNotFoundWithHeader(validator, "GET", "/a/foo", List("a:observer wsp"), description, List("'b'","yes","no"))
   }
 }
