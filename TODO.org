@@ -896,6 +896,34 @@
          8. [X] rax:message
          9. [X] JoinOpt
          10. [X] RemoveDups
+** TODO Extend Support for Capture Header to support standalone element [2/2]
+   1. [X] Add CaptureHeader Step [10/10]
+      1. [X] Extend XSD to support New Capture Header Step
+      2. [X] Extend / Generalize raxAssert.xsl to handle new Capture
+         Header Step
+      3. [X] Updated raxAssert call in checker builder
+      4. [X] Update builder to include Capture Header Step [3/3]
+         1. [X] Handle in method / request
+         2. [X] In representation other than XML or JSON :
+            (wadl:request/wadl:representation[@mediaType] template)
+         3. [X] In representation with XML or JSON (in
+            check:addWellForm template)
+      5. [X] Add step to priority map
+      6. [X] Check assertions related to capture header step
+      7. [X] Update WADL2Dot to display steps correctly
+      8. [X] Ensure optimizations work with the new step
+      9. [X] Create new step
+      10. [X] Update handler for new step
+   2. [X] Testing [3/3]
+      1. [X] Step
+      2. [X] Bulider
+      3. [X] Validator [6/6]
+         1. [X] At resources level
+         2. [X] At resource level
+         3. [X] At method level
+         4. [X] No representation
+         5. [X] XML / JSON representation
+         6. [X] Media types other than XML or JSON
 ** TODO Use Saxon Compile Lib feature to compile shared module.
    - This requires Saxon-EEQ
 ** TODO Compile Performance improvements

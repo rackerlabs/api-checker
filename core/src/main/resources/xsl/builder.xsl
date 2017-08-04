@@ -342,44 +342,37 @@
 
     <xsl:template match="wadl:representation[@mediaType and (check:isXML(@mediaType) or check:isJSON(@mediaType))]/wadl:param[(@style = 'plain') and @path]"
                   priority="2" mode="ns">
-        <!--
-            If we have an XPath param in an XML or JSON
-            representation, then copy all namespace nodes in that
-            param. And enure that we don't prune the namespaces.
-
-            A nicer thing to do would be to parse out the XPath,
-            include only those namespaces referenced and allow for
-            pruning...
-        -->
         <xsl:if test="$usePlainParamCheck">
-            <xsl:variable name="this" as="node()" select="."/>
-            <xsl:variable name="path" as="xsd:string" select="$this/@path"/>
-            <xsl:if test="contains($path,':')">
-                <xsl:for-each select="in-scope-prefixes($this)">
-                    <xsl:if test="contains($path,concat(.,':'))">
-                        <xsl:call-template name="check:printns">
-                            <xsl:with-param name="pfix" select="."/>
-                            <xsl:with-param name="uri" select="namespace-uri-for-prefix(.,$this)"/>
-                        </xsl:call-template>
-                    </xsl:if>
-                </xsl:for-each>
-            </xsl:if>
-            <dont_prune/>
+          <xsl:call-template name="check:handleXPathNameSpaces"/>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template match="rax:captureHeader" mode="ns">
+        <xsl:if test="$useCaptureHeaderExtension">
+            <xsl:call-template name="check:handleXPathNameSpaces"/>
         </xsl:if>
     </xsl:template>
 
     <xsl:template match="rax:assert" mode="ns">
+        <xsl:if test="$useAssert">
+            <xsl:call-template name="check:handleXPathNameSpaces">
+                <xsl:with-param name="test" select="@test"/>
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="check:handleXPathNameSpaces">
         <!--
-            If we have an assert then copy all namespace nodes in that
+            Copy all namespace nodes in the *this*
             param. And enure that we don't prune the namespaces.
 
             A nicer thing to do would be to parse out the XPath,
             include only those namespaces referenced and allow for
             pruning...
         -->
-        <xsl:if test="$useAssert">
-            <xsl:variable name="this" as="node()" select="."/>
-            <xsl:variable name="test" as="xsd:string" select="@test"/>
+        <xsl:param name="this" as="node()" select="."/>
+        <xsl:param name="test" as="xsd:string" select="$this/@path"/>
+        <xsl:if test="contains($test,':')">
             <xsl:for-each select="in-scope-prefixes($this)">
                 <xsl:if test="contains($test,concat(.,':'))">
                     <xsl:call-template name="check:printns">
@@ -636,6 +629,27 @@
             </step>
         </xsl:for-each>
     </xsl:template>
+    <xsl:template name="check:addCaptureHeaderSteps">
+        <xsl:param name="next" as="xsd:string*"/>
+        <xsl:param name="from" as="node()" select="."/>
+        <xsl:variable name="captureHeaders" select="check:getCaptureHeaders($from)" as="node()*"/>
+        <xsl:for-each select="$captureHeaders">
+            <xsl:variable name="pos" select="position()"/>
+            <step id="{check:captureHeaderID(.)}"
+                  type="CAPTURE_HEADER" name="{@name}" path="{@path}">
+                <xsl:attribute name="next">
+                    <xsl:choose>
+                        <xsl:when test="$pos = last()">
+                            <xsl:value-of separator=" " select="$next"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="check:captureHeaderID($captureHeaders[position() = ($pos+1)])"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+            </step>
+        </xsl:for-each>
+    </xsl:template>
     <xsl:template name="check:addHeaderSteps">
         <xsl:param name="next" as="xsd:string*"/>
         <xsl:param name="from" as="node()" select="."/>
@@ -811,10 +825,13 @@
                       select="wadl:request and check:haveHeaders(wadl:request)"/>
         <xsl:variable name="haveAsserts" as="xsd:boolean"
                       select="wadl:request and check:haveAsserts(wadl:request)"/>
+        <xsl:variable name="haveCaptureHeaders" as="xsd:boolean"
+                      select="wadl:request and check:haveCaptureHeaders(wadl:request)"/>
         <xsl:variable name="nextSteps" as="xsd:string*">
             <xsl:sequence select="check:getNextReqTypeLinks(.)"/>
         </xsl:variable>
         <xsl:variable name="nextAsserts" as="xsd:string*" select="check:getNextAssertLinks(wadl:request)"/>
+        <xsl:variable name="nextCaptureHeaders" as="xsd:string*" select="check:getNextCaptureHeaderLinks(wadl:request)"/>
         <xsl:variable name="links" as="xsd:string*">
             <xsl:choose>
                 <xsl:when test="$haveHeaders">
@@ -822,6 +839,9 @@
                 </xsl:when>
                 <xsl:when test="$haveAsserts">
                     <xsl:sequence select="$nextAsserts"/>
+                </xsl:when>
+                <xsl:when test="$haveCaptureHeaders">
+                    <xsl:sequence select="$nextCaptureHeaders"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:sequence select="$nextSteps"/>
@@ -860,6 +880,9 @@
                             <xsl:when test="$haveAsserts">
                                 <xsl:value-of select="$nextAsserts"/>
                             </xsl:when>
+                            <xsl:when test="$haveCaptureHeaders">
+                                <xsl:sequence select="$nextCaptureHeaders"/>
+                            </xsl:when>
                             <xsl:when test="count($nextSteps) &gt; 0">
                                 <xsl:value-of select="$nextSteps"/>
                             </xsl:when>
@@ -874,6 +897,24 @@
             </xsl:if>
             <xsl:if test="$haveAsserts">
                 <xsl:call-template name="check:addAssertSteps">
+                    <xsl:with-param name="next">
+                        <xsl:choose>
+                            <xsl:when test="$haveCaptureHeaders">
+                                <xsl:sequence select="$nextCaptureHeaders"/>
+                            </xsl:when>
+                            <xsl:when test="count($nextSteps) &gt; 0">
+                                <xsl:sequence select="$nextSteps"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="($ACCEPT)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:with-param>
+                    <xsl:with-param name="from" select="wadl:request"/>
+                </xsl:call-template>
+            </xsl:if>
+            <xsl:if test="$haveCaptureHeaders">
+                <xsl:call-template name="check:addCaptureHeaderSteps">
                     <xsl:with-param name="next">
                         <xsl:choose>
                             <xsl:when test="count($nextSteps) &gt; 0">
@@ -894,9 +935,11 @@
     <xsl:template match="wadl:request/wadl:representation[@mediaType]">
         <xsl:variable name="defaultNext" select="$ACCEPT"/>
         <xsl:variable name="haveAsserts" as="xsd:boolean" select="check:haveAsserts(.)"/>
+        <xsl:variable name="haveCaptureHeaders" as="xsd:boolean" select="check:haveCaptureHeaders(.)"/>
+        <xsl:variable name="nextCaptureHeaders" as="xsd:string*" select="check:getNextCaptureHeaderLinks(.)"/>
         <xsl:variable name="doUseWellFormCheck" as="xsd:boolean"
                       select="$useWellFormCheck or ($usePreProcessExtension and exists(rax:preprocess))
-                              or $haveAsserts"/>
+                              or $haveAsserts or $haveCaptureHeaders"/>
         <step type="REQ_TYPE">
             <xsl:attribute name="id" select="generate-id()"/>
             <!-- Note that matches on the media type are always case insensitive -->
@@ -910,6 +953,11 @@
                         <xsl:when test="$haveAsserts">
                             <xsl:attribute name="next">
                                 <xsl:value-of select="check:getNextAssertLinks(.)" separator=" "/>
+                            </xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="$haveCaptureHeaders">
+                            <xsl:attribute name="next">
+                                <xsl:value-of select="$nextCaptureHeaders" separator=" "/>
                             </xsl:attribute>
                         </xsl:when>
                         <xsl:otherwise>
@@ -935,12 +983,29 @@
                         <xsl:with-param name="type" select="'WELL_JSON'"/>
                     </xsl:call-template>
                 </xsl:when>
-                <xsl:when test="$haveAsserts">
-                    <xsl:call-template name="check:addAssertSteps">
-                        <xsl:with-param name="next" select="$defaultNext"/>
-                        <xsl:with-param name="from" select="."/>
-                    </xsl:call-template>
-                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:if test="$haveAsserts">
+                        <xsl:call-template name="check:addAssertSteps">
+                            <xsl:with-param name="next">
+                                <xsl:choose>
+                                    <xsl:when test="$haveCaptureHeaders">
+                                        <xsl:sequence select="$nextCaptureHeaders"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:sequence select="$defaultNext"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:with-param>
+                            <xsl:with-param name="from" select="."/>
+                        </xsl:call-template>
+                    </xsl:if>
+                    <xsl:if test="$haveCaptureHeaders">
+                        <xsl:call-template name="check:addCaptureHeaderSteps">
+                            <xsl:with-param name="next" select="$defaultNext"/>
+                            <xsl:with-param name="from" select="."/>
+                        </xsl:call-template>
+                    </xsl:if>
+                </xsl:otherwise>
             </xsl:choose>
         </xsl:if>
     </xsl:template>
@@ -1034,6 +1099,11 @@
         <xsl:value-of select="concat(check:assertID($context), 'AF')"/>
     </xsl:function>
 
+    <xsl:function name="check:captureHeaderID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="generate-id($context)"/>
+    </xsl:function>
+
     <xsl:function name="check:XSDID" as="xsd:string">
         <xsl:param name="context" as="node()"/>
         <xsl:value-of select="concat(generate-id($context),'XSD')"/>
@@ -1096,6 +1166,7 @@
         <xsl:variable name="doReqPlainParam" as="xsd:boolean"
                       select="($type = ('WELL_XML','WELL_JSON')) and $usePlainParamCheck and exists($defaultPlainParams)"/>
         <xsl:variable name="haveAsserts" as="xsd:boolean" select="check:haveAsserts(.)"/>
+        <xsl:variable name="haveCaptureHeaders" as="xsd:boolean" select="check:haveCaptureHeaders(.)"/>
         <xsl:variable name="XSDID" as="xsd:string"
                       select="check:XSDID(.)"/>
         <xsl:variable name="JSONID" as="xsd:string"
@@ -1108,8 +1179,10 @@
                       select="check:WarnID(.,0)"/>
         <xsl:variable name="TRANSFORM_XSDID" as="xsd:string"
                       select="check:WarnID(.,1)"/>
-        <xsl:variable name="assertNext" as="xsd:string"
-                      select="string-join(check:getNextAssertLinks(.),' ')"/>
+        <xsl:variable name="assertNext" as="xsd:string*"
+                      select="check:getNextAssertLinks(.)"/>
+        <xsl:variable name="captureHeadersNext" as="xsd:string*"
+                      select="check:getNextCaptureHeaderLinks(.)"/>
         <step type="{$type}" id="{check:WellFormID(.)}">
             <xsl:choose>
                 <xsl:when test="$doElement">
@@ -1141,6 +1214,11 @@
                         select="$assertNext"
                         separator=" "/>
                 </xsl:when>
+                <xsl:when test="$haveCaptureHeaders">
+                    <xsl:attribute name="next"
+                        select="$captureHeadersNext"
+                        separator=" "/>
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="next" select="$ACCEPT"/>
                 </xsl:otherwise>
@@ -1167,6 +1245,11 @@
                         <xsl:attribute name="next"
                             select="$assertNext"
                             separator=" "/>
+                    </xsl:when>
+                    <xsl:when test="$haveCaptureHeaders">
+                        <xsl:attribute name="next"
+                                       select="$captureHeadersNext"
+                                       separator=" "/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:attribute name="next" select="$ACCEPT"/>
@@ -1211,6 +1294,11 @@
                                     <xsl:attribute name="next"
                                         select="$assertNext"
                                         separator=" "/>
+                                </xsl:when>
+                                <xsl:when test="$haveCaptureHeaders">
+                                    <xsl:attribute name="next"
+                                                   select="$captureHeadersNext"
+                                                   separator=" "/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:attribute name="next" select="$ACCEPT"/>
@@ -1264,6 +1352,11 @@
                                         select="$assertNext"
                                         separator=" "/>
                                 </xsl:when>
+                                <xsl:when test="$haveCaptureHeaders">
+                                    <xsl:attribute name="next"
+                                                   select="$captureHeadersNext"
+                                                   separator=" "/>
+                                </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:attribute name="next" select="$ACCEPT"/>
                                 </xsl:otherwise>
@@ -1300,6 +1393,11 @@
                                 select="$assertNext"
                                 separator=" "/>
                         </xsl:when>
+                        <xsl:when test="$haveCaptureHeaders">
+                            <xsl:attribute name="next"
+                                           select="$captureHeadersNext"
+                                           separator=" "/>
+                        </xsl:when>
                         <xsl:otherwise>
                             <xsl:attribute name="next" select="$ACCEPT"/>
                         </xsl:otherwise>
@@ -1320,6 +1418,11 @@
                             select="$assertNext"
                             separator=" "/>
                     </xsl:when>
+                    <xsl:when test="$haveCaptureHeaders">
+                        <xsl:attribute name="next"
+                                       select="$captureHeadersNext"
+                                       separator=" "/>
+                    </xsl:when>
                     <xsl:otherwise>
                         <xsl:attribute name="next" select="$ACCEPT"/>
                     </xsl:otherwise>
@@ -1337,6 +1440,11 @@
                                 select="$assertNext"
                                 separator=" "/>
                         </xsl:when>
+                        <xsl:when test="$haveCaptureHeaders">
+                            <xsl:attribute name="next"
+                                           select="$captureHeadersNext"
+                                           separator=" "/>
+                        </xsl:when>
                         <xsl:otherwise>
                             <xsl:attribute name="next" select="$ACCEPT"/>
                         </xsl:otherwise>
@@ -1346,6 +1454,21 @@
         </xsl:if>
         <xsl:if test="$haveAsserts">
             <xsl:call-template name="check:addAssertSteps">
+                <xsl:with-param name="next">
+                    <xsl:choose>
+                        <xsl:when test="$haveCaptureHeaders">
+                            <xsl:sequence select="$captureHeadersNext"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:sequence select="$ACCEPT"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:with-param>
+                <xsl:with-param name="from" select="."/>
+            </xsl:call-template>
+        </xsl:if>
+        <xsl:if test="$haveCaptureHeaders">
+            <xsl:call-template name="check:addCaptureHeaderSteps">
                 <xsl:with-param name="next" select="$ACCEPT"/>
                 <xsl:with-param name="from" select="."/>
             </xsl:call-template>
@@ -1524,6 +1647,29 @@
     <xsl:function name="check:getAsserts" as="node()*">
         <xsl:param name="from" as="node()"/>
         <xsl:sequence select="$from/rax:assert"/>
+    </xsl:function>
+
+    <xsl:function name="check:getNextCaptureHeaderLinks" as="xsd:string*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:choose>
+            <xsl:when test="check:haveCaptureHeaders($from)">
+                <xsl:variable name="firstCaptureHeader" as="node()" select="check:getCaptureHeaders($from)[1]"/>
+                <xsl:sequence select="(check:captureHeaderID($firstCaptureHeader))"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:sequence select="()"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="check:haveCaptureHeaders" as="xsd:boolean">
+        <xsl:param name="from" as="node()"/>
+        <xsl:value-of select="$useCaptureHeaderExtension and $from/rax:captureHeader"/>
+    </xsl:function>
+
+    <xsl:function name="check:getCaptureHeaders" as="node()*">
+        <xsl:param name="from" as="node()"/>
+        <xsl:sequence select="$from/rax:captureHeader"/>
     </xsl:function>
     
     <xsl:function name="check:getNextMethodLinks" as="xsd:string*">

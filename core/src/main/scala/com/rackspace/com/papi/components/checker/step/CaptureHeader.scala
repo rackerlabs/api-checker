@@ -17,6 +17,8 @@ package com.rackspace.com.papi.components.checker.step
 
 import javax.servlet.FilterChain
 
+import scala.collection.mutable.ListBuffer
+
 import org.xml.sax.SAXParseException
 
 import com.rackspace.com.papi.components.checker.Config
@@ -29,39 +31,50 @@ import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.om.Sequence
 
 import net.sf.saxon.s9api.XQueryEvaluator
+import net.sf.saxon.s9api.XdmValue
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 
-class Assert(id : String, label : String, val expression : String, val message : Option[String],
-             val code : Option[Int], val nc : ImmutableNamespaceContext, val version : Int,
-             val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) with LazyLogging {
-
-  override val mismatchMessage : String = message.getOrElse (s"Expecting $expression")
-  val mismatchCode : Int = code.getOrElse(400)
+class CaptureHeader(id : String, label : String, val name : String, val expression : String,
+                    val nc : ImmutableNamespaceContext, val version : Int,
+                    next : Array[Step]) extends ConnectedStep(id, label, next) with LazyLogging {
 
   private val exec = XPathStepUtil.xqueryExecutableForExpression(expression, nc)
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
-    var ret : Option[StepContext] = None
+
+    var ret : Option[StepContext] = Some(context) // This step is always successful!
     var eval : XQueryEvaluator = null
 
     try {
       eval = borrowEvaluator(expression, exec)
       XPathStepUtil.setupXQueryEvaluator(eval, req, context)
-      val res : Boolean = eval.evaluate.getUnderlyingValue match {
-        case groundedValue : GroundedValue => groundedValue.effectiveBooleanValue
-        case s : Sequence => s.head != null
+      val res = eval.evaluate
+      if (res.size > 0) {
+        //
+        //  The result is stored in the request context as a
+        //  header. Each item in the result sequence is stored as a
+        //  sepearte header value.
+        //
+        //  Note that it's very possible to add header values that
+        //  contain multiple lines of text or that contain characters
+        //  outside of the US-ASCII character set.  It is up to the
+        //  underlying servlet container to handle these subtleties.
+        //
+        ret=Some(context.copy(requestHeaders=context.requestHeaders.addHeaders(name,toReqHeaders(res))))
       }
-      if (res) {
-        ret = Some(context)
-      } else {
-        req.contentError(new SAXParseException (mismatchMessage, null), mismatchCode, priority)
-      }
-    } catch {
-      case e : Exception => req.contentError(new SAXParseException(mismatchMessage+" : "+e.getMessage, null, e), mismatchCode, priority)
     }finally {
       returnEvaluator (expression, eval)
     }
     ret
+  }
+
+  def toReqHeaders (xdmValue : XdmValue) : List[String] = {
+    var ret = new ListBuffer[String]()
+    val iterator = xdmValue.iterator
+    while (iterator.hasNext) {
+      ret += iterator.next.getStringValue
+    }
+    ret.toList
   }
 }

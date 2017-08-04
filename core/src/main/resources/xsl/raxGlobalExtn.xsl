@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  raxAssert.xsl
+  raxGlobalExtn.xsl
 
-  The builder.xsl expects rax:assert elements to live at the method
-  request or representation level.  But the actual feature
-  allows rax:assert to appear at the resources and resource level.
+  The builder.xsl expects certain global extension elements
+  (rax:assert, rax:captureHeader) to live at the method
+  request or representation level.  But these elements are allowed to
+  appear at the resources and resource level.
+
   Additionally there is a @applyToChildren attribute that is applicable
-  to rax:assert at the resource level that specifies that the assertion
+  to these elements at the resource level that specifies that the feature
   should apply to all subresources.
 
-  This stylesheet is responsible for moving rax:assert found in
+  This stylesheet is responsible for moving extension elements found in
   resources and resource level and pushing those assertions down into
   the method level. It is also responsible for implementing the
   @applyToChildren functionality.
 
-  Finally, the stylesheet performs error checking on rax:assert and
-  provides appropriate warnings if the assertion is misplaced.
+  Finally, the stylesheet performs error checking and
+  provides appropriate warnings if an element is misplaced.
 
   Copyright 2017 Rackspace US, Inc.
 
@@ -31,6 +33,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE stylesheet [
+  <!ENTITY extnsMatch "rax:assert|rax:captureHeader">
+  <!ENTITY extns "(&extnsMatch;)">
+  <!ENTITY extnsNames "rax:assert and rax:captureHader">
+]>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:rax="http://docs.rackspace.com/api"
@@ -48,13 +55,13 @@
     </xsl:template>
 
     <!--
-        The following templates gather local and global asserts.
-        The are the source of asserts.
+        The following templates gather local and global asserts.  The
+        are the source of asserts.
     -->
-    <xsl:template match="wadl:resources[rax:assert]">
+    <xsl:template match="wadl:resources[&extns;]">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()">
-                <xsl:with-param name="globalAsserts" as="element()*" select="rax:assert" tunnel="yes"/>
+                <xsl:with-param name="globalAsserts" as="element()*" select="&extns;" tunnel="yes"/>
             </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>
@@ -63,17 +70,17 @@
         <xsl:param name="globalAsserts" as="element()*" tunnel="yes"/>
         <xsl:copy>
             <xsl:apply-templates select="@* | node()">
-                <xsl:with-param name="globalAsserts" as="element()*" select="($globalAsserts, rax:assert[xs:boolean(@applyToChildren)])" tunnel="yes"/>
-                <xsl:with-param name="localAsserts" as="element()*" select="rax:assert[not(@applyToChildren) or not(xs:boolean(@applyToChildren))]" tunnel="yes"/>
+                <xsl:with-param name="globalAsserts" as="element()*" select="($globalAsserts, &extns;[xs:boolean(@applyToChildren)])" tunnel="yes"/>
+                <xsl:with-param name="localAsserts" as="element()*" select="&extns;[not(@applyToChildren) or not(xs:boolean(@applyToChildren))]" tunnel="yes"/>
             </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="wadl:request[rax:assert and wadl:representation]">
+    <xsl:template match="wadl:request[&extns; and wadl:representation]">
         <xsl:param name="localAsserts" as="element()*" tunnel="yes"/>
         <xsl:copy>
             <xsl:apply-templates select="@* | node()">
-                <xsl:with-param name="localAsserts" as="element()*" select="($localAsserts, rax:assert)" tunnel="yes"/>
+                <xsl:with-param name="localAsserts" as="element()*" select="($localAsserts, &extns;)" tunnel="yes"/>
             </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>
@@ -90,7 +97,7 @@
             <xsl:apply-templates select="@* | node()"/>
             <xsl:copy-of select="$globalAsserts | $localAsserts"/>
             <xsl:if test="self::wadl:representation and ../wadl:representation[not(@mediaType)]">
-                <xsl:copy-of select="../wadl:representation[not(@mediaType)]/rax:assert"/>
+                <xsl:copy-of select="../wadl:representation[not(@mediaType)]/&extns;"/>
             </xsl:if>
         </xsl:copy>
     </xsl:template>
@@ -119,7 +126,7 @@
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
             <xsl:if test="every $r in wadl:representation satisfies not($r/@mediaType)">
-                <xsl:copy-of select="$globalAsserts | $localAsserts | wadl:representation[not(@mediaType)]/rax:assert"/>
+                <xsl:copy-of select="$globalAsserts | $localAsserts | wadl:representation[not(@mediaType)]/&extns;"/>
             </xsl:if>
         </xsl:copy>
     </xsl:template>
@@ -128,7 +135,7 @@
         Handle copying/removing of asserts and flag warnings if an
         assert is in the wrong place.
     -->
-    <xsl:template match="rax:assert">
+    <xsl:template match="&extnsMatch;">
         <xsl:variable name="parent" as="element()" select=".."/>
         <xsl:variable name="grandparent" as="element()" select="../.."/>
         <xsl:choose>
@@ -164,7 +171,7 @@
 
     <xsl:template name="badPlacement">
         <xsl:message>[WARNING] bad placement for <xsl:copy-of select="."  copy-namespaces="no"/> parent is <xsl:value-of select="name(..)"/> but</xsl:message>
-        <xsl:message>[WARNING] only allowed parents for the rax:assert extension are</xsl:message>
+        <xsl:message>[WARNING] only allowed parents for the &extnsNames; extensions are</xsl:message>
         <xsl:message>[WARNING] wadl:resources, wadl:resource, wadl:request, wadl:representation (of a method request)</xsl:message>
         <xsl:message>[WARNING] ignoring this assertion!</xsl:message>
     </xsl:template>
