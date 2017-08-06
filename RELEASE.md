@@ -3,6 +3,7 @@
 1. Fixed a bug where rax:roles were not masked correctly if default headers were set.
 1. Added support for ```rax:captureHeader```, this allows setting XPath 3.1 paths at the method request, representation, resource, and resources
    level to allow capturing a header with the result of the XPath. The XPaths can simultaneously introspect headers, uri, methods, and body content (xml or json).
+1. Fixed a bug where the priority of URL_FAIL states was set too high and this caused mislabeled 404 errors when rax:roles masked was enabled.
 
 ## Release 2.2.1 (2017-05-24) ##
 1. Fixed a bug where we were not correctly setting the classloader.
