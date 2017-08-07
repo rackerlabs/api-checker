@@ -29,7 +29,7 @@
     limitations under the License.
 -->
 <priority-map xmlns="http://www.rackspace.com/repose/wadl/checker/priority">
-    <map type="URL_FAIL"      priority="10000" attributeMultipliers="notMatch notTypes" multValue="50"/>
+    <map type="URL_FAIL"      priority="10000" attributeMultipliers="notMatch notTypes" multValue="2"/>
     <map type="METHOD_FAIL"   priority="20000" attributeMultipliers="notMatch" multValue="50"/>
     <map type="CONTENT_FAIL"  priority="40000"/>
     <map type="HEADER"        priority="41000"/>
