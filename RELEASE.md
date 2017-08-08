@@ -7,7 +7,8 @@
 1. Added support for `X-Relevant-Roles`, a header which will be added to the request any time `rax:roles` are being used.
    `X-Relevant-Roles` are the values of the `X-Roles` header which match a `rax:roles` value for the resource being requested.
    In other words, `X-Relevant-Roles` are the user roles which granted access to the resource.
-   Note that the `rax:captureHeader` feature must be enabled for the `X-Relevant-Roles` header to be populated. 
+   Note that the `rax:captureHeader` feature must be enabled for the `X-Relevant-Roles` header to be populated.
+1. Clean up : code for optimization stages is now generated in smaller templates to avoid method size restrictions and allow for bytecode generation.
 
 ## Release 2.2.1 (2017-05-24) ##
 1. Fixed a bug where we were not correctly setting the classloader.

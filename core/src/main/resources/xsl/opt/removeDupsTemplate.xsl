@@ -35,6 +35,7 @@
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
+    <xsl:variable name="pfx" as="xs:string" select="'TMP-'"/>
     <xsl:variable name="rules" as="node()" select="/rules:rules"/>
     <xsl:variable name="types" as="xs:string*" select="distinct-values(tokenize(string-join($rules/rules:rule/@types, ' '), ' '))"/>
 
@@ -58,40 +59,49 @@
                <xslout:param name="checker" as="node()"/>
                <check:checker>
                    <xsl:for-each select="$types">
-                       <xsl:variable name="rule" as="node()" select="key('rule-by-type', ., $rules)"/>
-                       <xsl:variable name="required" as="xs:string*" select="tokenize($rule/@required,' ')"/>
-                       <xsl:variable name="optional" as="xs:string*" select="tokenize($rule/@optional,' ')"/>
-                       <xsl:variable name="match" as="xs:string?" select="$rule/@match"/>
-                       <xsl:choose>
-                           <xsl:when test="empty($optional) and empty($required)">
-                               <xslout:variable name="{.}" as="node()*"
-                                   select="key('checker-by-type','{.}', $checker){if ($match) then concat('[',$match,']') else ()}"/>
-                               <xslout:if test="count(${.}) > 1">
-                                   <check:group>
-                                       <xslout:attribute name="include">
-                                           <xslout:value-of select="${.}[1]/@id"></xslout:value-of>
-                                       </xslout:attribute>
-                                       <xslout:attribute name="exclude">
-                                           <xslout:value-of separator=" ">
-                                               <xslout:sequence select="subsequence(${.},2)/@id"></xslout:sequence>
-                                           </xslout:value-of>
-                                       </xslout:attribute>
-                                   </check:group>
-                               </xslout:if>
-                           </xsl:when>
-                           <xsl:otherwise>
-                               <xsl:call-template name="matchTemplates">
-                                   <xsl:with-param name="type" select="."/>
-                                   <xsl:with-param name="required" select="if (empty($required)) then 'type' else $required"/>
-                                   <xsl:with-param name="optional" select="$optional"/>
-                                   <xsl:with-param name="currentMatch" select="()"/>
-                                   <xsl:with-param name="match" select="$match"/>
-                               </xsl:call-template>
-                           </xsl:otherwise>
-                       </xsl:choose>
+                       <xslout:call-template name="{$pfx}{.}">
+                           <xslout:with-param name="checker" select="$checker"/>
+                       </xslout:call-template>
                    </xsl:for-each>
                </check:checker>
            </xslout:template>
+           <xsl:for-each select="$types">
+               <xsl:variable name="rule" as="node()" select="key('rule-by-type', ., $rules)"/>
+               <xsl:variable name="required" as="xs:string*" select="tokenize($rule/@required,' ')"/>
+               <xsl:variable name="optional" as="xs:string*" select="tokenize($rule/@optional,' ')"/>
+               <xsl:variable name="match" as="xs:string?"
+                             select="$rule/@match"/>
+               <xslout:template name="{$pfx}{.}">
+                   <xslout:param name="checker" as="node()"/>
+                   <xsl:choose>
+                       <xsl:when test="empty($optional) and empty($required)">
+                           <xslout:variable name="{.}" as="node()*"
+                                            select="key('checker-by-type','{.}', $checker){if ($match) then concat('[',$match,']') else ()}"/>
+                           <xslout:if test="count(${.}) > 1">
+                               <check:group>
+                                   <xslout:attribute name="include">
+                                       <xslout:value-of select="${.}[1]/@id"></xslout:value-of>
+                                   </xslout:attribute>
+                                   <xslout:attribute name="exclude">
+                                       <xslout:value-of separator=" ">
+                                           <xslout:sequence select="subsequence(${.},2)/@id"></xslout:sequence>
+                                       </xslout:value-of>
+                                   </xslout:attribute>
+                               </check:group>
+                           </xslout:if>
+                       </xsl:when>
+                       <xsl:otherwise>
+                           <xsl:call-template name="matchTemplates">
+                               <xsl:with-param name="type" select="."/>
+                               <xsl:with-param name="required" select="if (empty($required)) then 'type' else $required"/>
+                               <xsl:with-param name="optional" select="$optional"/>
+                               <xsl:with-param name="currentMatch" select="()"/>
+                               <xsl:with-param name="match" select="$match"/>
+                           </xsl:call-template>
+                       </xsl:otherwise>
+                   </xsl:choose>
+               </xslout:template>
+           </xsl:for-each>
         </xslout:stylesheet>
     </xsl:template>
 
