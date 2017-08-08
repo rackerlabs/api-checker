@@ -35,6 +35,7 @@
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
+    <xsl:variable name="pfx" as="xs:string" select="'TMP-'"/>
     <xsl:variable name="rules" as="node()" select="/rules:rules"/>
     <xsl:variable name="types" as="xs:string*" select="('HEADER', 'HEADER_ANY', 'HEADER_SINGLE')"/>
 
@@ -58,12 +59,22 @@
                 <xslout:param name="checker" as="node()"/>
                 <xslout:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))"/>
                 <xsl:for-each select="$types">
-                    <xsl:variable name="rule" as="node()" select="key('rule-by-type', ., $rules)"/>
-                    <xsl:variable name="required" as="xs:string*" select="for $r in tokenize($rule/@required,' ') return
-                                                                          (: Exclude name, match attributes we are joining by these :)
-                                                                          if ($r = ('name','match')) then () else $r"/>
-                    <xsl:variable name="optional" as="xs:string*" select="tokenize($rule/@optional,' ')"/>
-                    <xsl:variable name="match" as="xs:string?" select="$rule/@match"/>
+                    <xslout:call-template name="{$pfx}{.}">
+                        <xslout:with-param name="checker"  select="$checker"/>
+                        <xslout:with-param name="nextStep" select="$nextStep"/>
+                    </xslout:call-template>
+                </xsl:for-each>
+            </xslout:template>
+            <xsl:for-each select="$types">
+                <xsl:variable name="rule" as="node()" select="key('rule-by-type', ., $rules)"/>
+                <xsl:variable name="required" as="xs:string*" select="for $r in tokenize($rule/@required,' ') return
+                                                                      (: Exclude name, match attributes we are joining by these :)
+                                                                      if ($r = ('name','match')) then () else $r"/>
+                <xsl:variable name="optional" as="xs:string*" select="tokenize($rule/@optional,' ')"/>
+                <xsl:variable name="match" as="xs:string?" select="$rule/@match"/>
+                <xslout:template name="{$pfx}{.}">
+                    <xslout:param name="checker" as="node()"/>
+                    <xslout:param name="nextStep" as="node()*"/>
                     <xsl:call-template name="matchJoinTemplates">
                         <xsl:with-param name="type" select="."/>
                         <xsl:with-param name="required" select="if (empty($required)) then 'type' else $required"/>
@@ -71,8 +82,8 @@
                         <xsl:with-param name="currentMatch" select="()"/>
                         <xsl:with-param name="match" select="$match"/>
                     </xsl:call-template>
-                </xsl:for-each>
-            </xslout:template>
+                </xslout:template>
+            </xsl:for-each>
         </xslout:stylesheet>
     </xsl:template>
     <xsl:template name="matchJoinTemplates">
