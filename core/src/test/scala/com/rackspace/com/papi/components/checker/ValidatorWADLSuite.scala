@@ -2184,7 +2184,9 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
     , TestConfig(false, false, true, true, false, 1, false, true, true, "Xalan"))
 
   //
-  //  Like validator_XSDContentTT except uses Saxon instead of XalanC for XSL 1.0 engine
+  //  Like validator_XSDContentTT except uses Saxon instead of XalanC,
+  //  we use XSLT 2.0 instead of 1 to allow for compatibility with
+  //  SaxonHE -- which no longer supports XSLT 1.0
   //
   val validator_XSDContentTTS = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
@@ -2197,7 +2199,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
                <method name="PUT">
                   <request>
                       <representation mediaType="application/xml">
-                          <rax:preprocess href="src/test/resources/xsl/beginStart.xsl"/>
+                          <rax:preprocess href="src/test/resources/xsl/beginStart2.xsl"/>
                       </representation>
                       <representation mediaType="application/json"/>
                   </request>
@@ -2220,7 +2222,7 @@ class ValidatorWADLSuite extends BaseValidatorSuite {
            </resource>
         </resources>
     </application>)
-    , TestConfig(false, false, true, true, false, 1, false, true, true, "SaxonHE"))
+    , TestConfig(false, false, true, true, false, 20, false, true, true, "SaxonHE"))
 
 
   test ("PUT on /a/b with application/xml should succeed on validator_XSDContentTT with valid XML1") {

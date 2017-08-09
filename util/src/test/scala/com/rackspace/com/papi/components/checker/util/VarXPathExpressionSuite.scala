@@ -22,6 +22,8 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import net.sf.saxon.s9api.XdmMap
+
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[JUnitRunner])
@@ -84,9 +86,9 @@ class VarXPathExpressionSuite extends FunSuite {
     try {
       varExpression = XPathExpressionPool.borrowExpression(expression, nsContext, XPATH_VERSION_3_1).asInstanceOf[VarXPathExpression]
       assert (varExpression.evaluate (inDoc, XPathConstants.STRING,
-                                      Map[QName, Object](new QName("person") -> mapAsJavaMap(Map[String,String]("firstName"->"Jorge", "lastName"->"Williams")))) == "Jorge Williams")
+                                      Map[QName, Object](new QName("person") -> XdmMap.makeMap(mapAsJavaMap(Map[String,String]("firstName"->"Jorge", "lastName"->"Williams"))))) == "Jorge Williams")
       assert (varExpression.evaluate (inDoc, XPathConstants.STRING,
-                                      Map[QName, Object](new QName("person") -> mapAsJavaMap(Map[String,String]("firstName"->"Rachel", "lastName"->"Kraft")))) == "Rachel Kraft")
+                                      Map[QName, Object](new QName("person") -> XdmMap.makeMap(mapAsJavaMap(Map[String,String]("firstName"->"Rachel", "lastName"->"Kraft"))))) == "Rachel Kraft")
     } finally {
       if (varExpression != null) XPathExpressionPool.returnExpression(expression, nsContext, XPATH_VERSION_3_1, varExpression)
     }

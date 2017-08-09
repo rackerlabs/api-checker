@@ -78,7 +78,6 @@ object XPathStepUtil extends LazyLogging {
   }
   protected val compiler = {
     val c = processor.newXQueryCompiler
-    c.setLanguageVersion(Config.RAX_ASSERT_XPATH_VERSION_STRING)
     c
   }
 
@@ -281,7 +280,7 @@ object XPathStepUtil extends LazyLogging {
 
     eval.setSource(xml)
     eval.setExternalVariable (new QName(prefix,uri,"__JSON__"), json)
-    eval.setExternalVariable (new QName(prefix,uri,"__REQUEST__"), req.asXdmValue(saxonConfig))
-    eval.setExternalVariable (new QName(prefix,uri,"__CONTEXT__"), context.asXdmValue(saxonConfig)) 
+    eval.setExternalVariable (new QName(prefix,uri,"__REQUEST__"), req.asXdmValue)
+    eval.setExternalVariable (new QName(prefix,uri,"__CONTEXT__"), context.asXdmValue)
   }
 }

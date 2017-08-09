@@ -35,8 +35,8 @@ import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.w3c.dom.Document
 import net.sf.saxon.om.Sequence
 import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.Configuration
-import net.sf.saxon.expr.JPConverter
 
 import scala.collection.JavaConverters._
 
@@ -149,9 +149,9 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
   }
   def contentErrorPriority_= (p : Long) : Unit = request.setAttribute (CONTENT_ERROR_PRIORITY, p)
 
-  def asXdmValue(c : Configuration) : XdmValue = request.getAttribute(REQUEST_XDM_VALUE) match {
+  def asXdmValue : XdmValue = request.getAttribute(REQUEST_XDM_VALUE) match {
     case reqValue : XdmValue => reqValue
-    case null => val rv = XdmValue.wrap(JPConverter.FromMap.INSTANCE.convert(new HttpServletRequestMap(this),c.getConversionContext))
+    case null => val rv = XdmMap.makeMap(new HttpServletRequestMap(this))
                  request.setAttribute(REQUEST_XDM_VALUE, rv)
                  rv
   }

@@ -1,4 +1,13 @@
 # Releases #
+## In Progress Work ##
+1. Updated Dependencies
+   1. saxon: 9.7.0-15 → 9.8.0-4
+      1. There is no longer a need for a Saxon EE License to use XSLT 3.0
+      1. XSLT 2.0 processor is no longer available, XSLT 3.0 processor will be used for XSLT 2.0 code which ensures a high level of backwards compatibility.
+      1. XSLT 1.0 backward compatibility is no longer supported unless you have a Saxon EE license, if you don't have license switch your XSLT engine to be Xalan or XalanC.
+   1. wadl-tools: 1.0.36 → 1.0.37
+
+
 ## Release 2.3.0 (2017-08-08) ##
 1. Fixed a bug where rax:roles were not masked correctly if default headers were set.
 1. Added support for ```rax:captureHeader```, this allows setting XPath 3.1 paths at the method request, representation, resource, and resources
