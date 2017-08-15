@@ -17,6 +17,7 @@ package com.rackspace.com.papi.components.checker.wadl
 
 import javax.xml.namespace.QName
 
+import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.TestConfig
 import com.rackspace.com.papi.components.checker.step.startend.{MethodFail, Start, URLFail}
 import org.junit.runner.RunWith
@@ -626,7 +627,7 @@ class WADLStepSpec extends BaseStepSpec {
       assert(step, Start, URI("this"), URI("is"), MethodFail)
     }
 
-    scenario("The WADL contains method ids") {
+    scenario("The WADL contains method ids (remove dups)") {
       Given ("a WADL with method IDs")
       val inWADL =
         <application xmlns="http://wadl.dev.java.net/2009/02">
@@ -644,6 +645,34 @@ class WADLStepSpec extends BaseStepSpec {
         </application>
       When("the wadl is translated")
       val step = builder.build (inWADL)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)
+      assert(step, Start, URI("path"), URLFailMatch("to"))
+      assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), MethodFailMatch("DELETE|GET"))
+      assert(step, Start, URI("path"), MethodFail)
+    }
+
+    scenario("The WADL contains method ids") {
+      Given ("a WADL with method IDs")
+      val inWADL =
+        <application xmlns="http://wadl.dev.java.net/2009/02">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource">
+                   <method id="getResource" name="GET">
+                      <response status="200 203"/>
+                   </method>
+                   <method id="deleteResource" name="DELETE">
+                      <response status="200"/>
+                   </method>
+              </resource>
+          </resources>
+        </application>
+      When("the wadl is translated")
+      val config = new Config()
+      config.removeDups = false;
+      val step = builder.build (inWADL, config)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("GET"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), Method("DELETE"), Accept)
       assert(step, Start, URI("path"), URI("to"), URI("my"), URI("resource"), URLFail)

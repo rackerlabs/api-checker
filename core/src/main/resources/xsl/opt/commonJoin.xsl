@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   join.xsl
+   commonJoin.xsl
 
    This stylesheet take a document in checker format and safely joins
    states in different branches of execution. The operation works like
@@ -47,9 +47,10 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         xmlns:check="http://www.rackspace.com/repose/wadl/checker"
+        xmlns:map="http://www.w3.org/2005/xpath-functions/map"
         xmlns="http://www.rackspace.com/repose/wadl/checker"
         exclude-result-prefixes="xsd check"
-        version="2.0">
+        version="3.0">
 
     <!--
         Most of the work of joining is done by the following util. The
@@ -125,13 +126,13 @@
     <!--
         Convert joins into a checker step.
     -->
-    <xsl:template match="check:join" mode="join">
+    <xsl:template name="createJoinStep">
         <xsl:param name="checker" as="node()"/>
-        <xsl:param name="joins" as="node()*"/>
-        <xsl:variable name="steps" select="@steps"/>
-        <xsl:variable name="joinSteps" as="node()*" select="check:stepsByIds($checker, tokenize($steps, ' '))"/>
+        <xsl:param name="joins" as="map(xsd:string, xsd:string*)"/>
+        <xsl:param name="stepsToJoin" as="map(xsd:string, xsd:string)"/>
+        <xsl:variable name="joinSteps" as="node()*" select="check:stepsByIds($checker, $joins(.))"/>
 
-        <step id="{generate-id(.)}">
+        <step id="{.}">
             <!--
                 Since the steps are exactly alike, we need to simply copy
                 over the attributes from the first join step.
@@ -142,8 +143,10 @@
                 <xsl:call-template name="joinNext">
                     <xsl:with-param name="checker" select="$checker"/>
                     <xsl:with-param name="joins" select="$joins"/>
+                    <xsl:with-param name="stepsToJoin" select="$stepsToJoin"/>
                 </xsl:call-template>
             </xsl:if>
         </step>
     </xsl:template>
+
 </xsl:stylesheet>
