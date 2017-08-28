@@ -55,7 +55,7 @@
     <rule types="METHOD REQ_TYPE" required="next match">
         Steps that simply contain a match.
     </rule>
-    <rule types="XSD" contians="next" optional="transform">
+    <rule types="XSD" required="next" optional="transform">
         Rule for XSD types.
     </rule>
     <rule types="URL_FAIL" optional="notTypes notMatch">

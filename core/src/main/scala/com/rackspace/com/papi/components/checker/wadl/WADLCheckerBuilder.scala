@@ -106,6 +106,13 @@ object WADLCheckerBuilder {
   private lazy val buildXsltExec : XsltExecutable = timeFunction ("compile /xsl/builder.xsl",
                                                                   compiler.compile(new StreamSource(getClass.getResource("/xsl/builder.xsl").toString)))
 
+  private lazy val joinSetupXsltExec : XsltExecutable = timeFunction ("compile /xsl/opt/removeDups-rules.setup.xsl",
+                                                                      compiler.compile(new StreamSource(getClass.getResource("/xsl/opt/removeDups-rules.setup.xsl").toString)))
+
+  private lazy val joinCleanupXsltExec : XsltExecutable = timeFunction ("compile /xsl/opt/joinCleanup.xsl",
+                                                                        compiler.compile(new StreamSource(getClass.getResource("/xsl/opt/joinCleanup.xsl").toString)))
+
+
   private lazy val dupsXsltExec : XsltExecutable = timeFunction ("compile /xsl/opt/removeDups.xsl",
                                                                  compiler.compile(new StreamSource(getClass.getResource("/xsl/opt/removeDups.xsl").toString)))
 
@@ -454,6 +461,40 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   })
 
   //
+  //  Setup for join optimizations
+  //
+  private def joinOptSetup(in : Source, c : Config) : Source = timeFunction("joinOptSetup", {
+    if (c.removeDups || c.joinXPathChecks) {
+      val joinTransform = getXsltTransformer(joinSetupXsltExec)
+      val out = new XdmDestination
+      joinTransform.setSource(in)
+      joinTransform.setDestination(out)
+      joinTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+
+  //
+  //  Cleanup for join optimizations
+  //
+  private def joinOptCleanup(in : Source, c : Config) : Source = timeFunction("joinOptCleanup", {
+    if (c.removeDups || c.joinXPathChecks) {
+      val joinTransform = getXsltTransformer(joinCleanupXsltExec)
+      val out = new XdmDestination
+      joinTransform.setSource(in)
+      joinTransform.setDestination(out)
+      joinTransform.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+
+  //
   //  Perform the join optimization
   //
   private def joinOpt(in : Source, c : Config) : Source = timeFunction("joinOpt", {
@@ -639,8 +680,9 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         val buildSteps : List[CheckerTransform] =
           List(raxGlobalExtn, authenticatedBy, raxRoles,
                buildChecker(entityDoc, _, _),
-               raxRolesMask, joinOpt, dupsOpt,
-               joinHeaderOpt, joinXPathOpt, adjustNext, validateChecker)
+               raxRolesMask, joinOptSetup, joinOpt, joinOptSetup,    // It is not a mistake to call joinOptStep twice
+               dupsOpt, joinHeaderOpt, joinOptCleanup, joinXPathOpt, // joinOpt creates error states that need setup!
+               adjustNext, validateChecker)
 
         //
         //  Apply the transformations and send results to out

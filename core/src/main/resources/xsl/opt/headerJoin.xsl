@@ -54,7 +54,7 @@
         xmlns:check="http://www.rackspace.com/repose/wadl/checker"
         xmlns="http://www.rackspace.com/repose/wadl/checker"
         exclude-result-prefixes="xsd check"
-        version="2.0">
+        version="3.0">
 
     <!--
         Most of the work of joining is done by the following util. The
@@ -71,17 +71,18 @@
     <!--
         Convert joins into a checker step.
     -->
-    <xsl:template match="check:join" mode="join">
+    <xsl:template name="createJoinStep">
         <xsl:param name="checker" as="node()"/>
-        <xsl:param name="joins" as="node()*"/>
-        <xsl:variable name="steps" select="@steps"/>
-        <xsl:variable name="joinSteps" as="node()*" select="check:stepsByIds($checker, tokenize($steps,' '))"/>
+        <xsl:param name="joins" as="map(xsd:string, xsd:string*)"/>
+        <xsl:param name="stepsToJoin" as="map(xsd:string, xsd:string)"/>
+        <xsl:variable name="joinSteps" as="node()*" select="check:stepsByIds($checker, $joins(.))"/>
         <xsl:variable name="distinctMatches" as="xsd:string*" select="distinct-values($joinSteps/@match)"/>
 
-        <step id="{generate-id(.)}" type="{@type}" name="{@name}">
+        <step id="{.}" type="{$joinSteps[1]/@type}" name="{$joinSteps[1]/@name}">
             <xsl:call-template name="joinNext">
                 <xsl:with-param name="checker" select="$checker"/>
                 <xsl:with-param name="joins" select="$joins"/>
+                <xsl:with-param name="stepsToJoin" select="$stepsToJoin"/>
             </xsl:call-template>
             <xsl:attribute name="match">
                 <xsl:value-of select="$distinctMatches" separator="|" />

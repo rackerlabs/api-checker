@@ -27,9 +27,10 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:check="http://www.rackspace.com/repose/wadl/checker"
     xmlns:xslout="http://www.rackspace.com/repose/wadl/checker/Transform"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     exclude-result-prefixes="xsd check"
-    version="2.0">
+    version="3.0">
 
     <!--
         Most of the work of joining is done by the following util. The
@@ -52,8 +53,6 @@
     <xsl:param name="preserveRequestBody" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'preserveRequestBody'))"/>
     <xsl:param name="xslEngine" as="xsd:string" select="string(check:optionValue($configMetadata,'xslEngine'))"/>
 
-    <xsl:variable name="XSLT3Engine" as="xsd:string" select="'SaxonEE'"/>
-
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
 
     <!--
@@ -67,51 +66,59 @@
         </xsl:apply-templates>
     </xsl:template>
 
-    <xsl:template match="check:step[@type='WELL_XML']" mode="targetJoins">
+    <xsl:template match="check:step[@type='WELL_XML'] | check:step[@type='XSL' and xsl:transform/@check:mergable]" mode="targetJoins">
         <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[check:isMergableXPathStep(.)]"/>
+        <xsl:variable name="type" as="xsd:string" select="@type"/>
+        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[check:isMergableStep(., $type)]"/>
+        <xsl:variable name="joinElem" as="node()"><check:join/></xsl:variable>
         <xsl:if test="count($nextStep) = 1">
-            <join type="{@type}" steps="{@id}">
-                <xsl:attribute name="mergeSteps">
-                    <xsl:value-of select="$nextStep/@id" separator=' '/>
-                </xsl:attribute>
-            </join>
+            <xsl:map-entry key="generate-id($joinElem)" select="string(@id)"/>
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="check:step[@type='XSL' and xsl:transform/@check:mergable]" mode="targetJoins">
-        <xsl:param name="checker" as="node()"/>
-        <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next,' ')"/>
-        <xsl:variable name="nextStep" as="node()*" select="check:stepsByIds($checker, check:next(.))[check:isMergableXPathStep(.) or (@type='XSL' and xsl:transform/@check:mergable)]"/>
+    <xsl:function name="check:isMergableStep" as="xsd:boolean">
+        <xsl:param name="step" as="node()"/>
+        <xsl:param name="rootType" as="xsd:string"/>
+        <xsl:choose>
+            <xsl:when test="$rootType = 'XSL'">
+                <xsl:sequence select="check:isMergableXPathStep($step) or check:isMergableXsltStep($step)"/>
+            </xsl:when>
+            <xsl:when test="$rootType = 'WELL_XML'">
+                <xsl:sequence select="check:isMergableXPathStep($step)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- This should never happen! -->
+                <xsl:message>[WARNING] Illegal argument passed root type of <xsl:value-of select="$rootType"/> is not expected.</xsl:message>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
 
-        <xsl:if test="count($nextStep) = 1">
-            <join type="{@type}" steps="{@id}">
-                <xsl:attribute name="mergeSteps">
-                    <xsl:value-of select="$nextStep/@id" separator=' '/>
-                </xsl:attribute>
-            </join>
-        </xsl:if>
-    </xsl:template>
+    <xsl:function name="check:isMergableXsltStep" as="xsd:boolean">
+        <xsl:param name="step" as="node()"/>
+        <xsl:variable name="rightType" as="xsd:boolean" select="$step/@type='XSL'"/>
+        <xsl:variable name="mergable"  as="xsd:boolean" select="boolean($step/xsl:transform/@check:mergable)"/>
+        <xsl:sequence select="$rightType and $mergable"/>
+    </xsl:function>
 
     <xsl:function name="check:isMergableXPathStep" as="xsd:boolean">
         <xsl:param name="step" as="node()"/>
         <xsl:variable name="rightType" as="xsd:boolean" select="$step/@type='XPATH'"/>
-        <xsl:variable name="rightVersion" as="xsd:boolean" select="if ($xslEngine = $XSLT3Engine) then true() else ($step/@version &lt;= 20) or ($xpathVersion &lt;= 20)"/>
+        <xsl:variable name="rightVersion" as="xsd:boolean" select="($step/@version &lt;= 31) or ($xpathVersion &lt;= 31)"/>
         <xsl:variable name="noCaptureHeader" as="xsd:boolean" select="not($step/@captureHeader)"/>
         <xsl:sequence select="$rightType and $rightVersion and $noCaptureHeader"/>
     </xsl:function>
     <!--
         Produce joined steps
     -->
-    <xsl:template match="check:join" mode="join">
+    <xsl:template name="createJoinStep">
         <xsl:param name="checker" as="node()"/>
-        <xsl:param name="joins" as="node()*"/>
+        <xsl:param name="joins" as="map(xsd:string, xsd:string*)"/>
+        <xsl:param name="stepsToJoin" as="map(xsd:string, xsd:string)"/>
 
-        <xsl:variable name="rootID" as="xsd:string" select="@steps"/>
-        <xsl:variable name="mergeSteps" as="xsd:string*" select="tokenize(@mergeSteps,' ')"/>
-        <xsl:variable name="steps" as="node()*" select="check:stepsByIds($checker,$mergeSteps)"/>
+        <xsl:variable name="rootID" as="xsd:string" select="$joins(.)[1]"/>
         <xsl:variable name="root" as="node()" select="check:stepsByIds($checker, $rootID)"/>
         <xsl:variable name="rootNext" as="node()*" select="check:stepsByIds($checker, check:next($root))"/>
+        <xsl:variable name="steps" as="node()*" select="$rootNext[check:isMergableStep(.,string($root/@type))]"/>
         <xsl:variable name="version" as="xsd:integer">
             <xsl:choose>
                 <xsl:when test="$root/@type = 'XSL'"><xsl:value-of select="$root/@version"/></xsl:when>
@@ -128,7 +135,7 @@
             are next steps that are not XPATH or CONTENT_FAIL.
         -->
         <xsl:variable name="preserveWellFormedStep" as="xsd:boolean" select="($preserveRequestBody or $rootNext[@type!= 'XPATH' and @type!='CONTENT_FAIL']) and ($root/@type = 'WELL_XML')"/>
-        <xsl:variable name="idBase" as="xsd:string" select="generate-id(.)"/>
+        <xsl:variable name="idBase" as="xsd:string" select="."/>
         <xsl:variable name="newStepID" as="xsd:string">
             <xsl:choose>
                 <xsl:when test="$preserveWellFormedStep">
@@ -160,6 +167,7 @@
             <xsl:call-template name="joinNext">
                 <xsl:with-param name="checker" select="$checker"/>
                 <xsl:with-param name="joins" select="$joins"/>
+                <xsl:with-param name="stepsToJoin" select="$stepsToJoin"/>
              </xsl:call-template>
 
              <xslout:transform version="{$version}.0" check:mergable="true">
@@ -228,11 +236,11 @@
     -->
     <xsl:template name="joinNext">
         <xsl:param name="checker" as="node()*"/>
-        <xsl:param name="joins" as="node()*"/>
-        <xsl:param name="join" as="node()" select="."/>
-        <xsl:param name="steps" as="node()*" select="check:stepsByIds($checker, tokenize($join/@steps,' '))"/>
+        <xsl:param name="joins" as="map(xsd:string, xsd:string*)"/>
+        <xsl:param name="stepsToJoin" as="map(xsd:string, xsd:string)"/>
+        <xsl:param name="steps" as="node()*" select="check:stepsByIds($checker, $joins(.)[1])"/>
         <xsl:param name="nexts" as="xsd:string*" select="()"/>
-
+        <xsl:variable name="inMergeSteps" as="node()*" select="check:stepsByIds($checker, check:next($steps[1]))[check:isMergableStep(.,string($steps[1]/@type))]"/>
         <xsl:variable name="mergeSteps" as="node()*">
             <!--
                 If there are no current nexts, then merge in the merge
@@ -240,8 +248,7 @@
             -->
             <xsl:choose>
                 <xsl:when test="empty($nexts)">
-                    <xsl:variable name="stepNodes" as="node()*" select="check:stepsByIds($checker, tokenize(@mergeSteps,' '))"/>
-                    <xsl:copy-of select="$stepNodes"/>
+                    <xsl:copy-of select="$inMergeSteps"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:copy-of select="$steps"/>
@@ -257,14 +264,16 @@
                 </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="snexts" as="xsd:string*" select="check:getNexts($joins,tokenize($mergeSteps[1]/@next,' '))"/>
+                <xsl:variable name="snexts" as="xsd:string*"
+                              select="check:getNexts($joins,$stepsToJoin, tokenize($mergeSteps[1]/@next,' '))"/>
                 <xsl:call-template name="joinNext">
                     <xsl:with-param name="checker" select="$checker"/>
                     <xsl:with-param name="joins" select="$joins"/>
+                    <xsl:with-param name="stepsToJoin" select="$stepsToJoin"/>
                     <xsl:with-param name="steps" select="$mergeSteps[position() != 1]"/>
                     <xsl:with-param name="nexts"
                                     select="(for $s in $snexts
-                                             return if (not($s = $nexts)) then $s else (), $nexts)"/>
+                                            return if (not($s = $nexts)) then $s else (), $nexts)"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
