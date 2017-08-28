@@ -1,5 +1,5 @@
 # Releases #
-## In Progress Work ##
+## Release 2.4.0 (2017-08-28) ##
 1. Updated Dependencies
    1. saxon: 9.7.0-15 → 9.8.0-4
       1. There is no longer a need for a Saxon EE License to use XSLT 3.0
