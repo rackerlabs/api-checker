@@ -52,7 +52,7 @@
     <!-- Paramenters -->
     <xsl:param name="user" as="xsd:string" select="'unknown'" />
     <xsl:param name="creator" as="xsd:string" select="'unknown'"/>
-    <xsl:param name="schematronOutput" as="node()"/>
+    <xsl:param name="schematronOutput" as="node()"><check:out/></xsl:param>
     <xsl:param name="configMetadata" as="node()">
         <params>
           <meta>
@@ -1556,14 +1556,14 @@
     </xsl:function>
 
     <xsl:function name="check:getNextReqTypeLinks" as="xsd:string*">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:sequence select="if ($from/wadl:request/wadl:representation[@mediaType]) then
                               (for $r in $from/wadl:request/wadl:representation[@mediaType]
                               return generate-id($r), check:ReqTypeFailID($from)) else ()"/>
     </xsl:function>
         
     <xsl:function name="check:getNextURLLinks" as="xsd:string*">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:sequence select="for $r in $from/wadl:resource[@path] return
             if ($r/@path = '/') then
             (check:getNextURLLinks($r))
@@ -1573,7 +1573,7 @@
     </xsl:function>
 
     <xsl:function name="check:getNextHeaderLinks" as="xsd:string*">
-      <xsl:param name="from" as="node()"/>
+      <xsl:param name="from" as="node()?"/>
       <xsl:variable name="headers" select="check:getHeaders($from)"/>
       <xsl:variable name="default" select="$headers[@default]" as="node()*"/>
       <xsl:choose>
@@ -1617,17 +1617,17 @@
     </xsl:function>
 
     <xsl:function name="check:haveHeaders" as="xsd:boolean">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:value-of select="$useHeaderCheck and check:getHeaders($from)"/>
     </xsl:function>
 
     <xsl:function name="check:getHeaders" as="node()*">
-      <xsl:param name="from" as="node()"/>
+      <xsl:param name="from" as="node()?"/>
       <xsl:sequence select="$from/wadl:param[@style='header' and @required='true']"/>
     </xsl:function>
 
     <xsl:function name="check:getNextAssertLinks" as="xsd:string*">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:choose>
             <xsl:when test="check:haveAsserts($from)">
                 <xsl:variable name="firstAssert" as="node()" select="check:getAsserts($from)[1]"/>
@@ -1640,17 +1640,17 @@
     </xsl:function>
 
     <xsl:function name="check:haveAsserts" as="xsd:boolean">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:value-of select="$useAssert and $from/rax:assert"/>
     </xsl:function>
 
     <xsl:function name="check:getAsserts" as="node()*">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:sequence select="$from/rax:assert"/>
     </xsl:function>
 
     <xsl:function name="check:getNextCaptureHeaderLinks" as="xsd:string*">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:choose>
             <xsl:when test="check:haveCaptureHeaders($from)">
                 <xsl:variable name="firstCaptureHeader" as="node()" select="check:getCaptureHeaders($from)[1]"/>
@@ -1663,17 +1663,17 @@
     </xsl:function>
 
     <xsl:function name="check:haveCaptureHeaders" as="xsd:boolean">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:value-of select="$useCaptureHeaderExtension and $from/rax:captureHeader"/>
     </xsl:function>
 
     <xsl:function name="check:getCaptureHeaders" as="node()*">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:sequence select="$from/rax:captureHeader"/>
     </xsl:function>
     
     <xsl:function name="check:getNextMethodLinks" as="xsd:string*">
-        <xsl:param name="from" as="node()"/>
+        <xsl:param name="from" as="node()?"/>
         <xsl:for-each-group select="$from/wadl:method" group-by="@name">
             <xsl:choose>
                 <xsl:when test="count(current-group()) &gt; 1">

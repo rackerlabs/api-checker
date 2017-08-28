@@ -32,6 +32,8 @@ import java.io.BufferedReader
 import javax.xml.namespace.QName
 import javax.xml.xpath.XPathConstants
 
+import net.sf.saxon.s9api.XdmMap
+
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
@@ -50,9 +52,9 @@ class HttpServletRequestMapSuite extends BaseValidatorSuite {
 
 
   test("Method should be accesible in XPath") {
-    val req1 = new HttpServletRequestMap(request("GET","/"))
-    val req2 = new HttpServletRequestMap(request("DELETE","/"))
-    val req3 = new HttpServletRequestMap(request("PUT", "/"))
+    val req1 = XdmMap.makeMap(new HttpServletRequestMap(request("GET","/")))
+    val req2 = XdmMap.makeMap(new HttpServletRequestMap(request("DELETE","/")))
+    val req3 = XdmMap.makeMap(new HttpServletRequestMap(request("PUT", "/")))
 
     val xpath1 = borrowExpression("$request?method='GET'", defaultContext, XPATH_VERSION).asInstanceOf[VarXPathExpression]
     val xpath2 = borrowExpression("$request?method='DELETE'", defaultContext, XPATH_VERSION).asInstanceOf[VarXPathExpression]
@@ -90,9 +92,9 @@ class HttpServletRequestMapSuite extends BaseValidatorSuite {
   }
 
   test("URI should be accessible in XPath") {
-    val req1 = new HttpServletRequestMap(request("GET","/path/to/foo"))
-    val req2 = new HttpServletRequestMap(request("DELETE","/path/to/bar"))
-    val req3 = new HttpServletRequestMap(request("PUT", "/yet/another/path.txt"))
+    val req1 = XdmMap.makeMap(new HttpServletRequestMap(request("GET","/path/to/foo")))
+    val req2 = XdmMap.makeMap(new HttpServletRequestMap(request("DELETE","/path/to/bar")))
+    val req3 = XdmMap.makeMap(new HttpServletRequestMap(request("PUT", "/yet/another/path.txt")))
 
 
     val xpath1 = borrowExpression("$request?uri='/path/to/foo'", defaultContext, XPATH_VERSION).asInstanceOf[VarXPathExpression]
@@ -140,17 +142,17 @@ class HttpServletRequestMapSuite extends BaseValidatorSuite {
   }
 
   test("Headers should be accessible, though in a (lower) case sensitive manner") {
-    var req1 = new HttpServletRequestMap(request("GET", "/path/to/foo", "application/json", "null", false,
+    var req1 = XdmMap.makeMap(new HttpServletRequestMap(request("GET", "/path/to/foo", "application/json", "null", false,
                                                  Map[String,List[String]]("foo"->List("bar"),
                                                                           "bIz"->List("baz","boom","bit"),
-                                                                          "x"->List("y"))))
-    var req2 = new HttpServletRequestMap(request("DELETE", "/path/to/bar", "application/json", "null", false,
-                                                 Map[String,List[String]]("FoO"->List("baz"))))
+                                                                          "x"->List("y")))))
+    var req2 = XdmMap.makeMap(new HttpServletRequestMap(request("DELETE", "/path/to/bar", "application/json", "null", false,
+                                                 Map[String,List[String]]("FoO"->List("baz")))))
 
-    var req3 = new HttpServletRequestMap(request("PUT", "/yet/another/path.txt", "application/json", "null", false,
-                                                 Map[String,List[String]]()))
+    var req3 = XdmMap.makeMap(new HttpServletRequestMap(request("PUT", "/yet/another/path.txt", "application/json", "null", false,
+                                                 Map[String,List[String]]())))
 
-    var req4 = new HttpServletRequestMap(request("POST", "/no/headers/allowed"))
+    var req4 = XdmMap.makeMap(new HttpServletRequestMap(request("POST", "/no/headers/allowed")))
 
 
     assert (getVarPath ("""
@@ -181,15 +183,15 @@ class HttpServletRequestMapSuite extends BaseValidatorSuite {
   }
 
   test("Mix access method, uri, headers") {
-    var req1 = new HttpServletRequestMap(request("GET", "/path/to/foo", "application/json", "null", false,
+    var req1 = XdmMap.makeMap(new HttpServletRequestMap(request("GET", "/path/to/foo", "application/json", "null", false,
                                                  Map[String,List[String]]("foo"->List("bar"),
                                                                           "bIz"->List("baz","boom","bit"),
-                                                                          "x"->List("y"))))
-    var req2 = new HttpServletRequestMap(request("DELETE", "/path/to/bar", "application/json", "null", false,
-                                                 Map[String,List[String]]("FoO"->List("baz"))))
+                                                                          "x"->List("y")))))
+    var req2 = XdmMap.makeMap(new HttpServletRequestMap(request("DELETE", "/path/to/bar", "application/json", "null", false,
+                                                 Map[String,List[String]]("FoO"->List("baz")))))
 
-    var req3 = new HttpServletRequestMap(request("PUT", "/yet/another/path.txt", "application/json", "null", false,
-                                                 Map[String,List[String]]()))
+    var req3 = XdmMap.makeMap(new HttpServletRequestMap(request("PUT", "/yet/another/path.txt", "application/json", "null", false,
+                                                 Map[String,List[String]]())))
 
     assert(getVarPath("""($request?method='GET') and ($request?uri='/path/to/foo') and ($request?headers?x = 'y')""",
                       XPathConstants.BOOLEAN, Map(REQUEST_VAR->req1)).asInstanceOf[Boolean])

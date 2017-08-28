@@ -321,9 +321,15 @@ class Config extends LazyLogging {
   var enableAssertExtension : Boolean = true
 
   //
-  //  The XSL 1.0 engine to use.  Possible choices are Xalan, XalanC,
-  //  and Saxon. Note that Saxon is an XSL 2.0 engine, but most 1.0
-  //  XSLs should work fine.
+  //  The XSL engine to use.  Possible choices are Xalan, XalanC,
+  //  SaxonHE and SaxonEE. SaxonEE requires a Saxon License.
+  //
+  //  - Xalan, XalanC and SaxonEE support XSLT 1.0
+  //  - SaxonHE and SaxonEE support XSLT 3.0
+  //
+  //  There is no formal XSL 2.0 engine however XSLT 3.0 is highly
+  //  backwards compatible with XSLT 2.0 and 2.0 stylesheets will work
+  //  unmodified in most cases.
   //
   private var xsle : String = "XalanC"
   private val supportedXSLEngines = Set("Xalan", "XalanC", "SaxonHE", "SaxonEE",

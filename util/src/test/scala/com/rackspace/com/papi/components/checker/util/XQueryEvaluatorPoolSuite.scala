@@ -29,7 +29,6 @@ class XQueryEvaluatorPoolSuite extends FunSuite {
   private val processor   = new Processor(false)
   private val compiler    = {
     val c = processor.newXQueryCompiler()
-    c.setLanguageVersion("3.1")
     c
   }
   private val query = "/xq/load-json.xq"
