@@ -896,6 +896,94 @@
          8. [X] rax:message
          9. [X] JoinOpt
          10. [X] RemoveDups
+** DONE Compile Performance improvements
+** DONE SubRepresentations[2/2]
+   1. [X] Push Representation step [13/13]
+      1. [X] Extend XSD to support Push Rep step / Pop Rep step
+      2. [X] Config to enable / disable sub representation / should be
+         enabled by default.
+      3. [X] Updated CLIs to support sup rep extension
+      4. [X] Update Builder to support Push Rep / Pop Rep
+      5. [X] Add steps to priority map??
+      6. [X] Check assertions related to new steps.
+      7. [X] Darnit, to match up with WELL_XML and WELL_JSON -- add
+         PUSH_XML_REP and PUSH_JSON_REP.
+      8. [X] Ensure that wadl2checker correctly draws steps
+      9. [X] Ensure optimizations work with the new steps
+      10. [X] Update Servlet Request to include push/pop [3/3]
+          1. [X] PUSH_XML
+          2. [X] PUSH_JSON
+          3. [X] POP
+      11. [X] Create the new step[4/4]
+          1. [X] Pop
+          2. [X] Push_XML
+          3. [X] Push_JSON
+          4. [X] Relevant exceptions
+      12. [X] Place rax:representation outside of wadl:representation [2/2]
+          1. [X] wadl:method
+          2. [X] wadl:representation (nonXML OR nonJSON)
+      13. [X] Update handler for new steps
+   2. [X] Testing [3/3]
+      1. [X] Step [3/3]
+         1. [X] PopRep
+         2. [X] PushXML
+         3. [X] PushJSON
+      2. [X] Builder [12/12]
+         1. [X] Ensure namespaces are set correctly in
+            rax:representation.
+         2. [X] rax:rep in representation XML/JSON
+         3. [X] rax:rep in rax:rep
+         4. [X] At method level mulitple reps
+         5. [X] At resource level multiple methods
+         6. [X] At resource level mulitple methods (apply children false)
+         7. [X] At resource level mulitple methods (apply children true)
+         8. [X] At resources level
+         9. [X] At resources level with resource apply children true
+         10. [X] rax:rep in the wrong place
+         11. [X] rax:rep with wrong media type
+         12. [X] rax:rep with +json and +xml
+      3. [X] Validator [12/12]
+         1. [X] XML with JSON sub resource
+         2. [X] XML with XML sub resource
+         3. [X] JSON with JSON sub resource
+         4. [X] JSON with XML sub resource
+         5. [X] Test plain params and elements
+         6. [X] Test with XSD in sub resource
+         7. [X] Test with JSONSchema in sub resource
+         8. [X] Multiple layers of subresource [2/2]
+            1. [X] Happy
+            2. [X] Failures at multiple layers
+         9. [X] At resource level
+         10. [X] At resources level
+         11. [X] RaxRoles
+         12. [X] RaxRoles Mask
+*** Notes
+   - <rax:representation path="" mediaType="" name=""/>
+   - Works like representation but ebedded within a representation,
+     specifies XPath into the parenet representation.  Support for XML
+     and JSON.
+     - Should support all features of representation.
+     - Achive by pushing, poping representations.
+   - <rax:representation/> can be placed in places outside of a
+     representation.  It may be placed at the method level -- in place
+     of an actual representation -- when no representation is
+     available. Or at the resource or resources level.  This enables
+     parsing a representation outside of the actual body of the HTTP
+     request -- such as a header.
+** TODO Preproc extended for sub resource[0/2]
+   1. [ ] Extend Preproc to take parameters from sub resorurces if
+      AFTER_SUB is specified
+   2. [ ] Extend builder to place AFTER_SUB preprocs in the right
+      place.
+*** Notes
+   - <rax:preproc type="BEFORE_VALIDATE | AFTER_SUB"/>.  The idea is
+      that this can be used to bring back any changes in the
+      subRepresentation into the original rep?  Can we do this
+      automatically...maybe for some changes -- but it's complex so for
+      now you need preproc to compbine.
+      - AFTER_SUB gets all sub representations as parameters.  Name can
+        be used to identify them, else they are passed by number (in an
+        array? or map?)
 ** TODO Extend Support for Capture Header to support standalone element [2/2]
    1. [X] Add CaptureHeader Step [10/10]
       1. [X] Extend XSD to support New Capture Header Step
@@ -926,7 +1014,6 @@
          6. [X] Media types other than XML or JSON
 ** TODO Use Saxon Compile Lib feature to compile shared module.
    - This requires Saxon-EEQ
-** TODO Compile Performance improvements
 ** TODO Assign CONTENT_FAIL to XSL steps in builder
 ** TODO Investigate whether there is an issue with rax:roles with other headers
 ** TODO Cache checker format on load [0/3]

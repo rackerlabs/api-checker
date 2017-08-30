@@ -3,9 +3,9 @@
   raxGlobalExtn.xsl
 
   The builder.xsl expects certain global extension elements
-  (rax:assert, rax:captureHeader) to live at the method
-  request or representation level.  But these elements are allowed to
-  appear at the resources and resource level.
+  (rax:assert, rax:captureHeader, rax:representation) to live at the
+  method request or representation level.  But these elements are
+  allowed to appear at the resources and resource level.
 
   Additionally there is a @applyToChildren attribute that is applicable
   to these elements at the resource level that specifies that the feature
@@ -34,9 +34,9 @@
   limitations under the License.
 -->
 <!DOCTYPE stylesheet [
-  <!ENTITY extnsMatch "rax:assert|rax:captureHeader">
+  <!ENTITY extnsMatch "rax:assert|rax:captureHeader|rax:representation">
   <!ENTITY extns "(&extnsMatch;)">
-  <!ENTITY extnsNames "rax:assert and rax:captureHader">
+  <!ENTITY extnsNames "rax:assert, rax:captureHader, and rax:representation">
 ]>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -44,7 +44,7 @@
     xmlns="http://wadl.dev.java.net/2009/02"
     xmlns:wadl="http://wadl.dev.java.net/2009/02"
     exclude-result-prefixes="wadl"
-    version="2.0">
+    version="3.0">
 
     <xsl:output method="xml" indent="yes"/>
 
@@ -156,6 +156,22 @@
                     </xsl:when>
                     <xsl:when test="(local-name($parent) = 'representation') and (local-name($grandparent) = 'request')
                                     and (namespace-uri($grandparent) = 'http://wadl.dev.java.net/2009/02')">
+                        <xsl:call-template name="copy"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="badPlacement"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="namespace-uri($parent) = 'http://docs.rackspace.com/api'">
+                <!--
+                    Special case: rax:representation is allowed to be
+                    recursive. You can put a rax:representation inside
+                    a rax:representation, so in this case we copy it
+                    over.
+                 -->
+                <xsl:choose>
+                    <xsl:when test="(local-name($parent) = 'representation') and (local-name(.) = 'representation')">
                         <xsl:call-template name="copy"/>
                     </xsl:when>
                     <xsl:otherwise>

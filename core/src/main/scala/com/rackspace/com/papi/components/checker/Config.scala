@@ -255,6 +255,42 @@ class Config extends LazyLogging {
   var enableRaxRolesExtension : Boolean = false
 
   //
+  //  Enable the rax-representation extension.
+  //
+  //  The extension is intended to validate representations that are
+  //  not in the usual area.  For example representations within
+  //  representations.  For example, JSON content inside XML content
+  //  or vice versa.  A <rax:representation/> works like a
+  //  <wadl:representation> except for 3 major differences:
+  //
+  //
+  //  1. A rax:representation contains an XPath that is expected to
+  //  return a string containing the representation.  Usually this
+  //  XPath points to the parent representation. In XML, the parent
+  //  body is placed in the local contex but can also be accessed via
+  //  the $_ or $body variable.
+  //
+  //  2. In addition to looking at the body a rax:representation may
+  //  look at the uri ($req:uri), method ($req:method), and headers
+  //  (with a call to req:header or req:headers).  The extension may
+  //  be placed in a wadl:method/wadl:request,
+  //  wadl:method/wadl:request/wadl:representation or in another
+  //  rax:representation.  The extension may also be placed in
+  //  wadl:resources where it applies to all methods globally or on
+  //  wadl:resource which applies to all methods of that resource and
+  //  if @applyToChildren is set to true then it will also apply to
+  //  all subresources as well.
+  //
+  //  Note that having the extension on a wadl:representation will
+  //  enable wellformed checks.
+  //
+  //  3. A rax:representation has an optional name.
+  //
+  @BeanProperty
+  @AffectsChecker
+  var enableRaxRepresentationExtension : Boolean = true
+
+  //
   //  Mask rax-roles with 404 and 405 errors. By default rax-roles
   //  response with a 403 if there is a role mismatch, if
   //  maskRaxRoles403 is true then the respose will be 404 if no

@@ -24,6 +24,8 @@ import javax.xml.parsers.DocumentBuilder
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.rackspace.com.papi.components.checker.servlet.ByteArrayServletInputStream
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
+import com.rackspace.com.papi.components.checker.servlet.ParsedXML
+import com.rackspace.com.papi.components.checker.servlet.ParsedJSON
 import com.rackspace.com.papi.components.checker.step.results.ErrorResult
 import com.rackspace.com.papi.components.checker.util.{ObjectMapperPool, XMLParserPool}
 import org.mockito.Matchers._
@@ -196,10 +198,14 @@ class BaseValidatorSuite extends FunSuite {
         contentType match {
           case "application/xml"  =>
             xmlParser = XMLParserPool.borrowParser
-            req.setAttribute (PARSED_XML, xmlParser.parse(new ByteArrayInputStream(content.getBytes)))
+            val doc = xmlParser.parse(new ByteArrayInputStream(content.getBytes))
+            req.setAttribute (PARSED_XML, doc)
+            req.setAttribute (PARSED_REPRESENTATION, new ParsedXML(doc))
           case "application/json" =>
             jsonParser = ObjectMapperPool.borrowParser
-            req.setAttribute (PARSED_JSON, jsonParser.readValue(content,classOf[JsonNode]))
+            val jnd = jsonParser.readValue(content,classOf[JsonNode])
+            req.setAttribute (PARSED_JSON, jnd)
+            req.setAttribute (PARSED_REPRESENTATION, new ParsedJSON(jnd))
         }
       }
     } finally {

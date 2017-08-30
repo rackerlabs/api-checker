@@ -42,6 +42,8 @@
     <map type="REQ_TYPE_FAIL" priority="45000"/>
     <map type="WELL_XML"      priority="50000"/>
     <map type="WELL_JSON"     priority="50000"/>
+    <map type="PUSH_XML_REP"  priority="50000"/>
+    <map type="PUSH_JSON_REP" priority="50000"/>
     <map type="XPATH"         priority="50000"/>
     <map type="JSON_XPATH"    priority="50000"/>
     <map type="XSL"           priority="50000"/>

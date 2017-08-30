@@ -18,6 +18,7 @@ package com.rackspace.com.papi.components.checker.servlet
 import java.io.{BufferedReader, ByteArrayOutputStream, IOException, InputStreamReader}
 import java.net.{URI, URISyntaxException}
 import java.util
+import java.util.NoSuchElementException
 import javax.servlet.ServletInputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import javax.xml.transform.Transformer
@@ -39,6 +40,8 @@ import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.Configuration
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable.Stack
+
 
 object CheckerServletRequest {
   val DEFAULT_CONTENT_ERROR_CODE : Integer = 400
@@ -53,6 +56,8 @@ import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest._
 //  An HTTP Request with some additional helper functions
 //
 class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) with LazyLogging {
+
+  private val repStack = new Stack[ParsedRepresentation]
 
   private var auxiliaryHeaders = new HeaderMap
 
@@ -86,8 +91,55 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
     "/" + URISegment.slice(0, uriLevel).reduceLeft( _ + "/" +_ )
   }
 
+  def parsedRepresentation : ParsedRepresentation = {
+    Option(request.getAttribute(PARSED_REPRESENTATION).asInstanceOf[ParsedRepresentation]) match {
+      case Some(r : ParsedRepresentation) => r
+      case None => ParsedNIL
+    }
+  }
+
+  def pushRepresentation (doc : Document) : Unit = {
+    repStack.push(parsedRepresentation)
+    parsedXML = doc
+  }
+
+  def pushRepresentation (tb : JsonNode) : Unit = {
+    repStack.push(parsedRepresentation)
+    parsedJSON = tb
+  }
+
+  def popRepresentation : Unit = {
+    try {
+      repStack.pop match  {
+        case xml   : ParsedXML  => parsedXML  = xml
+        case json  : ParsedJSON => parsedJSON = json
+        case ParsedNIL  => clearParsedRepresentation
+      }
+    } catch {
+      case nsee : NoSuchElementException =>
+        logger.error ("Very strange, I tried to pop an empty representation stack.  This should never happen, please report this error.", nsee)
+        //
+        //  This exception is handled at the step level.
+        //
+        throw nsee
+    }
+  }
+
+  def clearParsedRepresentation : Unit = {
+    parsedRepresentation.clearRepresentation(this)
+    request.setAttribute(PARSED_REPRESENTATION, ParsedNIL)
+  }
+
   def parsedXML : Document = request.getAttribute(PARSED_XML).asInstanceOf[Document]
-  def parsedXML_= (doc : Document):Unit = request.setAttribute (PARSED_XML, doc)
+  def parsedXML_= (doc : Document):Unit = {
+    val xmlRep = new ParsedXML(doc)
+    parsedXML = xmlRep
+  }
+  def parsedXML_= (xmlRep : ParsedXML) : Unit = {
+    clearParsedRepresentation
+    request.setAttribute (PARSED_REPRESENTATION, xmlRep)
+    xmlRep.setRepresentation(this)
+  }
 
   def parsedXMLSource : Source = {
     val src = request.getAttribute(PARSED_XML_SOURCE).asInstanceOf[Source]
@@ -99,10 +151,18 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       src
     }
   }
-  def parsedXMLSource_= (src : Source) : Unit = request.setAttribute(PARSED_XML_SOURCE, src)
+
 
   def parsedJSON : JsonNode = request.getAttribute(PARSED_JSON).asInstanceOf[JsonNode]
-  def parsedJSON_= (tb : JsonNode):Unit = request.setAttribute (PARSED_JSON, tb)
+  def parsedJSON_= (tb : JsonNode):Unit = {
+    val jsonRep = new ParsedJSON(tb)
+    parsedJSON = jsonRep
+  }
+  def parsedJSON_= (jsonRep : ParsedJSON) : Unit = {
+    clearParsedRepresentation
+    request.setAttribute (PARSED_REPRESENTATION, jsonRep)
+    jsonRep.setRepresentation(this)
+  }
 
   def parsedJSONSequence : Sequence = {
     val seq = request.getAttribute(PARSED_JSON_SEQUENCE).asInstanceOf[Sequence]
@@ -114,7 +174,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       seq
     }
   }
-  def parsedJSONSequence_= (seq : Sequence) : Unit = request.setAttribute (PARSED_JSON_SEQUENCE, seq)
+
 
   def parsedJSONXdmValue : XdmValue = {
     val xdmVal = request.getAttribute(PARSED_JSON_XDM_VALUE).asInstanceOf[XdmValue]
@@ -126,8 +186,6 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       xdmVal
     }
   }
-
-  def parsedJSONXdmValue_= (xdmVal : XdmValue) : Unit = request.setAttribute(PARSED_JSON_XDM_VALUE, xdmVal)
 
 
   def contentError : Exception = request.getAttribute(CONTENT_ERROR).asInstanceOf[Exception]
@@ -230,7 +288,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
       } catch {
         case e : Exception => throw new IOException("Error while serializing!", e)
       } finally {
-        parsedXML = null
+        clearParsedRepresentation
         returnTransformer(transformer)
       }
     } else if (parsedJSON != null) {
@@ -239,8 +297,7 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
         om = ObjectMapperPool.borrowParser
         new ByteArrayServletInputStream(om.writeValueAsBytes(parsedJSON))
       } finally {
-        parsedJSON = null
-        parsedJSONSequence = null
+        clearParsedRepresentation
         if (om != null) {
           ObjectMapperPool.returnParser(om)
         }
