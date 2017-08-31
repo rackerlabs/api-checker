@@ -114,26 +114,41 @@
     <xsl:template name="replaceDups">
         <xsl:param name="checker" as="node()"/>
         <xsl:param name="dups" as="map(xsd:string, xsd:string*)"/>
+        <xsl:param name="excluded" as="map(xsd:string, xsd:string*)"
+                   select="check:getExcludeMap($dups)"/>
         <checker>
             <xsl:apply-templates select="$checker" mode="unDup">
+                <xsl:with-param name="checker" select="$checker"/>
                 <xsl:with-param name="dups" select="$dups"/>
+                <xsl:with-param name="excluded" select="$excluded"/>
             </xsl:apply-templates>
         </checker>
     </xsl:template>
 
-    <xsl:template match="check:step" mode="unDup">
+    <xsl:function name="check:getExcludeMap" as="map(xsd:string, xsd:string*)">
         <xsl:param name="dups" as="map(xsd:string, xsd:string*)"/>
+        <xsl:sequence select="map:merge(for $k in map:keys($dups) return map{$dups($k) :  $k},map{'duplicates' : 'combine'})"/>
+    </xsl:function>
+
+    <xsl:template match="check:step" mode="unDup">
+        <xsl:param name="checker" as="node()" />
+        <xsl:param name="dups" as="map(xsd:string, xsd:string*)"/>
+        <xsl:param name="excluded" as="map(xsd:string, xsd:string*)"/>
         <step>
             <xsl:apply-templates select="@*" mode="unDup">
+                <xsl:with-param name="checker" select="$checker"/>
                 <xsl:with-param name="dups" select="$dups"/>
                 <xsl:with-param name="id" select="@id"/>
+                <xsl:with-param name="excluded" select="$excluded"/>
             </xsl:apply-templates>
             <xsl:copy-of select="element()"/>
         </step>
     </xsl:template>
 
     <xsl:template match="@*" mode="unDup">
+        <xsl:param name="checker" as="node()" />
         <xsl:param name="dups" as="map(xsd:string, xsd:string*)"/>
+        <xsl:param name="excluded" as="map(xsd:string, xsd:string*)"/>
         <xsl:param name="id" as="xsd:string"/>
         <xsl:choose>
             <!-- Substitude excludes from nexts -->
@@ -145,8 +160,24 @@
                     <xsl:value-of select="$newNext" separator=" "/>
                 </xsl:attribute>
             </xsl:when>
-            <!-- Don't copy labels -->
-            <xsl:when test="name() = 'label'"/>
+            <!-- Copy labels if it is appropriate  to do so -->
+            <xsl:when test="name() = 'label'">
+                <xsl:choose>
+                    <!-- Copy the label if there are no dups of this step -->
+                    <xsl:when test="not(map:contains($dups, $id))">
+                        <xsl:copy/>
+                    </xsl:when>
+                    <!-- If there is a dup, copy the label only if all other labels match -->
+                    <xsl:otherwise>
+                        <xsl:variable name="selectedId" as="xsd:string" select="$dups($id)"/>
+                        <xsl:variable name="selectedLabel" as="xsd:string" select="string($checker//check:step[@id=$selectedId]/@label)"/>
+                        <xsl:variable name="excludedLabels" as="xsd:string*" select="for $estep in $checker//check:step[@id=$excluded($selectedId)] return if ($estep/@label) then string($estep/@label) else ()"/>
+                        <xsl:if test="every $l in $excludedLabels satisfies $l = $selectedLabel">
+                            <xsl:copy />
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
             <xsl:otherwise>
                 <xsl:copy/>
             </xsl:otherwise>

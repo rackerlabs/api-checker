@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Fixed a regression where the remove dups optimization was always dropping step labels.
+
 ## Release 2.4.0 (2017-08-28) ##
 1. Updated Dependencies
    1. saxon: 9.7.0-15 → 9.8.0-4
