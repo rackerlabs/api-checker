@@ -78,6 +78,13 @@
           <xsl:choose>
               <xsl:when test="count($allRoles) != 0">
                   <xsl:apply-templates select="@*[not(local-name() = 'id') and not(namespace-uri() = 'http://docs.rackspace.com/api')]"/>
+                  <!--
+                      The label may be based of a rax:id so make sure
+                      we copy it into a doc since we are removing rax:id.
+                  -->
+                  <xsl:if test="not(wadl:doc/@title) and @rax:id">
+                      <wadl:doc title="{@rax:id}"/>
+                  </xsl:if>
                   <xsl:if test="not(wadl:request)">
                       <wadl:request>
                           <xsl:call-template name="generateRoles">

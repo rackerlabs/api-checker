@@ -166,6 +166,11 @@ class BaseCheckerSpec extends BaseWADLSpec with LazyLogging {
     stepsWithMatch (checker, methodMatch).filter(n => (n \ "@type").text == "METHOD")
   }
 
+  def stepsWithMethodLabelMatch (checker : NodeSeq, methodMatch  : String, labelMatch : String) : NodeSeq = {
+    stepsWithMatch (checker, methodMatch).filter(n => (n \ "@type").text == "METHOD").filter(n => (n \ "@label").text == labelMatch)
+  }
+
+
   def stepsWithReqTypeMatch (checker : NodeSeq, reqTypeMatch : String) : NodeSeq = {
     stepsWithMatch (checker, reqTypeMatch).filter(n => (n \ "@type").text == "REQ_TYPE")
   }
@@ -384,6 +389,7 @@ class BaseCheckerSpec extends BaseWADLSpec with LazyLogging {
   def URLXSDWithCapture(url : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithURLXSDMatchCapture(_, url, captureHeader)
   def Label(label : String) : (NodeSeq) => NodeSeq = stepsWithLabel(_, label)
   def Method(method : String) : (NodeSeq) => NodeSeq = stepsWithMethodMatch(_, method)
+  def Method(method : String, label : String) : (NodeSeq) => NodeSeq = stepsWithMethodLabelMatch(_, method, label)
   def XPath(expression : String) : (NodeSeq) => NodeSeq = stepsWithXPathMatch (_, expression)
   def XPathWithCapture(expression : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithXPathMatchCapture (_, expression, captureHeader)
   def XPath(expression: String, message : String) : (NodeSeq) => NodeSeq = stepsWithXPathMessageMatch(_, expression, message)
