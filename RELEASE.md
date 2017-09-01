@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Fixed a bug where method labels were sometimes lost when the rax:roles was used.
+
 ## Release 2.4.1 (2017-09-01) ##
 1. Fixed a regression where the remove dups optimization was always dropping step labels.
 
