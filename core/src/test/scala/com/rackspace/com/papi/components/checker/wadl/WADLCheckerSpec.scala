@@ -1668,15 +1668,16 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
       assert (checker, "count(/chk:checker/chk:step[@type='URL']) = 7")
       And("A single URLXSD node")
       assert (checker, "count(/chk:checker/chk:step[@type='URLXSD']) = 1")
+      assert (checker, "count(/chk:checker/chk:step[@type='URLXSD' and @label='yn']) = 1")
       And ("The checker should contain a GET method")
       assert (checker, "/chk:checker/chk:step[@type='METHOD' and @match='GET']")
       And ("The path from the start should contain all URL and URLXSD nodes")
       And ("it should end in the GET method node")
-      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), URLXSD("tst:yesno"), Method("GET"))
+      assert (checker, Start, URL("path"), URL("to"), URL("my"), URL("resource"), Label("yn"), Method("GET"))
       And ("The URLXSD should match a valid QName")
-      assert (checker, "namespace-uri-from-QName(resolve-QName(//chk:step[@type='URLXSD'][1]/@match, //chk:step[@type='URLXSD'][1])) "+
+      assert (checker, "namespace-uri-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'test://schema/a'")
-      assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@type='URLXSD'][1]/@match, //chk:step[@type='URLXSD'][1])) "+
+      assert (checker, "local-name-from-QName(resolve-QName(//chk:step[@label='yn'][1]/@match, //chk:step[@label='yn'][1])) "+
                                            "= 'yesno'")
       And ("There should not be a duplicate dup node")
       assert (checker, "count(//chk:step[@type='URL' and @match='dup']) = 1")
@@ -1700,6 +1701,8 @@ class WADLCheckerSpec extends BaseCheckerSpec with LogAssertions {
       assert (checker, URL("my"), MethodFail)
       assert (checker, URL("resource"), URLFail)
       assert (checker, URL("resource"), MethodFail)
+      assert (checker, Label("yn"), URLFail)
+      assert (checker, Label("yn"), MethodFail)
       And("The grammar nodes are added to the checker")
       assert (checker, "/chk:checker/chk:grammar[@ns='test://schema/a' and @href='test://app/xsd/simple.xsd' and @type='W3C_XML']")
     }
