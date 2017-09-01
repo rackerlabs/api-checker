@@ -52,6 +52,18 @@
         exclude-result-prefixes="xsd check"
         version="3.0">
 
+    <xsl:param name="configMetadata" as="node()">
+        <params>
+          <meta>
+            <config option="preserveMethodLabels"
+                    value="false"/>
+          </meta>
+        </params>
+    </xsl:param>
+
+    <xsl:variable name="preserveMethodLabels" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'preserveMethodLabels'))"/>
+
+
     <!--
         Most of the work of joining is done by the following util. The
         purpose of this template is to identify the joins and to

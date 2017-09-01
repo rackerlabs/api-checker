@@ -60,10 +60,30 @@
                 <xslout:variable name="nextStep" as="node()*"
                     select="check:stepsByIds($checker, check:next(.))"/>
                 <xsl:for-each select="$types">
-                    <xslout:call-template name="{$pfx}{.}">
-                        <xslout:with-param name="checker" select="$checker"/>
-                        <xslout:with-param name="nextStep" select="$nextStep"/>
-                    </xslout:call-template>
+                    <xsl:choose>
+                        <xsl:when test=". = 'METHOD'">
+                            <xslout:choose>
+                                <xslout:when test="$preserveMethodLabels">
+                                    <xslout:call-template name="{$pfx}{.}L">
+                                        <xslout:with-param name="checker" select="$checker"/>
+                                        <xslout:with-param name="nextStep" select="$nextStep"/>
+                                    </xslout:call-template>
+                                </xslout:when>
+                                <xslout:otherwise>
+                                    <xslout:call-template name="{$pfx}{.}">
+                                        <xslout:with-param name="checker" select="$checker"/>
+                                        <xslout:with-param name="nextStep" select="$nextStep"/>
+                                    </xslout:call-template>
+                                </xslout:otherwise>
+                            </xslout:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xslout:call-template name="{$pfx}{.}">
+                                <xslout:with-param name="checker" select="$checker"/>
+                                <xslout:with-param name="nextStep" select="$nextStep"/>
+                            </xslout:call-template>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:for-each>
             </xslout:template>
             <xsl:for-each select="$types">
@@ -79,6 +99,23 @@
                                 $r,
                         tokenize($rule/@optional, ' '), $error-sink-types)"/>
                 <xsl:variable name="match" as="xs:string?" select="$rule/@match"/>
+                <xsl:if test=". = 'METHOD'">
+                    <xslout:template name="{$pfx}{.}L">
+                        <xslout:param name="checker" as="node()"/>
+                        <xslout:param name="nextStep" as="node()*"/>
+                        <xsl:call-template name="matchJoinTemplates">
+                            <xsl:with-param name="type" select="."/>
+                            <xsl:with-param name="required"
+                                            select="
+                                                    (if (empty($required)) then
+                                                    'type'
+                                                    else
+                                                    $required,'label')"/>
+                            <xsl:with-param name="currentMatch" select="()"/>
+                            <xsl:with-param name="match" select="$match"/>
+                        </xsl:call-template>
+                    </xslout:template>
+                </xsl:if>
                 <xslout:template name="{$pfx}{.}">
                     <xslout:param name="checker" as="node()"/>
                     <xslout:param name="nextStep" as="node()*"/>

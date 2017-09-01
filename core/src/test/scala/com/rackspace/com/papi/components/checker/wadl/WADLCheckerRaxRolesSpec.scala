@@ -147,6 +147,13 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
       tf.enableRaxRolesExtension = true
       tf
     }
+    val raxRolesEnabledRemoveDupsPreserveLabels  = {
+      val tf = TestConfig()
+      tf.removeDups = true
+      tf.enableRaxRolesExtension = true
+      tf.preserveMethodLabels = true
+      tf
+    }
     val raxRolesMaskEnabled = {
       val tf = TestConfig()
       tf.removeDups = false
@@ -161,6 +168,14 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
       tf.maskRaxRoles403 = true
       tf
     }
+    val raxRolesMaskEnabledRemoveDupsPreserveLabels = {
+      val tf = TestConfig()
+      tf.removeDups = true
+      tf.enableRaxRolesExtension = true
+      tf.maskRaxRoles403 = true
+      tf
+    }
+
 
     val wadls = Map[String, NodeSeq]("A WADL with rax:roles but no references" -> raxRolesWADLNoRef,
                                      "A WADL with rax:roles and method references" -> raxRolesWADLRef)
@@ -475,6 +490,70 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, URL("c"), Header("X-Auth-Token", "(?s).*"), Method("POST"), ContentFail)
       }
 
+      scenario ("The WADL contains rax:roles and rax:roles checks are enabled with RemoveDups and preserve method labels with "+desc) {
+        Given (desc)
+        When ("The wadl is translated with rax:roles disabled")
+        val config = raxRolesEnabledRemoveDupsPreserveLabels
+        val checker = builder.build (inWADL, config)
+        Then("Header checks should be set for each method")
+        assert (checker, "exactly-one(chk:checker/chk:grammar[@type='W3C_XML']/xsd:schema/xsd:simpleType[@name='yesno'])")
+        assert (checker, "count(chk:checker/chk:step[@type='HEADER_ANY' and @code='403']) = 6")
+        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 5")
+        assert (checker, "count(chk:checker/chk:step[@type='URL_FAIL']) = 3")
+        assert (checker, """every $s in chk:checker/chk:step[@type='URLXSD'] satisfies
+                             namespace-uri-from-QName(resolve-QName($s/@match, $s)) = 'test://schema/a' and
+                             local-name-from-QName(resolve-QName($s/@match, $s)) = 'yesno'""")
+        assert (checker, """every $s in chk:checker/chk:step[@type='URL_FAIL' and @notTypes] satisfies
+                             namespace-uri-from-QName(resolve-QName($s/@notTypes, $s)) = 'test://schema/a' and
+                             local-name-from-QName(resolve-QName($s/@notTypes, $s)) = 'yesno'""")
+        And("URLs and Methods should be validated as well as headers")
+        assert (checker, Start, URL("a"), Method("PUT","putOnA"),
+                HeaderAny("X-ROLES","a:admin|a:observer","You are forbidden to perform the operation", 403),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'a:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, URL("a"), URL("b"), Method("POST","postOnB"),
+                HeaderAny("X-ROLES","a:admin|b:creator","You are forbidden to perform the operation", 403),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:creator')) then $h else ()"),
+                Accept)
+        assert (checker, Start, URL("a"), URL("b"), Method("PUT","putOnB"),
+                HeaderAny("X-ROLES","a:admin|b:creator|b:observer","You are forbidden to perform the operation", 403),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, URL("a"), URL("b"), Method("DELETE","deleteOnB"),
+                HeaderAny("X-ROLES","a:admin|b:creator|b:observer|b:admin","You are forbidden to perform the operation", 403),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, URL("a"), URL("b"), Method("GET","getOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "req:headers('X-ROLES', true())"),
+                Accept)
+        assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("POST","postOnB"),
+                HeaderAny("X-ROLES","a:admin","You are forbidden to perform the operation", 403),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin')) then $h else ()"),
+                Accept)
+        assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("PUT","putOnB"),
+                HeaderAny("X-ROLES","a:admin|b:observer","You are forbidden to perform the operation", 403),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, URL("a"), Method("PUT"), ContentFail)
+        assert (checker, Start, URL("a"), URL("b"), Method("POST"), ContentFail)
+        assert (checker, Start, URL("a"), URL("b"), Method("PUT"), ContentFail)
+        assert (checker, Start, URL("a"), URL("b"), Method("DELETE"), ContentFail)
+        assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("POST"), ContentFail)
+        assert (checker, Start, URL("a"), URLXSD("tst:yesno"), Method("PUT"), ContentFail)
+        assert (checker, Start, MethodFail)
+        assert (checker, Start, URL("c"), ContentFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", "(?s).*"), URLFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", "(?s).*"), MethodFail("GET|POST"))
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", "(?s).*"), Method("GET"), HeaderAny("X-ROLES","a:admin"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin')) then $h else ()"),
+                Accept)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", "(?s).*"), Method("GET"), ContentFail)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", "(?s).*"), Method("POST"), HeaderAny("X-ROLES","a:admin|a:observer"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'a:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, URL("c"), Header("X-Auth-Token", "(?s).*"), Method("POST"), ContentFail)
+      }
+
       scenario ("The WADL contains rax:roles and rax:roles checks are enabled with RemoveDups with 403s masked and with "+desc) {
         Given (desc)
         When ("The wadl is translated with rax:roles disabled")
@@ -582,6 +661,120 @@ class WADLCheckerRaxRolesSpec extends BaseCheckerSpec {
         assert (checker, Start, URL("a"), URLFail("b"))
         assert (checker, Start, URL("a"), MethodFail)
         assert (checker, Start, URL("a"), URL("b"), Method("GET"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "req:headers('X-ROLES', true())"),
+                Accept)
+        assert (checker, Start, URL("a"), URL("b"), MethodFail("GET"))
+        assert (checker, Start, URL("a"), URL("b"), URLFail)
+        assert (checker, Start, MethodFail)
+      }
+
+      scenario ("The WADL contains rax:roles and rax:roles checks are enabled with RemoveDups with 403s masked and preserve method labels with "+desc) {
+        Given (desc)
+        When ("The wadl is translated with rax:roles disabled")
+        val config = raxRolesMaskEnabledRemoveDupsPreserveLabels
+        val checker = builder.build (inWADL, config)
+        Then("Header checks should be set for each method")
+        assert (checker, "exactly-one(chk:checker/chk:grammar[@type='W3C_XML']/xsd:schema/xsd:simpleType[@name='yesno'])")
+        assert (checker, "count(chk:checker/chk:step[@type='HEADER_ANY']) = 5")
+        assert (checker, "count(chk:checker/chk:step[@type='METHOD_FAIL']) = 9")
+        assert (checker, "count(chk:checker/chk:step[@type='URL_FAIL']) = 5")
+        assert (checker, """every $s in chk:checker/chk:step[@type='URLXSD'] satisfies
+                             namespace-uri-from-QName(resolve-QName($s/@match, $s)) = 'test://schema/a' and
+                             local-name-from-QName(resolve-QName($s/@match, $s)) = 'yesno'""")
+        assert (checker, """every $s in chk:checker/chk:step[@type='URL_FAIL' and @notTypes] satisfies
+                             namespace-uri-from-QName(resolve-QName($s/@notTypes, $s)) = 'test://schema/a' and
+                             local-name-from-QName(resolve-QName($s/@notTypes, $s)) = 'yesno'""")
+        And("URLs and Methods should be validated as well as headers")
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), Method("PUT","putOnA"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'a:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), MethodFail("PUT"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), URLFail("b"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"),URL("a"), URLFailT("tst:yesno"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URLFail("a|c"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("POST","postOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:creator')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("PUT","putOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("DELETE","deleteOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), Method("GET","getOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "req:headers('X-ROLES', true())"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), MethodFail("DELETE|GET|POST|PUT"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URL("b"), URLFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URLXSD("tst:yesno"), Method("POST","postOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URLXSD("tst:yesno"), Method("PUT","putOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("a"), URLXSD("tst:yesno"), MethodFail("POST|PUT"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), Method("PUT","putOnA"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'a:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), MethodFail("PUT"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"),URL("a"), URLFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URLFail("a|c"))
+        assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("POST","postOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:creator')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("PUT","putOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("DELETE","deleteOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), Method("GET","getOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "req:headers('X-ROLES', true())"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), MethodFail("DELETE|GET|POST|PUT"))
+        assert (checker, Start, HeaderAny("X-ROLES","b:creator"), URL("a"), URL("b"), URLFail)
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URLFail("b"))
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URLFailT("tst:yesno"))
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URL("b"), Method("PUT","putOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URL("b"), Method("DELETE","deleteOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URL("b"), Method("GET","getOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "req:headers('X-ROLES', true())"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URL("b"), MethodFail("DELETE|GET|PUT"))
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URL("b"), URLFail)
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URLXSD("tst:yesno"), Method("PUT","putOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:observer"), URL("a"), URLXSD("tst:yesno"), MethodFail("PUT"))
+        assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), Method("DELETE","deleteOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'b:admin', 'b:creator', 'b:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), Method("GET","getOnB"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "req:headers('X-ROLES', true())"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), MethodFail("DELETE|GET"))
+        assert (checker, Start, HeaderAny("X-ROLES","b:admin"), URL("a"), URL("b"), URLFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), MethodFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), ContentFail)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", "(?s).*"), Method("GET","getOnC"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", "(?s).*"), Method("POST","postOnC"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'a:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:admin"), URL("c"), Header("X-Auth-Token", "(?s).*"), MethodFail("GET|POST"))
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URL("c"), Header("X-Auth-Token", "(?s).*"), Method("POST","postOnC"),
+                RaxCaptureHeader("X-RELEVANT-ROLES", "for $h in req:headers('X-ROLES', true()) return if ($h = ('a:admin', 'a:observer')) then $h else ()"),
+                Accept)
+        assert (checker, Start, HeaderAny("X-ROLES","a:observer"), URL("c"), Header("X-Auth-Token", "(?s).*"), MethodFail("POST"))
+        assert (checker, Start, URLFail("a"))
+        assert (checker, Start, URL("a"), URLFail("b"))
+        assert (checker, Start, URL("a"), MethodFail)
+        assert (checker, Start, URL("a"), URL("b"), Method("GET","getOnB"),
                 RaxCaptureHeader("X-RELEVANT-ROLES", "req:headers('X-ROLES', true())"),
                 Accept)
         assert (checker, Start, URL("a"), URL("b"), MethodFail("GET"))

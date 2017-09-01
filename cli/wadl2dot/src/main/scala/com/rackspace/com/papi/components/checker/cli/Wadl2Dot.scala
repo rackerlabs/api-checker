@@ -88,6 +88,9 @@ object Wadl2Dot {
     val preserveRequestBody = parser.flag[Boolean] (List("b", "preserve-req-body"),
                                                     "Ensure that the request body is preserved after validating the request.")
 
+    val preserveMethodLabels = parser.flag[Boolean] (List("L", "preserve-method-labels"),
+                                                    "Ensure that method labels are always preserved.")
+
     val xsdCheck = parser.flag[Boolean] (List("x", "xsd"),
                                          "Add checks to ensure that XML validates against XSD grammar Default: false")
 
@@ -188,6 +191,7 @@ object Wadl2Dot {
         c.enableAssertExtension = !raxAssert.value.getOrElse(false)
         c.xpathVersion = xpathVersion.value.getOrElse(10)
         c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
+        c.preserveMethodLabels = preserveMethodLabels.value.getOrElse(false)
         c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
         c.validateChecker = !dontValidate.value.getOrElse(false)
         c.enableWarnHeaders = !warnHeaders.value.getOrElse(false)

@@ -57,6 +57,17 @@
 
     <xsl:output indent="yes" method="xml"/>
 
+    <xsl:param name="configMetadata" as="node()">
+        <params>
+          <meta>
+            <config option="preserveMethodLabels"
+                    value="false"/>
+          </meta>
+        </params>
+    </xsl:param>
+
+    <xsl:variable name="preserveMethodLabels" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'preserveMethodLabels'))"/>
+
     <xsl:template match="check:checker" name="replaceAllDups">
         <xsl:param name="checker" select="." as="node()"/>
         <xsl:variable name="dups" as="map(xsd:string, xsd:string*)" select="check:getDups($checker)"/>
