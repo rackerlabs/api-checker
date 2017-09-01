@@ -1,5 +1,5 @@
 # Releases #
-## In Progress Work ##
+## Release 2.4.1 (2017-09-01) ##
 1. Fixed a regression where the remove dups optimization was always dropping step labels.
 
 ## Release 2.4.0 (2017-08-28) ##
