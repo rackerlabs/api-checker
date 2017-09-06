@@ -127,7 +127,8 @@
 
     <xsl:function name="check:getExcludeMap" as="map(xsd:string, xsd:string*)">
         <xsl:param name="dups" as="map(xsd:string, xsd:string*)"/>
-        <xsl:sequence select="map:merge(for $k in map:keys($dups) return map{$dups($k) :  $k},map{'duplicates' : 'combine'})"/>
+        <xsl:sequence select="map:merge(for $k in map:keys($dups) return
+                                          for $d in $dups($k) return map{$d :  $k},map{'duplicates' : 'combine'})"/>
     </xsl:function>
 
     <xsl:template match="check:step" mode="unDup">
@@ -154,8 +155,8 @@
             <!-- Substitude excludes from nexts -->
             <xsl:when test="name() = 'next'">
                 <xsl:variable name="nexts" as="xsd:string*" select="tokenize(., ' ')"/>
-                <xsl:variable name="newNext" as="xsd:string*" select="for $n in $nexts return
-                    if (map:contains($dups, $n)) then $dups($n) else $n"/>
+                <xsl:variable name="newNext" as="xsd:string*" select="distinct-values(for $n in $nexts return
+                    if (map:contains($dups, $n)) then $dups($n) else $n)"/>
                 <xsl:attribute name="next">
                     <xsl:value-of select="$newNext" separator=" "/>
                 </xsl:attribute>
@@ -163,19 +164,42 @@
             <!-- Copy labels if it is appropriate  to do so -->
             <xsl:when test="name() = 'label'">
                 <xsl:choose>
-                    <!-- Copy the label if there are no dups of this step -->
+                    <!--
+                        Copy the label if there are no dups of this
+                        step.
+                    -->
                     <xsl:when test="not(map:contains($dups, $id))">
                         <xsl:copy/>
                     </xsl:when>
-                    <!-- If there is a dup, copy the label only if all other labels match -->
-                    <xsl:otherwise>
-                        <xsl:variable name="selectedId" as="xsd:string" select="$dups($id)"/>
-                        <xsl:variable name="selectedLabel" as="xsd:string" select="string($checker//check:step[@id=$selectedId]/@label)"/>
-                        <xsl:variable name="excludedLabels" as="xsd:string*" select="for $estep in $checker//check:step[@id=$excluded($selectedId)] return if ($estep/@label) then string($estep/@label) else ()"/>
-                        <xsl:if test="every $l in $excludedLabels satisfies $l = $selectedLabel">
+                    <!--
+                        Don't copy the label if this step is being
+                        replaced by multiple steps, likely the step
+                        will be replaced anyway
+                    -->
+                    <xsl:when test="count($dups($id)) &gt; 1"/>
+                    <!--
+                        If this step is being replaced by a single
+                        step, and it's replacing itself then copy the
+                        label only if all other steps this step is
+                        replacing have the same label.
+
+                        This step is a target step, possibly replacing
+                        a number of other steps, possibly with
+                        different labels so keep the label only if
+                        other labels match to avoid confusion.
+                    -->
+                    <xsl:when test="$dups($id) = $id">
+                        <xsl:variable name="possibleLabel" as="xsd:string" select="string(.)"/>
+                        <xsl:variable name="excludedLabels" as="xsd:string*" select="for $estep in $checker//check:step[@id=$excluded($id)] return if ($estep/@label) then string($estep/@label) else ()"/>
+                        <xsl:if test="every $l in $excludedLabels satisfies $l = $possibleLabel">
                             <xsl:copy />
                         </xsl:if>
-                    </xsl:otherwise>
+                    </xsl:when>
+                    <!--
+                        Otherwise don't bother copying the lable, this
+                        step is being replaced anyway.
+                    -->
+                    <xsl:otherwise/>
                 </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
@@ -189,14 +213,13 @@
         <xsl:map>
             <!-- Treat epsilon methods as dups -->
             <xsl:for-each select="$checker//check:step[@type = 'METHOD']">
-                <xsl:variable name="nexts" as="xsd:string*" select="tokenize(@next, ' ')"/>
+                <xsl:variable name="nexts" as="xsd:string*" select="distinct-values(tokenize(@next, ' '))"/>
                 <xsl:variable name="nextStep" as="node()*"
                     select="$checker//check:step[@id = $nexts]"/>
-                <xsl:if
-                    test="
-                        every $s in $nextStep
-                            satisfies $s/@type = 'METHOD'">
-                    <xsl:map-entry key="string(@id)" select="$nexts"/>
+                <xsl:variable name="nextStepsNonSink" as="node()*" select="$nextStep[not(@type=$sink-types)]"/>
+                <xsl:if test="(not(empty($nextStepsNonSink))) and (every $s in $nextStepsNonSink
+                    satisfies $s/@type = 'METHOD')">
+                     <xsl:map-entry key="string(@id)" select="$nexts"/>
                 </xsl:if>
             </xsl:for-each>
         </xsl:map>

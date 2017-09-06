@@ -31,6 +31,8 @@
     xmlns:xslout="http://www.rackspace.com/repose/wadl/checker/Transform"
     exclude-result-prefixes="rules" version="2.0">
 
+    <xsl:import href="../util/funs.xsl"/>
+
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
@@ -42,9 +44,9 @@
 
     <xsl:template match="/">
         <xsl:comment>
-            ********** ********** ********** THIS IS A GENERATED
-            STYLESHEET DO NOT EDIT BY HAND ********** **********
-            **********
+            **********                                                    **********
+            ********** THIS IS A GENERATED STYLESHEET DO NOT EDIT BY HAND **********
+            **********                                                    **********
 </xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         <xslout:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -74,7 +76,8 @@
                                 ()
                             else
                                 $r,
-                        tokenize($rule/@optional, ' '))"/>
+                        tokenize($rule/@optional, ' '),
+                        $error-sink-types)"/>
                 <xsl:variable name="match" as="xs:string?" select="$rule/@match"/>
                 <xslout:template name="{$pfx}{.}">
                     <xslout:param name="checker" as="node()"/>

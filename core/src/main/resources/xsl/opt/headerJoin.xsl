@@ -96,6 +96,7 @@
             <xsl:if test="$joinSteps[1]/@captureHeader">
                 <xsl:attribute name="captureHeader" select="$joinSteps[1]/@captureHeader"/>
             </xsl:if>
+            <xsl:copy-of select="$joinSteps[1]/@*[name() = $error-sink-types]"/>
         </step>
     </xsl:template>
 </xsl:stylesheet>
