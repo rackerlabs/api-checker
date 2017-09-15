@@ -59,64 +59,11 @@
     -->
     <xsl:import href="../util/join.xsl"/>
 
-    <xsl:variable name="fix-error-types" as="xsd:string*" select="('METHOD_FAIL', 'URL_FAIL', 'REQ_TYPE_FAIL')"/>
-
     <xsl:template match="/">
-        <xsl:variable name="joined" as="node()">
-            <xsl:copy>
-                <xsl:apply-templates select="check:checker"/>
-            </xsl:copy>
-        </xsl:variable>
-        <xsl:apply-templates select="$joined" mode="cleanupErrorStates">
-            <xsl:with-param name="checker" select="$joined/check:checker" tunnel="yes"/>
-        </xsl:apply-templates>
+       <xsl:copy>
+          <xsl:apply-templates select="check:checker"/>
+       </xsl:copy>
     </xsl:template>
-
-    <xsl:template match="node() | @*" mode="cleanupErrorStates">
-        <xsl:copy>
-            <xsl:apply-templates select="@* | node()" mode="cleanupErrorStates"/>
-        </xsl:copy>
-    </xsl:template>
-
-    <xsl:template match="check:step[@next]" mode="cleanupErrorStates">
-        <xsl:param name="checker" as="node()" tunnel="yes"/>
-        <xsl:variable name="nexts" as="node()*" select="for $n in check:next(.) return key('checker-by-id',$n,$checker)"/>
-        <xsl:variable name="URLFailID" as="xsd:string" select="concat(@id,'__UF')"/>
-        <xsl:variable name="MethodFailID" as="xsd:string" select="concat(@id,'__MF')"/>
-        <xsl:variable name="REQTypeFailID" as="xsd:string" select="concat(@id,'__RQTF')"/>
-        <xsl:copy>
-            <xsl:apply-templates select="@*[not(name() = 'next')]" mode="cleanupErrorStates"/>
-            <xsl:attribute name="next">
-                <xsl:variable name="next" as="xsd:string*">
-                    <xsl:sequence select="$nexts[not(@type= ($fix-error-types, 'CONTENT_FAIL'))]/@id"/>
-                    <xsl:if test="$nexts[@type = 'URL_FAIL']">
-                        <xsl:sequence select="($URLFailID)"/>
-                    </xsl:if>
-                    <xsl:if test="$nexts[@type = 'METHOD_FAIL']">
-                        <xsl:sequence select="$MethodFailID"/>
-                    </xsl:if>
-                    <xsl:if test="$nexts[@type = 'REQ_TYPE_FAIL']">
-                        <xsl:sequence select="$REQTypeFailID"/>
-                    </xsl:if>
-                    <xsl:sequence select="$nexts[@type='CONTENT_FAIL']/@id"/>
-                </xsl:variable>
-                <xsl:value-of select="$next" separator=" "/>
-            </xsl:attribute>
-            <xsl:apply-templates select="node()" mode="cleanupErrorStates"/>
-        </xsl:copy>
-        <xsl:if test="$nexts[@type = 'URL_FAIL']">
-            <xsl:copy-of select="check:createURIErrorStep($URLFailID,$nexts[@type=('URL', 'URLXSD')])"/>
-        </xsl:if>
-        <xsl:if test="$nexts[@type = 'METHOD_FAIL']">
-            <xsl:copy-of select="check:createMethodErrorStep($MethodFailID,$nexts[@type='METHOD'])"/>
-        </xsl:if>
-        <xsl:if test="$nexts[@type = 'REQ_TYPE_FAIL']">
-            <xsl:copy-of select="check:createReqTypeErrorStep($REQTypeFailID, $nexts[@type='REQ_TYPE'])"/>
-        </xsl:if>
-    </xsl:template>
-
-    <xsl:template match="check:step[@type = $fix-error-types]" mode="cleanupErrorStates"/>
-
 
     <!--
         Select join candidates with auto-generated code.

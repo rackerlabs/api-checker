@@ -34,10 +34,12 @@
     <xsl:namespace-alias stylesheet-prefix="xslout" result-prefix="xsl"/>
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
+    <xsl:import href="../util/funs.xsl"/>
+
     <xsl:variable name="pfx" as="xs:string" select="'TMP-'"/>
     <xsl:variable name="rules" as="node()" select="/rules:rules"/>
     <xsl:variable name="types" as="xs:string*"
-        select="distinct-values(tokenize(string-join($rules/rules:rule/@types, ' '), ' '))"/>
+        select="distinct-values(tokenize(string-join($rules/rules:rule/@types, ' '), ' '))[not(. = $error-sink-types)]"/>
 
     <xsl:key name="rule-by-type" match="rules:rule" use="tokenize(@types, ' ')"/>
 
@@ -75,7 +77,7 @@
                                 ()
                             else
                                 $r,
-                        tokenize($rule/@optional, ' '))"/>
+                        tokenize($rule/@optional, ' '), $error-sink-types)"/>
                 <xsl:variable name="match" as="xs:string?" select="$rule/@match"/>
                 <xslout:template name="{$pfx}{.}">
                     <xslout:param name="checker" as="node()"/>
