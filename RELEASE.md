@@ -1,5 +1,5 @@
 # Releases #
-## In Progress Work ##
+## Release 2.5.0 (2017-09-25) ##
 1. Fixed a bug where method labels were sometimes lost when the rax:roles was used.
 1. Clean up : better handling of error states in optimization stages.
 1. New configuration option ```preserveMethodLabels``` ensures that method labels are always kept in the state machine.
