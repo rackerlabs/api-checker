@@ -70,6 +70,20 @@ class ValidatorWADLAssertSuite extends BaseValidatorSuite {
   }
 
 
+  val baseWithAssertRemoveDupsMethodLabels = {
+    val c = TestConfig()
+    c.xpathVersion = 31
+    c.removeDups = true
+    c.checkWellFormed = false
+    c.checkPlainParams = false
+    c.enableCaptureHeaderExtension = false
+    c.setParamDefaults = false
+    c.enableAssertExtension = true
+    c.preserveMethodLabels = true
+    c
+  }
+
+
   val baseWithAssertParamDefaults = {
     val c = TestConfig()
     c.removeDups = false
@@ -91,6 +105,20 @@ class ValidatorWADLAssertSuite extends BaseValidatorSuite {
     c.setParamDefaults = true
     c.checkHeaders = true
     c.enableAssertExtension = true
+    c
+  }
+
+
+  val baseWithAssertParamDefaultsRemoveDupsMethodLabels = {
+    val c = TestConfig()
+    c.removeDups = true
+    c.checkWellFormed = false
+    c.checkPlainParams = false
+    c.enableCaptureHeaderExtension = false
+    c.setParamDefaults = true
+    c.checkHeaders = true
+    c.enableAssertExtension = true
+    c.preserveMethodLabels = true
     c
   }
 
@@ -120,6 +148,20 @@ class ValidatorWADLAssertSuite extends BaseValidatorSuite {
     c
   }
 
+  val baseAssertWithJoinXPathsMethodLabels = {
+    val c = TestConfig()
+    c.removeDups = false
+    c.joinXPathChecks = true
+    c.checkWellFormed = true
+    c.checkPlainParams = true
+    c.checkElements = true
+    c.enableCaptureHeaderExtension = false
+    c.setParamDefaults = false
+    c.enableAssertExtension = true
+    c.preserveMethodLabels = true
+    c
+  }
+
   val baseAssertWithJoinXPathsAndRemoveDups = {
     val c = TestConfig()
     c.removeDups = true
@@ -130,6 +172,20 @@ class ValidatorWADLAssertSuite extends BaseValidatorSuite {
     c.enableCaptureHeaderExtension = false
     c.setParamDefaults = false
     c.enableAssertExtension = true
+    c
+  }
+
+  val baseAssertWithJoinXPathsAndRemoveDupsMethodLabels = {
+    val c = TestConfig()
+    c.removeDups = true
+    c.joinXPathChecks = true
+    c.checkWellFormed = true
+    c.checkPlainParams = true
+    c.checkElements = true
+    c.enableCaptureHeaderExtension = false
+    c.setParamDefaults = false
+    c.enableAssertExtension = true
+    c.preserveMethodLabels = true
     c
   }
 
@@ -163,6 +219,21 @@ class ValidatorWADLAssertSuite extends BaseValidatorSuite {
     c
   }
 
+  val baseWithRemoveDupsRaxRolesMethodLabels = {
+    val c = TestConfig()
+    c.enableRaxRolesExtension = true
+    c.removeDups = true
+    c.checkWellFormed = true
+    c.checkPlainParams = true
+    c.enableCaptureHeaderExtension = false
+    c.setParamDefaults = false
+    c.enableAssertExtension = true
+    c.checkElements = true
+    c.preserveMethodLabels = true
+    c
+  }
+
+
   val baseWithJoinXPathsRaxRoles = {
     val c = TestConfig()
     c.enableRaxRolesExtension = true
@@ -188,6 +259,21 @@ class ValidatorWADLAssertSuite extends BaseValidatorSuite {
     c.setParamDefaults = false
     c.enableAssertExtension = true
     c.checkElements = true
+    c
+  }
+
+  val baseWithJoinXPathsAndRemoveDupsRaxRolesMethodLabels = {
+    val c = TestConfig()
+    c.enableRaxRolesExtension = true
+    c.removeDups = true
+    c.joinXPathChecks = true
+    c.checkWellFormed = true
+    c.checkPlainParams = true
+    c.enableCaptureHeaderExtension = false
+    c.setParamDefaults = false
+    c.enableAssertExtension = true
+    c.checkElements = true
+    c.preserveMethodLabels = true
     c
   }
 
@@ -223,6 +309,22 @@ class ValidatorWADLAssertSuite extends BaseValidatorSuite {
     c
   }
 
+  val baseWithRemoveDupsRaxRolesMaskMethodLabels = {
+    val c = TestConfig()
+    c.enableRaxRolesExtension = true
+    c.maskRaxRoles403 = true
+    c.removeDups = true
+    c.checkWellFormed = true
+    c.checkPlainParams = true
+    c.enableCaptureHeaderExtension = false
+    c.setParamDefaults = false
+    c.enableAssertExtension = true
+    c.checkElements = true
+    c.preserveMethodLabels = true
+    c
+  }
+
+
   val baseWithJoinXPathsRaxRolesMask = {
     val c = TestConfig()
     c.enableRaxRolesExtension = true
@@ -252,6 +354,23 @@ class ValidatorWADLAssertSuite extends BaseValidatorSuite {
     c.checkElements = true
     c
   }
+
+  val baseWithJoinXPathsAndRemoveDupsRaxRolesMaskMethodLabels = {
+    val c = TestConfig()
+    c.enableRaxRolesExtension = true
+    c.maskRaxRoles403 = true
+    c.removeDups = true
+    c.joinXPathChecks = true
+    c.checkWellFormed = true
+    c.checkPlainParams = true
+    c.enableCaptureHeaderExtension = false
+    c.setParamDefaults = false
+    c.enableAssertExtension = true
+    c.checkElements = true
+    c.preserveMethodLabels = true
+    c
+  }
+
 
 val WADL_withAsserts = <application xmlns="http://wadl.dev.java.net/2009/02"
              xmlns:rax="http://docs.rackspace.com/api"
@@ -450,24 +569,34 @@ val WADL_withAsserts2 = <application xmlns="http://wadl.dev.java.net/2009/02"
   val assertDisabledConfigs = Map[String, Config]("base config with asserts disabled"->baseConfig)
 
   val assertEnabledConfigs  = Map[String, Config]("Config with asserts enabled"->baseWithAssert,
-                                                  "Config with asserts and remove dups"->baseWithAssertRemoveDups)
+    "Config with asserts and remove dups"->baseWithAssertRemoveDups,
+    "Config with asserts and remove dups preserve method labels "->baseWithAssertRemoveDupsMethodLabels
+  )
 
   val assertEnabledParamDefaultConfigs = Map[String, Config]("Config with asserts enabled, param defaults"->baseWithAssertParamDefaults,
-                                                             "Config with asserts enabled, param defaults and remove dups"->baseWithAssertParamDefaultsRemoveDups)
+    "Config with asserts enabled, param defaults and remove dups"->baseWithAssertParamDefaultsRemoveDups,
+    "Config with asserts enabled, param defaults and remove dups preserve method labels"->baseWithAssertParamDefaultsRemoveDupsMethodLabels
+  )
 
   val assertEnabledPlainParamConfigs = Map[String, Config]("Config with asserts enabled, plain params"->baseAssertWithPlainParams,
-                                                           "Config with asserts enabled, plain params join XPath"->baseAssertWithJoinXPaths,
-                                                           "Config with asserts enabled, plain params join XPath, remove dups"->baseAssertWithJoinXPathsAndRemoveDups)
+    "Config with asserts enabled, plain params join XPath"->baseAssertWithJoinXPaths,
+    "Config with asserts enabled, plain params join XPath, remove dups"->baseAssertWithJoinXPathsAndRemoveDups,
+    "Config with asserts enabled, plain params join XPath preserve method labels"->baseAssertWithJoinXPathsMethodLabels,
+    "Config with asserts enabled, plain params join XPath, remove dups preserve method labels"->baseAssertWithJoinXPathsAndRemoveDupsMethodLabels
+  )
 
   val assertEnabledPlainRaxRoles = Map[String, Config]("Config with asserts enabled, plain params, rax roles"->baseWithPlainParamsRaxRoles,
-                                                       "Config with asserts enabled, plain params, rax roles, remove dups"->baseWithRemoveDupsRaxRoles,
-                                                       "Config with asserts enabled, plain params, rax roles, join xpath"->baseWithJoinXPathsRaxRoles,
-                                                       "Config with asserts enabled, plain params, rax roles, remove dups, join xpath"->baseWithJoinXPathsAndRemoveDupsRaxRoles)
+    "Config with asserts enabled, plain params, rax roles, remove dups"->baseWithRemoveDupsRaxRoles,
+    "Config with asserts enabled, plain params, rax roles, remove dups method labels"->baseWithRemoveDupsRaxRolesMethodLabels,
+    "Config with asserts enabled, plain params, rax roles, join xpath"->baseWithJoinXPathsRaxRoles,
+    "Config with asserts enabled, plain params, rax roles, remove dups, join xpath"->baseWithJoinXPathsAndRemoveDupsRaxRoles,
+    "Config with asserts enabled, plain params, rax roles, remove dups, join xpath, preserve method labels"->baseWithJoinXPathsAndRemoveDupsRaxRolesMethodLabels)
 
   val assertEnabledPlainRaxRolesMask = Map[String, Config]("Config with asserts enabled, plain params, rax roles masked"->baseWithPlainParamsRaxRolesMask,
-                                                           "Config with asserts enabled, plain params, rax roles masked, remove dups"->baseWithRemoveDupsRaxRolesMask,
-                                                           "Config with asserts enabled, plain params, rax roles masked, join xpath"->baseWithJoinXPathsRaxRolesMask,
-                                                           "Config with asserts enabled, plain params, rax roles masked, remove dups, join xpath"->baseWithJoinXPathsAndRemoveDupsRaxRolesMask)
+    "Config with asserts enabled, plain params, rax roles masked, remove dups"->baseWithRemoveDupsRaxRolesMask,
+    "Config with asserts enabled, plain params, rax roles masked, remove dups, preserve method labels"->baseWithRemoveDupsRaxRolesMaskMethodLabels,
+    "Config with asserts enabled, plain params, rax roles masked, join xpath"->baseWithJoinXPathsRaxRolesMask,
+    "Config with asserts enabled, plain params, rax roles masked, remove dups, join xpath, preserve method labels"->baseWithJoinXPathsAndRemoveDupsRaxRolesMaskMethodLabels)
 
 
   //

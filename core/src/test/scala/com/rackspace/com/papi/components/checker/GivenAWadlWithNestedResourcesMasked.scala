@@ -24,8 +24,10 @@ import org.scalatest.junit.JUnitRunner
 class GivenAWadlWithNestedResourcesMasked extends FlatSpec with RaxRolesBehaviors {
 
   val configs = Map[String, Config]("Config With Roles Enabled" -> configWithRolesMaskedEnabled,
+    "Config With Roles Enabled and Preserved Labels" -> configWithRolesMaskedEnabledAndPreservedLabels,
     "Config With Roles Enabled and Messsage Extensions Disabled" -> configWithRolesMaskedEnabledMessageExtDisabled,
     "Config With Roles Enabled and Duplications Removed" -> configWithRolesMaskedEnabledDupsRemoved,
+    "Config With Roles Enabled , Duplications Removed, and Preserved Labels" -> configWithRolesMaskedEnabledDupsRemovedAndPreservedLabels,
     "Config With Roles Enabled and Header Checks Disabled" -> configWithRolesMaskedEnabledHeaderCheckDisabled,
     "Config With Roles Enabled and Defaults Enabled" -> configWithRolesMaskedEnabledDefaultsEnabled,
     "Config With Roles Enabled and Dubplications Removed and Defaults Enabled" -> configWithRolesMaskedEnabledDupsRemovedDefaultsEnabled)

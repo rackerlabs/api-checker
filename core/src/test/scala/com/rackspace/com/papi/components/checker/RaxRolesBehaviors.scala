@@ -32,14 +32,39 @@ trait RaxRolesBehaviors {
   def configWithRolesEnabled =
     TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, true)
 
+  def configWithRolesEnabledAndPreservedLabels = { 
+    val tc = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, true)
+    tc.preserveMethodLabels = true
+    tc
+  }
+
   def configWithRolesEnabledDupsRemoved =
     TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, true)
+
+  def configWithRolesEnabledDupsRemovedAndPreservedLabels = {
+    val tc = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, true)
+    tc.preserveMethodLabels = true
+    tc
+  }
 
   def configWithRolesMaskedEnabled =
     TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, false, true, true)
 
+  def configWithRolesMaskedEnabledAndPreservedLabels = {
+    val tc = TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, false, true, true)
+    tc.preserveMethodLabels = true
+    tc
+  }
+
   def configWithRolesMaskedEnabledDupsRemoved =
     TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, false, true, true)
+
+  def configWithRolesMaskedEnabledDupsRemovedAndPreservedLabels = {
+    val tc = TestConfig(true, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, true, false, true, true)
+    tc.preserveMethodLabels = true
+    tc
+  }
+
 
   def configWithRolesDisabledMaskedEnabled =
     TestConfig(false, false, true, true, true, 1, true, true, true, "XalanC", true, true, true, true, false, false, false, false, true, true)

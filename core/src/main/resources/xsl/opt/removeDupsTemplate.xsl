@@ -62,10 +62,23 @@
                     <xsl:attribute name="select">
                         <xsl:text>map:merge((</xsl:text>
                         <xsl:for-each select="$types">
-                            <xsl:text>check:</xsl:text>
-                            <xsl:value-of select="$pfx"/>
-                            <xsl:value-of select="."/>
-                            <xsl:text>($checker)</xsl:text>
+                            <xsl:choose>
+                                <xsl:when test=".='METHOD'">
+                                    <xsl:text>if ($preserveMethodLabels) then </xsl:text>
+                                    <xsl:call-template name="dupsCall">
+                                        <xsl:with-param name="name" select="concat(.,'L')"/>
+                                    </xsl:call-template>
+                                    <xsl:text> else </xsl:text>
+                                    <xsl:call-template name="dupsCall">
+                                        <xsl:with-param name="name" select="."/>
+                                    </xsl:call-template>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:call-template name="dupsCall">
+                                        <xsl:with-param name="name" select="."/>
+                                    </xsl:call-template>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <xsl:if test="position() != last()">
                                 <xsl:text>, </xsl:text>
                             </xsl:if>
@@ -75,6 +88,7 @@
                 </xslout:sequence>
             </xslout:function>
             <xsl:for-each select="$types">
+                <xsl:variable name="type" as="xsd:string" select="."/>
                 <xsl:variable name="rule" as="node()" select="key('rule-by-type', ., $rules)"/>
                 <xsl:variable name="required" as="xs:string*"
                     select="
@@ -85,34 +99,67 @@
                             tokenize($rule/@optional, ' '),
                             $error-sink-types)"/>
                 <xsl:variable name="match" as="xs:string?" select="$rule/@match"/>
-                <xslout:function name="check:{$pfx}{.}" as="map(xs:string, xs:string*)">
-                    <xslout:param name="checker" as="node()"/>
-                    <xslout:map>
-                        <xsl:choose>
-                            <xsl:when test="empty($required)">
-                                <xslout:variable name="{.}" as="node()*"
-                                    select="key('checker-by-type','{.}', $checker){if ($match) then concat('[',$match,']') else ()}"/>
-                                <xslout:if test="count(${.}) > 1">
-                                    <xslout:variable name="include" as="xs:string"
-                                        select="${.}[1]/@id"/>
-                                    <xslout:for-each select="${.}/@id">
-                                        <xslout:map-entry key="string(.)" select="$include"/>
-                                    </xslout:for-each>
-                                </xslout:if>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:call-template name="matchTemplates">
-                                    <xsl:with-param name="type" select="."/>
-                                    <xsl:with-param name="required" select="$required"/>
-                                    <xsl:with-param name="currentMatch" select="()"/>
-                                    <xsl:with-param name="match" select="$match"/>
-                                </xsl:call-template>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xslout:map>
-                </xslout:function>
+                <xsl:if test="$type = 'METHOD'">
+                    <xsl:call-template name="dupsFunction">
+                        <xsl:with-param name="type" select="$type"/>
+                        <xsl:with-param name="name" select="concat($type,'L')"/>
+                        <xsl:with-param name="rule" select="$rule"/>
+                        <xsl:with-param name="required" select="($required,'label')"/>
+                        <xsl:with-param name="match" select="$match"/>
+                    </xsl:call-template>
+                </xsl:if>
+                <xsl:call-template name="dupsFunction">
+                    <xsl:with-param name="type" select="$type"/>
+                    <xsl:with-param name="name" select="$type"/>
+                    <xsl:with-param name="rule" select="$rule"/>
+                    <xsl:with-param name="required" select="$required"/>
+                    <xsl:with-param name="match" select="$match"/>
+                </xsl:call-template>
             </xsl:for-each>
         </xslout:stylesheet>
+    </xsl:template>
+
+    <xsl:template name="dupsCall">
+        <xsl:param name="name" as="xs:string"/>
+        <xsl:text>check:</xsl:text>
+        <xsl:value-of select="$pfx"/>
+        <xsl:value-of select="$name"/>
+        <xsl:text>($checker)</xsl:text>
+    </xsl:template>
+
+    <xsl:template name="dupsFunction">
+        <xsl:param name="type" as="xs:string"/>
+        <xsl:param name="name" as="xs:string"/>
+        <xsl:param name="rule" as="node()"/>
+        <xsl:param name="required" as="xs:string*"/>
+        <xsl:param name="match" as="xs:string?"/>
+
+        <xslout:function name="check:{$pfx}{$name}" as="map(xs:string, xs:string*)">
+            <xslout:param name="checker" as="node()"/>
+            <xslout:map>
+                <xsl:choose>
+                    <xsl:when test="empty($required)">
+                        <xslout:variable name="{$type}" as="node()*"
+                                         select="key('checker-by-type','{.}', $checker){if ($match) then concat('[',$match,']') else ()}"/>
+                        <xslout:if test="count(${$type}) > 1">
+                            <xslout:variable name="include" as="xs:string"
+                                             select="${$type}[1]/@id"/>
+                            <xslout:for-each select="${$type}/@id">
+                                <xslout:map-entry key="string($type)" select="$include"/>
+                            </xslout:for-each>
+                        </xslout:if>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="matchTemplates">
+                            <xsl:with-param name="type" select="$type"/>
+                            <xsl:with-param name="required" select="$required"/>
+                            <xsl:with-param name="currentMatch" select="()"/>
+                            <xsl:with-param name="match" select="$match"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xslout:map>
+        </xslout:function>
     </xsl:template>
 
     <xsl:template name="matchTemplates">

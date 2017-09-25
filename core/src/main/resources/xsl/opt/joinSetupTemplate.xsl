@@ -51,8 +51,34 @@
             exclude-result-prefixes="xsd check"
             version="2.0">
 
+            <xslout:import href="../util/funs.xsl"/>
+
+            <xslout:param name="configMetadata" as="node()">
+                <params>
+                    <meta>
+                        <config option="preserveMethodLabels"
+                                value="false"/>
+                    </meta>
+                </params>
+            </xslout:param>
+
+            <xslout:variable name="preserveMethodLabels" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'preserveMethodLabels'))"/>
+
             <xslout:template match="@* | node()">
                 <xslout:copy>
+                    <xslout:apply-templates select="@* | node()"/>
+                </xslout:copy>
+            </xslout:template>
+
+            <xsl:comment>
+                SPECIAL CASE : if we are preserving method labels then
+                see the label as an optional attribute.
+            </xsl:comment>
+            <xslout:template match="check:step[$preserveMethodLabels and (@type='METHOD')]">
+                <xslout:copy>
+                    <xslout:if test="not(@label)">
+                        <xslout:attribute name="label" select="'{$EMPTY}'"/>
+                    </xslout:if>
                     <xslout:apply-templates select="@* | node()"/>
                 </xslout:copy>
             </xslout:template>
@@ -68,16 +94,22 @@
         <xsl:variable name="sq" as="xs:string">'</xsl:variable>
         <xsl:variable name="qtypes" as="xs:string*" select="for $t in $types return concat($sq,$t,$sq)"/>
         <xsl:variable name="typematch" as="xs:string"><xsl:value-of select="$qtypes" separator=", "/></xsl:variable>
-        <xslout:template match="check:step[@type=({$typematch})]">
-            <xslout:copy>
-                <xsl:for-each select="$optionals">
-                    <xslout:if test="not(@{.})">
-                        <xslout:attribute name="{.}" select="'{$EMPTY}'"/>
-                    </xslout:if>
-                </xsl:for-each>
-                <xslout:apply-templates select="@* | node()"/>
-            </xslout:copy>
-        </xslout:template>
+        <xsl:if test="not(empty($optionals))">
+            <!-- METHOD is a special case we should fail it get's caught here -->
+            <xsl:if test="'METHOD' = $types">
+                <xsl:message terminate="yes">[ERROR] Assertion failed in joinSetup. Method should not be handled here.</xsl:message>
+            </xsl:if>
+            <xslout:template match="check:step[@type=({$typematch})]">
+                <xslout:copy>
+                    <xsl:for-each select="$optionals">
+                        <xslout:if test="not(@{.})">
+                            <xslout:attribute name="{.}" select="'{$EMPTY}'"/>
+                        </xslout:if>
+                    </xsl:for-each>
+                    <xslout:apply-templates select="@* | node()"/>
+                </xslout:copy>
+            </xslout:template>
+        </xsl:if>
     </xsl:template>
     <xsl:template match="text()"/>
 

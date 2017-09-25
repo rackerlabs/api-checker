@@ -470,8 +470,9 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   //
   private def joinOptSetup(in : Source, c : Config) : Source = timeFunction("joinOptSetup", {
     if (c.removeDups || c.joinXPathChecks) {
+      val builder = processor.newDocumentBuilder
       val removeErrorStatesTransform = getXsltTransformer(removeErrorStatesXsltExec)
-      val joinTransform = getXsltTransformer(joinSetupXsltExec)
+      val joinTransform = getXsltTransformer(joinSetupXsltExec, Map(new QName(CONFIG_METADATA) -> builder.build(new StreamSource(c.checkerMetaElem))))
       val out = new XdmDestination
       removeErrorStatesTransform.setSource(in)
       removeErrorStatesTransform.setDestination(joinTransform)
@@ -508,7 +509,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   //
   private def joinOpt(in : Source, c : Config) : Source = timeFunction("joinOpt", {
     if (c.removeDups || c.joinXPathChecks) {
-      val joinTransform = getXsltTransformer(joinXsltExec)
+      val builder = processor.newDocumentBuilder
+      val joinTransform = getXsltTransformer(joinXsltExec, Map(new QName(CONFIG_METADATA) -> builder.build(new StreamSource(c.checkerMetaElem))))
       val out = new XdmDestination
       joinTransform.setSource(in)
       joinTransform.setDestination(out)
@@ -524,7 +526,8 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   //
   private def dupsOpt(in : Source, c : Config) : Source = timeFunction("dupsOpt", {
     if (c.removeDups || c.joinXPathChecks) {
-      val dupsTransform = getXsltTransformer(dupsXsltExec)
+      val builder = processor.newDocumentBuilder
+      val dupsTransform = getXsltTransformer(dupsXsltExec, Map(new QName(CONFIG_METADATA) -> builder.build(new StreamSource(c.checkerMetaElem))))
       val out = new XdmDestination
       dupsTransform.setSource(in)
       dupsTransform.setDestination(out)

@@ -320,6 +320,20 @@ class Config extends LazyLogging {
   @AffectsChecker
   var enableAssertExtension : Boolean = true
 
+
+  //
+  // Ensure that method labels are always preserved in the state
+  // machine, even at the cost of having a more complex machine.  If
+  // the value is set to false then method labels may be dropped by
+  // optimization stages in order to consolidate steps.
+  //
+  // Method labels are typically needed for reporting and debugging
+  // purposes, they have no effect on validation.
+  //
+  @BeanProperty
+  @AffectsChecker
+  var preserveMethodLabels : Boolean = false
+
   //
   //  The XSL engine to use.  Possible choices are Xalan, XalanC,
   //  SaxonHE and SaxonEE. SaxonEE requires a Saxon License.

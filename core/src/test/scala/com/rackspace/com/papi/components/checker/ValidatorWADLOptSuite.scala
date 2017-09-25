@@ -36,6 +36,11 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
   val shardXPathNoRemoveDups = Validator(sharedXPathWADL, TestConfig(false, false, true, true, true, 1, true, true, false, "Xalan", false))
   val shardXPathNoDups = Validator(sharedXPathWADL, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", false))
   val shardXPathNoDupsJoinXPath = Validator(sharedXPathWADL, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", true))
+  val shardXPathNoDupsJoinXPathMethodLabels = Validator(sharedXPathWADL, {
+    val tc = TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", true)
+    tc.preserveMethodLabels = true
+    tc
+  })
 
   val good_usage16 =
 <atom:entry xmlns:atom="http://www.w3.org/2005/Atom" xmlns="http://docs.rackspace.com/usage/nova/ips" only_usage_up_down="true">
@@ -74,6 +79,11 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
     shardXPathNoDupsJoinXPath.validate(request("POST", "nova/entries", "application/atom+xml", good_rhel), response, chain)
   }
 
+  test("POST of RHEL should work on nova/entries on shardXPathNoDupsJoinXPathMethodLabels") {
+    shardXPathNoDupsJoinXPathMethodLabels.validate(request("POST", "nova/entries", "application/atom+xml", good_rhel), response, chain)
+  }
+
+
   test("POST of RHEL should work on servers/entries on shardXPathNoRemoveDups") {
     shardXPathNoRemoveDups.validate(request("POST", "servers/entries", "application/atom+xml", good_rhel), response, chain)
   }
@@ -84,6 +94,10 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
 
   test("POST of RHEL should work on servers/entries on shardXPathNoDupsJoinXPath") {
     shardXPathNoDupsJoinXPath.validate(request("POST", "servers/entries", "application/atom+xml", good_rhel), response, chain)
+  }
+
+  test("POST of RHEL should work on servers/entries on shardXPathNoDupsJoinXPathMethodLabels") {
+    shardXPathNoDupsJoinXPathMethodLabels.validate(request("POST", "servers/entries", "application/atom+xml", good_rhel), response, chain)
   }
 
   test("POST of good_usage17 should work on servers/entries on shardXPathNoRemoveDups") {
@@ -98,6 +112,10 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
     shardXPathNoDupsJoinXPath.validate(request("POST", "servers/entries", "application/atom+xml", good_usage17), response, chain)
   }
 
+  test("POST of good_usage17 should work on servers/entries on shardXPathNoDupsJoinXPathMethodLabels") {
+    shardXPathNoDupsJoinXPathMethodLabels.validate(request("POST", "servers/entries", "application/atom+xml", good_usage17), response, chain)
+  }
+
   test("POST of good_usage16 should work on nova/entries on shardXPathNoRemoveDups") {
     shardXPathNoRemoveDups.validate(request("POST", "nova/entries", "application/atom+xml", good_usage16), response, chain)
   }
@@ -108,6 +126,10 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
 
   test("POST of good_usage16 should work on nova/entries on shardXPathNoDupsJoinXPath") {
     shardXPathNoDupsJoinXPath.validate(request("POST", "nova/entries", "application/atom+xml", good_usage16), response, chain)
+  }
+
+  test("POST of good_usage16 should work on nova/entries on shardXPathNoDupsJoinXPathMethodLabels") {
+    shardXPathNoDupsJoinXPathMethodLabels.validate(request("POST", "nova/entries", "application/atom+xml", good_usage16), response, chain)
   }
 
 
@@ -126,6 +148,11 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
                                                          good_usage16), response, chain), 400)
   }
 
+  test("POST of good_usage16 on servers/entries  should fail on shardXPathNoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPathNoDupsJoinXPathMethodLabels.validate(request("POST", "servers/entries", "application/atom+xml",
+                                                         good_usage16), response, chain), 400)
+  }
+
   test("POST of good_usage17 on nova/entries should fail on shardXPathNoRemoveDups") {
     assertResultFailed(shardXPathNoRemoveDups.validate(request("POST", "nova/entries", "application/atom+xml",
                                                                good_usage17), response, chain), 400)
@@ -138,6 +165,11 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
 
   test("POST of good_usage17 on servers/entries  should fail on shardXPathNoDupsJoinXPath") {
     assertResultFailed(shardXPathNoDupsJoinXPath.validate(request("POST", "nova/entries", "application/atom+xml",
+                                                         good_usage17), response, chain), 400)
+  }
+
+  test("POST of good_usage17 on nova/entries  should fail on shardXPathNoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPathNoDupsJoinXPathMethodLabels.validate(request("POST", "nova/entries", "application/atom+xml",
                                                          good_usage17), response, chain), 400)
   }
 
@@ -157,6 +189,11 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
                                                          bad_usage), response, chain), 400)
   }
 
+  test("POST of bad_usage on nova/entries  should fail on shardXPathNoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPathNoDupsJoinXPathMethodLabels.validate(request("POST", "nova/entries", "application/atom+xml",
+                                                         bad_usage), response, chain), 400)
+  }
+
   test("POST of bad_usage on servers/entries should fail on shardXPathNoRemoveDups") {
     assertResultFailed(shardXPathNoRemoveDups.validate(request("POST", "servers/entries", "application/atom+xml",
                                                                bad_usage), response, chain), 400)
@@ -171,6 +208,12 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
     assertResultFailed(shardXPathNoDupsJoinXPath.validate(request("POST", "servers/entries", "application/atom+xml",
                                                          bad_usage), response, chain), 400)
   }
+
+  test("POST of bad_usage on servers/entries  should fail on shardXPathNoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPathNoDupsJoinXPathMethodLabels.validate(request("POST", "servers/entries", "application/atom+xml",
+                                                         bad_usage), response, chain), 400)
+  }
+
 
     val sharedXPathWADL2 =
 <application xmlns="http://wadl.dev.java.net/2009/02"
@@ -210,6 +253,11 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
   val shardXPath2NoRemoveDups = Validator(sharedXPathWADL2, TestConfig(false, false, true, true, true, 1, true, true, false, "Xalan", false))
   val shardXPath2NoDups = Validator(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", false))
   val shardXPath2NoDupsJoinXPath = Validator(sharedXPathWADL2, TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", true))
+  val shardXPath2NoDupsJoinXPathMethodLabels = Validator(sharedXPathWADL2, {
+    val tc=TestConfig(true, false, true, true, true, 1, true, true, false, "Xalan", true)
+    tc.preserveMethodLabels = true
+    tc
+  })
 
   val good_bar = <bar xmlns="http://www.rackspace.com/foo/bar" junk="true"/>
   val good_foo = <foo xmlns="http://www.rackspace.com/foo/bar" junk="true"/>
@@ -229,6 +277,10 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
     shardXPath2NoDupsJoinXPath.validate(request("POST", "y", "application/xml", good_bar), response, chain)
   }
 
+  test("POST of good_bar should work on y on shardXPath2NoDupsJoinXPathMethodLabels") {
+    shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "y", "application/xml", good_bar), response, chain)
+  }
+
   test("POST of good_bar should work on x on shardXPath2NoRemoveDups") {
     shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml", good_bar), response, chain)
   }
@@ -241,6 +293,10 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
     shardXPath2NoDupsJoinXPath.validate(request("POST", "x", "application/xml", good_bar), response, chain)
   }
 
+  test("POST of good_bar should work on x on shardXPath2NoDupsJoinXPathMethodLabels") {
+    shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "x", "application/xml", good_bar), response, chain)
+  }
+
   test("POST of good_foo should work on x on shardXPath2NoRemoveDups") {
     shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml", good_foo), response, chain)
   }
@@ -251,6 +307,10 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
 
   test("POST of good_foo should work on x on shardXPath2NoDupsJoinXPath") {
     shardXPath2NoDupsJoinXPath.validate(request("POST", "x", "application/xml", good_foo), response, chain)
+  }
+
+  test("POST of good_foo should work on x on shardXPath2NoDupsJoinXPathMethodLabels") {
+      shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "x", "application/xml", good_foo), response, chain)
   }
 
   test("POST of good_foo on y should fail on shardXPath2NoRemoveDups") {
@@ -268,6 +328,12 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
                                                           good_foo), response, chain), 400)
   }
 
+  test("POST of good_foo on y should fail on shardXPath2NoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "y", "application/xml",
+                                                          good_foo), response, chain), 400)
+  }
+
+
   test("POST of bad_bar on y should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml",
                                                                 bad_bar), response, chain), 400)
@@ -280,6 +346,11 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
 
   test("POST of bad_bar on y should fail on shardXPath2NoDupsJoinXPath") {
     assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "y", "application/xml",
+                                                          bad_bar), response, chain), 400)
+  }
+
+  test("POST of bad_bar on y should fail on shardXPath2NoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "y", "application/xml",
                                                           bad_bar), response, chain), 400)
   }
 
@@ -298,6 +369,12 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
                                                           bad_foo), response, chain), 400)
   }
 
+  test("POST of bad_foo on y should fail on shardXPath2NoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "y", "application/xml",
+                                                          bad_foo), response, chain), 400)
+  }
+
+
   test("POST of bad_foo_bar on y should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "y", "application/xml",
                                                                 bad_foo_bar), response, chain), 400)
@@ -312,6 +389,12 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
     assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "y", "application/xml",
                                                           bad_foo_bar), response, chain), 400)
   }
+
+  test("POST of bad_foo_bar on y should fail on shardXPath2NoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "y", "application/xml",
+                                                          bad_foo_bar), response, chain), 400)
+  }
+
 
   test("POST of bad_bar on x should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml",
@@ -328,6 +411,12 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
                                                           bad_bar), response, chain), 400)
   }
 
+  test("POST of bad_bar on x should fail on shardXPath2NoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "x", "application/xml",
+                                                          bad_bar), response, chain), 400)
+  }
+
+
   test("POST of bad_foo on x should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml",
                                                                 bad_foo), response, chain), 400)
@@ -343,6 +432,12 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
                                                           bad_foo), response, chain), 400)
   }
 
+  test("POST of bad_foo on x should fail on shardXPath2NoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "x", "application/xml",
+                                                          bad_foo), response, chain), 400)
+  }
+
+
   test("POST of bad_foo_bar on x should fail on shardXPath2NoRemoveDups") {
     assertResultFailed(shardXPath2NoRemoveDups.validate(request("POST", "x", "application/xml",
                                                                 bad_foo_bar), response, chain), 400)
@@ -355,6 +450,11 @@ class ValidatorWADLOptSuite extends BaseValidatorSuite {
 
   test("POST of bad_foo_bar on x should fail on shardXPath2NoDupsJoinXPath") {
     assertResultFailed(shardXPath2NoDupsJoinXPath.validate(request("POST", "x", "application/xml",
+                                                          bad_foo_bar), response, chain), 400)
+  }
+
+  test("POST of bad_foo_bar on x should fail on shardXPath2NoDupsJoinXPathMethodLabels") {
+    assertResultFailed(shardXPath2NoDupsJoinXPathMethodLabels.validate(request("POST", "x", "application/xml",
                                                           bad_foo_bar), response, chain), 400)
   }
 }
