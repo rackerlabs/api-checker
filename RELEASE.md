@@ -1,5 +1,5 @@
 # Releases #
-## In Progress Work ##
+## Release 2.5.1 (2017-10-24) ##
 1. Fixed a bug where the removeDups opt sometimes created checkers with missing states.
 
 ## Release 2.5.0 (2017-09-25) ##
