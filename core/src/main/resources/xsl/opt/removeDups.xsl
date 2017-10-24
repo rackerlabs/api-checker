@@ -84,9 +84,13 @@
             <xsl:otherwise>
                 <xsl:call-template name="replaceAllDups">
                     <xsl:with-param name="checker">
-                        <xsl:call-template name="replaceDups">
-                            <xsl:with-param name="checker" select="util:pruneSteps($checker)"/>
-                            <xsl:with-param name="dups" select="$dups"/>
+                        <xsl:call-template name="util:pruneSteps">
+                            <xsl:with-param name="checker">
+                                <xsl:call-template name="replaceDups">
+                                    <xsl:with-param name="checker" select="$checker"/>
+                                    <xsl:with-param name="dups" select="$dups"/>
+                                </xsl:call-template>
+                            </xsl:with-param>
                         </xsl:call-template>
                     </xsl:with-param>
                 </xsl:call-template>
@@ -112,9 +116,13 @@
             <xsl:otherwise>
                 <xsl:call-template name="replaceEpsilons">
                     <xsl:with-param name="checker">
-                        <xsl:call-template name="replaceDups">
-                            <xsl:with-param name="checker" select="util:pruneSteps($checker)"/>
-                            <xsl:with-param name="dups" select="$dups"/>
+                        <xsl:call-template name="util:pruneSteps">
+                            <xsl:with-param name="checker">
+                                <xsl:call-template name="replaceDups">
+                                    <xsl:with-param name="checker" select="$checker"/>
+                                    <xsl:with-param name="dups" select="$dups"/>
+                                </xsl:call-template>
+                            </xsl:with-param>
                         </xsl:call-template>
                     </xsl:with-param>
                 </xsl:call-template>

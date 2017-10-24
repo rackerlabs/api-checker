@@ -100,10 +100,14 @@
             <xsl:otherwise>
                 <xsl:call-template name="joinDups">
                     <xsl:with-param name="checker">
-                        <xsl:call-template name="doJoin">
-                            <xsl:with-param name="checker" select="$checker"/>
-                            <xsl:with-param name="joins" select="$joins"/>
-                            <xsl:with-param name="stepsToJoin" select="check:stepsToJoin(map:keys($joins), $joins, map{})"/>
+                        <xsl:call-template name="util:pruneSteps">
+                            <xsl:with-param name="checker">
+                                <xsl:call-template name="doJoin">
+                                    <xsl:with-param name="checker" select="$checker"/>
+                                    <xsl:with-param name="joins" select="$joins"/>
+                                    <xsl:with-param name="stepsToJoin" select="check:stepsToJoin(map:keys($joins), $joins, map{})"/>
+                                </xsl:call-template>
+                            </xsl:with-param>
                         </xsl:call-template>
                     </xsl:with-param>
                 </xsl:call-template>
