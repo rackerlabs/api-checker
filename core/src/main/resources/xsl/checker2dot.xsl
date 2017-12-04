@@ -24,7 +24,7 @@
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     xmlns:check="http://www.rackspace.com/repose/wadl/checker"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    version="2.0">
+    version="3.0">
      
    <xsl:output method="text"/>
    <xsl:param name="ignoreSinks" select="true()" as="xsd:boolean"/>
@@ -145,7 +145,7 @@
                                        <xsl:when test="$label = 'ε'">
                                            <xsl:value-of select="$label"/>
                                        </xsl:when>
-                                       <xsl:when test="$nextStep/@type = 'ACCEPT'">
+                                       <xsl:when test="$nextStep/@type = ('ACCEPT', 'POP_REP')">
                                            <xsl:value-of select="'ε'"/>
                                        </xsl:when>
                                        <xsl:otherwise>
@@ -213,6 +213,9 @@
              <xsl:otherwise>
                  <xsl:value-of select="concat(@id,'[')"/>
                  <xsl:value-of select="'label=&quot;'"/>
+                 <xsl:if test="@type = ('PUSH_XML_REP','PUSH_JSON_REP') and not($nfaMode)">
+                     <xsl:value-of select="@type || '\n'"/>
+                 </xsl:if>
                  <xsl:choose>
                      <xsl:when test="$nfaMode">
                          <xsl:value-of select="@id"/>
@@ -228,6 +231,9 @@
                      </xsl:when>
                      <xsl:when test="@name and @path">
                          <xsl:value-of select="concat(@name,':&#x2190; ',check:escapeRegex(@path))"/>
+                     </xsl:when>
+                     <xsl:when test="@path">
+                         <xsl:value-of select="check:escapeRegex(@path)"/>
                      </xsl:when>
                      <xsl:when test="@match or @matchRegEx">
                          <xsl:value-of select="check:matchValue(.)"/>

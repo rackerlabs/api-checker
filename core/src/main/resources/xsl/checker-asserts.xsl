@@ -25,7 +25,7 @@
     xmlns:chk="http://www.rackspace.com/repose/wadl/checker"
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     exclude-result-prefixes="xs chk"
-    version="2.0">
+    version="3.0">
 
     <xsl:import href="util/funs.xsl"/>
 
@@ -224,13 +224,16 @@
 
             If a step is of type HEADER_ANY then its parent is allowed to be START.
             This weird edge case allows the implementation of rax:roles MASK.
+
+            Another exception is that POP_REP is allowed to be a parent, because
+            it should always be proceeded by a content step.
          -->
         <xsl:choose>
             <xsl:when test="every $parent in $parents satisfies $parent/@type = $cont-error-types"/>
             <xsl:when test="(@type='HEADER_ANY') and (every $parent in $parents satisfies $parent/@type = 'START')"/>
             <xsl:otherwise>
                 <xsl:call-template name="chk:requireParentOrSiblingType">
-                    <xsl:with-param name="parentTypes" select="$cont-error-types"/>
+                    <xsl:with-param name="parentTypes" select="($cont-error-types, 'POP_REP')"/>
                     <xsl:with-param name="siblingTypes" select="'CONTENT_FAIL'"/>
                 </xsl:call-template>
             </xsl:otherwise>
@@ -238,19 +241,42 @@
         <!--
             Content dependecies:  XSD and XPATH require parent to be XSL, WELL_XML, XPATH
                                   JSON_SCHEMA and JSON_XPATH requires parent to be WELL_JSON
+
+                                  Both can have a parent of type
+                                  PUSH_REP, but it must be of the right type.
+
+                                  Both can have a parent of a POP_REP,
+                                  because we might be popping into the
+                                  correct representation.  TODO:
+                                  better checks on popping correctly!
          -->
         <xsl:choose>
             <xsl:when test="@type=('XSD', 'XPATH')">
                 <xsl:call-template name="chk:requireParentType">
-                    <xsl:with-param name="parentTypes" select="('WELL_XML', 'XSL', 'XPATH')"/>
+                    <xsl:with-param name="parentTypes" select="('WELL_XML', 'XSL', 'XPATH','PUSH_XML_REP','POP_REP')"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="@type=('JSON_SCHEMA', 'JSON_XPATH')">
                 <xsl:call-template name="chk:requireParentType">
-                    <xsl:with-param name="parentTypes" select="('WELL_JSON', 'JSON_XPATH')"/>
+                    <xsl:with-param name="parentTypes" select="('WELL_JSON', 'JSON_XPATH','PUSH_JSON_REP','POP_REP')"/>
                 </xsl:call-template>
             </xsl:when>
+            <xsl:when test="@type=('PUSH_XML_REP','PUSH_JSON_REP')">
+                <xsl:if test="not(chk:descendantTypes(.,'POP_REP'))">
+                    <xsl:message terminate="yes">
+                        The PUSH_REP Step <xsl:value-of select="@id"/> must eventually be followed by a POP_REP.
+                    </xsl:message>
+                </xsl:if>
+            </xsl:when>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="chk:step[@type='POP_REP']">
+        <xsl:if test="not(chk:ancestorTypes(.,('PUSH_XML_REP','PUSH_JSON_REP')))">
+            <xsl:message terminate="yes">
+                The POP_REP Step <xsl:value-of select="@id"/> must eventually be preceded by a PUSH_REP.
+            </xsl:message>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="chk:step[@type='CONTENT_FAIL']">
@@ -416,6 +442,24 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="some $s in $nextSteps satisfies chk:descendantTypes($s, $descendantTypes)"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <!--
+        Returns true, if there are ancestors of ancestor types
+        given the current node.
+     -->
+    <xsl:function name="chk:ancestorTypes" as="xs:boolean">
+        <xsl:param name="step" as="node()"/>
+        <xsl:param name="ancestorTypes" as="xs:string*"/>
+        <xsl:variable name="parentSteps" as="node()*" select="key('checker-by-ref',$step/@id, $checker)"/>
+        <xsl:choose>
+            <xsl:when test="some $s in $parentSteps satisfies $s/@type=$ancestorTypes">
+                <xsl:value-of select="true()"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="some $s in $parentSteps satisfies chk:ancestorTypes($s, $ancestorTypes)"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>

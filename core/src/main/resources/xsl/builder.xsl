@@ -42,7 +42,7 @@
     xmlns:util="http://www.rackspace.com/repose/wadl/checker/util"
     xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
     exclude-result-prefixes="xsd wadl rax check svrl"
-    version="2.0">
+    version="3.0">
 
     <!-- Add prune steps template -->
     <xsl:import href="util/pruneSteps.xsl"/>
@@ -76,6 +76,7 @@
             <config option="preserveRequestBody" value="false"/>
             <config option="checkHeaders" value="true"/>
             <config option="enableRaxRolesExtension" value="false"/>
+            <config option="enableRaxRepresentationExtension" value="false"/>
             <config option="maskRaxRoles403" value="false"/>
             <config option="enableAuthenticatedByExtension" value="false"/>
             <config option="enableWarnHeaders" value="true"/>
@@ -97,6 +98,7 @@
     <xsl:variable name="enableIgnoreJSONSchemaExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableIgnoreJSONSchemaExtension'))"/>
     <xsl:variable name="enableMessageExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableMessageExtension'))"/>
     <xsl:variable name="enableRaxRolesExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRolesExtension'))"/>
+    <xsl:variable name="enableRaxRepresentationExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRepresentationExtension'))"/>
     <xsl:variable name="enableAuthenticatedByExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAuthenticatedByExtension'))"/>
     <xsl:variable name="enableCaptureHeaderExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableCaptureHeaderExtension'))"/>
     <xsl:variable name="enableAnyMatchExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAnyMatchExtension'))"/>
@@ -142,6 +144,8 @@
                           $checkPlainParams or $useJSONContentCheck"/>
     <xsl:variable name="useRaxRoles" as="xsd:boolean"
                   select="$enableRaxRolesExtension"/>
+    <xsl:variable name="useRaxRepresentation" as="xsd:boolean"
+                  select="$enableRaxRepresentationExtension"/>
     <xsl:variable name="useAuthenticatedBy" as="xsd:boolean"
                   select="$enableAuthenticatedByExtension"/>
     <xsl:variable name="useAnyMatchExtension" as="xsd:boolean"
@@ -330,7 +334,7 @@
         </xsl:call-template>
     </xsl:template>
 
-    <xsl:template match="wadl:representation[@element]" mode="ns">
+    <xsl:template match="(wadl:representation|rax:representation[$useRaxRepresentation])[@element]" mode="ns">
         <xsl:variable name="qname" select="resolve-QName(@element,.)" as="xsd:QName"/>
         <xsl:variable name="pfix" select="prefix-from-QName($qname)"/>
         <xsl:call-template name="check:printns">
@@ -340,7 +344,7 @@
         <xsl:apply-templates mode="ns"/>
     </xsl:template>
 
-    <xsl:template match="wadl:representation[@mediaType and (check:isXML(@mediaType) or check:isJSON(@mediaType))]/wadl:param[(@style = 'plain') and @path]"
+    <xsl:template match="(wadl:representation|rax:representation[$useRaxRepresentation])[@mediaType and (check:isXML(@mediaType) or check:isJSON(@mediaType))]/wadl:param[(@style = 'plain') and @path]"
                   priority="2" mode="ns">
         <xsl:if test="$usePlainParamCheck">
           <xsl:call-template name="check:handleXPathNameSpaces"/>
@@ -607,6 +611,31 @@
             </xsl:if>
         </xsl:for-each-group>
     </xsl:template>
+    <xsl:template name="check:addRaxRepSteps">
+        <xsl:param name="next" as="xsd:string*"/>
+        <xsl:param name="from" as="node()" select="."/>
+        <xsl:variable name="popId" as="xsd:string" select="check:PopID($from)"/>
+        <xsl:for-each select="$from/rax:representation">
+            <xsl:variable name="wfType" as="xsd:string">
+                <xsl:choose>
+                    <xsl:when test="check:isXML(@mediaType)">WELL_XML</xsl:when>
+                    <xsl:when test="check:isJSON(@mediaType)">WELL_JSON</xsl:when>
+                    <xsl:otherwise>
+                        <xsl:message terminate="yes">[ERROR] Only XML and JSON mediaTypes are allowed with rax:representation</xsl:message>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:call-template name="check:addWellForm">
+                <xsl:with-param name="type" select="$wfType"/>
+                <xsl:with-param name="afterStep" select="$popId"/>
+            </xsl:call-template>
+        </xsl:for-each>
+        <step type="POP_REP" id="{$popId}">
+            <xsl:attribute name="next"
+                           select="$next"
+                           separator=" "/>
+        </step>
+    </xsl:template>
     <xsl:template name="check:addAssertSteps">
         <xsl:param name="next" as="xsd:string*"/>
         <xsl:param name="from" as="node()" select="."/>
@@ -827,15 +856,21 @@
                       select="wadl:request and check:haveAsserts(wadl:request)"/>
         <xsl:variable name="haveCaptureHeaders" as="xsd:boolean"
                       select="wadl:request and check:haveCaptureHeaders(wadl:request)"/>
+        <xsl:variable name="haveRaxRep" as="xsd:boolean"
+                      select="wadl:request and check:haveRaxRep(wadl:request)"/>
         <xsl:variable name="nextSteps" as="xsd:string*">
             <xsl:sequence select="check:getNextReqTypeLinks(.)"/>
         </xsl:variable>
+        <xsl:variable name="nextRaxReps" as="xsd:string*" select="check:getNextRaxRepLinks(wadl:request)"/>
         <xsl:variable name="nextAsserts" as="xsd:string*" select="check:getNextAssertLinks(wadl:request)"/>
         <xsl:variable name="nextCaptureHeaders" as="xsd:string*" select="check:getNextCaptureHeaderLinks(wadl:request)"/>
         <xsl:variable name="links" as="xsd:string*">
             <xsl:choose>
                 <xsl:when test="$haveHeaders">
                     <xsl:sequence select="check:getNextHeaderLinks(wadl:request)"/>
+                </xsl:when>
+                <xsl:when test="$haveRaxRep">
+                    <xsl:sequence select="$nextRaxReps"/>
                 </xsl:when>
                 <xsl:when test="$haveAsserts">
                     <xsl:sequence select="$nextAsserts"/>
@@ -877,6 +912,9 @@
                 <xsl:call-template name="check:addHeaderSteps">
                     <xsl:with-param name="next">
                         <xsl:choose>
+                            <xsl:when test="$haveRaxRep">
+                                <xsl:sequence select="$nextRaxReps"/>
+                            </xsl:when>
                             <xsl:when test="$haveAsserts">
                                 <xsl:value-of select="$nextAsserts"/>
                             </xsl:when>
@@ -893,6 +931,27 @@
                     </xsl:with-param>
                     <xsl:with-param name="from" select="wadl:request"/>
                     <xsl:with-param name="inRequest" select="true()"/>
+                </xsl:call-template>
+            </xsl:if>
+            <xsl:if test="$haveRaxRep">
+                <xsl:call-template name="check:addRaxRepSteps">
+                    <xsl:with-param name="next">
+                        <xsl:choose>
+                            <xsl:when test="$haveAsserts">
+                                <xsl:value-of select="$nextAsserts"/>
+                            </xsl:when>
+                            <xsl:when test="$haveCaptureHeaders">
+                                <xsl:sequence select="$nextCaptureHeaders"/>
+                            </xsl:when>
+                            <xsl:when test="count($nextSteps) &gt; 0">
+                                <xsl:value-of select="$nextSteps"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="($ACCEPT)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:with-param>
+                    <xsl:with-param name="from" select="wadl:request"/>
                 </xsl:call-template>
             </xsl:if>
             <xsl:if test="$haveAsserts">
@@ -934,12 +993,15 @@
 
     <xsl:template match="wadl:request/wadl:representation[@mediaType]">
         <xsl:variable name="defaultNext" select="$ACCEPT"/>
+        <xsl:variable name="haveRaxRep" as="xsd:boolean" select="check:haveRaxRep(.)"/>
+        <xsl:variable name="nextRaxReps" as="xsd:string*" select="check:getNextRaxRepLinks(.)"/>
         <xsl:variable name="haveAsserts" as="xsd:boolean" select="check:haveAsserts(.)"/>
+        <xsl:variable name="nextAsserts" as="xsd:string*" select="check:getNextAssertLinks(.)"/>
         <xsl:variable name="haveCaptureHeaders" as="xsd:boolean" select="check:haveCaptureHeaders(.)"/>
         <xsl:variable name="nextCaptureHeaders" as="xsd:string*" select="check:getNextCaptureHeaderLinks(.)"/>
         <xsl:variable name="doUseWellFormCheck" as="xsd:boolean"
                       select="$useWellFormCheck or ($usePreProcessExtension and exists(rax:preprocess))
-                              or $haveAsserts or $haveCaptureHeaders"/>
+                              or $haveAsserts or $haveCaptureHeaders or $haveRaxRep"/>
         <step type="REQ_TYPE">
             <xsl:attribute name="id" select="generate-id()"/>
             <!-- Note that matches on the media type are always case insensitive -->
@@ -950,9 +1012,14 @@
                         <xsl:when test="check:isXML(@mediaType) or check:isJSON(@mediaType)">
                             <xsl:call-template name="check:addWellFormNext"/>
                         </xsl:when>
+                        <xsl:when test="$haveRaxRep">
+                            <xsl:attribute name="next">
+                                <xsl:value-of select="$nextRaxReps" separator=" "/>
+                            </xsl:attribute>
+                        </xsl:when>
                         <xsl:when test="$haveAsserts">
                             <xsl:attribute name="next">
-                                <xsl:value-of select="check:getNextAssertLinks(.)" separator=" "/>
+                                <xsl:value-of select="$nextAsserts" separator=" "/>
                             </xsl:attribute>
                         </xsl:when>
                         <xsl:when test="$haveCaptureHeaders">
@@ -984,6 +1051,24 @@
                     </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
+                    <xsl:if test="$haveRaxRep">
+                        <xsl:call-template name="check:addRaxRepSteps">
+                            <xsl:with-param name="next">
+                                <xsl:choose>
+                                    <xsl:when test="$haveAsserts">
+                                        <xsl:sequence select="$nextAsserts"/>
+                                    </xsl:when>
+                                    <xsl:when test="$haveCaptureHeaders">
+                                        <xsl:sequence select="$nextCaptureHeaders"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:sequence select="$defaultNext"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:with-param>
+                            <xsl:with-param name="from" select="."/>
+                        </xsl:call-template>
+                    </xsl:if>
                     <xsl:if test="$haveAsserts">
                         <xsl:call-template name="check:addAssertSteps">
                             <xsl:with-param name="next">
@@ -1074,6 +1159,12 @@
         <xsl:value-of select="concat(generate-id($context),'WF')"/>
     </xsl:function>
 
+    <xsl:function name="check:PopID" as="xsd:string">
+        <xsl:param name="context" as="node()"/>
+        <xsl:value-of select="concat(generate-id($context),'POP')"/>
+    </xsl:function>
+
+
     <xsl:function name="check:SetHeaderID" as="xsd:string">
       <xsl:param name="context" as="node()"/>
       <xsl:value-of select="concat(generate-id($context), 'SH')"/>
@@ -1148,6 +1239,7 @@
 
     <xsl:template name="check:addWellForm">
         <xsl:param name="type" />
+        <xsl:param name="afterStep" as="xsd:string*" select="$ACCEPT"/>
         <xsl:variable name="this" as="node()" select="."/>
         <xsl:variable name="defaultPlainParams" as="node()*"
                       select="wadl:param[xsd:boolean(@required) and @path and (@style='plain')]"/>
@@ -1165,6 +1257,8 @@
                       select="($type = 'WELL_XML') and $useElementCheck and @element"/>
         <xsl:variable name="doReqPlainParam" as="xsd:boolean"
                       select="($type = ('WELL_XML','WELL_JSON')) and $usePlainParamCheck and exists($defaultPlainParams)"/>
+        <xsl:variable name="doRaxRep" as="xsd:boolean"
+                      select="check:haveRaxRep(.)"/>
         <xsl:variable name="haveAsserts" as="xsd:boolean" select="check:haveAsserts(.)"/>
         <xsl:variable name="haveCaptureHeaders" as="xsd:boolean" select="check:haveCaptureHeaders(.)"/>
         <xsl:variable name="XSDID" as="xsd:string"
@@ -1183,7 +1277,33 @@
                       select="check:getNextAssertLinks(.)"/>
         <xsl:variable name="captureHeadersNext" as="xsd:string*"
                       select="check:getNextCaptureHeaderLinks(.)"/>
-        <step type="{$type}" id="{check:WellFormID(.)}">
+        <xsl:variable name="raxRepNext" as="xsd:string*"
+                      select="check:getNextRaxRepLinks(.)"/>
+        <xsl:variable name="typeToRepType" as="map(xsd:string, xsd:string)"
+                      select="map { 'WELL_XML'  : 'PUSH_XML_REP',
+                                    'WELL_JSON' : 'PUSH_JSON_REP' }"/>
+        <step id="{check:WellFormID(.)}">
+            <xsl:choose>
+                <!--
+                    When this is a rax:representation...
+                -->
+                <xsl:when test="namespace-uri(.) = 'http://docs.rackspace.com/api'">
+                    <xsl:attribute name="type" select="$typeToRepType($type)"/>
+                    <xsl:attribute name="path" select="@path"/>
+                    <xsl:if test="exists(@name)">
+                        <xsl:attribute name="name" select="@name"/>
+                    </xsl:if>
+                    <xsl:if test="exists(@version)">
+                        <xsl:attribute name="version" select="@version"/>
+                    </xsl:if>
+                </xsl:when>
+                <!--
+                    Otherwise this is a wadl:representation...
+                -->
+                <xsl:otherwise>
+                    <xsl:attribute name="type" select="$type"/>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:choose>
                 <xsl:when test="$doElement">
                     <xsl:attribute name="next"
@@ -1193,6 +1313,11 @@
                 <xsl:when test="$doReqPlainParam">
                     <xsl:attribute name="next"
                                    select="(check:XPathID(.,1), $FAILID)"
+                                   separator=" "/>
+                </xsl:when>
+                <xsl:when test="$doRaxRep">
+                    <xsl:attribute name="next"
+                                   select="$raxRepNext"
                                    separator=" "/>
                 </xsl:when>
                 <xsl:when test="$doPreProcess">
@@ -1220,7 +1345,7 @@
                         separator=" "/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:attribute name="next" select="$ACCEPT"/>
+                    <xsl:attribute name="next" select="$afterStep"/>
                 </xsl:otherwise>
             </xsl:choose>
         </step>
@@ -1230,6 +1355,11 @@
                     <xsl:when test="$doReqPlainParam">
                         <xsl:attribute name="next"
                                        select="(check:XPathID(.,1), $FAILID)"
+                                       separator=" "/>
+                    </xsl:when>
+                    <xsl:when test="$doRaxRep">
+                        <xsl:attribute name="next"
+                                       select="$raxRepNext"
                                        separator=" "/>
                     </xsl:when>
                     <xsl:when test="$doPreProcess">
@@ -1252,7 +1382,7 @@
                                        separator=" "/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:attribute name="next" select="$ACCEPT"/>
+                        <xsl:attribute name="next" select="$afterStep"/>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:attribute name="match" select="concat('/',check:normType(resolve-QName(@element,.)))"/>
@@ -1276,6 +1406,11 @@
                     <xsl:choose>
                         <xsl:when test="position() = last()">
                             <xsl:choose>
+                                <xsl:when test="$doRaxRep">
+                                    <xsl:attribute name="next"
+                                                   select="$raxRepNext"
+                                                   separator=" "/>
+                                </xsl:when>
                                 <xsl:when test="$doPreProcess">
                                     <xsl:attribute name="next"
                                                    select="check:PreProcID($this, 1)"/>
@@ -1301,7 +1436,7 @@
                                                    separator=" "/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:attribute name="next" select="$ACCEPT"/>
+                                    <xsl:attribute name="next" select="$afterStep"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
@@ -1313,6 +1448,33 @@
                     </xsl:choose>
                 </step>
             </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="$doRaxRep">
+            <xsl:call-template name="check:addRaxRepSteps">
+                <xsl:with-param name="from" select="."/>
+                <xsl:with-param name="next">
+                    <xsl:choose>
+                        <xsl:when test="$doPreProcess">
+                            <xsl:sequence select="check:PreProcID($this, 1)"/>
+                        </xsl:when>
+                        <xsl:when test="$doXSD">
+                            <xsl:sequence select="($XSDID, $FAILID)"/>
+                        </xsl:when>
+                        <xsl:when test="$doJSON">
+                            <xsl:sequence select="($JSONID, $FAILID)"/>
+                        </xsl:when>
+                        <xsl:when test="$haveAsserts">
+                            <xsl:sequence select="$assertNext"/>
+                        </xsl:when>
+                        <xsl:when test="$haveCaptureHeaders">
+                            <xsl:sequence select="$captureHeadersNext"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:sequence select="$afterStep"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:with-param>
+            </xsl:call-template>
         </xsl:if>
         <xsl:if test="$doPreProcess">
             <xsl:for-each select="rax:preprocess">
@@ -1358,7 +1520,7 @@
                                                    separator=" "/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:attribute name="next" select="$ACCEPT"/>
+                                    <xsl:attribute name="next" select="$afterStep"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
@@ -1379,7 +1541,7 @@
                                   separator=" "/>
                           </xsl:when>
                           <xsl:otherwise>
-                              <xsl:attribute name="next" select="$ACCEPT"/>
+                              <xsl:attribute name="next" select="$afterStep"/>
                           </xsl:otherwise>
                       </xsl:choose>
                 </step>
@@ -1399,7 +1561,7 @@
                                            separator=" "/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:attribute name="next" select="$ACCEPT"/>
+                            <xsl:attribute name="next" select="$afterStep"/>
                         </xsl:otherwise>
                     </xsl:choose>
             </step>
@@ -1424,7 +1586,7 @@
                                        separator=" "/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:attribute name="next" select="$ACCEPT"/>
+                        <xsl:attribute name="next" select="$afterStep"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </step>
@@ -1446,7 +1608,7 @@
                                            separator=" "/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:attribute name="next" select="$ACCEPT"/>
+                            <xsl:attribute name="next" select="$afterStep"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </step>
@@ -1460,7 +1622,7 @@
                             <xsl:sequence select="$captureHeadersNext"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:sequence select="$ACCEPT"/>
+                            <xsl:sequence select="$afterStep"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:with-param>
@@ -1469,7 +1631,7 @@
         </xsl:if>
         <xsl:if test="$haveCaptureHeaders">
             <xsl:call-template name="check:addCaptureHeaderSteps">
-                <xsl:with-param name="next" select="$ACCEPT"/>
+                <xsl:with-param name="next" select="$afterStep"/>
                 <xsl:with-param name="from" select="."/>
             </xsl:call-template>
         </xsl:if>
@@ -1655,6 +1817,24 @@
             <xsl:when test="check:haveCaptureHeaders($from)">
                 <xsl:variable name="firstCaptureHeader" as="node()" select="check:getCaptureHeaders($from)[1]"/>
                 <xsl:sequence select="(check:captureHeaderID($firstCaptureHeader))"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:sequence select="()"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="check:haveRaxRep" as="xsd:boolean">
+        <xsl:param name="from" as="node()?"/>
+        <xsl:value-of select="$useRaxRepresentation and exists($from/rax:representation)"/>
+    </xsl:function>
+
+    <xsl:function name="check:getNextRaxRepLinks" as="xsd:string*">
+        <xsl:param name="from" as="node()?"/>
+        <xsl:choose>
+            <xsl:when test="check:haveRaxRep($from)">
+                <xsl:sequence select="(for $rep in $from/rax:representation return check:WellFormID($rep),
+                                       check:WellFormFailID($from/rax:representation[1]))"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:sequence select="()"/>

@@ -42,6 +42,9 @@
     <rule types="CAPTURE_HEADER" required="next name path" optional="version">
         Rule for the capture header extension.
     </rule>
+    <rule types="PUSH_XML_REP PUSH_JSON_REP" required="next path" optional="name version">
+        Rule for PUSH steps.
+    </rule>
     <rule types="HEADER HEADERXSD HEADER_ANY HEADERXSD_ANY HEADER_SINGLE HEADERXSD_SINGLE" required="next name match" optional="captureHeader code message">
         Rule for Header, HeaderXSD, HeaderAny.
     </rule>
@@ -67,7 +70,7 @@
     <rule types="XSL" required="next href version" match="@href">
         We only merge XSLs with href.
     </rule>
-    <rule types="WELL_XML WELL_JSON JSON_SCHEMA" required="next">
+    <rule types="WELL_XML WELL_JSON JSON_SCHEMA POP_REP" required="next">
         Connected nodes with no match.
     </rule>
     <rule types="CONTENT_FAIL">

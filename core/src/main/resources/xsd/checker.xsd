@@ -117,6 +117,9 @@
                 <alternative test="@type eq 'JSON_XPATH'" type="chk:JsonXPathStep"/>
                 <alternative test="@type eq 'ASSERT'" type="chk:AssertStep"/>
                 <alternative test="@type eq 'CAPTURE_HEADER'" type="chk:CaptureHeaderStep"/>
+                <alternative test="@type eq 'PUSH_XML_REP'" type="chk:PushXMLRepStep"/>
+                <alternative test="@type eq 'PUSH_JSON_REP'" type="chk:PushJSONRepStep"/>
+                <alternative test="@type eq 'POP_REP'" type="chk:PopRepStep"/>
             </element>
         </sequence>
         <assert test="if (count(chk:step[@type='START']) = 1) then true() else false()"
@@ -401,6 +404,107 @@
                 <attribute name="version" type="chk:XPathVersion" fixed="31" use="optional"/>
                 <attributeGroup ref="chk:MessageAttributes"/>
             </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="PushXMLRepStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    This step pushes a new XML representation into the
+                    representation stack.  This is used to support
+                    representations within representations. The path
+                    is an XPath in the current representation of the
+                    new path.
+                </html:p>
+                <html:p>
+                    Although the intent is to push a representation,
+                    that's found in the body of the request.  This
+                    step supports all XPath features of the AssertStep
+                    (see that step for details). This means that it is
+                    possible to examine headers, URI, the step
+                    context, etc to determine how to get the the JSON
+                    representation.
+                </html:p>
+                <html:p>
+                    As with AssertStep the XPath version is fixed to
+                    be 3.1 since it's the only version that supports
+                    JSON.
+                </html:p>
+                <html:p>
+                    The name attribute can be used as a friendly name
+                    for the representation.
+                </html:p>
+                <html:p>
+                    Since this step is not executing an assertion
+                    rax:message and rax:code extensions do not apply.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:GenContentFailStep">
+                <attribute name="path" type="xsd:string" use="required"/>
+                <attribute name="name" type="xsd:string" use="optional"/>
+                <attribute name="version" type="chk:XPathVersion" fixed="31" use="optional"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="PushJSONRepStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    This step pushes a new JSON representation into the
+                    representation stack.  This is used to support
+                    representations within representations. The path
+                    is an XPath in the current representation of the
+                    new path.
+                </html:p>
+                <html:p>
+                    Although the intent is to push a representation,
+                    that's found in the body of the request.  This
+                    step supports all XPath features of the AssertStep
+                    (see that step for details). This means that it is
+                    possible to examine headers, URI, the step
+                    context, etc to determine how to get the the JSON
+                    representation.
+                </html:p>
+                <html:p>
+                    As with AssertStep the XPath version is fixed to
+                    be 3.1 since it's the only version that supports
+                    JSON.
+                </html:p>
+                <html:p>
+                    The name attribute can be used as a friendly name
+                    for the representation.
+                </html:p>
+                <html:p>
+                    Since this step is not executing an assertion
+                    rax:message and rax:code extensions do not apply.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:GenContentFailStep">
+                <attribute name="path" type="xsd:string" use="required"/>
+                <attribute name="name" type="xsd:string" use="optional"/>
+                <attribute name="version" type="chk:XPathVersion" fixed="31" use="optional"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="PopRepStep">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    This step pops a representation out of the
+                    representation stack.  This is used to support
+                    representations within representations.
+                </html:p>
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="chk:ConnectedStep"/>
         </complexContent>
     </complexType>
 
@@ -959,6 +1063,9 @@
             <enumeration value="JSON_XPATH" />
             <enumeration value="ASSERT"/>
             <enumeration value="CAPTURE_HEADER"/>
+            <enumeration value="PUSH_XML_REP"/>
+            <enumeration value="PUSH_JSON_REP"/>
+            <enumeration value="POP_REP"/>
         </restriction>
     </simpleType>
 

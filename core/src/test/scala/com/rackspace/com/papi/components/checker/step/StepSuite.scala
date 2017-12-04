@@ -21,10 +21,12 @@ import javax.xml.namespace.QName
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.github.fge.jsonschema.exceptions.ProcessingException
+import com.rackspace.com.papi.components.checker.LogAssertions
 import com.rackspace.com.papi.components.checker.Validator
 import com.rackspace.com.papi.components.checker.handler.ResultHandler
-import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse}
-import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
+import com.rackspace.com.papi.components.checker.servlet.{CheckerServletRequest, CheckerServletResponse, ParsedXML,
+                                                          ParsedJSON, ParsedNIL}
+import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext, RepresentationException}
 import com.rackspace.com.papi.components.checker.step.results._
 import com.rackspace.com.papi.components.checker.step.startend._
 import com.rackspace.com.papi.components.checker.util.{HeaderMap, ImmutableNamespaceContext, ObjectMapperPool, XMLParserPool}
@@ -37,17 +39,21 @@ import org.scalatest.mock.MockitoSugar
 import org.w3c.dom.Document
 import org.xml.sax.SAXParseException
 
+import org.apache.logging.log4j.Level
+
 import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 import scala.xml._
 
+import java.io.IOException
 import java.io.InputStreamReader
 import java.io.BufferedReader
 import java.nio.file.Files
 import java.nio.file.Paths
 
 @RunWith(classOf[JUnitRunner])
-class StepSuite extends BaseStepSuite with MockitoSugar {
+class StepSuite extends BaseStepSuite with MockitoSugar
+                                      with LogAssertions {
   class GenericStep(id: String, label: String, next: Array[Step], extraHeaders: Option[HeaderMap] = None) extends ConnectedStep(id, label, next) {
     override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] =
       Some(extraHeaders.map({headers => context.copy(requestHeaders = context.requestHeaders.addHeaders(headers))}).getOrElse(context))
@@ -7040,6 +7046,1121 @@ class StepSuite extends BaseStepSuite with MockitoSugar {
 
     assert(newCTX1.get.requestHeaders("X-METHOD") == List("FAZZ"));
     assert(newCTX2.get.requestHeaders("X-METHOD") == List("FAZZ", "FIZZ"));
+  }
+
+  test ("The pop rep step test should pop a representation") {
+    val popRepStep = new PopRep("PopRep", "PopRep", Array[Step]())
+    val req = request("GET","/foo/bar")
+    req.pushRepresentation(EMPTY_DOC)
+    assert (req.parsedRepresentation.isInstanceOf[ParsedXML])
+    val popContext = popRepStep.checkStep(req, response, chain, StepContext())
+    assert (popContext.isDefined)
+    assert (req.parsedRepresentation == ParsedNIL)
+  }
+
+  test ("The pop rep step test should pop a representation (multiple-reps)") {
+    val popRepStep = new PopRep("PopRep", "PopRep", Array[Step]())
+    val req = request("GET","/foo/bar")
+    req.pushRepresentation(EMPTY_DOC)
+    req.pushRepresentation(EMPTY_JSON)
+    assert (req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    val popContext = popRepStep.checkStep(req, response, chain, StepContext())
+    assert (popContext.isDefined)
+    assert (req.parsedRepresentation.isInstanceOf[ParsedXML])
+    val popContext2 = popRepStep.checkStep(req, response, chain, StepContext())
+    assert (popContext2.isDefined)
+    assert (req.parsedRepresentation == ParsedNIL)
+  }
+
+  test ("The pop rep step should result in exception if we have a stack underflow, and a log error") {
+    val popRepStep = new PopRep("PopRep", "PopRep", Array[Step]())
+
+    val popLog = log(Level.ERROR) {
+      intercept[java.util.NoSuchElementException] {
+        popRepStep.checkStep(request("GET","/foo/bar"), response, chain, StepContext())
+      }
+    }
+    //
+    // We should output a message stating what happened
+    //
+    assert(popLog, "pop an empty representation stack")
+  }
+
+  test("In a PushXML step, we should be able to push an XML representation from a request body") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "$body('xml')",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/json","""
+         {
+            "xml" : "<foo xmlns='http://rackspace.com/bar' />"
+         }
+    """, true)
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    val pushContext = pushXML.checkStep(req, response, chain, StepContext())
+
+    assert(pushContext.isDefined)
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    val xml = XML.load(req.getInputStream)
+    assert (xml != null)
+    assert (xml.toString.contains("<foo"))
+
+    val req2 = request("PUT", "/a/b","application/json","""
+         {
+            "xml" : "<bar xmlns='http://rackspace.com/bar' />"
+         }
+    """, true)
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    val pushContext2 = pushXML.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext2.isDefined)
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+    val xml2 = XML.load(req2.getInputStream)
+    assert (xml2 != null)
+    assert (xml2.toString.contains("<bar"))
+  }
+
+  test("In a PushXML step, we should be able to push an XML representation from a request body, when the result of the path is a Node") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "/root/xml",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+         <root>
+             <xml>
+                &lt;foo xmlns="http://rackspace.com/bar" /&gt;
+             </xml>
+         </root>
+    , true)
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    val pushContext = pushXML.checkStep(req, response, chain, StepContext())
+
+    assert(pushContext.isDefined)
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    val xml = XML.load(req.getInputStream)
+    assert (xml != null)
+    assert (xml.toString.contains("<foo"))
+
+    val req2 = request("PUT", "/a/b","application/xml",
+         <root>
+             <xml>
+               <internal>
+                 &lt;bar xmlns="http://rackspace.com/biz" /&gt;
+               </internal>
+             </xml>
+         </root>
+    , true)
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+    val pushContext2 = pushXML.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext2.isDefined)
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+    val xml2 = XML.load(req2.getInputStream)
+    assert (xml2 != null)
+    assert (xml2.toString.contains("<bar"))
+  }
+
+  test("In a PushXML step, pushing malformed XML should result in a SAXParseException as the contentError") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "$_?xml",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : "<foo xmlns='http://rackspace.com/bar'>"
+         |}""".stripMargin, true)
+    val origRep = req.parsedRepresentation
+    assert(origRep.isInstanceOf[ParsedJSON])
+    val pushContext = pushXML.checkStep(req, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req.parsedRepresentation == origRep)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[SAXParseException])
+    assert(req.contentErrorPriority == 10)
+
+
+    val req2 = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : "booga"
+         |}""".stripMargin, true)
+    val origRep2 = req2.parsedRepresentation
+    assert(origRep2.isInstanceOf[ParsedJSON])
+    val pushContext2 = pushXML.checkStep(req2, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext2.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation == origRep2)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[SAXParseException])
+    assert(req2.contentErrorPriority == 10)
+  }
+
+  test("In a PushXML step, pushing an atomic value other than a string should result in representation contentError with appropriate msg") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "$_?xml",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : 42
+         |}""".stripMargin, true)
+    val origRep = req.parsedRepresentation
+    assert(origRep.isInstanceOf[ParsedJSON])
+    val pushContext = pushXML.checkStep(req, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req.parsedRepresentation == origRep)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[RepresentationException])
+    assert(req.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("atomic value"))
+    assert(req.contentError.getMessage.contains("42"))
+    assert(req.contentError.getMessage.contains("cannot be converted into XML"))
+    assert(req.contentError.getMessage.contains("$_?xml"))
+
+    val req2 = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : false
+         |}""".stripMargin, true)
+    val origRep2 = req2.parsedRepresentation
+    assert(origRep2.isInstanceOf[ParsedJSON])
+    val pushContext2 = pushXML.checkStep(req2, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext2.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation == origRep2)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[RepresentationException])
+    assert(req2.contentErrorPriority == 10)
+    assert(req2.contentError.getMessage.contains("atomic value"))
+    assert(req2.contentError.getMessage.contains("false"))
+    assert(req2.contentError.getMessage.contains("cannot be converted into XML"))
+    assert(req2.contentError.getMessage.contains("$_?xml"))
+  }
+
+  test("In a PushXML step, pushing a function value should result in representation contentError with appropriate msg") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "$_?xml",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : { "biz" : "baz" }
+         |}""".stripMargin, true)
+    val origRep = req.parsedRepresentation
+    assert(origRep.isInstanceOf[ParsedJSON])
+    val pushContext = pushXML.checkStep(req, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req.parsedRepresentation == origRep)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[RepresentationException])
+    assert(req.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("A map"))
+    assert(req.contentError.getMessage.contains("cannot be converted into XML"))
+    assert(req.contentError.getMessage.contains("$_?xml"))
+
+    val req2 = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : [1, 2, 3]
+         |}""".stripMargin, true)
+    val origRep2 = req2.parsedRepresentation
+    assert(origRep2.isInstanceOf[ParsedJSON])
+    val pushContext2 = pushXML.checkStep(req2, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext2.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation == origRep2)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[RepresentationException])
+    assert(req2.contentErrorPriority == 10)
+    assert(req2.contentError.getMessage.contains("An array"))
+    assert(req2.contentError.getMessage.contains("cannot be converted into XML"))
+    assert(req2.contentError.getMessage.contains("$_?xml"))
+  }
+
+  test("In a PushXML step, pushing an empty sequence should result in representation contentError with appropriate msg") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "$_?xml",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : null
+         |}""".stripMargin, true)
+    val origRep = req.parsedRepresentation
+    assert(origRep.isInstanceOf[ParsedJSON])
+    val pushContext = pushXML.checkStep(req, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req.parsedRepresentation == origRep)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[RepresentationException])
+    assert(req.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("Expecting XML"))
+    assert(req.contentError.getMessage.contains("got an empty sequence"))
+    assert(req.contentError.getMessage.contains("$_?xml"))
+
+    val req2 = request("PUT", "/a/b","application/json",
+      """{
+         |   "array" : [1, 2, 3]
+         |}""".stripMargin, true)
+    val origRep2 = req2.parsedRepresentation
+    assert(origRep2.isInstanceOf[ParsedJSON])
+    val pushContext2 = pushXML.checkStep(req2, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext2.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation == origRep2)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[RepresentationException])
+    assert(req2.contentErrorPriority == 10)
+    assert(req2.contentError.getMessage.contains("Expecting XML"))
+    assert(req2.contentError.getMessage.contains("got an empty sequence"))
+    assert(req2.contentError.getMessage.contains("$_?xml"))
+  }
+
+  test("In a PushXML step, returning a sequence of multiple items should result in representation contentError with appropriate msg") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "($_?xml,'<baz />')",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : "<foo xmlns='http://rackspace.com/bar' />"
+         |}""".stripMargin, true)
+    val origRep = req.parsedRepresentation
+    assert(origRep.isInstanceOf[ParsedJSON])
+    val pushContext = pushXML.checkStep(req, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req.parsedRepresentation == origRep)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[RepresentationException])
+    assert(req.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("Expecting XML"))
+    assert(req.contentError.getMessage.contains("got a sequence of size > 1"))
+    assert(req.contentError.getMessage.contains("($_?xml,'<baz />')"))
+
+    val req2 = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : [1, 2, 3]
+         |}""".stripMargin, true)
+    val origRep2 = req2.parsedRepresentation
+    assert(origRep2.isInstanceOf[ParsedJSON])
+    val pushContext2 = pushXML.checkStep(req2, response, chain, StepContext())
+
+    //
+    //  Context should not be defined
+    //
+    assert(pushContext2.isEmpty)
+
+    //
+    //  Original rep should stay in place
+    //
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation == origRep2)
+
+    //
+    //  Appropriate Exception and priority
+    //
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[RepresentationException])
+    assert(req2.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("Expecting XML"))
+    assert(req.contentError.getMessage.contains("got a sequence of size > 1"))
+    assert(req.contentError.getMessage.contains("($_?xml,'<baz />')"))
+  }
+
+  test("In a PushXML step, we should be able to push an XML representation and pass to additonal steps") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "$body('xml')",nsContext,31,10,Array[Step](new Accept("A","A",100)))
+    val req = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : "<foo xmlns='http://rackspace.com/bar' />"
+         |}""".stripMargin, true)
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    val pushResult = pushXML.check(req, response, chain, StepContext())
+
+    assert(pushResult.isDefined)
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    val xml = XML.load(req.getInputStream)
+    assert (xml != null)
+    assert (xml.toString.contains("<foo"))
+
+    val req2 = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : "<bar xmlns='http://rackspace.com/bar' />"
+         |}""".stripMargin, true)
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    val pushResult2 = pushXML.check(req2, response, chain, StepContext())
+
+    assert(pushResult2.isDefined)
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+    val xml2 = XML.load(req2.getInputStream)
+    assert (xml2 != null)
+    assert (xml2.toString.contains("<bar"))
+  }
+
+  test("In a PushXML step, if we correctly push a representation but a child step fails, we should pop the representation out") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushXML = new PushXML("PushXML", "PushXML", "XML", "$body('xml')",nsContext,31,10,Array[Step](new ContentFail("C","C",100)))
+    val req = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : "<foo xmlns='http://rackspace.com/bar' />"
+         |}""".stripMargin, true)
+    req.contentError = new IOException("Phony exception")
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    val origJSON = req.parsedRepresentation
+    val pushResult = pushXML.check(req, response, chain, StepContext())
+
+    assert(pushResult.isDefined)
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(origJSON == req.parsedRepresentation)
+    assert(req.contentError.isInstanceOf[IOException])
+    assert(req.contentError.getMessage.contains("Phony exception"))
+
+    val req2 = request("PUT", "/a/b","application/json",
+      """{
+         |   "xml" : "<bar xmlns='http://rackspace.com/bar' />"
+         |}""".stripMargin, true)
+    req2.contentError = new IOException("Phony exception")
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    val origJSON2 = req2.parsedRepresentation
+    val pushResult2 = pushXML.check(req2, response, chain, StepContext())
+
+    assert(pushResult2.isDefined)
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(origJSON2 == req2.parsedRepresentation)
+    assert(req2.contentError.isInstanceOf[IOException])
+    assert(req2.contentError.getMessage.contains("Phony exception"))
+  }
+
+  test("In a PushJSON step, we should be able to push an JSON representation from a request body") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "/root/json",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |    <json>
+        |
+        |      {
+        |        "foo" : "bar"
+        |      }
+        |    </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+         |<root>
+         |   <other />
+         |   <json>
+         |    <actual>
+         |      {
+         |         "baz" : "biz"
+         |      }
+         |    </actual>
+         |   </json>
+         |</root>""".stripMargin.stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isDefined)
+    assert(pushContext2.isDefined)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+
+    var jparser : ObjectMapper = null
+    try {
+      jparser = ObjectMapperPool.borrowParser
+      val j1 = jparser.readValue(req.getInputStream, classOf[java.util.Map[Object, Object]])
+      val j2 = jparser.readValue(req2.getInputStream, classOf[java.util.Map[Object, Object]])
+
+      assert (j1 != null)
+      assert (j2 != null)
+
+      assert (j1.asInstanceOf[java.util.Map[Object,Object]].get("foo") == "bar")
+      assert (j2.asInstanceOf[java.util.Map[Object,Object]].get("baz") == "biz")
+
+    } finally {
+      if (jparser != null) ObjectMapperPool.returnParser(jparser)
+    }
+  }
+
+  test("In a PushJSON step, we should be able to push an JSON representation from a request body (result is a string)") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "string(/root/json)",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>
+        |    {
+        |      "foo" : "bar"
+        |    }
+        |  </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        | <other />
+        | <json>
+        |   <actual>
+        |     {
+        |      "baz" : "biz"
+        |     }
+        |   </actual>
+        | </json>
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isDefined)
+    assert(pushContext2.isDefined)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+
+    var jparser : ObjectMapper = null
+    try {
+      jparser = ObjectMapperPool.borrowParser
+      val j1 = jparser.readValue(req.getInputStream, classOf[java.util.Map[Object, Object]])
+      val j2 = jparser.readValue(req2.getInputStream, classOf[java.util.Map[Object, Object]])
+
+      assert (j1 != null)
+      assert (j2 != null)
+
+      assert (j1.asInstanceOf[java.util.Map[Object,Object]].get("foo") == "bar")
+      assert (j2.asInstanceOf[java.util.Map[Object,Object]].get("baz") == "biz")
+
+    } finally {
+      if (jparser != null) ObjectMapperPool.returnParser(jparser)
+    }
+  }
+
+
+  test("In a PushJSON step, we should be able to push atomic values as JSON representation from a request body (integer)") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]("xsd"->"http://www.w3.org/2001/XMLSchema"))
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "xsd:integer(/root/json)",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>
+        |    42
+        |  </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <other />
+        |  <json>
+        |     76
+        |  </json>
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isDefined)
+    assert(pushContext2.isDefined)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+
+    var jparser : ObjectMapper = null
+    try {
+      jparser = ObjectMapperPool.borrowParser
+      val j1 = jparser.readValue(req.getInputStream, classOf[Integer])
+      val j2 = jparser.readValue(req2.getInputStream, classOf[Integer])
+
+      assert (j1 != null)
+      assert (j2 != null)
+
+      assert (j1.asInstanceOf[Integer] == 42)
+      assert (j2.asInstanceOf[Integer] == 76)
+    } finally {
+      if (jparser != null) ObjectMapperPool.returnParser(jparser)
+    }
+  }
+
+  test("In a PushJSON step, we should be able to push atomic values as JSON representation from a request body (boolean)") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]("xsd"->"http://www.w3.org/2001/XMLSchema"))
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "xsd:boolean(/root/json)",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>
+        |   false
+        |  </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        | <other />
+        | <json>
+        |   true
+        | </json>
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isDefined)
+    assert(pushContext2.isDefined)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+
+    var jparser : ObjectMapper = null
+    try {
+      jparser = ObjectMapperPool.borrowParser
+      val j1 = jparser.readValue(req.getInputStream, classOf[Boolean])
+      val j2 = jparser.readValue(req2.getInputStream, classOf[Boolean])
+
+      assert (!j1.asInstanceOf[Boolean])
+      assert (j2.asInstanceOf[Boolean])
+    } finally {
+      if (jparser != null) ObjectMapperPool.returnParser(jparser)
+    }
+  }
+
+  test("In a PushJSON step, we should be able to push null values as JSON representation from a request body") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]("xsd"->"http://www.w3.org/2001/XMLSchema"))
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "/root/json",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>
+        |   null
+        |  </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <other />
+        |  <json>null</json>
+        |</root>""".stripMargin, true)
+
+    println(req.contentError)
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isDefined)
+    assert(pushContext2.isDefined)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+
+    var jparser : ObjectMapper = null
+    try {
+      jparser = ObjectMapperPool.borrowParser
+      val j1 = jparser.readValue(req.getInputStream, classOf[String])
+      val j2 = jparser.readValue(req2.getInputStream, classOf[String])
+
+      assert (j1 == null)
+      assert (j2 == null)
+    } finally {
+      if (jparser != null) ObjectMapperPool.returnParser(jparser)
+    }
+  }
+
+
+  test("In a PushJSON step, pushing an empty (or whitespace only) string should generate a representation error") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]("xsd"->"http://www.w3.org/2001/XMLSchema"))
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "/root/json",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>         </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json />
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val origRep  = req.parsedRepresentation
+    val origRep2 = req2.parsedRepresentation
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isEmpty)
+    assert(pushContext2.isEmpty)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    assert(origRep == req.parsedRepresentation)
+    assert(origRep2 == req2.parsedRepresentation)
+
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[RepresentationException])
+    assert(req.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("Expecting JSON"))
+    assert(req.contentError.getMessage.contains("got an empty string"))
+    assert(req.contentError.getMessage.contains("/root/json"))
+
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[RepresentationException])
+    assert(req2.contentErrorPriority == 10)
+    assert(req2.contentError.getMessage.contains("Expecting JSON"))
+    assert(req2.contentError.getMessage.contains("got an empty string"))
+    assert(req2.contentError.getMessage.contains("/root/json"))
+  }
+
+
+  test("In a PushJSON step, pushing an empty sequence should generate a representation error") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]("xsd"->"http://www.w3.org/2001/XMLSchema"))
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "/root/json",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <wooga>         </wooga>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <other />
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val origRep  = req.parsedRepresentation
+    val origRep2 = req2.parsedRepresentation
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isEmpty)
+    assert(pushContext2.isEmpty)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    assert(origRep == req.parsedRepresentation)
+    assert(origRep2 == req2.parsedRepresentation)
+
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[RepresentationException])
+    assert(req.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("Expecting JSON"))
+    assert(req.contentError.getMessage.contains("got an empty sequence"))
+    assert(req.contentError.getMessage.contains("/root/json"))
+
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[RepresentationException])
+    assert(req2.contentErrorPriority == 10)
+    assert(req2.contentError.getMessage.contains("Expecting JSON"))
+    assert(req2.contentError.getMessage.contains("got an empty sequence"))
+    assert(req2.contentError.getMessage.contains("/root/json"))
+  }
+
+  test("In a PushJSON step, pushing a sequence of multiple items should generate a representation error") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]("xsd"->"http://www.w3.org/2001/XMLSchema"))
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "/root/json",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>true</json>
+        |  <json>{ "booga" : "wooga" }</json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>null</json>
+        |  <json />
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val origRep  = req.parsedRepresentation
+    val origRep2 = req2.parsedRepresentation
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isEmpty)
+    assert(pushContext2.isEmpty)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    assert(origRep == req.parsedRepresentation)
+    assert(origRep2 == req2.parsedRepresentation)
+
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[RepresentationException])
+    assert(req.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("Expecting JSON"))
+    assert(req.contentError.getMessage.contains("got a sequence of size > 1"))
+    assert(req.contentError.getMessage.contains("/root/json"))
+
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[RepresentationException])
+    assert(req2.contentErrorPriority == 10)
+    assert(req2.contentError.getMessage.contains("Expecting JSON"))
+    assert(req2.contentError.getMessage.contains("got a sequence of size > 1"))
+    assert(req2.contentError.getMessage.contains("/root/json"))
+  }
+
+  test("In a PushJSON step, pushing a function should generate a representation error") {
+
+    val nsContext = ImmutableNamespaceContext(Map[String,String]("xsd"->"http://www.w3.org/2001/XMLSchema"))
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "parse-json(/root/json)",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>{ "booga" : "wooga" }</json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>[1, 2, 3]</json>
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val origRep  = req.parsedRepresentation
+    val origRep2 = req2.parsedRepresentation
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isEmpty)
+    assert(pushContext2.isEmpty)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    assert(origRep == req.parsedRepresentation)
+    assert(origRep2 == req2.parsedRepresentation)
+
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[RepresentationException])
+    assert(req.contentErrorPriority == 10)
+    assert(req.contentError.getMessage.contains("A map"))
+    assert(req.contentError.getMessage.contains("cannot be converted into JSON"))
+    assert(req.contentError.getMessage.contains("parse-json(/root/json)"))
+
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[RepresentationException])
+    assert(req2.contentErrorPriority == 10)
+    assert(req2.contentError.getMessage.contains("An array"))
+    assert(req2.contentError.getMessage.contains("cannot be converted into JSON"))
+    assert(req2.contentError.getMessage.contains("parse-json(/root/json)"))
+  }
+
+  test("In a PushJSON step, pushing non-json atomic values should generate parse errors") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]("xsd"->"http://www.w3.org/2001/XMLSchema"))
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "xsd:dateTime(/root/json)",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        | <json>
+        |   2017-10-26T21:32:52
+        | </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <other />
+        |  <json>
+        |    2017-12-25T00:00:09
+        |  </json>
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val origRep  = req.parsedRepresentation
+    val origRep2 = req2.parsedRepresentation
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isEmpty)
+    assert(pushContext2.isEmpty)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    assert(origRep == req.parsedRepresentation)
+    assert(origRep2 == req2.parsedRepresentation)
+
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[JsonParseException])
+    assert(req.contentErrorPriority == 10)
+
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[JsonParseException])
+    assert(req2.contentErrorPriority == 10)
+  }
+
+  test("In a PushJSON step, pushing malformed JSON should result in JSONParseException as the content Error") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "/root/json",nsContext,31,10,Array[Step]())
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>
+        |    {
+        |      "foo" :
+        |    }
+        |  </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>
+        |    {
+        |      "baz" : baz
+        |    }
+        |  </json>
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val origRep  = req.parsedRepresentation
+    val origRep2 = req2.parsedRepresentation
+
+    val pushContext  = pushJSON.checkStep(req, response, chain, StepContext())
+    val pushContext2 = pushJSON.checkStep(req2, response, chain, StepContext())
+
+    assert(pushContext.isEmpty)
+    assert(pushContext2.isEmpty)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    assert(origRep == req.parsedRepresentation)
+    assert(origRep2 == req2.parsedRepresentation)
+
+    assert(req.contentError != null)
+    assert(req.contentError.isInstanceOf[JsonParseException])
+    assert(req.contentErrorPriority == 10)
+
+    assert(req2.contentError != null)
+    assert(req2.contentError.isInstanceOf[JsonParseException])
+    assert(req2.contentErrorPriority == 10)
+  }
+
+  test("In a PushJSON step, we should be able to push an JSON representation to additional steps") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "/root/json",nsContext,31,10,Array[Step](new Accept("A","A", 100)))
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        | <json>
+        |   {
+        |     "foo" : "bar"
+        |   }
+        | </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <other />
+        |  <json>
+        |   <actual>
+        |     {
+        |      "baz" : "biz"
+        |     }
+        |   </actual>
+        |   </json>
+        |</root>""".stripMargin, true)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+
+    val pushResult  = pushJSON.check(req, response, chain, StepContext())
+    val pushResult2 = pushJSON.check(req2, response, chain, StepContext())
+
+    assert(pushResult.isDefined)
+    assert(pushResult2.isDefined)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedJSON])
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedJSON])
+
+    var jparser : ObjectMapper = null
+    try {
+      jparser = ObjectMapperPool.borrowParser
+      val j1 = jparser.readValue(req.getInputStream, classOf[java.util.Map[Object, Object]])
+      val j2 = jparser.readValue(req2.getInputStream, classOf[java.util.Map[Object, Object]])
+
+      assert (j1 != null)
+      assert (j2 != null)
+
+      assert (j1.asInstanceOf[java.util.Map[Object,Object]].get("foo") == "bar")
+      assert (j2.asInstanceOf[java.util.Map[Object,Object]].get("baz") == "biz")
+
+    } finally {
+      if (jparser != null) ObjectMapperPool.returnParser(jparser)
+    }
+  }
+
+  test("In a PushJSON step, if we correctly push a representation but a child step fails, we should pop the representation out") {
+    val nsContext = ImmutableNamespaceContext(Map[String,String]())
+    val pushJSON = new PushJSON("PushJSON", "PushJSON", "JSON", "/root/json",nsContext,31,10,Array[Step](new ContentFail("C","C", 100)))
+    val req = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <json>
+        |    {
+        |      "foo" : "bar"
+        |    }
+        |  </json>
+        |</root>""".stripMargin, true)
+    val req2 = request("PUT", "/a/b","application/xml",
+      """
+        |<root>
+        |  <other />
+        |  <json>
+        |    <actual>
+        |      {
+        |        "baz" : "biz"
+        |      }
+        |    </actual>
+        |  </json>
+        |</root>""".stripMargin, true)
+
+    val origRep  = req.parsedRepresentation
+    val origRep2 = req2.parsedRepresentation
+
+    assert(origRep.isInstanceOf[ParsedXML])
+    assert(origRep2.isInstanceOf[ParsedXML])
+
+    req.contentError = new IOException("Phony exception")
+    req2.contentError = new IOException("Phony exception")
+
+    val pushResult  = pushJSON.check(req, response, chain, StepContext())
+    val pushResult2 = pushJSON.check(req2, response, chain, StepContext())
+
+    assert(pushResult.isDefined)
+    assert(pushResult2.isDefined)
+
+    assert(req.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req.parsedRepresentation == origRep)
+    assert(req.contentError.isInstanceOf[IOException])
+    assert(req.contentError.getMessage.contains("Phony exception"))
+    assert(req2.parsedRepresentation.isInstanceOf[ParsedXML])
+    assert(req2.parsedRepresentation == origRep2)
+    assert(req2.contentError.isInstanceOf[IOException])
+    assert(req2.contentError.getMessage.contains("Phony exception"))
   }
 
 }

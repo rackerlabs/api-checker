@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Added support for ```rax:representation```, this works like ```wadl:representation``` in that it can make assertions about XML, JSON representations. With ```rax:representation```, the representation may be embedded in another representation (JSON in XML), or in a header.
+
 ## Release 2.5.1 (2017-10-24) ##
 1. Fixed a bug where the removeDups opt sometimes created checkers with missing states.
 

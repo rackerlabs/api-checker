@@ -322,6 +322,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
           case "JSON_XPATH" => addJSONXPath(atts)
           case "ASSERT"     => addAssert(atts)
           case "CAPTURE_HEADER" => addCaptureHeader(atts)
+          case "POP_REP" => addPopRep(atts)
+          case "PUSH_XML_REP" => addPushXML(atts)
+          case "PUSH_JSON_REP" => addPushJSON(atts)
         }
       case "grammar" =>
         addGrammar(atts)
@@ -872,6 +875,81 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
 
     next += (id -> nexts)
     steps += (id -> new CaptureHeader(id, label, name, path, context, version, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addPushXML(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val name : String = atts.getValue("name")
+    val path : String = atts.getValue("path")
+    val context : ImmutableNamespaceContext = ImmutableNamespaceContext(prefixes)
+    val version : Int = {
+      val sversion = atts.getValue("version")
+
+      if (sversion == null) {
+        Config.RAX_ASSERT_XPATH_VERSION
+      } else {
+        sversion.toInt
+      }
+    }
+    val priority = getPriority (atts)
+
+    //
+    //  Make an attempt to parse the XPath expression. Throw a
+    //  SAXParseException if something goes wrong.
+    //
+    try {
+      XPathStepUtil.parseXPath(path, context, version)
+    } catch {
+      case spe : SAXParseException => throw spe
+      case e : Exception => throw new SAXParseException ("Error while compiling rax:representation XPath expression: "+e.getMessage(), locator, e)
+    }
+
+    next += (id -> nexts)
+    steps += (id -> new PushXML(id, label, name, path, context, version, priority, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addPushJSON(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+    val name : String = atts.getValue("name")
+    val path : String = atts.getValue("path")
+    val context : ImmutableNamespaceContext = ImmutableNamespaceContext(prefixes)
+    val version : Int = {
+      val sversion = atts.getValue("version")
+
+      if (sversion == null) {
+        Config.RAX_ASSERT_XPATH_VERSION
+      } else {
+        sversion.toInt
+      }
+    }
+    val priority = getPriority (atts)
+
+    //
+    //  Make an attempt to parse the XPath expression. Throw a
+    //  SAXParseException if something goes wrong.
+    //
+    try {
+      XPathStepUtil.parseXPath(path, context, version)
+    } catch {
+      case spe : SAXParseException => throw spe
+      case e : Exception => throw new SAXParseException ("Error while compiling rax:representation XPath expression: "+e.getMessage(), locator, e)
+    }
+
+    next += (id -> nexts)
+    steps += (id -> new PushJSON(id, label, name, path, context, version, priority, new Array[Step](nexts.length)))
+  }
+
+  private[this] def addPopRep(atts : Attributes) : Unit = {
+    val nexts : Array[String] = atts.getValue("next").split(" ")
+    val id : String = atts.getValue("id")
+    val label : String = atts.getValue("label")
+
+    next += (id -> nexts)
+    steps += (id -> new PopRep(id, label, new Array[Step](nexts.length)))
   }
 
   private[this] def addURL(atts : Attributes) : Unit = {

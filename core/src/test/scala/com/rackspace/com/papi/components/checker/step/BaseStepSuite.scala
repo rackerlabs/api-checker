@@ -25,8 +25,11 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory
 import com.github.fge.jsonschema.report.{ListReportProvider, LogLevel}
 import com.rackspace.com.papi.components.checker.BaseValidatorSuite
 import com.rackspace.com.papi.components.checker.servlet._
+import com.rackspace.com.papi.components.checker.util.XMLParserPool._
 import com.rackspace.com.papi.components.checker.step.results.{BadMediaTypeResult, MismatchResult, Result}
 import com.rackspace.com.papi.components.checker.util.ObjectMapperPool
+
+import org.w3c.dom.Document
 
 import scala.xml._
 
@@ -42,6 +45,25 @@ class BaseStepSuite extends BaseValidatorSuite {
 
   val xsl1Templates = xsl1Factory.newTemplates (new StreamSource(getClass.getResourceAsStream("/xsl/testXSL1.xsl")))
   val xsl2Templates = xsl2Factory.newTemplates (new StreamSource(getClass.getResourceAsStream("/xsl/testXSL2.xsl")))
+
+  val EMPTY_DOC = {
+    val parser = borrowParser
+    try {
+      parser.newDocument
+    } finally {
+      returnParser(parser)
+    }
+  }
+
+  val EMPTY_JSON = {
+    var om : ObjectMapper = null
+    try {
+      om = ObjectMapperPool.borrowParser
+      om.readTree("null")
+    } finally {
+      if (om != null) ObjectMapperPool.returnParser(om)
+    }
+  }
 
 
   //

@@ -162,6 +162,22 @@ class BaseCheckerSpec extends BaseWADLSpec with LazyLogging {
     stepsWithType(checker, "CAPTURE_HEADER").filter( n => (n \ "@name").text == name).filter( n => (n \ "@path").text == expression)
   }
 
+  def stepsWithPushXML (checker : NodeSeq, expression : String) : NodeSeq = {
+    stepsWithType(checker, "PUSH_XML_REP").filter(n => (n \ "@path").text == expression)
+  }
+
+  def stepsWithPushXML (checker : NodeSeq, name : String, expression : String) : NodeSeq = {
+    stepsWithPushXML(checker, expression).filter(n => (n \ "@name").text == name)
+  }
+
+  def stepsWithPushJSON (checker : NodeSeq, expression : String) : NodeSeq = {
+    stepsWithType(checker, "PUSH_JSON_REP").filter(n => (n \ "@path").text == expression)
+  }
+
+  def stepsWithPushJSON (checker : NodeSeq, name : String, expression : String) : NodeSeq = {
+    stepsWithPushJSON(checker, expression).filter(n => (n \ "@name").text == name)
+  }
+
   def stepsWithMethodMatch (checker : NodeSeq, methodMatch  : String) : NodeSeq = {
     stepsWithMatch (checker, methodMatch).filter(n => (n \ "@type").text == "METHOD")
   }
@@ -405,6 +421,11 @@ class BaseCheckerSpec extends BaseWADLSpec with LazyLogging {
   def RaxAssert(expression : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithAssertCodeMatch(_, expression, code)
   def RaxAssert(expression : String, message : String, code : Int) : (NodeSeq) => NodeSeq = stepsWithAssertMessageCodeMatch(_, expression, message, code)
   def RaxCaptureHeader(name : String, expression : String) : (NodeSeq) => NodeSeq = stepsWithCaptureHeader(_, name, expression)
+  def RaxPopRep : (NodeSeq) => NodeSeq = stepsWithType(_, "POP_REP")
+  def RaxPushXML (expression : String) : (NodeSeq) => NodeSeq = stepsWithPushXML(_, expression)
+  def RaxPushXML (name : String, expression : String) : (NodeSeq) => NodeSeq = stepsWithPushXML(_, name, expression)
+  def RaxPushJSON (expression : String) : (NodeSeq) => NodeSeq = stepsWithPushJSON(_, expression)
+  def RaxPushJSON (name : String, expression : String) : (NodeSeq) => NodeSeq = stepsWithPushJSON(_, name, expression)
   def ReqType(reqType : String) : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(?i)"+reqType)
   def AnyReqType : (NodeSeq) => NodeSeq = stepsWithReqTypeMatch (_, "(.*)()")
   def HeaderWithCapture(name : String, headerMatch : String, captureHeader : String) : (NodeSeq) => NodeSeq = stepsWithHeaderMatchCapture(_, name, headerMatch, captureHeader)

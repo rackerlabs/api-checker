@@ -41,6 +41,9 @@ object WadlTest {
   val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
                                          "Remove duplicate nodes. Default: false")
 
+  val raxRepresentation = parser.flag[Boolean] (List("R", "disable-rax-representation"),
+                                         "Disable Rax-Representation extension. Default: false")
+
   val raxRoles = parser.flag[Boolean] (List("r", "rax-roles"),
                                          "Enable Rax-Roles extension. Default: false")
 
@@ -272,6 +275,7 @@ object WadlTest {
 
         c.removeDups = removeDups.value.getOrElse(false)
         c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
+        c.enableRaxRepresentationExtension = !raxRepresentation.value.getOrElse(false)
         c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
         c.enableAuthenticatedByExtension = authenticatedBy.value.getOrElse(false)
         c.checkWellFormed = wellFormed.value.getOrElse(false)

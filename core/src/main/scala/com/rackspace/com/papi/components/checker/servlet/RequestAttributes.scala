@@ -19,6 +19,7 @@ package com.rackspace.com.papi.components.checker.servlet
 //  Request Keys
 //
 object RequestAttributes {
+  val PARSED_REPRESENTATION = "com.rackspace.com.papi.components.checker.servlet.ParsedRepresentation"
   val PARSED_XML    = "com.rackspace.com.papi.components.checker.servlet.ParsedXML"
   val PARSED_XML_SOURCE = "com.rackspace.com.papi.components.checker.servlet.ParsedXMLSource"
   val PARSED_JSON   = "com.rackspace.com.papi.components.checker.servlet.ParsedJSONTokens"
