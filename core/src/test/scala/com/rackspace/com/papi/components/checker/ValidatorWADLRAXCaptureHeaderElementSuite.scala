@@ -819,8 +819,8 @@ class ValidatorWADLRAXCaptureHeaderElementSuite extends BaseValidatorSuite {
         assert(csReq.getHeaders("X-HEADERS-START-WITH-A").toList == List("true"))
         assert(csReq.getHeaders("X-HEADERS-START-WITH-B").toList == List("true"))
         assert(csReq.getHeaders("ALL-X-AUTH-HEADERS").toList == List("foo!"))
-        assert(csReq.getHeaders("X-BODY-EMPTY").toList == List("false"))
-        assert(csReq.getHeaders("X-BODY-EMPTY2").toList == List("false"))
+        assert(csReq.getHeaders("X-BODY-EMPTY").toList == List("true"))
+        assert(csReq.getHeaders("X-BODY-EMPTY2").toList == List("true"))
         assert(csReq.getHeaders("X-FALSE").toList == List("false"))
       }))
 

@@ -22,13 +22,21 @@ import javax.xml.validation.Schema
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.HeaderUtil._
+
+import com.rackspace.com.papi.components.checker.util.TenantUtil._
+
 import org.xml.sax.SAXParseException
 
 import scala.collection.JavaConversions._
 
 class HeaderXSDSingle(id : String, label : String, val name : String, val value : QName, schema : Schema,
                 val message : Option[String], val code : Option[Int], val captureHeader : Option[String],
-                val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
+                val isTenant : Boolean, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
+
+  def this(id : String, label : String,  name : String,  ue : QName, schema : Schema,
+           message : Option[String],  code : Option[Int],  captureHeader : Option[String],
+           priority : Long, next : Array[Step]) = this(id, label, name, ue, schema, message, code, captureHeader,
+                                                       false, priority, next)
 
   override val mismatchMessage : String = {
     if (message.isEmpty) {
@@ -66,12 +74,18 @@ class HeaderXSDSingle(id : String, label : String, val name : String, val value 
       case Nil => req.contentError(new Exception(mismatchMessage),mismatchCode, priority)
                   None
       case header :: Nil => xsd.validate(header) match {
-              case None => captureHeader match {
-                  case None => Some(context)
-                  case Some(h) => Some(context.copy(requestHeaders = context.requestHeaders.addHeader(h, header)))
-              }
-              case Some(e) => req.contentError(new Exception(mismatchMessage+" "+e.getMessage, e),mismatchCode, priority)
-                              None
+        case None =>
+          val contextWithCaptureHeaders = captureHeader match {
+            case None => context
+            case Some(h) => context.copy(requestHeaders = context.requestHeaders.addHeader(h, header))
+          }
+          val contextWithTenantRoles = isTenant match {
+            case false => contextWithCaptureHeaders
+            case true => addTenantRoles(contextWithCaptureHeaders, req, name, header)
+          }
+          Some(contextWithTenantRoles)      
+        case Some(e) => req.contentError(new Exception(mismatchMessage+" "+e.getMessage, e),mismatchCode, priority)
+          None
       }
       case _  => req.contentError(new Exception(numMessage), mismatchCode, priority)
                  None

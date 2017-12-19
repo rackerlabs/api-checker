@@ -220,7 +220,7 @@
                      <xsl:when test="$nfaMode">
                          <xsl:value-of select="@id"/>
                      </xsl:when>
-                     <xsl:when test="@label">
+                     <xsl:when test="@label and (@match or @matchRegEx)">
                          <xsl:value-of select="concat(check:matchValue(.),' \n(',@label,')')"/>
                      </xsl:when>
                      <xsl:when test="@name and (@match or @matchRegEx)">
@@ -252,6 +252,11 @@
                      </xsl:otherwise>
                  </xsl:choose>
                  <xsl:if test="not($nfaMode)">
+                     <xsl:if test="exists(@matchingRoles)">
+                         <xsl:value-of select="'\n('"/>
+                         <xsl:value-of select="tokenize(@matchingRoles,' ')" separator=", "/>
+                         <xsl:value-of select="')'"/>
+                     </xsl:if>
                      <xsl:if test="exists(@priority)">
                          <xsl:value-of select="concat('\n[',@priority,']')"/>
                      </xsl:if>

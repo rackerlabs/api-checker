@@ -27,6 +27,9 @@ import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step,
 import com.rackspace.com.papi.components.checker.util.ImmutableNamespaceContext
 import com.rackspace.com.papi.components.checker.util.XQueryEvaluatorPool._
 
+
+import com.rackspace.com.papi.components.checker.util.TenantUtil._
+
 import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.om.Sequence
 
@@ -36,8 +39,12 @@ import net.sf.saxon.s9api.XdmValue
 import com.typesafe.scalalogging.slf4j.LazyLogging
 
 class CaptureHeader(id : String, label : String, val name : String, val expression : String,
-                    val nc : ImmutableNamespaceContext, val version : Int,
-                    next : Array[Step]) extends ConnectedStep(id, label, next) with LazyLogging {
+                    val nc : ImmutableNamespaceContext, val version : Int, val matchingRoles : Option[Set[String]],
+                    val isTenant : Boolean, next : Array[Step]) extends ConnectedStep(id, label, next) with LazyLogging {
+
+  def this (id : String, label : String,  name : String,  expression : String,
+            nc : ImmutableNamespaceContext,  version : Int,
+            next : Array[Step]) = this(id, label, name, expression, nc, version, None, false, next)
 
   private val exec = XPathStepUtil.xqueryExecutableForExpression(expression, nc)
 
@@ -61,12 +68,19 @@ class CaptureHeader(id : String, label : String, val name : String, val expressi
         //  outside of the US-ASCII character set.  It is up to the
         //  underlying servlet container to handle these subtleties.
         //
-        ret=Some(context.copy(requestHeaders=context.requestHeaders.addHeaders(name,toReqHeaders(res))))
+        val headers = toReqHeaders(res)
+        val contextWithCaptureHeaders = context.copy(requestHeaders = context.requestHeaders.addHeaders(name, headers))
+        val contextWithTenantRoles = isTenant match {
+          case false => contextWithCaptureHeaders
+          case true => addTenantRoles(contextWithCaptureHeaders, req, name, headers, matchingRoles)
+        }
+        Some(contextWithTenantRoles)
+      } else {
+        Some(context)
       }
     }finally {
       returnEvaluator (expression, eval)
     }
-    ret
   }
 
   def toReqHeaders (xdmValue : XdmValue) : List[String] = {

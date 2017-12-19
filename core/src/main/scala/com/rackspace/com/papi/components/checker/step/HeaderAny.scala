@@ -21,19 +21,26 @@ import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.HeaderUtil._
 
-import scala.collection.JavaConversions._
+import com.rackspace.com.papi.components.checker.util.TenantUtil._
+
 import scala.util.matching.Regex
 
 class HeaderAny(id : String, label : String, val name : String, val value : Regex,
                 val message : Option[String], val code : Option[Int], val captureHeader : Option[String],
-                val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
+                val matchingRoles : Option[Set[String]],
+                val isTenant : Boolean, val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
 
   def this(id : String, label : String, name : String, value : Regex, priority : Long,
-           next : Array[Step]) = this(id, label, name, value, None, None, None, priority, next)
+           next : Array[Step]) = this(id, label, name, value, None, None, None, None, false, priority, next)
 
   def this(id : String, label : String, name : String, value : Regex, message : Option[String],
            code : Option[Int], priority : Long,
-           next : Array[Step]) = this(id, label, name, value, message, code, None, priority, next)
+           next : Array[Step]) = this(id, label, name, value, message, code, None, None, false, priority, next)
+
+  def this(id : String, label : String,  name : String,  ue : Regex,
+           message : Option[String],  code : Option[Int],  captureHeader : Option[String],
+           priority : Long, next : Array[Step]) = this(id, label, name, ue, message, code, captureHeader, None, false,
+                                                       priority, next)
 
   override val mismatchMessage : String = {
     if (message.isEmpty) {
@@ -53,6 +60,7 @@ class HeaderAny(id : String, label : String, val name : String, val value : Rege
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
     val headers : List[String] = getHeaders(context, req, name)
+    lazy val matchHeaders : List[String] = headers.filter(_ match { case value() => true; case _ => false}).toList
 
     //
     //  If there exists at least one header matching the the name AND
@@ -60,11 +68,15 @@ class HeaderAny(id : String, label : String, val name : String, val value : Rege
     //  set an error and return None
     //
     if (headers.exists(v => v match { case value() => true ; case _ => false })) {
-      captureHeader match {
-        case None => Some(context)
-        case Some(h) => Some(context.copy(requestHeaders =
-          context.requestHeaders.addHeaders(h, headers.filter(_ match { case value() => true; case _ => false}).toList)))
+      val contextWithCaptureHeaders = captureHeader match {
+         case None => context
+         case Some(h) => context.copy(requestHeaders = context.requestHeaders.addHeaders(h, matchHeaders))
       }
+      val contextWithTenantRoles = isTenant match {
+        case false => contextWithCaptureHeaders
+        case true => addTenantRoles(contextWithCaptureHeaders, req, name, headers, matchingRoles)
+      }
+      Some(contextWithTenantRoles)
     } else {
       req.contentError(new Exception(mismatchMessage), mismatchCode, priority)
       None

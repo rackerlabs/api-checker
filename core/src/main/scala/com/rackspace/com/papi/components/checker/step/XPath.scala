@@ -23,17 +23,27 @@ import javax.xml.xpath.XPathExpression
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.XPathExpressionPool._
+
+import com.rackspace.com.papi.components.checker.util.TenantUtil._
+
 import org.xml.sax.SAXParseException
 
-class XPath(id : String, label : String, val expression : String, val message : Option[String],
+class XPath(id : String, label : String, val name : Option[String],
+            val expression : String, val message : Option[String],
             val code : Option[Int], val nc : NamespaceContext, val version : Int,
-            val captureHeader : Option[String], val priority : Long,
+            val captureHeader : Option[String], val isTenant : Boolean, val priority : Long,
             next : Array[Step]) extends ConnectedStep(id, label, next) {
 
   def this(id : String, label : String,  expression : String,  message : Option[String],
            code : Option[Int],  nc : NamespaceContext,  version : Int,
            priority : Long, next : Array[Step]) =
-             this (id, label, expression, message, code, nc, version, None, priority, next)
+    this (id, label, None, expression, message, code, nc, version, None, false, priority, next)
+
+  def this (id : String, label : String,  expression : String,  message : Option[String],
+             code : Option[Int],  nc : NamespaceContext,  version : Int,
+             captureHeader : Option[String],  priority : Long,
+            next : Array[Step]) =
+    this (id, label, None, expression, message, code, nc, version, captureHeader, false, priority, next)
 
   override val mismatchMessage : String = {
     if (message.isEmpty) {
@@ -52,7 +62,6 @@ class XPath(id : String, label : String, val expression : String, val message : 
   }
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
-    var ret : Option[StepContext] = None
     var xpath : XPathExpression = null
     val xml = req.parsedXML
 
@@ -60,19 +69,34 @@ class XPath(id : String, label : String, val expression : String, val message : 
       xpath = borrowExpression (expression, nc, version)
       if (!xpath.evaluate (xml, BOOLEAN).asInstanceOf[Boolean]) {
         req.contentError(new SAXParseException (mismatchMessage, null), mismatchCode, priority)
+        None
       } else {
-        ret = captureHeader match {
-          case None => Some(context)
-          case Some(h) => Some(context.copy (requestHeaders =
-            context.requestHeaders.addHeader(h, xpath.evaluate (xml, STRING).asInstanceOf[String])))
+        val value = xpath.evaluate (xml, STRING).asInstanceOf[String]
+        val contextWithCaptureHeaders = captureHeader match {
+          case None => context
+          case Some(h) => context.copy (requestHeaders = context.requestHeaders.addHeader(h, value))
         }
+        val contextWithTenantRoles = isTenant match {
+          case false => contextWithCaptureHeaders
+          case true =>
+            //
+            //  Note, if isTenant is true, then name will be set.  This is
+            //  enforced by validation of the checker format.
+            //
+            //  A valid machine should never have an empty name at this
+            //  point.
+            //
+            require(!name.isEmpty, "If isTenant is ture then a name should be specified.")
+            addTenantRoles(contextWithCaptureHeaders, req, name.get, value)
+        }
+        Some(contextWithTenantRoles)
       }
     } catch {
-      case e : Exception => req.contentError(new SAXParseException(mismatchMessage+" : "+e.getMessage, null, e), mismatchCode, priority)
+      case e : Exception =>
+        req.contentError(new SAXParseException(mismatchMessage+" : "+e.getMessage, null, e), mismatchCode, priority)
+        None
     } finally {
       if (xpath != null) returnExpression (expression, nc, version, xpath)
     }
-
-    ret
   }
 }

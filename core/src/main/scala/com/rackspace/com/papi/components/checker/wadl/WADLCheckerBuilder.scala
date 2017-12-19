@@ -103,6 +103,12 @@ object WADLCheckerBuilder {
   private lazy val raxRolesMaskXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxRolesMask.xsl",
                                                                          compiler.compile(new StreamSource(getClass.getResource("/xsl/raxRolesMask.xsl").toString)))
 
+  private lazy val raxRolesTenantsXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxRolesTenants.xsl",
+                                                                         compiler.compile(new StreamSource(getClass.getResource("/xsl/raxRolesTenants.xsl").toString)))
+
+  private lazy val raxRolesMultiTenantsXsltExec : XsltExecutable = timeFunction ("compile /xsl/raxRolesMultiTenants.xsl",
+                                                                         compiler.compile(new StreamSource(getClass.getResource("/xsl/raxRolesMultiTenants.xsl").toString)))
+
   private lazy val buildXsltExec : XsltExecutable = timeFunction ("compile /xsl/builder.xsl",
                                                                   compiler.compile(new StreamSource(getClass.getResource("/xsl/builder.xsl").toString)))
 
@@ -466,6 +472,26 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
   })
 
   //
+  //  Makes raxRolesTetants changes
+  //
+  private def raxRolesTenants(in : Source, c : Config) : Source = timeFunction("raxRolesTenants", {
+    if (c.enableRaxRolesExtension) {
+      val builder = processor.newDocumentBuilder
+      val raxRolesTenantsTransformer = getXsltTransformer(raxRolesTenantsXsltExec, Map(new QName(CONFIG_METADATA) -> builder.build(new StreamSource(c.checkerMetaElem))))
+      val raxRolesMultiTenantsTransformer = getXsltTransformer(raxRolesMultiTenantsXsltExec)
+      val out = new XdmDestination
+      raxRolesTenantsTransformer.setSource(in)
+      raxRolesTenantsTransformer.setDestination(raxRolesMultiTenantsTransformer)
+      raxRolesMultiTenantsTransformer.setDestination(out)
+      raxRolesTenantsTransformer.transform
+      out.getXdmNode.asSource
+    } else {
+      in
+    }
+  })
+
+
+  //
   //  Setup for join optimizations
   //
   private def joinOptSetup(in : Source, c : Config) : Source = timeFunction("joinOptSetup", {
@@ -691,7 +717,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         //
         val buildSteps : List[CheckerTransform] =
           List(raxGlobalExtn, authenticatedBy, raxRoles,
-               buildChecker(entityDoc, _, _),
+               buildChecker(entityDoc, _, _), raxRolesTenants,
                raxRolesMask, joinOptSetup, joinOpt, dupsOpt,
                joinHeaderOpt, joinOptCleanup,
                joinXPathOpt, adjustNext, validateChecker)

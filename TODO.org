@@ -897,6 +897,34 @@
          9. [X] JoinOpt
          10. [X] RemoveDups
 ** DONE Compile Performance improvements
+** DONE Extend Support for Capture Header to support standalone element [2/2]
+   1. [X] Add CaptureHeader Step [10/10]
+      1. [X] Extend XSD to support New Capture Header Step
+      2. [X] Extend / Generalize raxAssert.xsl to handle new Capture
+         Header Step
+      3. [X] Updated raxAssert call in checker builder
+      4. [X] Update builder to include Capture Header Step [3/3]
+         1. [X] Handle in method / request
+         2. [X] In representation other than XML or JSON :
+            (wadl:request/wadl:representation[@mediaType] template)
+         3. [X] In representation with XML or JSON (in
+            check:addWellForm template)
+      5. [X] Add step to priority map
+      6. [X] Check assertions related to capture header step
+      7. [X] Update WADL2Dot to display steps correctly
+      8. [X] Ensure optimizations work with the new step
+      9. [X] Create new step
+      10. [X] Update handler for new step
+   2. [X] Testing [3/3]
+      1. [X] Step
+      2. [X] Bulider
+      3. [X] Validator [6/6]
+         1. [X] At resources level
+         2. [X] At resource level
+         3. [X] At method level
+         4. [X] No representation
+         5. [X] XML / JSON representation
+         6. [X] Media types other than XML or JSON
 ** DONE SubRepresentations[2/2]
    1. [X] Push Representation step [13/13]
       1. [X] Extend XSD to support Push Rep step / Pop Rep step
@@ -984,34 +1012,168 @@
       - AFTER_SUB gets all sub representations as parameters.  Name can
         be used to identify them, else they are passed by number (in an
         array? or map?)
-** TODO Extend Support for Capture Header to support standalone element [2/2]
-   1. [X] Add CaptureHeader Step [10/10]
-      1. [X] Extend XSD to support New Capture Header Step
-      2. [X] Extend / Generalize raxAssert.xsl to handle new Capture
-         Header Step
-      3. [X] Updated raxAssert call in checker builder
-      4. [X] Update builder to include Capture Header Step [3/3]
-         1. [X] Handle in method / request
-         2. [X] In representation other than XML or JSON :
-            (wadl:request/wadl:representation[@mediaType] template)
-         3. [X] In representation with XML or JSON (in
-            check:addWellForm template)
-      5. [X] Add step to priority map
-      6. [X] Check assertions related to capture header step
-      7. [X] Update WADL2Dot to display steps correctly
-      8. [X] Ensure optimizations work with the new step
-      9. [X] Create new step
-      10. [X] Update handler for new step
-   2. [X] Testing [3/3]
-      1. [X] Step
-      2. [X] Bulider
-      3. [X] Validator [6/6]
-         1. [X] At resources level
-         2. [X] At resource level
-         3. [X] At method level
-         4. [X] No representation
-         5. [X] XML / JSON representation
-         6. [X] Media types other than XML or JSON
+** TODO Support tenant based role check[2/3]
+   1. [X] Support RAX-Roles [16/16]
+      1. [X] Extend state machine to support checkTenant flag (XSD).
+      2. [X] Create tenantChecker util.
+      3. [X] Support multiple tenant values in tenantChecker.
+      4. [X] Add support for checkTenant flag in steps[12/12]
+         1. [X] XPath
+         2. [X] JSONXPath
+         3. [X] URI
+         4. [X] URIXSD
+         5. [X] HEADER
+         6. [X] HEADERXSD
+         7. [X] HEADER_SINGLE
+         8. [X] HEADERXSD_SINGLE
+         9. [X] HEADER_ANY
+         10. [X] HEADERXSD_ANY
+         11. [X] HEADER_ALL
+         12. [X] CAPTURE_HEADER
+      5. [X] Modify step handler to load isTenant  flag correctly[12/12]
+         1. [X] XPath
+         2. [X] JSONXPath
+         3. [X] URI
+         4. [X] URIXSD
+         5. [X] HEADER
+         6. [X] HEADERXSD
+         7. [X] HEADER_SINGLE
+         8. [X] HEADERXSD_SINGLE
+         9. [X] HEADER_ANY
+         10. [X] HEADERXSD_ANY
+         11. [X] HEADER_ALL
+         12. [X] CAPTURE_HEADER
+      6. [X] Modify builder to ensure param name is always captured (as label) [12/12]
+         1. [X] XPath
+         2. [X] JSONXPath
+         3. [X] URI
+         4. [X] URIXSD
+         5. [X] HEADER
+         6. [X] HEADERXSD
+         7. [X] HEADER_SINGLE
+         8. [X] HEADERXSD_SINGLE
+         9. [X] HEADER_ANY
+         10. [X] HEADERXSD_ANY
+         11. [X] HEADER_ALL
+         12. [X] CAPTURE_HEADER
+      7. [X] Make sure that wadl2dot works with new labeled steps
+      8. [X] Damn it.  Use "name" instead of label [12/12]
+         1. [X] XPath
+         2. [X] JSONXPath
+         3. [X] URI
+         4. [X] URIXSD
+         5. [X] HEADER
+         6. [X] HEADERXSD
+         7. [X] HEADER_SINGLE
+         8. [X] HEADERXSD_SINGLE
+         9. [X] HEADER_ANY
+         10. [X] HEADERXSD_ANY
+         11. [X] HEADER_ALL
+         12. [X] CAPTURE_HEADER
+      9. [X] Look over wadl2dot to make sure things work.
+      10. [X] Modify builder to correctly capture isTenant flag[12/12]
+          1. [X] XPath
+          2. [X] JSONXPath
+          3. [X] URI
+          4. [X] URIXSD
+          5. [X] HEADER
+          6. [X] HEADERXSD
+          7. [X] HEADER_SINGLE
+          8. [X] HEADERXSD_SINGLE
+          9. [X] HEADER_ANY
+          10. [X] HEADERXSD_ANY
+          11. [X] HEADER_ALL
+          12. [X] CAPTURE_HEADER
+      11. [X] Ensure that new steps take isTenant and name into
+          account when handling optimizations
+      12. [X] Make sure opts copy over isTenant [4/4]
+          1. [X] Header Join : Works!
+          2. [X] Common Join : Works!
+          3. [X] Remove Dups : Works!
+          4. [X] XPath Join : Should not join if isTenant=true
+      13. [X] Add config option for isTenant extension [5/5]
+          1. [X] Implement config option
+          2. [X] Enable support in builder
+          3. [X] Fix checker tests to include approprate configs
+          4. [X] Add checker tests to check the flag works
+          5. [X] Add flag to cli tools [3/3]
+             1. [X] wadl2checker
+             2. [X] wadl2dot
+             3. [X] wadltest
+      14. [X] Ensure that HEADER_ANY header checks can occur after other isTenant params [5/5]
+          1. [X] URL, URLXSD
+          2. [X] XPATH, JSONXPATH
+          3. [X] CAPTURE_HEADER
+          4. [X] HEADER_ALL
+          5. [X] HEADER_SINGLE, HEADERXSD_SINGLE, HEADER, HEADERXSD,
+             HEADER_ANY, HEADERXSD_ANY
+      15. [X] Modify rax:roles to correctly handle role/{param} [5/5]
+          1. [X] Should support all supported param types
+          2. [X] Ensure header any check occurs after other params
+          3. [X] Should error check param
+          4. [X] Hint to builder to set handleTenant flag by setting rax:isTenant.
+          5. [X] Initial fail if mask raxroles
+      16. [X] Rewrite params that can handle multiple tenant match [3/3]
+          1. [X] Should be able to take allowed matches into account [7/7]
+             1. [X] XSD Changes
+             2. [X] Opt changes
+             3. [X] TenantUtil changes (test updates)
+             4. [X] Step Changes (test updates)
+             5. [X] Load Handler changes
+             6. [X] Dot changes
+             7. [X] Cleanup RAX templates.
+          2. [X] Transform to move items to place [2/2]
+             1. [X] Stage 1 : copy steps after Method
+             2. [X] Add allowed Roles
+          3. [X] Regression...
+   2. [X] Test for setup and RAX-ROLES [9/9]
+      1. [X] Get/set mapped roles on checker servlet request
+      2. [X] TenantUtil addTenantRoles
+      3. [X] TenantUtil addTenantRoles (multi-value)
+      4. [X] Test checkTenant flags in steps [12/12]
+         1. [X] XPath
+         2. [X] JSONXPath
+         3. [X] URI
+         4. [X] URIXSD
+         5. [X] HEADER_SINGLE
+         6. [X] HEADERXSD_SINGLE
+         7. [X] HEADER
+         8. [X] HEADERXSD
+         9. [X] HEADER_ANY
+         10. [X] HEADERXSD_ANY
+         11. [X] HEADER_ALL
+         12. [X] CAPTURE_HEADER
+      5. [X] Test checkTenant falgs (multi-value)
+      6. [X] Test isTenant in checker
+      7. [X] Test that step names in checker
+      8. [X] Validator Tests[9/9]
+         1. [X] URL, URLXSD
+         2. [X] XPATH, JSON_XPATH
+         3. [X] CAPTURE_HEADER at method level
+         4. [X] CAPTURE_HEADER at resource level
+         5. [X] CAPTURE_HEADER at resources level
+         6. [X] HEADER (Single, Any, All) at method level
+         7. [X] HEADER (Single, Any, All) at resource level
+         8. [X] Test to check releveant roles
+         9. [X] Test role with spaces
+      9. [X] Builder Tests[2/2]
+         1. [X] Fail scenarios[2/2]
+            1. [X] Mask Rax-Roles enabled
+            2. [X] Missing Param
+         2. [X] Other misc[2/2]
+            1. [X] Test param with \ in the role name.
+            2. [X] Test roles with spaces
+   3. [ ] Support RAX-Roles mask[0/0]
+*** Notes
+    The idea is that one can specify any WADL param as the tenant. RAX
+    roles can then be specified in the form role/{param}, which means
+    the method requires role on the teant specified by the param.
+
+    All param types should work.  For now, however, that means header,
+    URI, and plain.
+
+    There are two main chunks of work because this should support
+    RAX-ROLES and RAX-ROLES Mask.
 ** TODO Use Saxon Compile Lib feature to compile shared module.
    - This requires Saxon-EEQ
 ** TODO Assign CONTENT_FAIL to XSL steps in builder

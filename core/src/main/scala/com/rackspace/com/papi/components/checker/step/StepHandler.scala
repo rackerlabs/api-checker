@@ -731,10 +731,21 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     case null => None
   }
 
+  private[this] def getIsTenant(atts : Attributes) : Boolean = atts.getValue("isTenant") match {
+    case s : String if (s == "true" || s == "1") => true
+    case _ => false
+  }
+
+  private[this] def getMatchingRoles(atts : Attributes) : Option[Set[String]] = atts.getValue("matchingRoles") match {
+    case s : String => Some(Set[String]() ++ s.split(" ").map(_.replaceAll("\u00A0"," ")))
+    case _ => None
+  }
+
   private[this] def addXPath(atts : Attributes) : Unit = {
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val name : Option[String] = Option(atts.getValue("name"))
     val _match : String = atts.getValue("match")
     val captureHeader = getCaptureHeader(atts)
     val mc = getMessageCode(atts)
@@ -751,6 +762,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       }
     }
     val priority = getPriority (atts)
+    val isTenant = getIsTenant (atts)
 
     //
     //  Make an attempt to compile the XPath expression. Throw a
@@ -767,13 +779,14 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
 
     next += (id -> nexts)
-    steps += (id -> new XPath(id, label, _match, message, code, context, version, captureHeader, priority, new Array[Step](nexts.length)))
+    steps += (id -> new XPath(id, label, name, _match, message, code, context, version, captureHeader, isTenant, priority, new Array[Step](nexts.length)))
   }
 
   private[this] def addJSONXPath(atts : Attributes) : Unit = {
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val name : Option[String] = Option(atts.getValue("name"))
     val _match : String = atts.getValue("match")
     val captureHeader = getCaptureHeader(atts)
     val mc = getMessageCode(atts)
@@ -790,6 +803,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       }
     }
     val priority = getPriority (atts)
+    val isTenant = getIsTenant (atts)
 
     //
     //  Make an attempt to compile the XPath expression. Throw a
@@ -806,7 +820,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
 
     next += (id -> nexts)
-    steps += (id -> new JSONXPath(id, label, _match, message, code, context, version, captureHeader, priority, new Array[Step](nexts.length)))
+    steps += (id -> new JSONXPath(id, label, name, _match, message, code, context, version, captureHeader, isTenant, priority, new Array[Step](nexts.length)))
   }
 
 
@@ -861,6 +875,8 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
         sversion.toInt
       }
     }
+    val isTenant = getIsTenant (atts)
+    val matchingRoles = getMatchingRoles(atts)
 
     //
     //  Make an attempt to parse the XPath expression. Throw a
@@ -874,7 +890,7 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     }
 
     next += (id -> nexts)
-    steps += (id -> new CaptureHeader(id, label, name, path, context, version, new Array[Step](nexts.length)))
+    steps += (id -> new CaptureHeader(id, label, name, path, context, version, matchingRoles, isTenant, new Array[Step](nexts.length)))
   }
 
   private[this] def addPushXML(atts : Attributes) : Unit = {
@@ -956,11 +972,13 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val name : Option[String] = Option(atts.getValue("name"))
     val _match : String = atts.getValue("match")
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
 
     next  += (id -> nexts)
-    steps += (id -> new URI(id, label, _match.r, captureHeader, new Array[Step](nexts.length)))
+    steps += (id -> new URI(id, label, name, _match.r, captureHeader, isTenant, new Array[Step](nexts.length)))
   }
 
   private[this] def addHeader(atts : Attributes) : Unit = {
@@ -974,10 +992,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val code = mc._2
     val priority = getPriority (atts)
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
+    val matchingRoles = getMatchingRoles(atts)
 
     next += (id -> nexts)
     steps += (id -> new Header(id, label, name, _match.r,
-                               message, code, captureHeader, priority,
+                               message, code, captureHeader, matchingRoles, isTenant, priority,
                                new Array[Step](nexts.length)))
   }
 
@@ -992,10 +1012,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val code = mc._2
     val priority = getPriority (atts)
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderSingle(id, label, name, _match.r,
-                               message, code, captureHeader, priority,
+                               message, code, captureHeader, isTenant, priority,
                                new Array[Step](nexts.length)))
   }
 
@@ -1010,10 +1031,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val code = mc._2
     val priority = getPriority (atts)
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
+    val matchingRoles = getMatchingRoles(atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderAny(id, label, name, _match.r,
-                                  message, code, captureHeader,
+                                  message, code, captureHeader, matchingRoles, isTenant,
                                   priority, new Array[Step](nexts.length)))
   }
 
@@ -1029,10 +1052,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val code = mc._2
     val priority = getPriority (atts)
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
+    val matchingRoles = getMatchingRoles(atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderXSD(id, label, name, qn, schema(qn),
-                                  message, code, captureHeader,
+                                  message, code, captureHeader, matchingRoles, isTenant,
                                   priority, new Array[Step](nexts.length)))
   }
 
@@ -1048,10 +1073,11 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val code = mc._2
     val priority = getPriority (atts)
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderXSDSingle(id, label, name, qn, schema(qn),
-                                  message, code, captureHeader,
+                                  message, code, captureHeader, isTenant,
                                   priority, new Array[Step](nexts.length)))
   }
 
@@ -1067,10 +1093,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val code = mc._2
     val priority = getPriority (atts)
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
+    val matchingRoles = getMatchingRoles(atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderXSDAny(id, label, name, qn, schema(qn),
-                                     message, code, captureHeader,
+                                     message, code, captureHeader, matchingRoles, isTenant,
                                      priority, new Array[Step](nexts.length)))
   }
 
@@ -1087,10 +1115,12 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val code = mc._2
     val priority = getPriority (atts)
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
+    val matchingRoles = getMatchingRoles(atts)
 
     next += (id -> nexts)
     steps += (id -> new HeaderAll(id, label, name, _match, _schema, value,
-                                  message, code, captureHeader,
+                                  message, code, captureHeader, matchingRoles, isTenant,
                                   priority, new Array[Step](nexts.length)))
   }
 
@@ -1130,12 +1160,14 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
     val nexts : Array[String] = atts.getValue("next").split(" ")
     val id : String = atts.getValue("id")
     val label : String = atts.getValue("label")
+    val name : Option[String] = Option(atts.getValue("name"))
     val _match : String = atts.getValue("match")
     val qn : QName = qname(_match)
     val captureHeader = getCaptureHeader(atts)
+    val isTenant = getIsTenant (atts)
 
     next  += (id -> nexts)
-    steps += (id -> new URIXSD(id, label, qn, schema(qn), captureHeader, new Array[Step](nexts.length)))
+    steps += (id -> new URIXSD(id, label, name, qn, schema(qn), captureHeader, isTenant, new Array[Step](nexts.length)))
   }
 
   private[this] def qname(_match : String)  : QName = {

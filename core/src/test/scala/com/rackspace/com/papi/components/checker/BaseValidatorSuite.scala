@@ -15,8 +15,11 @@
  */
 package com.rackspace.com.papi.components.checker
 
+import java.nio.charset.StandardCharsets.UTF_8
+
 import java.io.{ByteArrayInputStream, File}
 import java.util.Enumeration
+import java.util.Base64
 import javax.servlet.FilterChain
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.xml.parsers.DocumentBuilder
@@ -42,6 +45,10 @@ import scala.language.implicitConversions
 import scala.xml._
 
 class BaseValidatorSuite extends FunSuite {
+
+  val base64Encoder = Base64.getEncoder
+
+  def b64Encode (s : String) : String = base64Encoder.encodeToString(s.getBytes(UTF_8))
 
   //
   //  Common test vars

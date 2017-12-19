@@ -16,8 +16,10 @@
 package com.rackspace.com.papi.components.checker.servlet
 
 import java.io.{BufferedReader, ByteArrayOutputStream, IOException, InputStreamReader}
+import java.nio.charset.StandardCharsets.UTF_8
 import java.net.{URI, URISyntaxException}
 import java.util
+import java.util.Base64
 import java.util.NoSuchElementException
 import javax.servlet.ServletInputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
@@ -26,6 +28,7 @@ import javax.xml.transform.Source
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.netaporter.uri.encoding.PercentEncoder
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
@@ -44,18 +47,31 @@ import scala.collection.mutable.Stack
 
 
 object CheckerServletRequest {
+  type MappedRoles = Map[String, List[String]]
+  val  NilMappedRoles : MappedRoles = Map[String, List[String]]()
+
   val DEFAULT_CONTENT_ERROR_CODE : Integer = 400
   val DEFAULT_URI_CHARSET : String = "ASCII"
+  val MAP_ROLES_HEADER : String = "X-MAP-ROLES"
+  val ROLES_HEADER : String = "X-ROLES"
 
   val uriEncoder = new PercentEncoder()
-}
+  val privateMapper = {
+    val om = new ObjectMapper
 
-import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest._
+    om.registerModule(DefaultScalaModule)
+    om
+  }
+
+  val base64Decoder = Base64.getDecoder
+}
 
 //
 //  An HTTP Request with some additional helper functions
 //
 class CheckerServletRequest(val request : HttpServletRequest) extends HttpServletRequestWrapper(request) with LazyLogging {
+
+  import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest._
 
   private val repStack = new Stack[ParsedRepresentation]
 
@@ -89,6 +105,32 @@ class CheckerServletRequest(val request : HttpServletRequest) extends HttpServle
 
   def pathToSegment(uriLevel : Int) : String = {
     "/" + URISegment.slice(0, uriLevel).reduceLeft( _ + "/" +_ )
+  }
+
+  def mappedRoles : MappedRoles = {
+    Option(request.getAttribute(MAP_ROLES).asInstanceOf[MappedRoles]) match {
+      case Some (m : MappedRoles) => m
+      case None => setMappedRoles
+    }
+  }
+
+  private[this] def setMappedRoles : MappedRoles = {
+    val ret = Option(getHeader(MAP_ROLES_HEADER)) match {
+      case Some(s : String) =>
+        try {
+          Option(privateMapper.readValue(new String(base64Decoder.decode(s),UTF_8), classOf[MappedRoles])) match {
+            case Some(m : MappedRoles) => m
+            case None => NilMappedRoles
+          }
+        } catch {
+          case e : Exception =>
+            logger.error(s"Strange error, the header $MAP_ROLES_HEADER could not be parsed.  Ignoring map roles!",e)
+            NilMappedRoles
+        }
+      case None => NilMappedRoles
+    }
+    request.setAttribute(MAP_ROLES, ret)
+    ret
   }
 
   def parsedRepresentation : ParsedRepresentation = {

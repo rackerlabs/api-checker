@@ -98,6 +98,11 @@
             <version>${jackson-databind.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-scala_${scala.major}.${scala.minor}</artifactId>
+            <version>${jackson-databind.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.fge</groupId>
             <artifactId>json-schema-validator</artifactId>
             <version>${json-schema-validator.version}</version>
