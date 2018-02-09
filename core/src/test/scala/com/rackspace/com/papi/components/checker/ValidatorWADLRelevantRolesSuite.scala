@@ -92,7 +92,12 @@ class ValidatorWADLRelevantRolesSuite extends BaseValidatorSuite {
           <resource path="/encoded" rax:roles="f&#160;oo bar">
             <method name="GET"/>
           </resource>
-        </resource>
+       </resource>
+       <resource path="/multi-line">
+           <method name="GET" rax:roles="foo
+                                         bar
+               "/>
+       </resource>
       </resources>
     </application>
   }
@@ -199,5 +204,42 @@ class ValidatorWADLRelevantRolesSuite extends BaseValidatorSuite {
 
       validator.validate(req, response, chain)
     }
+
+    test(s"X-RELEVANT-ROLES header should contain a matching role with multiline modes using $configDesc") {
+      val validator = Validator(WADL_withRaxRoles, config)
+      val req = request("GET", "/multi-line", "application/xml", goodXML, parseContent = false,
+        Map("X-Roles" -> List("buz", "foo")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        assert(csReq.getHeaders("X-RELEVANT-ROLES").toList == List("foo"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"X-RELEVANT-ROLES header should contain a matching role (bar) with multiline modes using $configDesc") {
+      val validator = Validator(WADL_withRaxRoles, config)
+      val req = request("GET", "/multi-line", "application/xml", goodXML, parseContent = false,
+        Map("X-Roles" -> List("bar","biz")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        assert(csReq.getHeaders("X-RELEVANT-ROLES").toList == List("bar"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
+    test(s"X-RELEVANT-ROLES header should contain a matching role (foo, bar) with multiline modes using $configDesc") {
+      val validator = Validator(WADL_withRaxRoles, config)
+      val req = request("GET", "/multi-line", "application/xml", goodXML, parseContent = false,
+        Map("X-Roles" -> List("foo","bar")))
+
+      req.setAttribute(ASSERT_FUNCTION, (csReq: CheckerServletRequest, csResp: CheckerServletResponse, res: Result) => {
+        assert(csReq.getHeaders("X-RELEVANT-ROLES").toList == List("foo","bar"))
+      })
+
+      validator.validate(req, response, chain)
+    }
+
   }
 }

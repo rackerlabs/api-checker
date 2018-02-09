@@ -1,4 +1,7 @@
 # Releases #
+## In Progress Work ##
+1. Fixed a bug where adding extra whitespace in the ```rax:roles``` attribute caused errors.
+
 ## Release 2.6.0 (2018-02-12) ##
 1. Added support for ```rax:representation```, this works like ```wadl:representation``` in that it can make assertions about XML, JSON representations. With ```rax:representation```, the representation may be embedded in another representation (JSON in XML), or in a header.
 1. Added support for multi-tenant role checks to rax:roles. These checks follow the pattern ```rolename/{tenantId}``` in ```rax:roles``` where ```rolename``` is the name of the role and ```tenantId``` is the name of a Header, Plain (Body), Template (URL), or CaptureHeader WADL parameter that captures the tenant.
