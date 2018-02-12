@@ -96,6 +96,12 @@
             <xsl:if test="$joinSteps[1]/@captureHeader">
                 <xsl:attribute name="captureHeader" select="$joinSteps[1]/@captureHeader"/>
             </xsl:if>
+            <xsl:if test="$joinSteps[1]/@isTenant">
+                <xsl:attribute name="isTenant" select="$joinSteps[1]/@isTenant"/>
+            </xsl:if>
+            <xsl:if test="$joinSteps/@priority">
+                <xsl:attribute name="priority" select="max($joinSteps/@priority)"/>
+            </xsl:if>
             <xsl:copy-of select="$joinSteps[1]/@*[name() = $error-sink-types]"/>
         </step>
     </xsl:template>

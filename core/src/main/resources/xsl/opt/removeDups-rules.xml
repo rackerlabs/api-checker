@@ -29,26 +29,29 @@
    limitations under the License.
 -->
 <rules xmlns="http://www.rackspace.com/repose/wadl/checker/opt/removeDups/rules">
-    <rule types="URL URLXSD" required="next match" optional="captureHeader">
+    <rule types="URL URLXSD" required="next match" optional="captureHeader name isTenant">
         Rule for URI and URIXSDs.  These may optionally have a
         captureHeader.
     </rule>
-    <rule types="XPATH JSON_XPATH" required="next match" optional="captureHeader version code message">
+    <rule types="XPATH JSON_XPATH" required="next match" optional="captureHeader version code message name isTenant">
         Rule for XPath states.
     </rule>
     <rule types="ASSERT" required="next match" optional="version code message">
         Rule for Assert state.
     </rule>
-    <rule types="CAPTURE_HEADER" required="next name path" optional="version">
+    <rule types="CAPTURE_HEADER" required="next name path" optional="version isTenant matchingRoles">
         Rule for the capture header extension.
     </rule>
     <rule types="PUSH_XML_REP PUSH_JSON_REP" required="next path" optional="name version">
         Rule for PUSH steps.
     </rule>
-    <rule types="HEADER HEADERXSD HEADER_ANY HEADERXSD_ANY HEADER_SINGLE HEADERXSD_SINGLE" required="next name match" optional="captureHeader code message">
+    <rule types="HEADER_SINGLE HEADERXSD_SINGLE" required="next name match" optional="captureHeader code message isTenant">
+        Rule for Single match headers
+    </rule>
+    <rule types="HEADER HEADERXSD HEADER_ANY HEADERXSD_ANY" required="next name match" optional="captureHeader code message isTenant matchingRoles">
         Rule for Header, HeaderXSD, HeaderAny.
     </rule>
-    <rule types="HEADER_ALL" required="next name" optional="match matchRegEx captureHeader code message">
+    <rule types="HEADER_ALL" required="next name" optional="match matchRegEx captureHeader code message isTenant matchingRoles">
         Rule for HEADER_ALL.  Although both match and matchRegEx are
         optional at least one of these should be specified.
     </rule>

@@ -55,16 +55,29 @@
         <attribute name="code" type="xsd:int" use="optional"/>
     </attributeGroup>
 
-    <attributeGroup name="ToRequestHeaderAttributes">
+    <attributeGroup name="RequestParamAttributes">
         <annotation>
             <documentation xmlns:html="http://www.w3.org/1999/xhtml">
                 <html:p>
-                    Attributes used by steps that support the
-                    toRequestHeader extension.
+                    Attributes used by steps that implement WADL
+                    request parameters.
                 </html:p>
             </documentation>
         </annotation>
         <attribute name="captureHeader" type="xsd:string" use="optional"/>
+        <attribute name="isTenant" type="xsd:boolean" use="optional" default="false"/>
+    </attributeGroup>
+
+    <attributeGroup name="MultiValueRequestParamAttributes">
+        <annotation>
+            <documentation xmlns:html="http://www.w3.org/1999/xhtml">
+                <html:p>
+                    Additional attributes used by request parameter
+                    steps when they accept multiple values.
+                </html:p>
+            </documentation>
+        </annotation>
+        <attribute name="matchingRoles" type="chk:StringList" use="optional"/>
     </attributeGroup>
 
     <!-- Complex Types -->
@@ -297,8 +310,12 @@
             <extension base="chk:GenContentFailStep">
                 <attribute name="match" type="xsd:string" use="required"/>
                 <attribute name="version" type="chk:XPathVersion" use="optional"/>
+                <attribute name="name" type="xsd:string" use="optional"/>
                 <attributeGroup ref="chk:MessageAttributes"/>
-                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+                <assert test="if (xsd:boolean(@isTenant)) then @name else true()"
+                        saxon:message="If isTenant is true, then the name should also have a name."
+                        xerces:message="If isTenant is true, then the name should also have a name."/>
             </extension>
         </complexContent>
     </complexType>
@@ -325,8 +342,12 @@
             <extension base="chk:GenContentFailStep">
                 <attribute name="match" type="xsd:string" use="required"/>
                 <attribute name="version" type="chk:XPathVersion" fixed="31" use="optional"/>
+                <attribute name="name" type="xsd:string" use="optional"/>
                 <attributeGroup ref="chk:MessageAttributes"/>
-                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+                <assert test="if (xsd:boolean(@isTenant)) then @name else true()"
+                        saxon:message="If isTenant is true, then the step should also have a name."
+                        xerces:message="If isTenant is true, then the step should also have a name."/>
             </extension>
         </complexContent>
     </complexType>
@@ -530,6 +551,11 @@
                     Since this step is not executing an assertion
                     rax:message and rax:code extensions do not apply.
                 </html:p>
+                <html:p>
+                    This step can be treated as a Request parameter,
+                    it can point to tenant values if isTenant is set
+                    to true.
+                </html:p>
             </documentation>
         </annotation>
         <complexContent>
@@ -537,6 +563,8 @@
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="path" type="xsd:string" use="required"/>
                 <attribute name="version" type="chk:XPathVersion" fixed="31" use="optional"/>
+                <attribute name="isTenant" type="xsd:boolean" use="optional"/>
+                <attributeGroup ref="chk:MultiValueRequestParamAttributes"/>
             </extension>
         </complexContent>
     </complexType>
@@ -568,7 +596,11 @@
         <complexContent>
             <extension base="chk:ConnectedStep">
                 <attribute name="match" type="xsd:string" use="required"/>
-                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
+                <attribute name="name" type="xsd:string" use="optional"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+                <assert test="if (xsd:boolean(@isTenant)) then @name else true()"
+                        saxon:message="If isTenant is true, then the name should also have a name."
+                        xerces:message="If isTenant is true, then the name should also have a name."/>
             </extension>
         </complexContent>
     </complexType>
@@ -592,7 +624,11 @@
         <complexContent>
             <extension base="chk:ConnectedStep">
                 <attribute name="match" type="xsd:QName" use="required"/>
-                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
+                <attribute name="name" type="xsd:string" use="optional"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+                <assert test="if (xsd:boolean(@isTenant)) then @name else true()"
+                        saxon:message="If isTenant is true, then the name should also have a name."
+                        xerces:message="If isTenant is true, then the name should also have a name."/>
             </extension>
         </complexContent>
     </complexType>
@@ -664,7 +700,8 @@
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:string" use="required"/>
                 <attributeGroup ref="chk:MessageAttributes"/>
-                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+                <attributeGroup ref="chk:MultiValueRequestParamAttributes"/>
             </extension>
         </complexContent>
     </complexType>
@@ -683,7 +720,12 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:HeaderStep"/>
+            <extension base="chk:GenContentFailStep">
+                <attribute name="name" type="xsd:string" use="required"/>
+                <attribute name="match" type="xsd:string" use="required"/>
+                <attributeGroup ref="chk:MessageAttributes"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+            </extension>
         </complexContent>
     </complexType>
 
@@ -724,7 +766,8 @@
                 <attribute name="match" type="chk:QNameList" use="optional"/>
                 <attribute name="matchRegEx" type="xsd:string" use="optional"/>
                 <attributeGroup ref="chk:MessageAttributes"/>
-                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+                <attributeGroup ref="chk:MultiValueRequestParamAttributes"/>
                 <assert test="@match or @matchRegEx"
                         saxon:message="A HEADER_ALL step must contain a match or matchRegEx attribute."
                         xerces:message="A HEADER_ALL step must contain a match or matchRegEx attribute."/>
@@ -749,7 +792,8 @@
                 <attribute name="name" type="xsd:string" use="required"/>
                 <attribute name="match" type="xsd:QName" use="required"/>
                 <attributeGroup ref="chk:MessageAttributes"/>
-                <attributeGroup ref="chk:ToRequestHeaderAttributes"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+                <attributeGroup ref="chk:MultiValueRequestParamAttributes"/>
             </extension>
         </complexContent>
     </complexType>
@@ -768,7 +812,12 @@
             </documentation>
         </annotation>
         <complexContent>
-            <extension base="chk:HeaderXSDStep"/>
+            <extension base="chk:GenContentFailStep">
+                <attribute name="name" type="xsd:string" use="required"/>
+                <attribute name="match" type="xsd:QName" use="required"/>
+                <attributeGroup ref="chk:MessageAttributes"/>
+                <attributeGroup ref="chk:RequestParamAttributes"/>
+            </extension>
         </complexContent>
     </complexType>
 
@@ -1096,5 +1145,9 @@
 
     <simpleType name="QNameList">
         <list itemType="xsd:QName"/>
+    </simpleType>
+
+    <simpleType name="StringList">
+        <list itemType="xsd:string"/>
     </simpleType>
 </schema>

@@ -24,7 +24,8 @@ declare %private variable $req:__JSON__    as map(*)? external;
 declare %private variable $req:__REQUEST__ as map(*) external;
 declare %private variable $req:__CONTEXT__ as map(*) external;
 
-declare variable $req:_           := if (not(empty($req:__JSON__))) then $req:__JSON__ else /;
+declare variable $req:_           := if (not(empty($req:__JSON__))) then $req:__JSON__ else
+                                     if (not(empty(/element()))) then (/) else ();
 declare variable $req:body        := $req:_;
 declare variable $req:method      := $req:__REQUEST__?method;
 declare variable $req:uri         := $req:__REQUEST__?uri;

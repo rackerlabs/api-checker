@@ -10,6 +10,11 @@
     of any attribute multipliers, and the largest distance in steps
     from start, it is computed in the chkp:priority function.
 
+    Given the definition above, if the step is not an URL or METHOD
+    fail and we compute a priority that is less than the parent steps
+    priority+1, we use parent priority+1 instead. This is needed to
+    adjust for content fail steps moving.
+
     This transform should be run at the end of the pipeline, after all
     optimization stages, but before validation.
 
@@ -33,7 +38,7 @@
     xmlns="http://www.rackspace.com/repose/wadl/checker"
     xmlns:chkp="http://www.rackspace.com/repose/wadl/checker/priority"
     exclude-result-prefixes="xs"
-    version="2.0">
+    version="3.0">
 
     <xsl:import href="util/funs.xsl"/>
 
@@ -46,6 +51,7 @@
         <xsl:variable name="prioritySteps" as="node()*">
             <xsl:call-template name="copyPrioritySteps">
                 <xsl:with-param name="priority" select="0"/>
+                <xsl:with-param name="parentPriority" select="0"/>
             </xsl:call-template>
         </xsl:variable>
         <xsl:copy>
@@ -62,24 +68,45 @@
         the start node.  NOTE: Assumes the graph is acyclic, if we
         ever add cycles we'll need to adjust.  Keeping things simple
         for now.
+
+        If the step is not an URL or Method fail and the computed
+        priority is less than the parents priority+1, we select the
+        parent priority+1 instead.
     -->
     <xsl:template name="copyPrioritySteps">
         <xsl:param name="priority" as="xs:integer"/>
+        <xsl:param name="parentPriority" as="xs:integer"/>
         <xsl:variable name="currentStep" as="node()" select="."/>
         <xsl:variable name="nexts" as="node()*" select="for $n in chk:next(.) return key('checker-by-id',$n)"/>
         <xsl:variable name="currentType" as="xs:string" select="@type"/>
-        <xsl:if test="$currentStep[$currentType=$priority-types]">
-            <xsl:copy>
-                <xsl:apply-templates select="@*[not(local-name() = 'priority')]"/>
-                <xsl:attribute name="priority" select="chkp:priority($currentStep, $priority)"/>
-                <xsl:apply-templates select="node()"/>
-            </xsl:copy>
-        </xsl:if>
-        <xsl:for-each select="$nexts">
-            <xsl:call-template name="copyPrioritySteps">
-                <xsl:with-param name="priority" select="$priority+1"/>
-            </xsl:call-template>
-        </xsl:for-each>
+        <xsl:choose>
+            <xsl:when test="$currentStep[$currentType=$priority-types]">
+                <xsl:variable name="computedPriority" as="xs:integer"
+                              select="chkp:priority($currentStep, $priority)"/>
+                <xsl:variable name="newPriority" as="xs:integer"
+                              select="if ($currentStep/@type = ('URL_FAIL', 'METHOD_FAIL')) then
+                                      $computedPriority else max(($computedPriority, $parentPriority+1))"/>
+                <xsl:copy>
+                    <xsl:apply-templates select="@*[not(local-name() = 'priority')]"/>
+                    <xsl:attribute name="priority" select="$newPriority"/>
+                    <xsl:apply-templates select="node()"/>
+                </xsl:copy>
+                <xsl:for-each select="$nexts">
+                    <xsl:call-template name="copyPrioritySteps">
+                        <xsl:with-param name="priority" select="$priority+1"/>
+                        <xsl:with-param name="parentPriority" select="$newPriority"/>
+                    </xsl:call-template>
+                </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:for-each select="$nexts">
+                    <xsl:call-template name="copyPrioritySteps">
+                        <xsl:with-param name="priority" select="$priority+1"/>
+                        <xsl:with-param name="parentPriority" select="$parentPriority"/>
+                    </xsl:call-template>
+                </xsl:for-each>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <!-- Don't copy sink types directly -->

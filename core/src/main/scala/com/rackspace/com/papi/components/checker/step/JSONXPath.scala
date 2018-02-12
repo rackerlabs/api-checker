@@ -28,6 +28,8 @@ import com.rackspace.com.papi.components.checker.util.XMLParserPool._
 import com.rackspace.com.papi.components.checker.util.VarXPathExpression
 import org.xml.sax.SAXParseException
 
+import com.rackspace.com.papi.components.checker.util.TenantUtil._
+
 import com.fasterxml.jackson.core.JsonParser.NumberType._
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -47,22 +49,26 @@ object JSONXPath {
 
 import JSONXPath._
 
-class JSONXPath(id : String, label : String, val expression : String, val message : Option[String],
+class JSONXPath(id : String, label : String, val name : Option[String], val expression : String, val message : Option[String],
             val code : Option[Int], val nc : NamespaceContext, val version : Int,
-            val captureHeader : Option[String], val priority : Long,
+            val captureHeader : Option[String], val isTenant : Boolean, val priority : Long,
             next : Array[Step]) extends ConnectedStep(id, label, next) {
 
   def this(id : String, label : String,  expression : String,  message : Option[String],
            code : Option[Int],  nc : NamespaceContext,  version : Int,
            priority : Long, next : Array[Step]) =
-             this (id, label, expression, message, code, nc, version, None, priority, next)
+    this (id, label, None, expression, message, code, nc, version, None, false, priority, next)
+
+  def this(id : String, label : String,  expression : String,  message : Option[String],
+           code : Option[Int],  nc : NamespaceContext,  version : Int,
+           captureHeader : Option[String],  priority : Long, next : Array[Step]) =
+    this (id, label, None, expression, message, code, nc, version, captureHeader, false, priority, next)
 
   override val mismatchMessage : String = message.getOrElse (s"Expecting $expression")
 
   val mismatchCode : Int = code.getOrElse(400)
 
   override def checkStep(req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, context : StepContext) : Option[StepContext] = {
-    var ret : Option[StepContext] = None
     var xpath : VarXPathExpression = null
 
     val sjson = req.parsedJSONSequence
@@ -73,19 +79,34 @@ class JSONXPath(id : String, label : String, val expression : String, val messag
       xpath = borrowExpression (expression, nc, version).asInstanceOf[VarXPathExpression]
       if (!xpath.evaluate (inDoc, XPathConstants.BOOLEAN, vars).asInstanceOf[Boolean]) {
         req.contentError(new SAXParseException (mismatchMessage, null), mismatchCode, priority)
+        None
       } else {
-        ret = captureHeader match {
-          case None => Some(context)
-          case Some(h) => Some(context.copy (requestHeaders =
-            context.requestHeaders.addHeader(h, xpath.evaluate (inDoc, XPathConstants.STRING, vars).asInstanceOf[String])))
+        val value = xpath.evaluate (inDoc, XPathConstants.STRING, vars).asInstanceOf[String]
+        val contextWithCaptureHeaders = captureHeader match {
+          case None => context
+          case Some(h) => context.copy (requestHeaders = context.requestHeaders.addHeader(h, value))
         }
+        val contextWithTenantRoles = isTenant match {
+          case false => contextWithCaptureHeaders
+          case true =>
+            //
+            //  Note, if isTenant is true, then name will be set.  This is
+            //  enforced by validation of the checker format.
+            //
+            //  A valid machine should never have an empty name at this
+            //  point.
+            //
+            require(!name.isEmpty, "If isTenant is ture then a name should be specified.")
+            addTenantRoles(contextWithCaptureHeaders, req, name.get, value)
+        }
+        Some(contextWithTenantRoles)
       }
     } catch {
-      case e : Exception => req.contentError(new SAXParseException(mismatchMessage+" : "+e.getMessage, null, e), mismatchCode, priority)
+      case e : Exception =>
+        req.contentError(new SAXParseException(mismatchMessage+" : "+e.getMessage, null, e), mismatchCode, priority)
+        None
     } finally {
       if (xpath != null) returnExpression (expression, nc, version, xpath)
     }
-
-    ret
   }
 }

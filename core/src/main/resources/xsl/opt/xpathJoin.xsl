@@ -105,7 +105,8 @@
         <xsl:variable name="rightType" as="xsd:boolean" select="$step/@type='XPATH'"/>
         <xsl:variable name="rightVersion" as="xsd:boolean" select="($step/@version &lt;= 31) or ($xpathVersion &lt;= 31)"/>
         <xsl:variable name="noCaptureHeader" as="xsd:boolean" select="not($step/@captureHeader)"/>
-        <xsl:sequence select="$rightType and $rightVersion and $noCaptureHeader"/>
+        <xsl:variable name="noIsTenant" as="xsd:boolean" select="not(xsd:boolean($step/@isTenant))"/>
+        <xsl:sequence select="$rightType and $rightVersion and $noCaptureHeader and $noIsTenant"/>
     </xsl:function>
     <!--
         Produce joined steps

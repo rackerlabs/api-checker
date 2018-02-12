@@ -246,13 +246,48 @@ class Config extends LazyLogging {
   //
   //  1. The rax:anyMatch extension
   //  2. The rax:assert extension
-  //  3. Header Checks
+  //  3. The rax:isTenant extension
+  //  4. Header Checks
   //
   //  ...these features are required to implement rax:roles.
   //
   @BeanProperty
   @AffectsChecker
   var enableRaxRolesExtension : Boolean = false
+
+
+  //
+  //  Enable rax-is-tenant extension.
+  //
+  //  The extension is at the heart of multi-tenant role checks. When
+  //  enabled, a parameter with an attribute of rax:isTenant set to
+  //  true will be captured as a tenant that can be used for role
+  //  checks.
+  //
+  //  It is expected that the relationship between tenant and roles is
+  //  contained in a JSON object in a header named X-MAP-ROLES.  The
+  //  object contains a map between the tenant and the roles
+  //  associated with that tenant.
+  //
+  //  It is possible to enableRaxIsTenantExtension without enabling
+  //  the rax-roles extension.  In this case tenant roles may be
+  //  resolved, but no authorization checks are actually
+  //  performed. This may be useful in cases where authorization
+  //  checks are performed in a different filter.
+  //
+  //  When a tenant / role match is made against a particular
+  //  parameter an X-ROLE is created with the pattern role/{param},
+  //  where param is the name of the parameter that supplied the
+  //  tenant id and role the role associated with that parameter.
+  //
+  //  Currently only URI, Header, and Plain parameter types support
+  //  rax:isTenant. The capture header extension also supports an
+  //  isTenant attribute.
+  //
+  @BeanProperty
+  @AffectsChecker
+  var enableRaxIsTenantExtension : Boolean = false
+
 
   //
   //  Enable the rax-representation extension.

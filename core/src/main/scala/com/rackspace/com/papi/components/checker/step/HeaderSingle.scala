@@ -21,13 +21,20 @@ import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.HeaderUtil._
 
+import com.rackspace.com.papi.components.checker.util.TenantUtil._
+
 import scala.collection.JavaConversions._
 import scala.util.matching.Regex
 
 class HeaderSingle(id : String, label : String, val name : String, val value : Regex,
              val message : Option[String], val code : Option[Int],
-             val captureHeader : Option[String], val priority : Long,
-             next : Array[Step]) extends ConnectedStep(id, label, next) {
+             val captureHeader : Option[String], val isTenant : Boolean,
+             val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
+
+  def this(id : String, label : String,  name : String,  ue : Regex,
+           message : Option[String],  code : Option[Int],
+           captureHeader : Option[String],  priority : Long,
+           next : Array[Step]) = this(id, label, name, ue, message, code, captureHeader, false, priority, next)
 
   override val mismatchMessage : String = {
     if (message.isEmpty) {
@@ -63,12 +70,18 @@ class HeaderSingle(id : String, label : String, val name : String, val value : R
       case Nil => req.contentError(new Exception(mismatchMessage),mismatchCode, priority)
                   None
       case header :: Nil => header match {
-              case value() => captureHeader match {
-                  case None => Some(context)
-                  case Some(h) => Some(context.copy(requestHeaders = context.requestHeaders.addHeader(h, header)))
-              }
-              case _ => req.contentError(new Exception(mismatchMessage),mismatchCode, priority)
-                        None
+        case value() =>
+          val contextWithCaptureHeaders = captureHeader match {
+            case None => context
+            case Some(h) => context.copy(requestHeaders = context.requestHeaders.addHeader(h, header))
+          }
+          val contextWithTenantRoles = isTenant match {
+            case false => contextWithCaptureHeaders
+            case true => addTenantRoles(contextWithCaptureHeaders, req, name, header)
+          }
+          Some(contextWithTenantRoles)
+        case _ => req.contentError(new Exception(mismatchMessage),mismatchCode, priority)
+          None
       }
       case _ => req.contentError(new Exception(numMessage), mismatchCode, priority)
                 None

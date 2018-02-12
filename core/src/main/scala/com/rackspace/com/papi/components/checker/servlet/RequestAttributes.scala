@@ -29,4 +29,5 @@ object RequestAttributes {
   val CONTENT_ERROR_CODE = "com.rackspace.com.papi.components.checker.servlet.ContentErrorCode"
   val CONTENT_ERROR_PRIORITY = "com.rackspace.com.papi.components.checker.servlet.ContentErrorPriority"
   val REQUEST_XDM_VALUE = "com.rackspace.com.papi.components.checker.servlet.RequestAsXdmValue"
+  val MAP_ROLES = "com.rackspace.com.papi.components.checker.servlet.MapRoles"
 }

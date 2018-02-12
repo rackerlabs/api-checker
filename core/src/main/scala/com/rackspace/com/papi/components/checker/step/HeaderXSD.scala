@@ -22,20 +22,27 @@ import javax.xml.validation.Schema
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.util.HeaderUtil._
-import org.xml.sax.SAXParseException
 
-import scala.collection.JavaConversions._
+import com.rackspace.com.papi.components.checker.util.TenantUtil._
+
+import org.xml.sax.SAXParseException
 
 class HeaderXSD(id : String, label : String, val name : String, val value : QName, schema : Schema,
                 val message : Option[String], val code : Option[Int], val captureHeader : Option[String],
-                val priority : Long, next : Array[Step]) extends ConnectedStep(id, label, next) {
+                val matchingRoles : Option[Set[String]], val isTenant : Boolean, val priority : Long,
+                next : Array[Step]) extends ConnectedStep(id, label, next) {
 
   def this(id : String, label : String, name : String, value : QName, schema : Schema, priority : Long,
-           next : Array[Step]) = this(id, label, name, value, schema, None, None, None, priority, next)
+           next : Array[Step]) = this(id, label, name, value, schema, None, None, None, None, false, priority, next)
 
   def this(id : String, label : String, name : String, value : QName, schema : Schema,
            message : Option[String], code : Option[Int], priority : Long,
-           next : Array[Step]) = this(id, label, name, value, schema, message, code, None, priority, next)
+           next : Array[Step]) = this(id, label, name, value, schema, message, code, None, None, false, priority, next)
+
+  def this(id : String, label : String,  name : String,  ue : QName, schema : Schema,
+           message : Option[String],  code : Option[Int],  captureHeader : Option[String],
+           priority : Long, next : Array[Step]) = this(id, label, name, ue, schema, message, code, captureHeader,
+                                                       None, false, priority, next)
 
   override val mismatchMessage : String = {
     if (message.isEmpty) {
@@ -66,10 +73,15 @@ class HeaderXSD(id : String, label : String, val name : String, val value : QNam
     //  return None
     //
     if (headers.nonEmpty && headers.filterNot(v => { last_err = xsd.validate(v);  last_err match { case None => true ; case Some(_) => false } }).isEmpty) {
-      captureHeader match {
-        case None => Some(context)
-        case Some(h) => Some(context.copy(requestHeaders = context.requestHeaders.addHeaders(h, headers)))
+      val contextWithCaptureHeaders = captureHeader match {
+         case None => context
+         case Some(h) => context.copy(requestHeaders = context.requestHeaders.addHeaders(h, headers))
       }
+      val contextWithTenantRoles = isTenant match {
+        case false => contextWithCaptureHeaders
+        case true => addTenantRoles(contextWithCaptureHeaders, req, name, headers, matchingRoles)
+      }
+      Some(contextWithTenantRoles)
     } else {
      last_err match {
         case Some(_) => req.contentError(new Exception(mismatchMessage+" "+last_err.get.getMessage, last_err.get), mismatchCode, priority)

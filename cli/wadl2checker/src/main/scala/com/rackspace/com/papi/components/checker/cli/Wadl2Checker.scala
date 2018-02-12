@@ -69,6 +69,9 @@ object Wadl2Checker {
     val raxRoles = parser.flag[Boolean] (List("r", "rax-roles"),
                                          "Enable Rax-Roles extension. Default: false")
 
+    val raxIsTenant = parser.flag[Boolean] (List("T", "rax-is-tenant"),
+                                         "Enable Rax-Is-Tenant extension. Default: false")
+
     val raxRepresentation = parser.flag[Boolean] (List("R", "disable-rax-representation"),
                                          "Disable Rax-Representation extension. Default: false")
 
@@ -168,6 +171,7 @@ object Wadl2Checker {
 
         c.removeDups = removeDups.value.getOrElse(false)
         c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
+        c.enableRaxIsTenantExtension = raxIsTenant.value.getOrElse(false)
         c.enableRaxRepresentationExtension = !raxRepresentation.value.getOrElse(false)
         c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
         c.enableAuthenticatedByExtension = authenticatedBy.value.getOrElse(false)

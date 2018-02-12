@@ -75,6 +75,7 @@ class BaseStepSuite extends BaseValidatorSuite {
   //  Test schema
   //
   val testSchema = schemaFactory.newSchema(new StreamSource(getClass.getResourceAsStream("/xsd/test-urlxsd.xsd")))
+  val xsdSchema  = schemaFactory.newSchema(new StreamSource(getClass.getResourceAsStream("/xsd/blank.xsd")))
 
   //
   // Test json schema

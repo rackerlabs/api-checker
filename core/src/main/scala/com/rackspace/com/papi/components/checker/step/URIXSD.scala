@@ -23,11 +23,17 @@ import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.base.{ConnectedStep, Step, StepContext}
 import com.rackspace.com.papi.components.checker.step.results.{MismatchResult, MultiFailResult, Result}
 
-class URIXSD(id : String, label : String, val simpleType : QName, val schema : Schema, val captureHeader : Option[String], next : Array[Step])
+import com.rackspace.com.papi.components.checker.util.TenantUtil._
+
+class URIXSD(id : String, label : String, name : Option[String], val simpleType : QName, val schema : Schema, val captureHeader : Option[String],
+             isTenant : Boolean, next : Array[Step])
       extends ConnectedStep(id, label, next) {
 
      def this(id : String, label : String, simpleType : QName, schema : Schema, next : Array[Step]) =
-       this(id, label, simpleType, schema, None, next)
+       this(id, label, None, simpleType, schema, None, false, next)
+
+     def this(id : String, label : String, simpleType : QName, schema : Schema, captureHeader : Option[String], next : Array[Step]) =
+       this(id, label, None, simpleType, schema, captureHeader, false, next)
 
      override val mismatchMessage : String = simpleType.toString
      val xsd = new XSDStringValidator(simpleType, schema, id)
@@ -43,12 +49,25 @@ class URIXSD(id : String, label : String, val simpleType : QName, val schema : S
          if (error.isDefined) {
            result = Some(new MismatchResult(error.get.getMessage, context, id))
          } else {
-           val newContext = captureHeader match {
+           val contextWithCaptureHeaders = captureHeader match {
              case None => context.copy(uriLevel = context.uriLevel + 1)
              case Some(h) => context.copy(uriLevel = context.uriLevel + 1,
                                          requestHeaders = context.requestHeaders.addHeader(h, v))
            }
-           val results : Array[Result] = nextStep (req, resp, chain, newContext)
+           val contextWithTenantRoles = isTenant match {
+            case false => contextWithCaptureHeaders
+            case true =>
+               //
+               //  Note, if isTenant is true, then name will be set.  This is
+               //  enforced by validation of the checker format.
+               //
+               //  A valid machine should never have an empty name at this
+               //  point.
+               //
+               require(!name.isEmpty, "If isTenant is ture then a name should be specified.")
+               addTenantRoles(contextWithCaptureHeaders, req, name.get, v)
+           }
+           val results : Array[Result] = nextStep (req, resp, chain, contextWithTenantRoles)
            results.length match {
              case 0 =>
                result = None

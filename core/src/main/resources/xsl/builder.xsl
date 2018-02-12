@@ -76,6 +76,7 @@
             <config option="preserveRequestBody" value="false"/>
             <config option="checkHeaders" value="true"/>
             <config option="enableRaxRolesExtension" value="false"/>
+            <config option="enableRaxIsTenantExtension" value="false"/>
             <config option="enableRaxRepresentationExtension" value="false"/>
             <config option="maskRaxRoles403" value="false"/>
             <config option="enableAuthenticatedByExtension" value="false"/>
@@ -98,6 +99,7 @@
     <xsl:variable name="enableIgnoreJSONSchemaExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableIgnoreJSONSchemaExtension'))"/>
     <xsl:variable name="enableMessageExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableMessageExtension'))"/>
     <xsl:variable name="enableRaxRolesExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRolesExtension'))"/>
+    <xsl:variable name="enableRaxIsTenantExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxIsTenantExtension'))"/>
     <xsl:variable name="enableRaxRepresentationExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableRaxRepresentationExtension'))"/>
     <xsl:variable name="enableAuthenticatedByExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableAuthenticatedByExtension'))"/>
     <xsl:variable name="enableCaptureHeaderExtension" as="xsd:boolean" select="xsd:boolean(check:optionValue($configMetadata, 'enableCaptureHeaderExtension'))"/>
@@ -161,6 +163,7 @@
     <xsl:variable name="useAssert" as="xsd:boolean" select="$enableAssertExtension or $useRaxRoles"/>
     <xsl:variable name="useWarnHeaders" as="xsd:boolean"
                   select="$enableWarnHeaders and ($useXSDTransform or $usePreProcessExtension)"/>
+    <xsl:variable name="useIsTenantExtension" as="xsd:boolean" select="$enableRaxIsTenantExtension or $useRaxRoles"/>
 
     <!-- Version of XPath that supports JSON -->
     <xsl:variable name="JSON_XPATH_VERSION" select="'31'"/>
@@ -503,8 +506,10 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="templatePath" select="starts-with(@path,'{')" as="xsd:boolean"/>
+        <xsl:variable name="templateParam" as="node()?"
+                      select="if ($templatePath) then check:paramForTemplatePath(.) else ()"/>
         <xsl:variable name="templatePathFixedValue" as="xsd:string?"
-                      select="if ($templatePath) then check:paramForTemplatePath(.)/@fixed else ()"/>
+                      select="if ($templatePath) then $templateParam/@fixed else ()"/>
         <step>
             <xsl:attribute name="type">
                 <xsl:choose>
@@ -532,10 +537,15 @@
             </xsl:attribute>
             <xsl:attribute name="next" select="$links" separator=" "/>
             <xsl:if test="$templatePath">
-                <xsl:variable name="templateParam" as="node()" select="check:paramForTemplatePath(.)"/>
                 <xsl:attribute name="label">
                     <xsl:value-of select="$templateParam/@name"/>
                 </xsl:attribute>
+                <xsl:attribute name="name">
+                    <xsl:value-of select="$templateParam/@name"/>
+                </xsl:attribute>
+                <xsl:call-template name="check:addIsTenantExtension">
+                    <xsl:with-param name="param" select="$templateParam"/>
+                </xsl:call-template>
                 <xsl:call-template name="check:addCaptureHeaderExtension">
                     <xsl:with-param name="context" select="$templateParam"/>
                 </xsl:call-template>
@@ -666,6 +676,9 @@
             <xsl:variable name="pos" select="position()"/>
             <step id="{check:captureHeaderID(.)}"
                   type="CAPTURE_HEADER" name="{@name}" path="{@path}">
+                <xsl:call-template name="check:addIsTenantExtension">
+                    <xsl:with-param name="isTenant" select="@isTenant"/>
+                </xsl:call-template>
                 <xsl:attribute name="next">
                     <xsl:choose>
                         <xsl:when test="$pos = last()">
@@ -724,11 +737,13 @@
             <xsl:variable name="last" select="last()"/>
             <xsl:variable name="current" select="." as="xsd:string"/>
             <xsl:variable name="multipleHeaders" as="xsd:boolean" select="count($headers[upper-case(@name)=$current]) gt 1" />
-            <xsl:for-each select="$headers[upper-case(@name)=$current]">
+            <xsl:variable name="currentHeaders" as="node()*" select="$headers[upper-case(@name)=$current]"/>
+            <xsl:for-each select="$currentHeaders">
                 <xsl:variable name="isXSD" select="check:isXSDParam(.)"/>
                 <xsl:variable name="isFixed" as="xsd:boolean" select="exists(@fixed)"/>
                 <xsl:variable name="isRepeating" as="xsd:boolean" select="exists(@repeating) and xsd:boolean(@repeating)"/>
                 <xsl:variable name="isHeaderAny" as="xsd:boolean" select="$useAnyMatchExtension and xsd:boolean(@rax:anyMatch)"/>
+                <xsl:variable name="isTenant" as="xsd:boolean" select="$useIsTenantExtension and (some $h in $currentHeaders satisfies xsd:boolean($h/@rax:isTenant))"/>
                 <xsl:choose>
                     <xsl:when test="$isRepeating and not($isHeaderAny) and $multipleHeaders">
                         <!-- This looks like HEADER_ALL with multiple matches which we process later -->
@@ -763,6 +778,9 @@
                                     <xsl:message terminate="yes">[ERROR] In header param <xsl:value-of select="@name"/> @default value "<xsl:value-of select="@default"/>"
                                     does not match @fixed value "<xsl:value-of select="@fixed"/>".</xsl:message>
                                 </xsl:if>
+                            </xsl:if>
+                            <xsl:if test="$isTenant">
+                                <xsl:attribute name="isTenant" select="'true'"/>
                             </xsl:if>
                             <xsl:attribute name="next">
                                 <xsl:choose>
@@ -829,6 +847,10 @@
                   <!-- grab extension from first header that has it-->
                   <xsl:call-template name="check:addCaptureHeaderExtension"/>
                 </xsl:for-each>
+                <!-- If any header was denoted as a tenant then this is a tenant -->
+                <xsl:if test="$useIsTenantExtension and (some $h in $allHeaders satisfies xsd:boolean($h/@rax:isTenant))">
+                    <xsl:attribute name="isTenant" select="'true'"/>
+                </xsl:if>
                 <xsl:attribute name="next">
                   <xsl:choose>
                     <xsl:when test="$pos = $last">
@@ -1391,7 +1413,7 @@
         </xsl:if>
         <xsl:if test="$doReqPlainParam">
             <xsl:for-each select="$defaultPlainParams">
-                <step id="{check:XPathID($this,position())}" match="{@path}">
+                <step id="{check:XPathID($this,position())}" match="{@path}" name="{@name}">
                     <xsl:attribute name="type">
                         <xsl:choose>
                             <xsl:when test="$type='WELL_XML'">XPATH</xsl:when>
@@ -1401,6 +1423,7 @@
                     <xsl:if test="$type='WELL_JSON'">
                         <xsl:attribute name="version" select="$JSON_XPATH_VERSION"/>
                     </xsl:if>
+                    <xsl:call-template name="check:addIsTenantExtension"/>
                     <xsl:call-template name="check:addMessageExtension"/>
                     <xsl:call-template name="check:addCaptureHeaderExtension"/>
                     <xsl:choose>
@@ -1671,6 +1694,26 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:template name="check:addIsTenantExtension">
+        <!--
+            This sholud be called from a parameter that supports the
+            isTenant extension.
+
+            The context should be the appropriate wadl:parameter,
+            otherwise the wadl:parameter should be passed in.
+
+            The attribute is added if the useIsTenantExtension is
+            enabled AND the extension is used for this step.
+        -->
+        <xsl:param name="param" as="node()" select="."/>
+        <xsl:param name="isTenant" as="node()?" select="$param/@rax:isTenant"/>
+        <xsl:if test="$useIsTenantExtension and $isTenant and xsd:boolean($isTenant)">
+            <xsl:if test="not($param/@name)">
+                <xsl:message terminate="yes">[ERROR] The element requires a name: <xsl:copy-of select="$param"/></xsl:message>
+            </xsl:if>
+            <xsl:attribute name="isTenant" select="'true'"/>
+        </xsl:if>
+    </xsl:template>
 
     <xsl:template name="check:addMessageExtension">
         <!--
@@ -1784,8 +1827,26 @@
     </xsl:function>
 
     <xsl:function name="check:getHeaders" as="node()*">
-      <xsl:param name="from" as="node()?"/>
-      <xsl:sequence select="$from/wadl:param[@style='header' and @required='true']"/>
+        <xsl:param name="from" as="node()?"/>
+        <xsl:variable name="headers" as="node()*" select="$from/wadl:param[@style='header' and @required='true']"/>
+        <xsl:variable name="unnamedHeaders" as="node()*" select="$headers[not(@name)]"/>
+        <xsl:if test="exists($unnamedHeaders)">
+            <!--
+                Headers always require a name, if there's a header without
+                a name that's an error condition. This used to fail with a
+                cryptic error since we added support for header
+                checks...we now provide a friendlier error message.
+
+                Technically, this should be checked during WADL
+                validation, but the W3C XSD for WADL does not set this
+                requirement.
+
+                It is uncleare how you can say anything about a header
+                without specifying its name!
+            -->
+            <xsl:message terminate="yes">[ERROR] Headers always require a name:  <xsl:copy-of select="$unnamedHeaders"/></xsl:message>
+        </xsl:if>
+        <xsl:sequence select="$headers"/>
     </xsl:function>
 
     <xsl:function name="check:getNextAssertLinks" as="xsd:string*">

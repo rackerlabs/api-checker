@@ -16,6 +16,11 @@
 package com.rackspace.com.papi.components.checker
 
 import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest
+import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest.MAP_ROLES_HEADER
+import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest.MappedRoles
+import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest.NilMappedRoles
+
+import com.rackspace.com.papi.components.checker.servlet.RequestAttributes.MAP_ROLES
 import org.junit.runner.RunWith
 import org.mockito.Mockito.when
 import org.scalatest.junit.JUnitRunner
@@ -23,10 +28,12 @@ import org.scalatest.junit.JUnitRunner
 import java.io.InputStreamReader
 import java.io.BufferedReader
 
+import org.apache.logging.log4j.Level
+
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
-class RequestResponseSuite extends BaseValidatorSuite {
+class RequestResponseSuite extends BaseValidatorSuite with LogAssertions {
 
   test ("Ensure wrapper does not parse commas on getHeader") {
     val req = request("POST","/foo","application/XML","",false,Map("User-Agent"->List("Bla, bla bla")))
@@ -148,6 +155,125 @@ class RequestResponseSuite extends BaseValidatorSuite {
     wrapper.addHeader("Moo", "Baz")
     val headers = wrapper.getHeaderNames
     assert(headers == null)
+  }
+
+  test("Ensure that MAP_ROLES_HEADER is correctly parsed") {
+    val headerValue = b64Encode("""
+      {
+         "tenant1" : ["admin","foo","bar"],
+         "tenant2" : ["admin"],
+         "tenant3" : ["foo", "bar", "biz", "booz"]
+      }
+    """)
+    val req = request("GET","/foo", "application/XML", "", false, Map(MAP_ROLES_HEADER->List(headerValue)))
+    val wrap = new CheckerServletRequest(req)
+
+    def mappedAsserts (mr : MappedRoles) {
+      assert(mr.size == 3)
+      assert(mr("tenant1").size == 3)
+      assert(mr("tenant2").size == 1)
+      assert(mr("tenant3").size == 4)
+      List("admin","foo","bar").foreach (r => assert(mr("tenant1").contains(r)))
+      List("admin").foreach (r  => assert(mr("tenant2").contains(r)))
+      List("foo","bar","biz","booz").foreach(r => assert(mr("tenant3").contains(r)))
+    }
+
+    //
+    //  Assertions should hold when calling mappedRoles directly.
+    //
+    mappedAsserts(wrap.mappedRoles)
+
+    //
+    //  After the first call they should hold when retrieving the
+    //  request parameter.
+    //
+    mappedAsserts(wrap.getAttribute(MAP_ROLES).asInstanceOf[MappedRoles])
+  }
+
+  test("Ensure we correctly handle missing MAP_ROLES_HEADER") {
+    val req = request("GET","/foo", "application/XML", "", false, Map("foo"->List("bar")))
+    val wrap = new CheckerServletRequest(req)
+
+    //
+    // Should get an empty map.
+    //
+    assert(wrap.mappedRoles.isEmpty)
+
+    //
+    //  After the first call, request param should also contain an empty map
+    //
+    assert(wrap.getAttribute(MAP_ROLES).asInstanceOf[MappedRoles].isEmpty)
+  }
+
+  test("Ensure we correctly handle null MAP_ROLES_HEADER, this should not be flagged as an error") {
+    val headerValue = b64Encode("null")
+    val req = request("GET","/foo", "application/XML", "", false, Map(MAP_ROLES_HEADER->List(headerValue)))
+    val wrap = new CheckerServletRequest(req)
+
+    //
+    // Should get an empty map.
+    //
+    val mapLog = log(Level.ERROR) {
+      assert(wrap.mappedRoles.isEmpty)
+    }
+
+    //
+    //  After the first call, request param should also contain an empty map
+    //
+    assert(wrap.getAttribute(MAP_ROLES).asInstanceOf[MappedRoles].isEmpty)
+
+    //
+    //  We should not have gotten an error message
+    //
+    assertEmpty(mapLog)
+  }
+
+  //
+  //  Improper MAP_ROLE headers sholud be correctly handled.
+  //
+  val badMapHeaders = Map("Improper JSON"->b64Encode("""
+      {
+         "tenant1" : ["admin","foo","bar"],
+         "tenant2" : ["admin",
+         "tenant3" : ["foo", "bar", "biz", "booz"]
+      }
+    """), "Bad JSON type (array)"-> b64Encode("""
+     ["admin","foo","bar"]
+    """), "Bad JSON type (int)"-> b64Encode("""
+     42
+    """), "Bad JSON type (string)"-> b64Encode("""
+     "admin"
+    """), "Non encoded data"-> """
+      {
+         "tenant1" : ["admin","foo","bar"],
+         "tenant2" : ["admin"],
+         "tenant3" : ["foo", "bar", "biz", "booz"]
+      }
+    """
+  )
+
+  for ((desc, headerValue) <- badMapHeaders) {
+    test(s"If the MAP_ROLES_HEADER contains $desc  an error should be logged and an empty map should be set") {
+      val req = request("GET","/foo", "application/XML", "", false, Map(MAP_ROLES_HEADER->List(headerValue)))
+      val wrap = new CheckerServletRequest(req)
+
+      //
+      // Should get an empty map.
+      //
+      val mapLog = log(Level.ERROR) {
+        assert(wrap.mappedRoles.isEmpty)
+      }
+
+      //
+      //  After the first call, request param should also contain an empty map
+      //
+      assert(wrap.getAttribute(MAP_ROLES).asInstanceOf[MappedRoles].isEmpty)
+
+      //
+      //  Assert that the error log contains the correct message.
+      //
+      assert(mapLog, s"$MAP_ROLES_HEADER could not be parsed.  Ignoring map roles!")
+    }
   }
 
   test("Ensure that cached XML is invalidated if getInputStream is called") {

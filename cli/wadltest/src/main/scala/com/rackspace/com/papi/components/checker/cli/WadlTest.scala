@@ -47,6 +47,9 @@ object WadlTest {
   val raxRoles = parser.flag[Boolean] (List("r", "rax-roles"),
                                          "Enable Rax-Roles extension. Default: false")
 
+  val raxIsTenant = parser.flag[Boolean] (List("T", "rax-is-tenant"),
+                                         "Enable Rax-Is-Tenant extension. Default: false")
+
   val raxRolesMask403 = parser.flag[Boolean] (List("M", "rax-roles-mask-403s"),
                                               "When Rax-Roles is enable mask 403 errors with 404 or 405s. Default: false")
 
@@ -275,6 +278,7 @@ object WadlTest {
 
         c.removeDups = removeDups.value.getOrElse(false)
         c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
+        c.enableRaxIsTenantExtension = raxIsTenant.value.getOrElse(false)
         c.enableRaxRepresentationExtension = !raxRepresentation.value.getOrElse(false)
         c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
         c.enableAuthenticatedByExtension = authenticatedBy.value.getOrElse(false)
