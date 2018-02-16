@@ -23,7 +23,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:wadl="http://wadl.dev.java.net/2009/02"
                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                 xmlns:rax="http://docs.rackspace.com/api">
@@ -48,7 +48,7 @@
         <xsl:variable name="allRoles" as="xsd:string*">
             <xsl:sequence select="$roles"/>
             <xsl:if test="@rax:roles">
-                <xsl:sequence select="tokenize(@rax:roles,' ')"/>
+                <xsl:sequence select="tokenize(normalize-space(@rax:roles),' ')"/>
             </xsl:if>
         </xsl:variable>
 
@@ -65,7 +65,7 @@
         <xsl:variable name="allRoles" as="xsd:string*">
           <xsl:sequence select="$roles"/>
           <xsl:if test="@rax:roles">
-              <xsl:sequence select="tokenize(@rax:roles,' ')"/>
+              <xsl:sequence select="tokenize(normalize-space(@rax:roles),' ')"/>
           </xsl:if>
         </xsl:variable>
         <xsl:copy>
