@@ -36,7 +36,7 @@ object Wadl2Checker {
   val version = getClass.getPackage.getImplementationVersion
 
   def parseArgs(args : Array[String], base : String,
-                in : InputStream, out : PrintStream, err : PrintStream) : Option[(Source, Result, Config)] = {
+                in : InputStream, out : PrintStream, err : PrintStream) : Option[(Source, Result, Option[StreamResult], Config)] = {
 
     val parser = new ArgotParser("wadl2checker", preUsage=Some(s"$title v$version"))
 
@@ -154,7 +154,10 @@ object Wadl2Checker {
                                           "XPath version to use. Can be 10, 20, 30, 31 for 1.0, 2.0, 3.0, and 3.1. Default: 10")
 
     val printVersion = parser.flag[Boolean] (List("version"),
-                                             "Display version.")
+      "Display version.")
+
+    val outputMetadata = parser.flag[Boolean](List("O", "output-metadata"),
+      "Display checker metadata")
 
     try {
       parser.parse(args)
@@ -200,7 +203,15 @@ object Wadl2Checker {
         c.xslEngine = xslEngine.value.getOrElse("XalanC")
         c.xsdEngine = xsdEngine.value.getOrElse("Xerces")
 
-        Some((source, result, c))
+        val metaOutResult = {
+          if (outputMetadata.value.getOrElse(false)) {
+            Some(new StreamResult(err))
+          } else {
+            None
+          }
+        }
+
+        Some((source, result, metaOutResult, c))
       }
     } catch {
       case e: ArgotUsageException => err.println(e.message)
@@ -220,8 +231,8 @@ object Wadl2Checker {
   def main(args: Array[String]) = {
     parseArgs (args, getBaseFromWorkingDir(System.getProperty("user.dir")),
                System.in, System.out, System.err) match {
-      case Some((source : Source, result : Result, config : Config)) =>
-        new WADLCheckerBuilder().build(source, result, config)
+      case Some((source : Source, result : Result, metaResult : Option[StreamResult], config : Config)) =>
+        new WADLCheckerBuilder().build(source, result, metaResult, config)
       case None => /* Bad args, Ignore */
     }
   }
@@ -232,8 +243,8 @@ object Wadl2Checker {
   def nailMain(context : NGContext) = {
     parseArgs (context.getArgs, getBaseFromWorkingDir(context.getWorkingDirectory),
                context.in, context.out, context.err) match {
-      case Some((source : Source, result : Result, config : Config)) =>
-        new WADLCheckerBuilder().build(source, result, config)
+      case Some((source : Source, result : Result, metaResult : Option[StreamResult], config : Config)) =>
+        new WADLCheckerBuilder().build(source, result, metaResult, config)
       case None => /* Bad args, Ignore */
     }
   }

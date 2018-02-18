@@ -53,7 +53,7 @@ object Validator {
     validator
   }
 
-  def apply (name : String, in : Source, config : Config = new Config) : Validator = {
+  def apply (name : String, in : Source, info : Option[StreamResult], config : Config) : Validator = {
     val builder = new StepBuilder()
     val transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", this.getClass.getClassLoader)
 
@@ -64,13 +64,17 @@ object Validator {
     val transHandler = transformerFactory.asInstanceOf[SAXTransformerFactory].newTransformerHandler()
     val domResult = new DOMResult
     transHandler.setResult(domResult)
-    val step = builder.build(in, new SAXResult(transHandler), config)
+    val step = builder.build(in, new SAXResult(transHandler), info, config)
 
     val checker = Some(domResult.getNode.asInstanceOf[Document])
     val validator = new Validator(name, step, config, checker)
     config.resultHandler.init(validator, checker)
 
     validator
+  }
+
+  def apply (name : String, in : Source, config : Config = new Config) : Validator = {
+    apply(name, in, None, config)
   }
 
   def apply (name : String, in : Source, resultHandler : ResultHandler) : Validator = {

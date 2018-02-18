@@ -5,13 +5,14 @@
             <PatternLayout pattern="[%p] [%t] %m%n"/>
         </Console>
         <List name="api-coverage-listAppender"/>
+        <File name="DEVNULL" fileName="/dev/null"/>
     </Appenders>
     <Loggers>
-        <Logger name="com.rackspace.com.papi.components.checker.wadl" level="debug">
-            <AppenderRef ref="STDOUT"/>
-        </Logger>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
+        </Root>
+        <Root level="trace">
+            <AppenderRef ref="DEVNULL"/>
         </Root>
         <Logger name="api-coverage-logger" level="info">
             <AppenderRef ref="api-coverage-listAppender"/>

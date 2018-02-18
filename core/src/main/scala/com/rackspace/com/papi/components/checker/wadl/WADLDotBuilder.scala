@@ -92,11 +92,15 @@ class WADLDotBuilder(protected[wadl] var wadl : WADLNormalizer) extends LazyLogg
     }
   })
 
-  def build (in : Source, out: StreamResult, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+  def build (in : Source, out: StreamResult, info : Option[StreamResult], config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
     val outChecker = new XdmDestination
 
-    checkerBuilder.build(in, outChecker.getReceiver(processor.getUnderlyingConfiguration), config)
+    checkerBuilder.build(in, outChecker.getReceiver(processor.getUnderlyingConfiguration), info, config)
     buildFromChecker(outChecker.getXdmNode.asSource, out, ignoreSinks, nfaMode)
+  }
+
+  def build (in : Source, out: StreamResult, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
+    build(in, out, None, config, ignoreSinks, nfaMode)
   }
 
   def build(in : (String, InputStream), out: StreamResult, config : Config, ignoreSinks : Boolean, nfaMode : Boolean) : Unit = {
