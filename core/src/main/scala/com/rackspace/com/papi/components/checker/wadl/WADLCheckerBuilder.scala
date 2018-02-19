@@ -84,6 +84,10 @@ object WADLCheckerBuilder {
                                                                         compiler.compile(new StreamSource(Class.forName("com.rackspace.cloud.api.wadl.WADLNormalizer").getResource("/xsl/svrl-handler.xsl").toString)))
 
 
+  private lazy val wadlAssertsXsltExec: XsltExecutable = timeFunction ("compile /xsl/wadl-asserts.xsl",
+                                                                       compiler.compile(new StreamSource(getClass.getResource("/xsl/wadl-asserts.xsl").toString)))
+
+
   private lazy val authenticatedByXsltExec: XsltExecutable = timeFunction ("compile /xsl/authenticated-by.xsl",
                                                                            compiler.compile(new StreamSource(getClass.getResource("/xsl/authenticated-by.xsl").toString)))
 
@@ -383,6 +387,18 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
       idTransform.transform(in, new SAXResult(schemaHandler))
     }
     bch.getDocumentNode.asSource
+  })
+
+  //
+  // Performs asserts on the normalized WADL
+  //
+  private def wadlAsserts(in : Source, c : Config) : Source = timeFunction ("wadlAsserts", {
+    val assertTrans = getXsltTransformer(wadlAssertsXsltExec)
+    val out = new XdmDestination
+    assertTrans.setSource(in)
+    assertTrans.setDestination(out)
+    assertTrans.transform
+    out.getXdmNode.asSource
   })
 
   //
@@ -716,7 +732,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         //  be applied.
         //
         val buildSteps : List[CheckerTransform] =
-          List(raxGlobalExtn, authenticatedBy, raxRoles,
+          List(wadlAsserts, raxGlobalExtn, authenticatedBy, raxRoles,
                buildChecker(entityDoc, _, _), raxRolesTenants,
                raxRolesMask, joinOptSetup, joinOpt, dupsOpt,
                joinHeaderOpt, joinOptCleanup,
