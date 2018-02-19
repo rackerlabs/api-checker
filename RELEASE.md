@@ -5,6 +5,7 @@
 1. Updated Dependencies
    1. saxon: 9.8.0-4 → 9.8.0-8
    1. wadl-tools: 1.0.37 → 1.0.38
+1. Clean up : Added simple tests to confirm case of a header param name is irrelevant.
 
 ## Release 2.6.0 (2018-02-12) ##
 1. Added support for ```rax:representation```, this works like ```wadl:representation``` in that it can make assertions about XML, JSON representations. With ```rax:representation```, the representation may be embedded in another representation (JSON in XML), or in a header.
