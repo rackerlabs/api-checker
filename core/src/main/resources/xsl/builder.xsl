@@ -830,7 +830,7 @@
                   </xsl:if>
                 </xsl:for-each>
               </xsl:variable>
-              <step type="HEADER_ALL" id="{check:HeaderID($allHeaders[1])}" name="{$current}">
+              <step type="HEADER_ALL" id="{check:HeaderID($allHeaders[1])}" name="{$allHeaders[1]/@name}">
                 <xsl:if test="not(empty($matches))">
                   <xsl:attribute name="matchRegEx"><xsl:value-of select="distinct-values($matches)" separator="|"/></xsl:attribute>
                 </xsl:if>

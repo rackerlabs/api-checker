@@ -2,6 +2,7 @@
 ## In Progress Work ##
 1. Fixed a bug where adding extra whitespace in the ```rax:roles``` attribute caused errors.
 1. Fixed a bug where we were not reporting a proper error if a method name was missing.
+1. Fixed a bug where the case of a HEADER_ALL parameter name was not being preserved.
 1. Updated Dependencies
    1. saxon: 9.8.0-4 → 9.8.0-8
    1. wadl-tools: 1.0.37 → 1.0.38
