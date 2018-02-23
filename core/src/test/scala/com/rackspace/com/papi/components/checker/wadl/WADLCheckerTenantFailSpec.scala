@@ -36,6 +36,7 @@ class WADLCheckerTenantFailSpec extends BaseCheckerSpec with LogAssertions {
     val c = new Config()
     c.enableRaxRolesExtension = true
     c.maskRaxRoles403 = true
+    c.checkPlainParams = true
     c
   }
 
@@ -43,6 +44,7 @@ class WADLCheckerTenantFailSpec extends BaseCheckerSpec with LogAssertions {
     val c = new Config()
     c.enableRaxRolesExtension = true
     c.maskRaxRoles403 = false
+    c.checkPlainParams = true
     c
   }
 
@@ -138,6 +140,331 @@ class WADLCheckerTenantFailSpec extends BaseCheckerSpec with LogAssertions {
       Then ("There should be an error detailing that rax:roles mask is currently not supported")
       assert(checkerLog, "no defined param named 'foo'")
     }
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (uri)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/{id}/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="id" style="template" type="xsd:string"/>
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#getMethod" />
+              </resource>
+           </resources>
+           <method id="getMethod" name="GET">
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (xpath)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                 <representation mediaType="application/xml">
+                    <param name="id" style="plain" path="//@id" required="true"/>
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (xpath-json)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                 <representation mediaType="application/json">
+                    <param name="id" style="plain" path="$body(@id)" required="true"/>
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (header)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="id" style="header" repeating="true" required="true"/>
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                 <representation mediaType="application/json">
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (header any)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="id" style="header" repeating="true" required="true" rax:anyMatch="true" fixed="foo"/>
+                   <param name="id" style="header" repeating="true" required="true" rax:anyMatch="true" fixed="bar"/>
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                 <representation mediaType="application/json">
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (header any, first match)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="id" style="header" repeating="true" required="true" rax:anyMatch="true" fixed="foo"/>
+                   <param name="ID" style="header" repeating="true" required="true" rax:anyMatch="true" fixed="bar"/>
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                 <representation mediaType="application/json">
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (header all)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="id" style="header" repeating="true" required="true" fixed="foo"/>
+                   <param name="id" style="header" repeating="true" required="true" fixed="bar"/>
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                 <representation mediaType="application/json">
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (header all, first match)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="id" style="header" repeating="true" required="true" fixed="foo"/>
+                   <param name="ID" style="header" repeating="true" required="true" fixed="bar"/>
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                 <representation mediaType="application/json">
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (header single)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="id" style="header" repeating="false" required="true"/>
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                 <representation mediaType="application/json">
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
+    scenario ("Given a transform with Rax-Roles on a teant but mismatch in case of tenant parameter (capture header)") {
+      Given("a WADL which leverages rax:roles when there is no tenant match")
+      val inWADL = <application xmlns="http://wadl.dev.java.net/2009/02"
+                     xmlns:rax="http://docs.rackspace.com/api"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+           <grammars/>
+           <resources base="https://test.api.openstack.com">
+              <resource path="path/to/my/resource/{stepType}" rax:roles="admin/{ID}">
+                   <param name="stepType" style="template" type="xsd:string"/>
+                   <method href="#postMethod" />
+              </resource>
+           </resources>
+           <method id="postMethod" name="POST">
+               <request>
+                <representation mediaType="application/json">
+                  <rax:captureHeader name="id" path="//@id"/>
+                 </representation>
+               </request>
+               <response status="200 203"/>
+           </method>
+      </application>
+      When("The WADL is translated")
+      val checkerLog = log(Level.ERROR) {
+        intercept[WADLException] {
+          val checker = builder.build(inWADL, raxRolesConfig)
+          println (checker) // Should never print!
+        }
+      }
+      Then ("There should be an error detailing that rax:roles mask is currently not supported")
+      assert(checkerLog, "no defined param named 'ID'")
+    }
+
 
     scenario ("Given a transform with Rax-Roles on a teant with a role name that contains a \\") {
       Given("a WADL which leverages rax:roles tenanted with a role name that contains a \\")
