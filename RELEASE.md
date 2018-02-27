@@ -1,5 +1,5 @@
 # Releases #
-## In Progress Work ##
+## Release 2.6.1 (2018-02-27) ##
 1. Fixed a bug where adding extra whitespace in the ```rax:roles``` attribute caused errors.
 1. Fixed a bug where we were not reporting a proper error if a method name was missing.
 1. Fixed a bug where the case of a HEADER_ALL parameter name was not being preserved.
