@@ -37,7 +37,7 @@ object Wadl2Dot {
   val version = getClass.getPackage.getImplementationVersion
 
   def parseArgs(args: Array[String], base : String,
-                in : InputStream, out : PrintStream, err : PrintStream) : Option[(Source, StreamResult, Config, Boolean, Boolean)] = {
+                in : InputStream, out : PrintStream, err : PrintStream) : Option[(Source, StreamResult, Option[StreamResult], Config, Boolean, Boolean)] = {
 
     val parser = new ArgotParser("wadl2dot", preUsage=Some(s"$title v$version"))
 
@@ -163,6 +163,9 @@ object Wadl2Dot {
     val printVersion = parser.flag[Boolean] (List("version"),
                                              "Display version.")
 
+    val outputMetadata = parser.flag[Boolean](List("O", "output-metadata"),
+      "Display checker metadata")
+
     try {
       parser.parse(args)
 
@@ -207,7 +210,15 @@ object Wadl2Dot {
         c.xslEngine = xslEngine.value.getOrElse("XalanC")
         c.xsdEngine = xsdEngine.value.getOrElse("Xerces")
 
-        Some((source, result, c, !showErrors.value.getOrElse(false), nfaMode.value.getOrElse(false)))
+        val metaOutResult = {
+          if (outputMetadata.value.getOrElse(false)) {
+            Some(new StreamResult(err))
+          } else {
+            None
+          }
+        }
+
+        Some((source, result, metaOutResult, c, !showErrors.value.getOrElse(false), nfaMode.value.getOrElse(false)))
       }
     } catch {
       case e: ArgotUsageException => err.println(e.message)
@@ -227,9 +238,9 @@ object Wadl2Dot {
   def main(args : Array[String]) = {
     parseArgs (args, getBaseFromWorkingDir(System.getProperty("user.dir")),
                System.in, System.out, System.err) match {
-      case Some((source : Source, result : StreamResult, config : Config,
+      case Some((source : Source, result : StreamResult, info : Option[StreamResult], config : Config,
                  ignoreSinks : Boolean, nfaMode : Boolean)) =>
-                   new WADLDotBuilder().build(source, result,
+                   new WADLDotBuilder().build(source, result, info,
                                               config, ignoreSinks, nfaMode)
       case None => /* Bad args, Ignore */
     }
@@ -241,9 +252,9 @@ object Wadl2Dot {
   def nailMain(context : NGContext) = {
     parseArgs (context.getArgs, getBaseFromWorkingDir(context.getWorkingDirectory),
                context.in, context.out, context.err) match {
-      case Some((source : Source, result : StreamResult, config : Config,
+      case Some((source : Source, result : StreamResult, info : Option[StreamResult], config : Config,
                  ignoreSinks : Boolean, nfaMode : Boolean)) =>
-                   new WADLDotBuilder().build(source, result,
+                   new WADLDotBuilder().build(source, result, info,
                                               config, ignoreSinks, nfaMode)
       case None => /* Bad args, Ignore */
     }

@@ -15,7 +15,8 @@
  */
 package com.rackspace.com.papi.components.checker.wadl
 
-import java.io.{ByteArrayOutputStream, InputStream, Reader}
+import java.io.{ByteArrayOutputStream, InputStream, Reader, File}
+import java.nio.charset.StandardCharsets.UTF_8
 import java.net.{URI, URISyntaxException}
 import javax.xml.transform._
 import javax.xml.transform.sax._
@@ -50,6 +51,7 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XsltExecutable
 import net.sf.saxon.s9api.XsltTransformer
 import net.sf.saxon.s9api.XPathExecutable
+import net.sf.saxon.s9api.Destination
 import net.sf.saxon.s9api.XdmDestination
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.s9api.XdmAtomicValue
@@ -87,6 +89,9 @@ object WADLCheckerBuilder {
   private lazy val wadlAssertsXsltExec: XsltExecutable = timeFunction ("compile /xsl/wadl-asserts.xsl",
                                                                        compiler.compile(new StreamSource(getClass.getResource("/xsl/wadl-asserts.xsl").toString)))
 
+
+  private lazy val checker2InfoXsltExec: XsltExecutable = timeFunction("compile /xsl/checker2info.xsl",
+                                                                        compiler.compile(new StreamSource(getClass.getResource("/xsl/checker2info.xsl").toString)))
 
   private lazy val authenticatedByXsltExec: XsltExecutable = timeFunction ("compile /xsl/authenticated-by.xsl",
                                                                            compiler.compile(new StreamSource(getClass.getResource("/xsl/authenticated-by.xsl").toString)))
@@ -691,8 +696,30 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
     })
   })
 
+  private def outputCheckerInfo(in : Source, out : StreamResult) : Unit = timeFunction ("Output checker meta info", {
+    val dest : Destination = {
+      if (out.getOutputStream != null) {
+        processor.newSerializer(out.getOutputStream)
+      } else if (out.getWriter != null) {
+        processor.newSerializer(out.getWriter)
+      } else {
+        processor.newSerializer(new File(new URI(out.getSystemId)))
+      }
+    }
 
-  private def buildFromWADL (in : Source, out: Result, config : Config) : Unit = {
+    val checker2InfoTransform = getXsltTransformer(checker2InfoXsltExec)
+    checker2InfoTransform.setSource(in)
+    checker2InfoTransform.setDestination(dest)
+    checker2InfoTransform.transform
+  })
+
+  private def logCheckerInfo(in : Source) : Unit = timeFunction ("Logging checker meta info", {
+    val bout = new ByteArrayOutputStream
+    outputCheckerInfo(in, new StreamResult(bout))
+    logger.trace (new String(bout.toByteArray, UTF_8))
+  })
+
+  private def buildFromWADL (in : Source, out: Result, info : Option[StreamResult], config : Config) : Unit = {
     var c = config
 
     if (c == null) {
@@ -742,6 +769,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         //  Apply the transformations and send results to out
         //
         val stepsSource = applyBuildSteps(buildSteps, normWADL, c)
+        if (logger.underlying.isTraceEnabled) {
+          logCheckerInfo(stepsSource)
+        }
+        info.foreach (infoOut => {
+          outputCheckerInfo(stepsSource, infoOut)
+        })
         timeFunction("convert", idTransform.transform(stepsSource, out))
       })
     } catch {
@@ -750,7 +783,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
     }
   }
 
-  private def buildFromChecker (in : Source, out : Result, config : Config) : Unit = {
+  private def buildFromChecker (in : Source, out : Result, info : Option[StreamResult], config : Config) : Unit = {
     var c = config
 
     if (c == null) {
@@ -766,6 +799,12 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         val buildSteps : List[CheckerTransform] = List(metaCheck, validateChecker)
 
         val stepsSource = applyBuildSteps(buildSteps, in, c)
+        if (logger.underlying.isTraceEnabled) {
+          logCheckerInfo(stepsSource)
+        }
+        info.foreach (infoOut => {
+          outputCheckerInfo(stepsSource, infoOut)
+        })
         timeFunction("convert", idTransform.transform (stepsSource, out))
       })
     } catch {
@@ -801,11 +840,19 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
     }
   }
 
+  def build (in : Source, out: Result, info : Option[StreamResult], config : Config) : Unit = {
+    if (useCheckerFormat(in)) {
+      buildFromChecker (in, out, info, config)
+    } else {
+      buildFromWADL (in, out, info, config)
+    }
+  }
+
   def build (in : Source, out: Result, config : Config) : Unit = {
     if (useCheckerFormat(in)) {
-      buildFromChecker (in, out, config)
+      buildFromChecker (in, out, None, config)
     } else {
-      buildFromWADL (in, out, config)
+      buildFromWADL (in, out, None, config)
     }
   }
 

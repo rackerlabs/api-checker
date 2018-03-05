@@ -152,6 +152,10 @@ object WadlTest {
   val printVersion = parser.flag[Boolean] (List("version"),
                                             "Display version.")
 
+  val outputMetadata = parser.flag[Boolean](List("O", "output-metadata"),
+      "Display checker metadata")
+
+
   def getSource: Source = {
     var source: Source = null
     if (input.value.isEmpty) {
@@ -195,7 +199,7 @@ object WadlTest {
     println()
   }
 
-  def runServer (name : String, port : Int, dot : File, config : Config) : Unit = {
+  def runServer (name : String, port : Int, metaOut : Option[StreamResult], dot : File, config : Config) : Unit = {
     val source = getSource
 
     val sourceName = {
@@ -213,7 +217,7 @@ object WadlTest {
     //  Initalize the validator, this catches errors early...
     //
     println(s"Loading $sourceName...\n")
-    val validator = Validator (name, source, config)
+    val validator = Validator (name, source, metaOut, config)
 
 
     //
@@ -307,6 +311,13 @@ object WadlTest {
         c.xslEngine = xslEngine.value.getOrElse("XalanC")
         c.xsdEngine = xsdEngine.value.getOrElse("Xerces")
 
+        val metaOutResult = {
+          if (outputMetadata.value.getOrElse(false)) {
+            Some(new StreamResult(System.err))
+          } else {
+            None
+          }
+        }
 
         val dot = File.createTempFile("chk", ".dot")
         dot.deleteOnExit()
@@ -328,7 +339,7 @@ object WadlTest {
 
         c.resultHandler = new DispatchResultHandler(handlerList)
 
-        runServer(name.value.getOrElse(DEFAULT_NAME), port.value.getOrElse(DEFAULT_PORT), dot, c)
+        runServer(name.value.getOrElse(DEFAULT_NAME), port.value.getOrElse(DEFAULT_PORT), metaOutResult, dot, c)
       }
     } catch {
       case e: ArgotUsageException => println(e.message)

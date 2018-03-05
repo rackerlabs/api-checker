@@ -38,7 +38,7 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
 
   def this() = this(null)
 
-  def build (in : Source, out : SAXResult, config : Config) : Step = {
+  def build (in : Source, out : SAXResult, info : Option[StreamResult], config : Config) : Step = {
     //
     //  We use the default config if the config is null.
     //
@@ -56,8 +56,12 @@ class StepBuilder(protected[wadl] var wadl : WADLNormalizer) {
       }
     }
     val handler = new StepHandler(nextHandler, c)
-    checkerBuilder.build(in, new SAXResult(handler), c)
+    checkerBuilder.build(in, new SAXResult(handler), info, c)
     handler.step
+  }
+
+  def build (in : Source, out : SAXResult, config : Config) : Step = {
+    build (in, out, None, config)
   }
 
   def build (in : Source, config : Config) : Step = {
