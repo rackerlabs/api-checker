@@ -1,4 +1,10 @@
 # Releases #
+## In Progress Work ##
+1. In order to help debugging, checker metadata can now be displayed or logged in a human friendly format by:
+   1. Supplying a ```StreamResult``` to capture the metadata when using checker/validator APIs.
+   1. Using ```-O``` in CLI utilities.
+   1. Setting the logger to ```TRACE``` level.
+
 ## Release 2.6.1 (2018-02-27) ##
 1. Fixed a bug where adding extra whitespace in the ```rax:roles``` attribute caused errors.
 1. Fixed a bug where we were not reporting a proper error if a method name was missing.
@@ -7,10 +13,6 @@
    1. saxon: 9.8.0-4 → 9.8.0-8
    1. wadl-tools: 1.0.37 → 1.0.38
 1. Clean up : Added simple tests to confirm case of a header param name is irrelevant.
-1. In order to help debugging, checker metadata can now be displayed or logged in a human friendly format by:
-   1. Supplying a ```StreamResult``` to capture the metadata when using checker/validator APIs.
-   1. Using ```-O``` in CLI utilities.
-   1. Setting the logger to ```TRACE``` level.
 
 ## Release 2.6.0 (2018-02-12) ##
 1. Added support for ```rax:representation```, this works like ```wadl:representation``` in that it can make assertions about XML, JSON representations. With ```rax:representation```, the representation may be embedded in another representation (JSON in XML), or in a header.
