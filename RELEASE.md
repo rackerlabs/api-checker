@@ -4,6 +4,8 @@
    1. Supplying a ```StreamResult``` to capture the metadata when using checker/validator APIs.
    1. Using ```-O``` in CLI utilities.
    1. Setting the logger to ```TRACE``` level.
+1. Updated Dependencies
+   1. jackson: 2.8.1 → 2.9.8
 
 ## Release 2.6.1 (2018-02-27) ##
 1. Fixed a bug where adding extra whitespace in the ```rax:roles``` attribute caused errors.
