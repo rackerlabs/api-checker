@@ -1,5 +1,5 @@
 # Releases #
-## In Progress Work ##
+## Release 2.7.0 (2019-02-20) ##
 1. In order to help debugging, checker metadata can now be displayed or logged in a human friendly format by:
    1. Supplying a ```StreamResult``` to capture the metadata when using checker/validator APIs.
    1. Using ```-O``` in CLI utilities.
