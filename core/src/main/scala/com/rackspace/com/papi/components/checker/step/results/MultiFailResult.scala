@@ -16,7 +16,7 @@
 package com.rackspace.com.papi.components.checker.step.results
 
 import com.rackspace.com.papi.components.checker.step.base.StepContext
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable.PriorityQueue
 

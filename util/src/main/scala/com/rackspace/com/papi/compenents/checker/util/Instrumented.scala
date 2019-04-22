@@ -1,7 +1,7 @@
 package com.rackspace.com.papi.components.checker.util
 
 import com.codahale.metrics.{Gauge, Metric, MetricFilter, MetricRegistry, JmxReporter}
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.language.existentials
 

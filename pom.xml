@@ -65,7 +65,7 @@
         <metrics-core.version>3.2.0</metrics-core.version>
         <jackson-databind.version>2.9.8</jackson-databind.version>
         <json-schema-validator.version>2.1.7</json-schema-validator.version>
-        <scala-logging.version>2.1.2</scala-logging.version>
+        <scala-logging.version>3.9.0</scala-logging.version>
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>2.1</log4j.version>
         <http.delegation.version>4.0.0</http.delegation.version>
@@ -150,7 +150,7 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging-slf4j_${scala.MajDotMin}</artifactId>
+            <artifactId>scala-logging_${scala.MajDotMin}</artifactId>
             <version>${scala-logging.version}</version>
         </dependency>
         <dependency>

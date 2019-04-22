@@ -35,7 +35,7 @@ import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool._
 import com.rackspace.com.papi.components.checker.util.{DateUtils, HeaderMap, ObjectMapperPool}
 import com.rackspace.com.papi.components.checker.util.JSONConverter
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 import org.w3c.dom.Document
 import net.sf.saxon.om.Sequence
 import net.sf.saxon.s9api.XdmValue

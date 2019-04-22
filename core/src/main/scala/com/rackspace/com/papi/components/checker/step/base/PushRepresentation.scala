@@ -36,7 +36,7 @@ import net.sf.saxon.value.StringValue
 
 import net.sf.saxon.om.Function
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 abstract class PushRepresentation(id : String, label : String, val name : String, val expression : String,
                                   val nc : ImmutableNamespaceContext, val version : Int, val priority : Long,

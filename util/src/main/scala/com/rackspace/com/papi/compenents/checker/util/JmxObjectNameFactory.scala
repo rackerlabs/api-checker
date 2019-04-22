@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.util
 import javax.management.{MalformedObjectNameException, ObjectName}
 
 import com.codahale.metrics.ObjectNameFactory
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 class JmxObjectNameFactory extends ObjectNameFactory with LazyLogging {
   override def createName(`type`: String, domain: String, name: String): ObjectName = {
