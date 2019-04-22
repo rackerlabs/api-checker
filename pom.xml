@@ -52,7 +52,7 @@
         <scala.MajDotMin>${scala.major}.${scala.minor}</scala.MajDotMin>
         <saxon-ee.version>9.8.0-8</saxon-ee.version>
         <scala.test.version>2.2.6</scala.test.version>
-        <scala.uri.version>0.4.2</scala.uri.version>
+        <scala.uri.version>0.5.7</scala.uri.version>
         <junit.version>4.10</junit.version>
         <wadl-tools.version>1.0.38</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
@@ -119,7 +119,7 @@
             <version>${scala.test.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.netaporter</groupId>
+            <groupId>io.lemonlabs</groupId>
             <artifactId>scala-uri_${scala.MajDotMin}</artifactId>
             <version>${scala.uri.version}</version>
         </dependency>
