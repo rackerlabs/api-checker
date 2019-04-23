@@ -27,7 +27,7 @@ import com.rackspace.com.papi.components.checker.{AssertResultHandler, BaseValid
 import com.rackspace.com.papi.components.checker.step.StepHandler
 import com.rackspace.com.papi.components.checker.util.IdentityTransformPool
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 
 @RunWith(classOf[JUnitRunner])

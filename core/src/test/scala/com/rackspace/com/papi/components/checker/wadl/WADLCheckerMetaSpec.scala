@@ -20,7 +20,7 @@ import javax.xml.transform.stream.{StreamResult, StreamSource}
 
 import com.rackspace.com.papi.components.checker.Config
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.reflect.runtime.universe
 import scala.xml._

@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.step
 import com.rackspace.com.papi.components.checker.step.base.StepContext
 import com.rackspace.com.papi.components.checker.step.results.{BadMediaTypeResult, MethodFailResult, MismatchResult, MultiFailResult}
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.collection.JavaConversions._
 

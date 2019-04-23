@@ -21,7 +21,7 @@ import com.rackspace.com.papi.components.checker.step.base.Step
 import com.rackspace.com.papi.components.checker.step.results.URLFailResult
 import com.rackspace.com.papi.components.checker.step.startend.{URLFailXSD, URLFailXSDMatch}
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 import org.xml.sax.SAXParseException
 
 import scala.xml._

@@ -16,7 +16,7 @@
 package com.rackspace.com.papi.components.checker.wadl
 
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 //
 //   Very simple tests here.  The assertions here suck, basically

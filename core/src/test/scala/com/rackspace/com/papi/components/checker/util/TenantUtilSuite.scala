@@ -24,7 +24,7 @@ import com.rackspace.com.papi.components.checker.BaseValidatorSuite
 
 import org.junit.runner.RunWith
 import org.mockito.Mockito.when
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 
 @RunWith(classOf[JUnitRunner])

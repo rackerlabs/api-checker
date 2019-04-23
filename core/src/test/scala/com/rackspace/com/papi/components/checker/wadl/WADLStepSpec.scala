@@ -22,7 +22,7 @@ import com.rackspace.com.papi.components.checker.TestConfig
 import com.rackspace.com.papi.components.checker.step.startend.{MethodFail, Start, URLFail}
 import org.junit.runner.RunWith
 import org.scalatest.exceptions.TestFailedException
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class WADLStepSpec extends BaseStepSpec {

@@ -23,7 +23,7 @@ import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest.N
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes.MAP_ROLES
 import org.junit.runner.RunWith
 import org.mockito.Mockito.when
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import java.io.InputStreamReader
 import java.io.BufferedReader

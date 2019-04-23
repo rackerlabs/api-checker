@@ -51,7 +51,7 @@
         <scala.patch>7</scala.patch>
         <scala.MajDotMin>${scala.major}.${scala.minor}</scala.MajDotMin>
         <saxon-ee.version>9.8.0-8</saxon-ee.version>
-        <scala.test.version>2.2.6</scala.test.version>
+        <scala.test.version>3.0.7</scala.test.version>
         <scala.uri.version>0.5.7</scala.uri.version>
         <junit.version>4.10</junit.version>
         <wadl-tools.version>1.0.38</wadl-tools.version>

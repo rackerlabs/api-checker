@@ -34,8 +34,8 @@ import org.junit.runner.RunWith
 import org.mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.junit.JUnitRunner
+import org.scalatestplus.mockito.MockitoSugar
 import org.w3c.dom.Document
 import org.xml.sax.SAXParseException
 

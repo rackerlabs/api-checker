@@ -20,7 +20,7 @@ import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.results.Result
 import com.rackspace.cloud.api.wadl.Converters._
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.collection.JavaConversions._
 
@@ -94,7 +94,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   //  Like validator_Header, but with header defaults enabled
   //
-  val validator_HeaderDefaults = Validator((localWADLURI,
+  lazy val validator_HeaderDefaults = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -132,7 +132,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   //  Like validator_Header, but returns a custom error code on error
   //
-  val validatorCode_Header = Validator((localWADLURI,
+  lazy val validatorCode_Header = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -170,7 +170,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   //  Like validator_Header, but returns a custom error message on error
   //
-  val validatorMessage_Header = Validator((localWADLURI,
+  lazy val validatorMessage_Header = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -208,7 +208,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   //  Like validator_Header, but returns a custom message and error code on error
   //
-  val validatorMessageCode_Header = Validator((localWADLURI,
+  lazy val validatorMessageCode_Header = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -246,7 +246,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like validator header, but expects the header to contain a fixed value
   //
-  val validator_HeaderFixed = Validator((localWADLURI,
+  lazy val validator_HeaderFixed = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -284,7 +284,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like header fixed, but expects the header to contain one of multiple fixed values
   //
-  val validator_HeaderFixed2 = Validator((localWADLURI,
+  lazy val validator_HeaderFixed2 = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -322,7 +322,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like header fixed2, but also expects a non-fixed header value.
   //
-  val validator_HeaderFixed3 = Validator((localWADLURI,
+  lazy val validator_HeaderFixed3 = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -362,7 +362,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   //  Like header fixed 3, but with default values set
   //
-  val validator_HeaderFixed3Defaults = Validator((localWADLURI,
+  lazy val validator_HeaderFixed3Defaults = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -402,7 +402,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like header fixed3, but also returns a custom error code and message
   //
-  val validatorCode_HeaderFixed3 = Validator((localWADLURI,
+  lazy val validatorCode_HeaderFixed3 = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -443,7 +443,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like header fixed3, but has remove dups optimization enabled
   //
-  val validator_HeaderFixed3Opt = Validator((localWADLURI,
+  lazy val validator_HeaderFixed3Opt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -483,7 +483,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //  Like header fixed3Defaults but with remove dups optimiziation enabled
   //
 
-  val validator_HeaderFixed3DefaultsOpt = Validator((localWADLURI,
+  lazy val validator_HeaderFixed3DefaultsOpt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -523,7 +523,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like header fixed3Opt, but has a custom error message and code
   //
-  val validatorCodeMessage_HeaderFixed3Opt = Validator((localWADLURI,
+  lazy val validatorCodeMessage_HeaderFixed3Opt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -564,7 +564,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like header fixed3, but fixed values are only allowed in the PUT request.
   //
-  val validator_HeaderFixed4 = Validator((localWADLURI,
+  lazy val validator_HeaderFixed4 = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -603,7 +603,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like header fixed4, but with remove dups optimization on.
   //
-  val validator_HeaderFixed4Opt = Validator((localWADLURI,
+  lazy val validator_HeaderFixed4Opt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -642,7 +642,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like validator header, but expects the header to be a UUID.
   //
-  val validator_HeaderUUID = Validator((localWADLURI,
+  lazy val validator_HeaderUUID = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -679,7 +679,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like validator header, but expects the header to be an int.
   //
-  val validator_HeaderInt = Validator((localWADLURI,
+  lazy val validator_HeaderInt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -716,7 +716,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like HeaderInt, but with custom error code / message on error.
   //
-  val validatorCodeMessage_HeaderInt = Validator((localWADLURI,
+  lazy val validatorCodeMessage_HeaderInt = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:rax="http://docs.rackspace.com/api"
@@ -755,7 +755,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like validator header int, but expects the header to only be required in the PUT request.
   //
-  val validator_HeaderIntPut = Validator((localWADLURI,
+  lazy val validator_HeaderIntPut = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -793,7 +793,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like validator header int, but expects the header to only be required in the PUT request.
   //
-  val validator_HeaderIntPutMix = Validator((localWADLURI,
+  lazy val validator_HeaderIntPutMix = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -831,7 +831,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   //  Like validator_HeaderIntPutMix but with defaults enabled
   //
-  val validator_HeaderIntPutMixDefaults = Validator((localWADLURI,
+  lazy val validator_HeaderIntPutMixDefaults = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:rax="http://docs.rackspace.com/api"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:tst="http://www.rackspace.com/repose/wadl/checker/step/test">
@@ -869,7 +869,7 @@ class ValidatorWADLHeaderSuite extends BaseValidatorSuite {
   //
   // Like validator header int put mix, but with custom error message and code
   //
-  val validatorCodeMessage_HeaderIntPutMix = Validator((localWADLURI,
+  lazy val validatorCodeMessage_HeaderIntPutMix = Validator((localWADLURI,
       <application xmlns="http://wadl.dev.java.net/2009/02"
                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                    xmlns:rax="http://docs.rackspace.com/api"

@@ -19,7 +19,7 @@ import javax.xml.xpath.{XPathExpression, XPathExpressionException}
 
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.collection.mutable.Map
 

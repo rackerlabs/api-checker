@@ -21,7 +21,7 @@ import java.util.{Date, UUID}
 import com.rackspace.com.papi.components.checker.step._
 import com.rackspace.com.papi.components.checker.step.startend._
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.util.Random
 

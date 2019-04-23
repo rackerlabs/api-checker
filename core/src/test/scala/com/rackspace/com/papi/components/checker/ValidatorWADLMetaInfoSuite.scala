@@ -27,7 +27,7 @@ import javax.xml.transform.stream.StreamSource
 import javax.xml.transform.stream.StreamResult
 
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import org.apache.logging.log4j.Level
 
