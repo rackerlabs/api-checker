@@ -47,8 +47,8 @@
 
     <properties>
         <scala.major>2</scala.major>
-        <scala.minor>11</scala.minor>
-        <scala.patch>7</scala.patch>
+        <scala.minor>12</scala.minor>
+        <scala.patch>8</scala.patch>
         <scala.MajDotMin>${scala.major}.${scala.minor}</scala.MajDotMin>
         <saxon-ee.version>9.8.0-8</saxon-ee.version>
         <scala.test.version>3.0.7</scala.test.version>
