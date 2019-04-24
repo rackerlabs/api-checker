@@ -1,4 +1,13 @@
 # Releases #
+## In Progress Work ##
+1. Updated Dependencies
+   1. scala: 2.11.7 → 2.12.8
+   1. scala-logging: 2.1.2 → 3.9.0
+   1. scala-test: 2.2.6 → 3.0.7
+   1. scala-uri: 0.4.2 → 0.5.7
+   1. wadl-tools: 1.0.38 → 1.1.0
+   1. http-delegation: 4.0.0 → 5.0.0
+
 ## Release 2.7.0 (2019-02-20) ##
 1. In order to help debugging, checker metadata can now be displayed or logged in a human friendly format by:
    1. Supplying a ```StreamResult``` to capture the metadata when using checker/validator APIs.
