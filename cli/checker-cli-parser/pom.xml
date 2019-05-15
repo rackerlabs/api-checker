@@ -8,25 +8,15 @@
     </parent>
 
     <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
-    <artifactId>wadl2checker</artifactId>
+    <artifactId>checker-cli-parser</artifactId>
     <packaging>jar</packaging>
 
-    <name>API Checker WADL2Checker</name>
+    <name>API Checker Common CLI Parser</name>
     <description>
-        A command line utility to convert a WADL to checker format.
+        The common parts of the CLI parser
     </description>
 
     <dependencies>
-        <dependency>
-            <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
-            <artifactId>checker-cli-parser</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.martiansoftware</groupId>
-            <artifactId>nailgun-server</artifactId>
-            <version>${nailgun.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -51,41 +41,6 @@
                             <goal>compile</goal>
                             <goal>testCompile</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.1</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <minimizeJar>false</minimizeJar>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.rackspace.com.papi.components.checker.cli.Wadl2Checker</mainClass>
-                                </transformer>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

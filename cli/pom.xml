@@ -15,6 +15,7 @@
     <description>API Checker Command Line Tools</description>
 
     <modules>
+        <module>checker-cli-parser</module>
         <module>wadl2checker</module>
         <module>wadl2dot</module>
         <module>wadltest</module>
