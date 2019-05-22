@@ -40,8 +40,11 @@ class WadlTestSuite extends FunSuite with Matchers {
         System.setErr(printErrStream)
         System.setOut(printOutStream)
 
-        test(outStream, errStream)
-
+        Console.withErr(printErrStream) {
+          Console.withOut(printOutStream) {
+            test(outStream, errStream)
+          }
+        }
       } finally {
         System.setErr(oldErr)
         System.setOut(oldOut)
@@ -83,10 +86,10 @@ class WadlTestSuite extends FunSuite with Matchers {
   test("-S with bad parameter") {
     withOutput((outStream, errStream) => {
       WadlTest.main(Array("-S", "foo", "input"))
-      assert(outStream.toString().contains("Unrecognized XSL engine"))
-      assert(outStream.toString().contains("foo"))
-      assert(outStream.toString().contains("Xerces, SaxonEE"))
-      assert(errStream.toString().isEmpty())
+      assert(errStream.toString().contains("Unrecognized XSL engine"))
+      assert(errStream.toString().contains("foo"))
+      assert(errStream.toString().contains("Xerces, SaxonEE"))
+      assert(outStream.toString().isEmpty())
     })
   }
 
