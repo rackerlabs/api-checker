@@ -20,7 +20,7 @@ import javax.xml.transform.stream.StreamSource
 
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class TransformPoolSuite extends FunSuite {

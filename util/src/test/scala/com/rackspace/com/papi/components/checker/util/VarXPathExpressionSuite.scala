@@ -20,7 +20,7 @@ import javax.xml.namespace.QName
 
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import net.sf.saxon.s9api.XdmMap
 

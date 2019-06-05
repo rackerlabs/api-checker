@@ -30,7 +30,7 @@ import com.rackspace.com.papi.components.checker.macros.TimeFunction._
 import scala.language.reflectiveCalls
 import scala.xml._
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XsltExecutable

@@ -21,7 +21,7 @@ import java.util.{Date, UUID}
 import com.rackspace.com.papi.components.checker.step._
 import com.rackspace.com.papi.components.checker.step.startend._
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.util.Random
 
@@ -447,10 +447,10 @@ class ValidatorSuite extends BaseValidatorSuite {
     val urlFailB = new URLFailMatch("UFB", "URLFail","b".r, 10)
     val reqTFail = new ReqTypeFail("RTF", "RTFail", "((?i)application/xml)()".r, 10)
     val reqTFail2 = new ReqTypeFail("RTF2", "RTFail", "((?i)application/xml|(?i)application/json)()".r, 10)
-    val methodFail = new MethodFail ("MF", "MethodFail", 10)
-    val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", "GET".r, 10)
-    val methodFailPut = new MethodFailMatch ("MFP", "MethodFail", "PUT".r, 10)
-    val methodFailPost = new MethodFailMatch ("MFPo", "MethodFail", "POST".r, 10)
+    val methodFail = new MethodFail ("MF", "MethodFail", 9)
+    val methodFailGet = new MethodFailMatch ("MFG", "MethodFail", "GET".r, 9)
+    val methodFailPut = new MethodFailMatch ("MFP", "MethodFail", "PUT".r, 9)
+    val methodFailPost = new MethodFailMatch ("MFPo", "MethodFail", "POST".r, 9)
     val get = new Method("GET", "GET", "GET".r, Array (accept))
     val putIn = new ReqType("ReqType", "XML", "((?i)application/xml)()".r, Array(accept))
     val postIn = new ReqType("ReqType", "XML|JSON", "((?i)application/xml|(?i)application/json)()".r, Array(accept))

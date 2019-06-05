@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker
 import com.rackspace.cloud.api.wadl.Converters._
 import org.junit.runner.RunWith
 import org.scalatest.FlatSpec
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class GivenAWadlWithNestedResources extends FlatSpec with RaxRolesBehaviors {

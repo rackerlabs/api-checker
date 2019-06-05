@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.util
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class JSONObjectMapperPoolSuite extends FunSuite {

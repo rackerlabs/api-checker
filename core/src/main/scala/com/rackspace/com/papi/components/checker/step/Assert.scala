@@ -30,7 +30,7 @@ import net.sf.saxon.om.Sequence
 
 import net.sf.saxon.s9api.XQueryEvaluator
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 class Assert(id : String, label : String, val expression : String, val message : Option[String],
              val code : Option[Int], val nc : ImmutableNamespaceContext, val version : Int,

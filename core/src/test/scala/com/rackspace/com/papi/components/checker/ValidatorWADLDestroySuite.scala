@@ -20,7 +20,7 @@ import javax.management.InstanceAlreadyExistsException
 import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.com.papi.components.checker.handler.InstrumentedHandler
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorWADLDestroySuite extends BaseValidatorSuite {

@@ -47,14 +47,14 @@
 
     <properties>
         <scala.major>2</scala.major>
-        <scala.minor>11</scala.minor>
-        <scala.patch>7</scala.patch>
+        <scala.minor>12</scala.minor>
+        <scala.patch>8</scala.patch>
         <scala.MajDotMin>${scala.major}.${scala.minor}</scala.MajDotMin>
         <saxon-ee.version>9.8.0-8</saxon-ee.version>
-        <scala.test.version>2.2.6</scala.test.version>
-        <scala.uri.version>0.4.2</scala.uri.version>
+        <scala.test.version>3.0.7</scala.test.version>
+        <scala.uri.version>0.5.7</scala.uri.version>
         <junit.version>4.10</junit.version>
-        <wadl-tools.version>1.0.38</wadl-tools.version>
+        <wadl-tools.version>1.1.0</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.1-rax</xerces.version>
         <servlet.version>3.1</servlet.version>
@@ -65,10 +65,10 @@
         <metrics-core.version>3.2.0</metrics-core.version>
         <jackson-databind.version>2.9.8</jackson-databind.version>
         <json-schema-validator.version>2.1.7</json-schema-validator.version>
-        <scala-logging.version>2.1.2</scala-logging.version>
+        <scala-logging.version>3.9.0</scala-logging.version>
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>2.1</log4j.version>
-        <http.delegation.version>4.0.0</http.delegation.version>
+        <http.delegation.version>5.0.0</http.delegation.version>
     </properties>
 
     <dependencies>
@@ -119,7 +119,7 @@
             <version>${scala.test.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.netaporter</groupId>
+            <groupId>io.lemonlabs</groupId>
             <artifactId>scala-uri_${scala.MajDotMin}</artifactId>
             <version>${scala.uri.version}</version>
         </dependency>
@@ -150,7 +150,7 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging-slf4j_${scala.MajDotMin}</artifactId>
+            <artifactId>scala-logging_${scala.MajDotMin}</artifactId>
             <version>${scala-logging.version}</version>
         </dependency>
         <dependency>

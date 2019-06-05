@@ -17,7 +17,7 @@ package com.rackspace.com.papi.components.checker.wadl
 
 import com.rackspace.com.papi.components.checker.Config
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.xml._
 

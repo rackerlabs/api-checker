@@ -22,7 +22,7 @@ import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.test.BaseWADLSpec
 import com.rackspace.com.papi.components.checker.Config
 import org.scalatest.exceptions.TestFailedException
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.xml._
 

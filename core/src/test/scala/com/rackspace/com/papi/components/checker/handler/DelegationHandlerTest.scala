@@ -23,7 +23,7 @@ import com.rackspace.com.papi.components.checker.step.base.StepContext
 import com.rackspace.com.papi.components.checker.step.results.{AcceptResult, ErrorResult}
 import org.junit.runner.RunWith
 import org.mockito.Mockito.{mock, never, verify}
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class DelegationHandlerTest extends BaseValidatorSuite {

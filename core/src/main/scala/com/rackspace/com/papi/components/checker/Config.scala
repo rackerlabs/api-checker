@@ -22,7 +22,7 @@ import scala.beans.BeanProperty
 import scala.reflect.runtime.universe
 import scala.xml._
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 /**
  * If set the annotation states that the configuration option

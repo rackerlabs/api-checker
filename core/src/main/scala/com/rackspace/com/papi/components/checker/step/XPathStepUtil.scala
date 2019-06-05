@@ -50,7 +50,7 @@ import net.sf.saxon.value.SequenceType
 import net.sf.saxon.functions.FunctionLibraryList
 import net.sf.saxon.`type`.BuiltInAtomicType
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 //
 //  This utility is used to execute XPaths on steps which have access

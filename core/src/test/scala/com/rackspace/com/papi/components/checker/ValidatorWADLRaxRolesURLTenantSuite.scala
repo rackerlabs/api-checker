@@ -20,7 +20,7 @@ import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest.MAP_ROLES_HEADER
 import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest.ROLES_HEADER
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.xml._
 

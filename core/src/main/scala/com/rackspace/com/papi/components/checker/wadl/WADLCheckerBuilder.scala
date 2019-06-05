@@ -38,7 +38,7 @@ import com.rackspace.cloud.api.wadl.util.XSLErrorDispatcher
 import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.macros.TimeFunction._
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.language.reflectiveCalls
 import scala.xml._
@@ -769,9 +769,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         //  Apply the transformations and send results to out
         //
         val stepsSource = applyBuildSteps(buildSteps, normWADL, c)
-        if (logger.underlying.isTraceEnabled) {
-          logCheckerInfo(stepsSource)
-        }
+        logCheckerInfo(stepsSource)
         info.foreach (infoOut => {
           outputCheckerInfo(stepsSource, infoOut)
         })
@@ -799,9 +797,7 @@ class WADLCheckerBuilder(protected[wadl] var wadl : WADLNormalizer) extends Lazy
         val buildSteps : List[CheckerTransform] = List(metaCheck, validateChecker)
 
         val stepsSource = applyBuildSteps(buildSteps, in, c)
-        if (logger.underlying.isTraceEnabled) {
-          logCheckerInfo(stepsSource)
-        }
+        logCheckerInfo(stepsSource)
         info.foreach (infoOut => {
           outputCheckerInfo(stepsSource, infoOut)
         })

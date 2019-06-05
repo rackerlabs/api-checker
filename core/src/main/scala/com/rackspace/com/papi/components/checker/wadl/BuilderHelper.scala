@@ -33,7 +33,7 @@ import com.rackspace.cloud.api.wadl.util.LogErrorListener
 import com.rackspace.com.papi.components.checker.Config
 import com.rackspace.com.papi.components.checker.macros.TimeFunction._
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.XsltExecutable

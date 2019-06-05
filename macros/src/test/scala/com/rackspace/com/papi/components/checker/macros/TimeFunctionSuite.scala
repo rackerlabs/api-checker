@@ -20,7 +20,7 @@ import scala.tools.reflect.ToolBox
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

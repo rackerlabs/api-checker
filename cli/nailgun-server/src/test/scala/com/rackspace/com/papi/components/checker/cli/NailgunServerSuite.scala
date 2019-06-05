@@ -24,7 +24,7 @@ import org.scalatest.concurrent.Timeouts
 import org.scalatest.concurrent.Timeouts._
 
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

@@ -20,7 +20,7 @@ import com.rackspace.com.papi.components.checker.RunAssertionsHandler._
 import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.step.results.Result
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.collection.JavaConversions._
 import scala.xml.Elem

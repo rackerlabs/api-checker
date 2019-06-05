@@ -15,12 +15,9 @@
  */
 package com.rackspace.com.papi.components.checker.cli
 
-import javax.xml.transform.stream._
-
-import org.clapper.argot.ArgotUsageException
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

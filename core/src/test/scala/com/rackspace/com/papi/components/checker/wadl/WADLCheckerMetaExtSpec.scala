@@ -23,7 +23,7 @@ import com.rackspace.cloud.api.wadl.Converters._
 import com.rackspace.cloud.api.wadl.WADLNormalizer
 import com.rackspace.com.papi.components.checker.{Config, LogAssertions}
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class WADLCheckerMetaExtSpec extends BaseCheckerSpec with LogAssertions {

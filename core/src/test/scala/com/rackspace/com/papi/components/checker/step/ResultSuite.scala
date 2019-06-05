@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.step
 import com.rackspace.com.papi.components.checker.step.base.StepContext
 import com.rackspace.com.papi.components.checker.step.results.{BadMediaTypeResult, MethodFailResult, MismatchResult, MultiFailResult}
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.collection.JavaConversions._
 
@@ -27,7 +27,7 @@ class ResultSuite extends BaseStepSuite {
   val e12 = new MismatchResult("Mismatch", StepContext(-1), "12")
   val e13 = new MismatchResult("Mismatch", StepContext(-1), "13")
   val e14 = new BadMediaTypeResult("Bad Media Type", StepContext(-1), "14", 8)
-  val e15 = new MethodFailResult("Bad Method", StepContext(-1), "15", 8, Map("Foo"->"Bar"))
+  val e15 = new MethodFailResult("Bad Method", StepContext(-1), "15", 7, Map("Foo"->"Bar"))
   val e16 = new BadMediaTypeResult("Bad MT", StepContext(-1), "16", 9)
 
   val e10 = new MultiFailResult(Array(e12, e13, e14, e15), "10")

@@ -1,29 +1,27 @@
-/***
- *   Copyright 2015 Rackspace US, Inc.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+/** *
+  * Copyright 2015 Rackspace US, Inc.
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package com.rackspace.com.papi.components.checker.cli
 
 import java.io.File
+
 import javax.xml.transform._
 import javax.xml.transform.stream._
-
 import com.rackspace.com.papi.components.checker.handler._
 import com.rackspace.com.papi.components.checker.util.URLResolver
 import com.rackspace.com.papi.components.checker.{Config, Validator}
-import org.clapper.argot.ArgotConverters._
-import org.clapper.argot.{ArgotParser, ArgotUsageException}
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.{FilterMapping, ServletContextHandler}
 
@@ -34,173 +32,95 @@ object WadlTest {
 
   val title = getClass.getPackage.getImplementationTitle
 
-  val version = getClass.getPackage.getImplementationVersion
-
-  val parser = new ArgotParser("wadltest", preUsage=Some(s"$title v$version"))
-
-  val removeDups = parser.flag[Boolean] (List("d", "remove-dups"),
-                                         "Remove duplicate nodes. Default: false")
-
-  val raxRepresentation = parser.flag[Boolean] (List("R", "disable-rax-representation"),
-                                         "Disable Rax-Representation extension. Default: false")
-
-  val raxRoles = parser.flag[Boolean] (List("r", "rax-roles"),
-                                         "Enable Rax-Roles extension. Default: false")
-
-  val raxIsTenant = parser.flag[Boolean] (List("T", "rax-is-tenant"),
-                                         "Enable Rax-Is-Tenant extension. Default: false")
-
-  val raxRolesMask403 = parser.flag[Boolean] (List("M", "rax-roles-mask-403s"),
-                                              "When Rax-Roles is enable mask 403 errors with 404 or 405s. Default: false")
-
-  val authenticatedBy = parser.flag[Boolean] (List("u", "authenticated-by"),
-                                              "Enable Authenticated-By extension. Default: false")
-
-  val wellFormed = parser.flag[Boolean] (List("w", "well-formed"),
-                                         "Add checks to ensure that XML and JSON are well formed. Default: false")
-
-  val joinXPaths = parser.flag[Boolean] (List("j", "join-xpaths"),
-                                         "Join multiple XPath and XML well-formed checks into a single check. Default: false")
-
-  val xsdGrammarTransform = parser.flag[Boolean] (List("g", "xsd-grammar-transform"),
-                                                  "Transform the XML after validation, to fill in things like default values etc. Default: false")
-
-  val preserveRequestBody = parser.flag[Boolean] (List("b", "preserve-req-body"),
-                                              "Ensure that the request body is preserved after validating the request.")
-
-  val preserveMethodLabels = parser.flag[Boolean] (List("L", "preserve-method-labels"),
-                                                    "Ensure that method labels are always preserved.")
-
-  val xsdCheck = parser.flag[Boolean] (List("x", "xsd"),
-                                         "Add checks to ensure that XML validates against XSD grammar Default: false")
-
-  val jsonCheck = parser.flag[Boolean] (List("J", "json"),
-                                         "Add checks to ensure that JSON validates against JSON Schema grammar Default: false")
-
-  val element = parser.flag[Boolean] (List("l", "element"),
-                                         "Add checks to ensure that XML requests use the correct element : false")
-
-  val header = parser.flag[Boolean] (List("H", "header"),
-                                         "Add checks to ensure that required headers are passed in: false")
-
-  val setDefaults = parser.flag[Boolean] (List("s", "setParamDefaults"),
-                                          "Fill in required parameters if a default value is specified Default: false")
-
-  val plainParam = parser.flag[Boolean] (List("p", "plain"),
-                                         "Add checks for plain parameters : false")
-
-  val preProc  = parser.flag[Boolean] (List("P", "disable-preproc-ext"),
-                                       "Disable preprocess extension : false")
-
-  val ignoreXSD  = parser.flag[Boolean] (List("i", "disable-ignore-xsd-ext"),
-                                         "Disable Ignore XSD  extension : false")
-
-  val ignoreJSON  = parser.flag[Boolean] (List("I", "disable-ignore-json-ext"),
-                                          "Disable Ignore JSON Schema  extension : false")
-
-  val message  = parser.flag[Boolean] (List("m", "disable-message-ext"),
-                                         "Disable Message extension : false")
-
-  val captureHeader = parser.flag[Boolean] (List("c", "disable-capture-header-ext"),
-                                            "Disable capture header extension : false")
-
-  val anyMatch  = parser.flag[Boolean] (List("a", "disable-any-match"),
-                                            "Disable any match extension : false")
-
-  val raxAssert = parser.flag[Boolean] (List("k", "disable-rax-assert"),
-                                          "Disable Rax-Assert extension : false")
-
-  val warnHeaders = parser.flag[Boolean] (List("W", "disable-warn-headers"),
-                                          "Disable warn headers : false")
-
-  val warnAgent = parser.option[String] (List("A", "warn-agent"), "agent-name",
-                                            "The name of the agent used in WARNING headers. Default: -")
-
-  val xslEngine = parser.option[String] (List("E", "xsl-engine"), "xsl-engine",
-                                            "The name of the XSLT engine to use. Possible names are Xalan, XalanC, SaxonHE, SaxonEE.  Default: XalanC")
+  val implVersion = getClass.getPackage.getImplementationVersion
 
 
-  val xsdEngine = parser.option[String] (List("S", "xsd-engine"), "xsd-engine",
-                                            "The name of the XSD engine to use. Possible names are Xerces, SaxonEE.  Default: Xerces")
-
-  val dontValidate = parser.flag[Boolean] (List("D", "dont-validate"),
-                                       "Don't validate produced checker Default: false")
-
-  val showErrors = parser.flag[Boolean] (List("e", "show-errors"),
-                                          "Show error nodes in the generated dot. Default: false")
-
-  val nfaMode = parser.flag[Boolean] (List("n", "nfa-mode"),
-                                          "Display the generated dot in NFA mode. Default: false")
-
-  val consoleLog = parser.flag[Boolean](List("L", "console-log"),
-                                        "Display request log in console. Default: false")
-
-  val port = parser.option[Int]("o", "portNumber", s"Port number. Default: $DEFAULT_PORT")
-
-  val name = parser.option[String]("N", "name", s"The validator name. Default: $DEFAULT_NAME")
-
-  val help = parser.flag[Boolean] (List("h", "help"),
-                                   "Display usage.")
-
-  val xpathVersion = parser.option[Int](List("t", "xpath-version"), "n",
-                                           "XPath version to use. Can be 10, 20, 30, 31 for 1.0, 2.0, 3.0, and 3.1. Default: 10")
-
-  val input = parser.parameter[String]("wadl",
-                                       "WADL file/uri to read.  If not specified, stdin will be used.",
-                                       true)
-
-  val printVersion = parser.flag[Boolean] (List("version"),
-                                            "Display version.")
-
-  val outputMetadata = parser.flag[Boolean](List("O", "output-metadata"),
-      "Display checker metadata")
-
-
-  def getSource: Source = {
+  def getSource(input: String): Source = {
     var source: Source = null
-    if (input.value.isEmpty) {
+    if (input.isEmpty) {
       source = new StreamSource(System.in)
     } else {
-      source = new StreamSource(URLResolver.toAbsoluteSystemId(input.value.get))
+      source = new StreamSource(URLResolver.toAbsoluteSystemId(input))
     }
     source
   }
 
-  def handleArgs(args: Array[String]): Unit = {
-    parser.parse(args)
+  def handleArgs(args: Array[String]): Option[(Boolean, Boolean, Boolean, Boolean, Config, String, Int, String)] = {
+    val c = new Config
 
-    if (help.value.getOrElse(false)) {
-      parser.usage()
+    // Fix default values for fields with defaults that differ between the API and CLI Config
+    c.removeDups = false
+
+    var input: String = ""
+    var outputMetadata: Boolean = false
+    var showErrors: Boolean = false
+    var nfaMode: Boolean = false
+    var consoleLog: Boolean = false
+    var port: Int = DEFAULT_PORT
+    var name: String = DEFAULT_NAME
+
+    val parser = new CheckerParser("wadltest", c) {
+      head(s"$title v$implVersion")
+
+      opt[Unit]('O', "output-metadata").text("Display checker metadata")
+        .foreach(_ => outputMetadata = true)
+
+      arg[String]("wadl").text("WADL file/uri to read.")
+        .optional()
+        .foreach(x => input = x)
+
+      opt[Unit]('e', "show-errors").text("Show error nodes in the generated dot. Default: false")
+        .foreach(_ => showErrors = true)
+
+      opt[Unit]('n', "nfa-mode").text("Display the generated dot in NFA mode. Default: false")
+        .foreach(_ => nfaMode = true)
+
+      opt[Unit]('L', "console-log").text("Display request log in console. Default: false")
+        .foreach(_ => consoleLog = true)
+
+      opt[Int]('o', "portNumber").text(s"Port number. Default: $DEFAULT_PORT")
+        .foreach(x => port = x)
+
+      opt[String]('N', "name").text(s"The validator name. Default: $DEFAULT_NAME")
+        .foreach(x => name = x)
+    }
+
+    if (parser.parse(args)) {
+      Some((outputMetadata, showErrors, nfaMode, consoleLog, c, name, port, input))
+    } else {
+      //bad args
+      None
     }
   }
 
   //
   //  Draw a silly console box, cus it's cool...
   //
-  def drawBox(title : String, content : String) {
-    val allText  = title+"\n"+content
-    val currMax = allText.split("\n").map(s=> s.trim).map(s => s.length()).reduceLeft((x,y) => if (x >= y) x else y)
+  def drawBox(title: String, content: String) {
+    val allText = title + "\n" + content
+    val currMax = allText.split("\n").map(s => s.trim).map(s => s.length()).reduceLeft((x, y) => if (x >= y) x else y)
 
-    def padString (s : String, pad  : Int, padString : String = " ") : String = {
-      s.padTo(pad,padString).map(a => a.toString).foldRight(""){(a, b) => a+b}
+    def padString(s: String, pad: Int, padString: String = " "): String = {
+      s.padTo(pad, padString).map(a => a.toString).foldRight("") { (a, b) => a + b }
     }
+
     println()
-    println (" ╒"+padString("",currMax,"═")+"╕")
-    println (" │ "+padString(title, currMax-1)+"│")
-    println (" ╞"+padString("",currMax,"═")+"╡")
-    content.split("\n").map(s=>s.trim()).foreach (s => {
+    println(" ╒" + padString("", currMax, "═") + "╕")
+    println(" │ " + padString(title, currMax - 1) + "│")
+    println(" ╞" + padString("", currMax, "═") + "╡")
+    content.split("\n").map(s => s.trim()).foreach(s => {
       if (s.contains(Console.RESET)) {
-        println (" │ "+padString(s,currMax+7)+"│")
+        println(" │ " + padString(s, currMax + 7) + "│")
       } else {
-        println (" │ "+padString(s,currMax-1)+"│")
+        println(" │ " + padString(s, currMax - 1) + "│")
       }
     })
-    println (" ╘"+padString("",currMax,"═")+"╛")
+    println(" ╘" + padString("", currMax, "═") + "╛")
     println()
   }
 
-  def runServer (name : String, port : Int, metaOut : Option[StreamResult], dot : File, config : Config) : Unit = {
-    val source = getSource
+  def runServer(name: String, port: Int, metaOut: Option[StreamResult], dot: File, config: Config, input: String): Unit = {
+    val source = getSource(input)
 
     val sourceName = {
       if (source.asInstanceOf[StreamSource].getInputStream != null) {
@@ -217,7 +137,7 @@ object WadlTest {
     //  Initalize the validator, this catches errors early...
     //
     println(s"Loading $sourceName...\n")
-    val validator = Validator (name, source, metaOut, config)
+    val validator = Validator(name, source, metaOut, config)
 
 
     //
@@ -241,11 +161,11 @@ object WadlTest {
     //
     //  Display a nice little text box with important info...
     //
-    val B  = Console.BOLD
-    val R  = Console.RESET
+    val B = Console.BOLD
+    val R = Console.RESET
 
-    drawBox(s"$title $version",
-            s"""
+    drawBox(s"$title $implVersion",
+      s"""
              Running validator $B$name$R
 
              Port: $B$port$R
@@ -272,47 +192,10 @@ object WadlTest {
   }
 
   def main(args: Array[String]) = {
-    try {
-      handleArgs(args)
-
-      if (printVersion.value.getOrElse(false)) {
-        println(s"$title v$version")
-      } else {
-        val c = new Config
-
-        c.removeDups = removeDups.value.getOrElse(false)
-        c.enableRaxRolesExtension = raxRoles.value.getOrElse(false)
-        c.enableRaxIsTenantExtension = raxIsTenant.value.getOrElse(false)
-        c.enableRaxRepresentationExtension = !raxRepresentation.value.getOrElse(false)
-        c.maskRaxRoles403 = raxRolesMask403.value.getOrElse(false)
-        c.enableAuthenticatedByExtension = authenticatedBy.value.getOrElse(false)
-        c.checkWellFormed = wellFormed.value.getOrElse(false)
-        c.checkXSDGrammar = xsdCheck.value.getOrElse(false)
-        c.checkJSONGrammar = jsonCheck.value.getOrElse(false)
-        c.checkElements = element.value.getOrElse(false)
-        c.checkPlainParams = plainParam.value.getOrElse(false)
-        c.enablePreProcessExtension = !preProc.value.getOrElse(false)
-        c.joinXPathChecks = joinXPaths.value.getOrElse(false)
-        c.checkHeaders = header.value.getOrElse(false)
-        c.setParamDefaults = setDefaults.value.getOrElse(false)
-        c.enableIgnoreXSDExtension = !ignoreXSD.value.getOrElse(false)
-        c.enableIgnoreJSONSchemaExtension = !ignoreJSON.value.getOrElse(false)
-        c.enableMessageExtension = !message.value.getOrElse(false)
-        c.enableCaptureHeaderExtension = !captureHeader.value.getOrElse(false)
-        c.enableAnyMatchExtension = !anyMatch.value.getOrElse(false)
-        c.enableAssertExtension = !raxAssert.value.getOrElse(false)
-        c.xpathVersion = xpathVersion.value.getOrElse(10)
-        c.preserveRequestBody = preserveRequestBody.value.getOrElse(false)
-        c.preserveMethodLabels = preserveMethodLabels.value.getOrElse(false)
-        c.doXSDGrammarTransform = xsdGrammarTransform.value.getOrElse(false)
-        c.validateChecker = !dontValidate.value.getOrElse(false)
-        c.enableWarnHeaders = !warnHeaders.value.getOrElse(false)
-        c.warnAgent = warnAgent.value.getOrElse("-")
-        c.xslEngine = xslEngine.value.getOrElse("XalanC")
-        c.xsdEngine = xsdEngine.value.getOrElse("Xerces")
-
+    handleArgs(args) match {
+      case Some((outputMetadata, showErrors, nfaMode, consoleLog, c, name, port, input)) =>
         val metaOutResult = {
-          if (outputMetadata.value.getOrElse(false)) {
+          if (outputMetadata) {
             Some(new StreamResult(System.err))
           } else {
             None
@@ -323,14 +206,13 @@ object WadlTest {
         dot.deleteOnExit()
 
         val handlerList = {
-          val dotHandler = new SaveDotHandler(dot, !showErrors.value.getOrElse(false),
-                                              nfaMode.value.getOrElse(false))
+          val dotHandler = new SaveDotHandler(dot, !showErrors, nfaMode)
 
           val initList = List[ResultHandler](dotHandler,
-                                             new ServletResultHandler(),
-                                             new InstrumentedHandler())
+            new ServletResultHandler(),
+            new InstrumentedHandler())
 
-          if (consoleLog.value.getOrElse(false)) {
+          if (consoleLog) {
             initList :+ new ConsoleResultHandler()
           } else {
             initList
@@ -339,11 +221,10 @@ object WadlTest {
 
         c.resultHandler = new DispatchResultHandler(handlerList)
 
-        runServer(name.value.getOrElse(DEFAULT_NAME), port.value.getOrElse(DEFAULT_PORT), metaOutResult, dot, c)
-      }
-    } catch {
-      case e: ArgotUsageException => println(e.message)
-      case iae : IllegalArgumentException => println(iae.getMessage)
+        runServer(name, port, metaOutResult, dot, c, input)
+      case None =>
+      //Failed to parse
     }
+
   }
 }

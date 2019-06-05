@@ -33,7 +33,7 @@ object RunAssertionsHandler {
   val ASSERT_FUNCTION = "com.rackspace.com.papi.components.checker.test.assertion.function"
 }
 class RunAssertionsHandler extends ResultHandler {
-  type AssertFunction = (CheckerServletRequest, CheckerServletResponse, Result) => Unit
+  type AssertFunction = (CheckerServletRequest, CheckerServletResponse, Result) => Any
 
   def init(validator : Validator, checker : Option[Document]) : Unit = {}
   def handle (req : CheckerServletRequest, resp : CheckerServletResponse, chain : FilterChain, result : Result)  : Unit =

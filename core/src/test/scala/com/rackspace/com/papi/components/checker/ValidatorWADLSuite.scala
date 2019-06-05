@@ -25,7 +25,7 @@ import com.rackspace.com.papi.components.checker.servlet._
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import com.rackspace.com.papi.components.checker.step.results.Result
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 import org.w3c.dom.Document
 
 import scala.util.Random

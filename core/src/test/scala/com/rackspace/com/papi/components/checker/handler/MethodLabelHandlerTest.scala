@@ -35,8 +35,8 @@ import org.mockito.Matchers.anyString
 import org.mockito.Mockito._
 import org.mockito.{ArgumentCaptor, Matchers, Mockito}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.junit.JUnitRunner
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.JavaConverters._
 

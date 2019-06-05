@@ -19,7 +19,7 @@ import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest.M
 import com.rackspace.com.papi.components.checker.servlet.CheckerServletRequest.ROLES_HEADER
 import com.rackspace.com.papi.components.checker.step.results.Result
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class ValidatorWADLRaxRolesHeaderTenantSuite extends ValidatorWADLRaxRolesHeaderTenantBase with VaryTestSuite {

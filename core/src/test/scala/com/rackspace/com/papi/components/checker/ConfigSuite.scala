@@ -17,7 +17,7 @@ package com.rackspace.com.papi.components.checker
 
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 import org.apache.logging.log4j.Level
 
 /**

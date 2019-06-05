@@ -18,6 +18,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
+            <artifactId>checker-cli-parser</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.martiansoftware</groupId>
             <artifactId>nailgun-server</artifactId>
             <version>${nailgun.version}</version>

@@ -36,7 +36,7 @@ import net.sf.saxon.om.Sequence
 import net.sf.saxon.s9api.XQueryEvaluator
 import net.sf.saxon.s9api.XdmValue
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 
 class CaptureHeader(id : String, label : String, val name : String, val expression : String,
                     val nc : ImmutableNamespaceContext, val version : Int, val matchingRoles : Option[Set[String]],

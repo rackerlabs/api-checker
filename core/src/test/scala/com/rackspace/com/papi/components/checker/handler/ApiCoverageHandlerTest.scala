@@ -24,7 +24,7 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.test.appender.ListAppender
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfter
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class ApiCoverageHandlerTest extends BaseValidatorSuite with BeforeAndAfter {

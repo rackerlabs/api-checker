@@ -18,7 +18,7 @@ package com.rackspace.com.papi.components.checker.wadl
 import com.rackspace.com.papi.components.checker.{LogAssertions, TestConfig}
 import org.apache.logging.log4j.Level
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 //
 //  Tests to make sure that valid checker assertions actually fire

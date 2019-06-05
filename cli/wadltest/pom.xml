@@ -22,6 +22,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.rackspace.papi.components.api-checker.cli</groupId>
+            <artifactId>checker-cli-parser</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>${jetty.version}</version>
