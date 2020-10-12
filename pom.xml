@@ -53,7 +53,7 @@
         <saxon-ee.version>9.8.0-8</saxon-ee.version>
         <scala.test.version>3.0.7</scala.test.version>
         <scala.uri.version>0.5.7</scala.uri.version>
-        <junit.version>4.10</junit.version>
+        <junit.version>4.13.1</junit.version>
         <wadl-tools.version>1.1.0</wadl-tools.version>
         <xmlsec.version>1.4.6</xmlsec.version>
         <xerces.version>2.12.1-rax</xerces.version>
