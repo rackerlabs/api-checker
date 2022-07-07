@@ -61,7 +61,7 @@
         <mockito.version>1.9.0</mockito.version>
         <pool.version>1.6</pool.version>
         <codec.version>1.7</codec.version>
-        <xalan.version>2.7.1</xalan.version>
+        <xalan.version>2.7.2</xalan.version>
         <metrics-core.version>3.2.0</metrics-core.version>
         <jackson-databind.version>2.9.8</jackson-databind.version>
         <json-schema-validator.version>2.1.7</json-schema-validator.version>
