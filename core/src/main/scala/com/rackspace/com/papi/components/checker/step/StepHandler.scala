@@ -112,6 +112,9 @@ class StepHandler(var contentHandler : ContentHandler, val config : Config) exte
       case "SaxonEE" => {
         sf = new com.saxonica.ee.jaxp.SchemaFactoryImpl()
         sf.setProperty("http://saxon.sf.net/feature/xsd-version","1.1")
+        if (config.disableSaxonByteCodeGen) {
+          sf.setProperty("http://saxon.sf.net/feature/generateByteCode", false)
+        }
       }
     }
 
