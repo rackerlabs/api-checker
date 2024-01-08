@@ -1,4 +1,7 @@
 # Releases #
+## Release 2.8.1 (2024-01-08) ##
+1. New configuration option ```disableSaxonByteCodeGen``` to disable generateByteCode feature in Saxon.
+
 ## Release 2.8.0 (2019-06-05) ##
 1. Updated Dependencies
    1. scala: 2.11.7 → 2.12.8
