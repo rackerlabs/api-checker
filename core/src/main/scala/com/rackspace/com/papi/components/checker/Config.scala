@@ -97,6 +97,12 @@ class Config extends LazyLogging {
   def setXSDEngine (engine : String) : Unit = { xsdEngine_=(engine) }
   def getXSDEngine : String = xsdEngine
 
+  //
+  //  Disable byte code generation for SAXON-EE engine
+  //
+  @BeanProperty
+  @AffectsChecker
+  var disableSaxonByteCodeGen : Boolean = false
 
   //
   //  Use SAXON-EE for XSD validation: This means that in cases where
