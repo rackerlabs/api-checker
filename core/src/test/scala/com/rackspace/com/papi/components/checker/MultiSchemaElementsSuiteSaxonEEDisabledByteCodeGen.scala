@@ -1,5 +1,5 @@
 /** *
-  * Copyright 2014 Rackspace US, Inc.
+  * Copyright 2024 Rackspace US, Inc.
   *
   * Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@ import org.junit.runner.RunWith
 import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class MultiSchemaElementsSuiteSaxonEE extends MultiSchemaElementsBaseSuite {
+class MultiSchemaElementsSuiteSaxonEEDisabledByteCodeGen extends MultiSchemaElementsBaseSuite {
   val useSaxon = true
-  val config = createConfigWithSaxonEE(useSaxon)
+  val disableByteCodeGen = true
+  val config = createConfigWithSaxonEE(useSaxon, disableByteCodeGen)
 
   val validator_SimpleSame = Validator((localWADLURI, wadl_SimpleSame), config)
   val validator_SimpleDiff = Validator((localWADLURI, wadl_SimpleDiff), config)
@@ -30,15 +31,15 @@ class MultiSchemaElementsSuiteSaxonEE extends MultiSchemaElementsBaseSuite {
   val validator_ElementDiff = Validator((localWADLURI, wadl_ElementDiff), config)
   val validator_ElementRepeat = Validator((localWADLURI, wadl_ElementSame), config)
 
-  assert(validator_SimpleSame.config.disableSaxonByteCodeGen == false)
-  assert(validator_SimpleDiff.config.disableSaxonByteCodeGen == false)
-  assert(validator_ElementSame.config.disableSaxonByteCodeGen == false)
-  assert(validator_ElementDiff.config.disableSaxonByteCodeGen == false)
-  assert(validator_ElementRepeat.config.disableSaxonByteCodeGen == false)
+  assert(validator_SimpleSame.config.disableSaxonByteCodeGen == true)
+  assert(validator_SimpleDiff.config.disableSaxonByteCodeGen == true)
+  assert(validator_ElementSame.config.disableSaxonByteCodeGen == true)
+  assert(validator_ElementDiff.config.disableSaxonByteCodeGen == true)
+  assert(validator_ElementRepeat.config.disableSaxonByteCodeGen == true)
 
   assertions_Simple(validator_SimpleSame, true, useSaxon)
   assertions_Simple(validator_SimpleDiff, false, useSaxon)
   assertions_Element(validator_ElementSame, true, useSaxon)
   assertions_Element(validator_ElementDiff, false, useSaxon)
-  assertions_Repeat(validator_ElementRepeat, true, useSaxon) // TODO: update to large enough wadl schema in order to crash saxon when byte code generation is triggered.
+  assertions_Repeat(validator_ElementRepeat, false, useSaxon)
 }

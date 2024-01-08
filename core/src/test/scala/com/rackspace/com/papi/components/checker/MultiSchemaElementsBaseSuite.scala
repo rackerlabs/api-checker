@@ -18,6 +18,7 @@ package com.rackspace.com.papi.components.checker
 import com.rackspace.com.papi.components.checker.Converters._
 import com.rackspace.com.papi.components.checker.servlet.RequestAttributes._
 import org.w3c.dom.Document
+import scala.xml.XML
 
 abstract class MultiSchemaElementsBaseSuite extends BaseValidatorSuite {
   val wadl_SimpleSame =
@@ -208,11 +209,14 @@ abstract class MultiSchemaElementsBaseSuite extends BaseValidatorSuite {
     }
   }
 
-  def createConfigWithSaxonEE(enabled: Boolean): Config = {
+  def createConfigWithSaxonEE(enabled: Boolean, disableByteCodeGen: Boolean = false): Config = {
     val config = new Config
 
     if (enabled) {
       config.xsdEngine = "SaxonEE"
+      if (disableByteCodeGen) {
+        config.disableSaxonByteCodeGen = disableByteCodeGen
+      }
     }
     config.removeDups            = true // -d Wadl2Checker default is different from Config default.
     config.checkWellFormed       = true // -w
@@ -324,6 +328,20 @@ abstract class MultiSchemaElementsBaseSuite extends BaseValidatorSuite {
         validator.validate(req, response, chain)
         val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
         assert((dom \ "@id").text == "2")
+      }
+    }
+  }
+
+  def assertions_Repeat(validator: Validator, generateByteCode: Boolean, useSaxon: Boolean) {
+    for (i <- 1 to 50) {
+      test("POST repeated requests with valid XML One should succeed, count : " + i) {
+        val node = XML.loadString(s"""<e xmlns="http://www.rackspace.com/repose/wadl/element/one/test">
+          <id>$i</id>
+        </e>""")
+        val req = request("POST", "/test", "application/xml", node)
+        validator.validate(req, response, chain)
+        val dom = req.getAttribute(PARSED_XML).asInstanceOf[Document]
+        assert((dom \ "id").text == i.toString)
       }
     }
   }
