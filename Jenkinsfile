@@ -26,7 +26,7 @@ node ('build') {
 
         if (isRelease) {
             git url: 'git@github.com:rackerlabs/api-checker.git',
-                credentialsId: 'repose-bot-PAT',
+                credentialsId: 'repose-bot',
                 branch: env.BRANCH_NAME
         } else {
             // check out code, repo and branch are set by the actual job
