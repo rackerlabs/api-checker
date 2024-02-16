@@ -5,9 +5,7 @@ node ('build') {
             disableConcurrentBuilds()
     ])
 
-    // Configure Java
-    env.JAVA_HOME="${tool 'jdk-8u77'}"
-    env.PATH="${env.JAVA_HOME}/bin:${env.PATH}"
+    // Configure saxon home
     env.SAXON_HOME="/var/lib/jenkins/saxon_ee/"
 
     // Configure GIT
@@ -25,7 +23,7 @@ node ('build') {
         sh 'java -version'
 
         if (isRelease) {
-            git url: 'git@github.com:rackerlabs/api-checker.git',
+            git url: 'https://github.com/rackerlabs/api-checker/',
                 credentialsId: 'repose-bot',
                 branch: env.BRANCH_NAME
         } else {
@@ -52,32 +50,29 @@ node ('build') {
             // Run the maven build
             if (isRelease) {
                 echo "Release build"
-                withMaven(maven: 'Maven3.3.9',
-                    mavenSettingsConfig: 'api-checker-maven-artifactory-settings.xml',
-                    mavenLocalRepo: '.repository',
-                    mavenOpts: '-Xms1024m -Xmx2048m') {
-                    def pom = readMavenPom file: 'pom.xml'
-                    def version  = pom.version
-                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'repose-bot-PAT',
+                def pom = readMavenPom file: 'pom.xml'
+                def version  = pom.version
+                configFileProvider([configFile(fileId: 'api-checker-maven-artifactory-settings.xml', variable: 'MAVEN_SETTINGS')]) {
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'repose-bot',
                                       usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-                        sh """
-                            mvn clean -B -V -e -U \
-                                -Dresume=false \
-                                -DdevelopmentVersion=${getNextDevVersion(version)} \
-                                -DreleaseVersion=${getReleaseVersion(version)} \
-                                -Dtag=${pom.artifactId}-${getReleaseVersion(version)} \
-                                -Dusername=${USERNAME} \
-                                -Dpassword=${PASSWORD} \
-                                -Darguments="-Dmaven.javadoc.skip=true" \
-                                release:prepare release:perform
-                        """
+                        withMaven(maven: 'maven') {
+                            sh """
+                                mvn clean -B -V -e -U -s $MAVEN_SETTINGS \
+                                    -Dresume=false \
+                                    -DdevelopmentVersion=${getNextDevVersion(version)} \
+                                    -DreleaseVersion=${getReleaseVersion(version)} \
+                                    -Dtag=${pom.artifactId}-${getReleaseVersion(version)} \
+                                    -Dusername=${USERNAME} \
+                                    -Dpassword=${PASSWORD} \
+                                    -Darguments="-Dmaven.javadoc.skip=true" \
+                                    release:prepare release:perform
+                            """
+                        }
                     }
                 }
             } else {
                 echo "Not a release"
-                withMaven(maven: 'Maven3.3.9',
-                    mavenLocalRepo: '.repository',
-                    mavenOpts: '-Xms1024m -Xmx2048m') {
+                withMaven(maven: 'maven') {
                     sh "mvn clean"
                     sh "mvn -B install"
                     sh "mvn -B -P xerces-only install"
@@ -88,8 +83,7 @@ node ('build') {
 
             // the withMaven plugin archives the surefire reports but not the failsafe or scalatest reports
             // on a failure, doing it manually here. TODO: fix failure reporting if needed
-            step([$class: 'JUnitResultArchiver', testResults: '**/target/failsafe-reports/TEST-*.xml'])
-            step([$class: 'JUnitResultArchiver', testResults: '**/target/scalatest-reports/TEST-*.xml'])
+            step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
 
             throw e
         }
