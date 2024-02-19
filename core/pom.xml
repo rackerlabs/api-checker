@@ -95,7 +95,7 @@
                         <include>**/*.class</include>
                     </includes>
                     <enableAssertions>false</enableAssertions>
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <argLine>-Dfile.encoding=UTF-8 -Xms1024m -Xmx2048m</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -188,7 +188,7 @@
                                 <exclude>**/*SaxonEE.class</exclude>
                             </excludes>
                             <enableAssertions>false</enableAssertions>
-                            <argLine>-Dfile.encoding=UTF-8</argLine>
+                            <argLine>-Dfile.encoding=UTF-8 -Xms1024m -Xmx2048m</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
