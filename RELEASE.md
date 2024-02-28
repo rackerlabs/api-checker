@@ -1,5 +1,5 @@
 # Releases #
-## Release 2.8.1 (2024-01-08) ##
+## Release 2.9.0 (2025-02-28) ##
 1. New configuration option ```disableSaxonByteCodeGen``` to disable generateByteCode feature in Saxon.
 
 ## Release 2.8.0 (2019-06-05) ##
