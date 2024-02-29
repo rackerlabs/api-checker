@@ -19,7 +19,7 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git@github.com:rackerlabs/api-checker.git</connection>
+        <connection>scm:git:https://github.com/rackerlabs/api-checker.git</connection>
         <tag>HEAD</tag>
     </scm>
 
@@ -232,13 +232,13 @@
                     <configuration>
                         <arguments>-DskipTests</arguments>
                     </configuration>
-                    <dependencies>
+                    <!-- <dependencies>
                         <dependency>
                             <groupId>org.apache.maven.scm</groupId>
                             <artifactId>maven-scm-provider-gitexe</artifactId>
                             <version>1.9.4</version>
                         </dependency>
-                    </dependencies>
+                    </dependencies> -->
                 </plugin>
             </plugins>
         </pluginManagement>
